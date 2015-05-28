@@ -6873,10 +6873,10 @@
  6877              		.file 3 "../tasks/display/Fonts/font24.c"
 DEFINED SYMBOLS
                             *ABS*:00000000 font24.c
-C:\Users\sagok\AppData\Local\Temp\ccRcYIbl.s:23     .rodata:00000000 Font24_Table
-C:\Users\sagok\AppData\Local\Temp\ccRcYIbl.s:20     .rodata:00000000 $d
-C:\Users\sagok\AppData\Local\Temp\ccRcYIbl.s:6869   .data:00000000 Font24
-C:\Users\sagok\AppData\Local\Temp\ccRcYIbl.s:6866   .data:00000000 $d
+C:\Users\sagok\AppData\Local\Temp\cc7En9bN.s:23     .rodata:00000000 Font24_Table
+C:\Users\sagok\AppData\Local\Temp\cc7En9bN.s:20     .rodata:00000000 $d
+C:\Users\sagok\AppData\Local\Temp\cc7En9bN.s:6869   .data:00000000 Font24
+C:\Users\sagok\AppData\Local\Temp\cc7En9bN.s:6866   .data:00000000 $d
                            .group:00000000 wm4.1.7f551ac7fcad8b79b9df4bfdaa536673
                            .group:00000000 wm4.newlib.h.8.384a112feabb3bef7b573ae48cde2e3b
                            .group:00000000 wm4.features.h.22.6a4ca7cd053637cc1d0db6c16f39b2d7

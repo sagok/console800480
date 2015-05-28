@@ -982,29 +982,29 @@
  826              		.file 8 "c:\\program files (x86)\\codesourcery\\arm-none-eabi\\include\\sys\\unistd.h"
 DEFINED SYMBOLS
                             *ABS*:00000000 syscalls.c
-C:\Users\sagok\AppData\Local\Temp\cc4HcgXm.s:18     .text:00000000 $t
-C:\Users\sagok\AppData\Local\Temp\cc4HcgXm.s:23     .text:00000000 _sbrk
-C:\Users\sagok\AppData\Local\Temp\cc4HcgXm.s:814    .bss:00000000 heap_end.5617
-C:\Users\sagok\AppData\Local\Temp\cc4HcgXm.s:112    .text:00000098 _gettimeofday
-C:\Users\sagok\AppData\Local\Temp\cc4HcgXm.s:158    .text:000000c4 initialise_monitor_handles
-C:\Users\sagok\AppData\Local\Temp\cc4HcgXm.s:183    .text:000000d0 _getpid
-C:\Users\sagok\AppData\Local\Temp\cc4HcgXm.s:211    .text:000000e0 _kill
-C:\Users\sagok\AppData\Local\Temp\cc4HcgXm.s:249    .text:00000108 _exit
-C:\Users\sagok\AppData\Local\Temp\cc4HcgXm.s:279    .text:0000011c _write
-C:\Users\sagok\AppData\Local\Temp\cc4HcgXm.s:334    .text:00000154 _close
-C:\Users\sagok\AppData\Local\Temp\cc4HcgXm.s:366    .text:0000016c _fstat
-C:\Users\sagok\AppData\Local\Temp\cc4HcgXm.s:403    .text:0000018c _isatty
-C:\Users\sagok\AppData\Local\Temp\cc4HcgXm.s:435    .text:000001a4 _lseek
-C:\Users\sagok\AppData\Local\Temp\cc4HcgXm.s:469    .text:000001c0 _read
-C:\Users\sagok\AppData\Local\Temp\cc4HcgXm.s:526    .text:000001fc _open
-C:\Users\sagok\AppData\Local\Temp\cc4HcgXm.s:564    .text:00000218 _wait
-C:\Users\sagok\AppData\Local\Temp\cc4HcgXm.s:601    .text:0000023c _unlink
-C:\Users\sagok\AppData\Local\Temp\cc4HcgXm.s:638    .text:00000260 _times
-C:\Users\sagok\AppData\Local\Temp\cc4HcgXm.s:670    .text:00000278 _stat
-C:\Users\sagok\AppData\Local\Temp\cc4HcgXm.s:707    .text:00000298 _link
-C:\Users\sagok\AppData\Local\Temp\cc4HcgXm.s:745    .text:000002c0 _fork
-C:\Users\sagok\AppData\Local\Temp\cc4HcgXm.s:778    .text:000002e0 _execve
-C:\Users\sagok\AppData\Local\Temp\cc4HcgXm.s:813    .bss:00000000 $d
+C:\Users\sagok\AppData\Local\Temp\ccycBLIN.s:18     .text:00000000 $t
+C:\Users\sagok\AppData\Local\Temp\ccycBLIN.s:23     .text:00000000 _sbrk
+C:\Users\sagok\AppData\Local\Temp\ccycBLIN.s:814    .bss:00000000 heap_end.5617
+C:\Users\sagok\AppData\Local\Temp\ccycBLIN.s:112    .text:00000098 _gettimeofday
+C:\Users\sagok\AppData\Local\Temp\ccycBLIN.s:158    .text:000000c4 initialise_monitor_handles
+C:\Users\sagok\AppData\Local\Temp\ccycBLIN.s:183    .text:000000d0 _getpid
+C:\Users\sagok\AppData\Local\Temp\ccycBLIN.s:211    .text:000000e0 _kill
+C:\Users\sagok\AppData\Local\Temp\ccycBLIN.s:249    .text:00000108 _exit
+C:\Users\sagok\AppData\Local\Temp\ccycBLIN.s:279    .text:0000011c _write
+C:\Users\sagok\AppData\Local\Temp\ccycBLIN.s:334    .text:00000154 _close
+C:\Users\sagok\AppData\Local\Temp\ccycBLIN.s:366    .text:0000016c _fstat
+C:\Users\sagok\AppData\Local\Temp\ccycBLIN.s:403    .text:0000018c _isatty
+C:\Users\sagok\AppData\Local\Temp\ccycBLIN.s:435    .text:000001a4 _lseek
+C:\Users\sagok\AppData\Local\Temp\ccycBLIN.s:469    .text:000001c0 _read
+C:\Users\sagok\AppData\Local\Temp\ccycBLIN.s:526    .text:000001fc _open
+C:\Users\sagok\AppData\Local\Temp\ccycBLIN.s:564    .text:00000218 _wait
+C:\Users\sagok\AppData\Local\Temp\ccycBLIN.s:601    .text:0000023c _unlink
+C:\Users\sagok\AppData\Local\Temp\ccycBLIN.s:638    .text:00000260 _times
+C:\Users\sagok\AppData\Local\Temp\ccycBLIN.s:670    .text:00000278 _stat
+C:\Users\sagok\AppData\Local\Temp\ccycBLIN.s:707    .text:00000298 _link
+C:\Users\sagok\AppData\Local\Temp\ccycBLIN.s:745    .text:000002c0 _fork
+C:\Users\sagok\AppData\Local\Temp\ccycBLIN.s:778    .text:000002e0 _execve
+C:\Users\sagok\AppData\Local\Temp\ccycBLIN.s:813    .bss:00000000 $d
                      .debug_frame:00000010 $d
                            .group:00000000 wm4.1.7f551ac7fcad8b79b9df4bfdaa536673
                            .group:00000000 wm4.newlib.h.8.384a112feabb3bef7b573ae48cde2e3b

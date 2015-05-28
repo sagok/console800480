@@ -1452,23 +1452,23 @@
  846              		.file 7 "D:\\workspace\\console800480\\system/core_cm3.h"
 DEFINED SYMBOLS
                             *ABS*:00000000 usbd_msc.c
-C:\Users\sagok\AppData\Local\Temp\ccTP5MfN.s:23     .data:00000000 USBD_MSC
-C:\Users\sagok\AppData\Local\Temp\ccTP5MfN.s:20     .data:00000000 $d
-C:\Users\sagok\AppData\Local\Temp\ccTP5MfN.s:170    .text:00000000 USBD_MSC_Init
-C:\Users\sagok\AppData\Local\Temp\ccTP5MfN.s:264    .text:00000088 USBD_MSC_DeInit
-C:\Users\sagok\AppData\Local\Temp\ccTP5MfN.s:323    .text:000000d4 USBD_MSC_Setup
-C:\Users\sagok\AppData\Local\Temp\ccTP5MfN.s:579    .text:0000024c USBD_MSC_DataIn
-C:\Users\sagok\AppData\Local\Temp\ccTP5MfN.s:617    .text:0000026c USBD_MSC_DataOut
-C:\Users\sagok\AppData\Local\Temp\ccTP5MfN.s:655    .text:0000028c USBD_MSC_GetHSCfgDesc
-C:\Users\sagok\AppData\Local\Temp\ccTP5MfN.s:692    .text:000002b0 USBD_MSC_GetFSCfgDesc
-C:\Users\sagok\AppData\Local\Temp\ccTP5MfN.s:729    .text:000002d4 USBD_MSC_GetOtherSpeedCfgDesc
-C:\Users\sagok\AppData\Local\Temp\ccTP5MfN.s:766    .text:000002f8 USBD_MSC_GetDeviceQualifierDescriptor
-C:\Users\sagok\AppData\Local\Temp\ccTP5MfN.s:42     .data:00000038 USBD_MSC_CfgHSDesc
-C:\Users\sagok\AppData\Local\Temp\ccTP5MfN.s:79     .data:00000058 USBD_MSC_CfgFSDesc
-C:\Users\sagok\AppData\Local\Temp\ccTP5MfN.s:116    .data:00000078 USBD_MSC_OtherSpeedCfgDesc
-C:\Users\sagok\AppData\Local\Temp\ccTP5MfN.s:153    .data:00000098 USBD_MSC_DeviceQualifierDesc
-C:\Users\sagok\AppData\Local\Temp\ccTP5MfN.s:165    .text:00000000 $t
-C:\Users\sagok\AppData\Local\Temp\ccTP5MfN.s:803    .text:0000031c USBD_MSC_RegisterStorage
+C:\Users\sagok\AppData\Local\Temp\cceATYT6.s:23     .data:00000000 USBD_MSC
+C:\Users\sagok\AppData\Local\Temp\cceATYT6.s:20     .data:00000000 $d
+C:\Users\sagok\AppData\Local\Temp\cceATYT6.s:170    .text:00000000 USBD_MSC_Init
+C:\Users\sagok\AppData\Local\Temp\cceATYT6.s:264    .text:00000088 USBD_MSC_DeInit
+C:\Users\sagok\AppData\Local\Temp\cceATYT6.s:323    .text:000000d4 USBD_MSC_Setup
+C:\Users\sagok\AppData\Local\Temp\cceATYT6.s:579    .text:0000024c USBD_MSC_DataIn
+C:\Users\sagok\AppData\Local\Temp\cceATYT6.s:617    .text:0000026c USBD_MSC_DataOut
+C:\Users\sagok\AppData\Local\Temp\cceATYT6.s:655    .text:0000028c USBD_MSC_GetHSCfgDesc
+C:\Users\sagok\AppData\Local\Temp\cceATYT6.s:692    .text:000002b0 USBD_MSC_GetFSCfgDesc
+C:\Users\sagok\AppData\Local\Temp\cceATYT6.s:729    .text:000002d4 USBD_MSC_GetOtherSpeedCfgDesc
+C:\Users\sagok\AppData\Local\Temp\cceATYT6.s:766    .text:000002f8 USBD_MSC_GetDeviceQualifierDescriptor
+C:\Users\sagok\AppData\Local\Temp\cceATYT6.s:42     .data:00000038 USBD_MSC_CfgHSDesc
+C:\Users\sagok\AppData\Local\Temp\cceATYT6.s:79     .data:00000058 USBD_MSC_CfgFSDesc
+C:\Users\sagok\AppData\Local\Temp\cceATYT6.s:116    .data:00000078 USBD_MSC_OtherSpeedCfgDesc
+C:\Users\sagok\AppData\Local\Temp\cceATYT6.s:153    .data:00000098 USBD_MSC_DeviceQualifierDesc
+C:\Users\sagok\AppData\Local\Temp\cceATYT6.s:165    .text:00000000 $t
+C:\Users\sagok\AppData\Local\Temp\cceATYT6.s:803    .text:0000031c USBD_MSC_RegisterStorage
                      .debug_frame:00000010 $d
                            .group:00000000 wm4.1.7f551ac7fcad8b79b9df4bfdaa536673
                            .group:00000000 wm4.stm32f2xx_hal_conf.h.40.007126baefb9f966c36646edbf8040d2
