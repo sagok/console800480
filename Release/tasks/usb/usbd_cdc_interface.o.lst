@@ -1,0 +1,934 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"usbd_cdc_interface.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.comm	uSdHandle,96,4
+  19              		.comm	SD_CardInfo,88,8
+  20              		.comm	data_size,2,2
+  21              		.comm	cnt_back,2,2
+  22              		.comm	timeout,1,1
+  23              		.comm	comd,1,1
+  24              		.global	state
+  25              		.bss
+  28              	state:
+  29 0000 00       		.space	1
+  30              		.global	From_USBpacket
+  33              	From_USBpacket:
+  34 0001 00       		.space	1
+  35              		.global	HEAD
+  38              	HEAD:
+  39 0002 00       		.space	1
+  40              		.comm	USBRxBuffer,64,4
+  41              		.comm	USBTxBuffer,32768,4
+  42              		.comm	BuffLength,4,4
+  43              		.comm	USB_Tx_Buffer_Size_For_Out,4,4
+  44              		.global	USBD_CDC_fops
+  45              		.data
+  46              		.align	2
+  49              	USBD_CDC_fops:
+  50 0000 00000000 		.word	CDC_Itf_Init
+  51 0004 00000000 		.word	CDC_Itf_DeInit
+  52 0008 00000000 		.word	CDC_Itf_Control
+  53 000c 00000000 		.word	CDC_Itf_Receive
+  54              		.text
+  55              		.align	2
+  56              		.global	send_ack
+  57              		.thumb
+  58              		.thumb_func
+  60              	send_ack:
+  61              	.LFB55:
+  62              		.file 1 "../tasks/usb/usbd_cdc_interface.c"
+   1:../tasks/usb/usbd_cdc_interface.c **** /**
+   2:../tasks/usb/usbd_cdc_interface.c ****   ******************************************************************************
+   3:../tasks/usb/usbd_cdc_interface.c ****   * @file    USB_Device/CDC_Standalone/Src/usbd_cdc_interface.c
+   4:../tasks/usb/usbd_cdc_interface.c ****   * @author  MCD Application Team
+   5:../tasks/usb/usbd_cdc_interface.c ****   * @version V1.1.0
+   6:../tasks/usb/usbd_cdc_interface.c ****   * @date    13-March-2014
+   7:../tasks/usb/usbd_cdc_interface.c ****   * @brief   Source file for USBD CDC interface
+   8:../tasks/usb/usbd_cdc_interface.c ****   ******************************************************************************
+   9:../tasks/usb/usbd_cdc_interface.c ****   * @attention
+  10:../tasks/usb/usbd_cdc_interface.c ****   *
+  11:../tasks/usb/usbd_cdc_interface.c ****   * <h2><center>&copy; COPYRIGHT(c) 2014 STMicroelectronics</center></h2>
+  12:../tasks/usb/usbd_cdc_interface.c ****   *
+  13:../tasks/usb/usbd_cdc_interface.c ****   * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+  14:../tasks/usb/usbd_cdc_interface.c ****   * You may not use this file except in compliance with the License.
+  15:../tasks/usb/usbd_cdc_interface.c ****   * You may obtain a copy of the License at:
+  16:../tasks/usb/usbd_cdc_interface.c ****   *
+  17:../tasks/usb/usbd_cdc_interface.c ****   *        http://www.st.com/software_license_agreement_liberty_v2
+  18:../tasks/usb/usbd_cdc_interface.c ****   *
+  19:../tasks/usb/usbd_cdc_interface.c ****   * Unless required by applicable law or agreed to in writing, software 
+  20:../tasks/usb/usbd_cdc_interface.c ****   * distributed under the License is distributed on an "AS IS" BASIS, 
+  21:../tasks/usb/usbd_cdc_interface.c ****   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  22:../tasks/usb/usbd_cdc_interface.c ****   * See the License for the specific language governing permissions and
+  23:../tasks/usb/usbd_cdc_interface.c ****   * limitations under the License.
+  24:../tasks/usb/usbd_cdc_interface.c ****   *
+  25:../tasks/usb/usbd_cdc_interface.c ****   ******************************************************************************
+  26:../tasks/usb/usbd_cdc_interface.c ****   */
+  27:../tasks/usb/usbd_cdc_interface.c **** 
+  28:../tasks/usb/usbd_cdc_interface.c **** /* Includes ------------------------------------------------------------------*/
+  29:../tasks/usb/usbd_cdc_interface.c **** #include "main.h"
+  30:../tasks/usb/usbd_cdc_interface.c **** 
+  31:../tasks/usb/usbd_cdc_interface.c **** #include "usb_task.h"
+  32:../tasks/usb/usbd_cdc_interface.c **** #include "LEDs.h"
+  33:../tasks/usb/usbd_cdc_interface.c **** #include "Display.h"
+  34:../tasks/usb/usbd_cdc_interface.c **** /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
+  35:../tasks/usb/usbd_cdc_interface.c ****   * @{
+  36:../tasks/usb/usbd_cdc_interface.c ****   */
+  37:../tasks/usb/usbd_cdc_interface.c **** 
+  38:../tasks/usb/usbd_cdc_interface.c **** /** @defgroup USBD_CDC 
+  39:../tasks/usb/usbd_cdc_interface.c ****   * @brief usbd core module
+  40:../tasks/usb/usbd_cdc_interface.c ****   * @{
+  41:../tasks/usb/usbd_cdc_interface.c ****   */ 
+  42:../tasks/usb/usbd_cdc_interface.c **** 
+  43:../tasks/usb/usbd_cdc_interface.c **** /* Private typedef -----------------------------------------------------------*/
+  44:../tasks/usb/usbd_cdc_interface.c **** /* Private define ------------------------------------------------------------*/
+  45:../tasks/usb/usbd_cdc_interface.c **** #define APP_RX_DATA_SIZE  64//2048
+  46:../tasks/usb/usbd_cdc_interface.c **** #define APP_TX_DATA_SIZE  32768
+  47:../tasks/usb/usbd_cdc_interface.c **** 
+  48:../tasks/usb/usbd_cdc_interface.c **** /* Private macro -------------------------------------------------------------*/
+  49:../tasks/usb/usbd_cdc_interface.c **** /* Private variables ---------------------------------------------------------*/
+  50:../tasks/usb/usbd_cdc_interface.c **** uint8_t 		state = ST_WAIT_PACKET_HDR;		// состояние USB запроса
+  51:../tasks/usb/usbd_cdc_interface.c **** int8_t 			From_USBpacket = FALSE;
+  52:../tasks/usb/usbd_cdc_interface.c **** int8_t 			HEAD = FALSE;
+  53:../tasks/usb/usbd_cdc_interface.c **** 
+  54:../tasks/usb/usbd_cdc_interface.c **** uint8_t USBRxBuffer[APP_RX_DATA_SIZE];			/* Received Data over USB are stored in this buffer */
+  55:../tasks/usb/usbd_cdc_interface.c **** uint8_t USBTxBuffer[APP_TX_DATA_SIZE];			/* Received Data over UART (CDC interface) are stored in t
+  56:../tasks/usb/usbd_cdc_interface.c **** uint32_t BuffLength;
+  57:../tasks/usb/usbd_cdc_interface.c **** uint32_t USB_Tx_Buffer_Size_For_Out;
+  58:../tasks/usb/usbd_cdc_interface.c **** 
+  59:../tasks/usb/usbd_cdc_interface.c **** /* USB handler declaration */
+  60:../tasks/usb/usbd_cdc_interface.c **** extern USBD_HandleTypeDef  USBD_Device;
+  61:../tasks/usb/usbd_cdc_interface.c **** 
+  62:../tasks/usb/usbd_cdc_interface.c **** /* Private function prototypes -----------------------------------------------*/
+  63:../tasks/usb/usbd_cdc_interface.c **** static int8_t CDC_Itf_Init     (void);
+  64:../tasks/usb/usbd_cdc_interface.c **** static int8_t CDC_Itf_DeInit   (void);
+  65:../tasks/usb/usbd_cdc_interface.c **** static int8_t CDC_Itf_Control  (uint8_t cmd, uint8_t* pbuf, uint16_t length);
+  66:../tasks/usb/usbd_cdc_interface.c **** static int8_t CDC_Itf_Receive  (uint8_t* buf, uint32_t *Len);
+  67:../tasks/usb/usbd_cdc_interface.c **** static int8_t CDC_Itf_Transmit (uint8_t* buf, uint16_t Len);
+  68:../tasks/usb/usbd_cdc_interface.c **** 
+  69:../tasks/usb/usbd_cdc_interface.c **** static int8_t decode_hdr(uint8_t* USB_Rx_Buffer,uint8_t USB_Rx_Cnt);
+  70:../tasks/usb/usbd_cdc_interface.c **** void send_ack(void);
+  71:../tasks/usb/usbd_cdc_interface.c **** 
+  72:../tasks/usb/usbd_cdc_interface.c **** USBD_CDC_ItfTypeDef USBD_CDC_fops = 
+  73:../tasks/usb/usbd_cdc_interface.c **** {
+  74:../tasks/usb/usbd_cdc_interface.c ****   CDC_Itf_Init,
+  75:../tasks/usb/usbd_cdc_interface.c ****   CDC_Itf_DeInit,
+  76:../tasks/usb/usbd_cdc_interface.c ****   CDC_Itf_Control,
+  77:../tasks/usb/usbd_cdc_interface.c ****   CDC_Itf_Receive
+  78:../tasks/usb/usbd_cdc_interface.c **** };
+  79:../tasks/usb/usbd_cdc_interface.c **** 
+  80:../tasks/usb/usbd_cdc_interface.c **** /* Private functions ---------------------------------------------------------*/
+  81:../tasks/usb/usbd_cdc_interface.c **** 
+  82:../tasks/usb/usbd_cdc_interface.c **** /*******************************************************************************
+  83:../tasks/usb/usbd_cdc_interface.c **** * Function Name  : void send_ack(void).
+  84:../tasks/usb/usbd_cdc_interface.c **** * Description    : подготовка данных для USB.
+  85:../tasks/usb/usbd_cdc_interface.c **** * Input          : None.
+  86:../tasks/usb/usbd_cdc_interface.c **** * Return         : none.
+  87:../tasks/usb/usbd_cdc_interface.c **** *******************************************************************************/
+  88:../tasks/usb/usbd_cdc_interface.c **** void send_ack(void)
+  89:../tasks/usb/usbd_cdc_interface.c **** {
+  63              		.loc 1 89 0
+  64              		.cfi_startproc
+  65              		@ args = 0, pretend = 0, frame = 0
+  66              		@ frame_needed = 1, uses_anonymous_args = 0
+  67              		@ link register save eliminated.
+  68 0000 80B4     		push	{r7}
+  69              		.cfi_def_cfa_offset 4
+  70              		.cfi_offset 7, -4
+  71 0002 00AF     		add	r7, sp, #0
+  72              		.cfi_def_cfa_register 7
+  90:../tasks/usb/usbd_cdc_interface.c **** 	USBTxBuffer[0] = ACK;
+  73              		.loc 1 90 0
+  74 0004 40F20003 		movw	r3, #:lower16:USBTxBuffer
+  75 0008 C0F20003 		movt	r3, #:upper16:USBTxBuffer
+  76 000c 4122     		movs	r2, #65
+  77 000e 1A70     		strb	r2, [r3]
+  91:../tasks/usb/usbd_cdc_interface.c **** 	USB_Tx_Buffer_Size_For_Out = 1;
+  78              		.loc 1 91 0
+  79 0010 40F20003 		movw	r3, #:lower16:USB_Tx_Buffer_Size_For_Out
+  80 0014 C0F20003 		movt	r3, #:upper16:USB_Tx_Buffer_Size_For_Out
+  81 0018 0122     		movs	r2, #1
+  82 001a 1A60     		str	r2, [r3]
+  92:../tasks/usb/usbd_cdc_interface.c **** }
+  83              		.loc 1 92 0
+  84 001c BD46     		mov	sp, r7
+  85              		@ sp needed
+  86 001e 5DF8047B 		ldr	r7, [sp], #4
+  87 0022 7047     		bx	lr
+  88              		.cfi_endproc
+  89              	.LFE55:
+  91              		.align	2
+  92              		.thumb
+  93              		.thumb_func
+  95              	decode_hdr:
+  96              	.LFB56:
+  93:../tasks/usb/usbd_cdc_interface.c **** /******************************************************************************
+  94:../tasks/usb/usbd_cdc_interface.c ****  * Function:        void decode_hdr(void)
+  95:../tasks/usb/usbd_cdc_interface.c ****  * Формат заголовка:
+  96:../tasks/usb/usbd_cdc_interface.c ****  *   Маркер     команда     hi_size     lo_size     wt_hsize   wt_lsize    timeout       CRC
+  97:../tasks/usb/usbd_cdc_interface.c ****  * |--------|  |--------|  |--------|  |--------|  |--------| |--------|  |--------|  |--------|
+  98:../tasks/usb/usbd_cdc_interface.c ****  *     0           1           2           3           4           5          6           7
+  99:../tasks/usb/usbd_cdc_interface.c ****  *
+ 100:../tasks/usb/usbd_cdc_interface.c ****  *****************************************************************************/
+ 101:../tasks/usb/usbd_cdc_interface.c **** static int8_t decode_hdr(uint8_t* USB_Rx_Buffer,uint8_t USB_Rx_Cnt)
+ 102:../tasks/usb/usbd_cdc_interface.c **** {
+  97              		.loc 1 102 0
+  98              		.cfi_startproc
+  99              		@ args = 0, pretend = 0, frame = 16
+ 100              		@ frame_needed = 1, uses_anonymous_args = 0
+ 101              		@ link register save eliminated.
+ 102 0024 80B4     		push	{r7}
+ 103              		.cfi_def_cfa_offset 4
+ 104              		.cfi_offset 7, -4
+ 105 0026 85B0     		sub	sp, sp, #20
+ 106              		.cfi_def_cfa_offset 24
+ 107 0028 00AF     		add	r7, sp, #0
+ 108              		.cfi_def_cfa_register 7
+ 109 002a 7860     		str	r0, [r7, #4]
+ 110 002c 0B46     		mov	r3, r1
+ 111 002e FB70     		strb	r3, [r7, #3]
+ 103:../tasks/usb/usbd_cdc_interface.c ****   uint8_t 	i,sum;
+ 104:../tasks/usb/usbd_cdc_interface.c **** 
+ 105:../tasks/usb/usbd_cdc_interface.c ****   if(USB_Rx_Cnt < HDR_SIZE) return FALSE;
+ 112              		.loc 1 105 0
+ 113 0030 FB78     		ldrb	r3, [r7, #3]	@ zero_extendqisi2
+ 114 0032 072B     		cmp	r3, #7
+ 115 0034 01D8     		bhi	.L3
+ 116              		.loc 1 105 0 is_stmt 0 discriminator 1
+ 117 0036 0023     		movs	r3, #0
+ 118 0038 53E0     		b	.L4
+ 119              	.L3:
+ 106:../tasks/usb/usbd_cdc_interface.c ****   if(USB_Rx_Buffer[0] != MARKER) return FALSE;
+ 120              		.loc 1 106 0 is_stmt 1
+ 121 003a 7B68     		ldr	r3, [r7, #4]
+ 122 003c 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 123 003e 502B     		cmp	r3, #80
+ 124 0040 01D0     		beq	.L5
+ 125              		.loc 1 106 0 is_stmt 0 discriminator 1
+ 126 0042 0023     		movs	r3, #0
+ 127 0044 4DE0     		b	.L4
+ 128              	.L5:
+ 107:../tasks/usb/usbd_cdc_interface.c ****   if(USB_Rx_Buffer[1] >= Line485CMD_LAST) return FALSE;
+ 129              		.loc 1 107 0 is_stmt 1
+ 130 0046 7B68     		ldr	r3, [r7, #4]
+ 131 0048 0133     		adds	r3, r3, #1
+ 132 004a 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 133 004c 022B     		cmp	r3, #2
+ 134 004e 01D9     		bls	.L6
+ 135              		.loc 1 107 0 is_stmt 0 discriminator 1
+ 136 0050 0023     		movs	r3, #0
+ 137 0052 46E0     		b	.L4
+ 138              	.L6:
+ 108:../tasks/usb/usbd_cdc_interface.c ****   // ----------- расчет CRC для игнора ошибочных данных -----------------------
+ 109:../tasks/usb/usbd_cdc_interface.c ****   sum = 0;
+ 139              		.loc 1 109 0 is_stmt 1
+ 140 0054 0023     		movs	r3, #0
+ 141 0056 BB73     		strb	r3, [r7, #14]
+ 110:../tasks/usb/usbd_cdc_interface.c ****   for(i=0; i<(HDR_SIZE-1); i++) sum += USB_Rx_Buffer[i];
+ 142              		.loc 1 110 0
+ 143 0058 0023     		movs	r3, #0
+ 144 005a FB73     		strb	r3, [r7, #15]
+ 145 005c 09E0     		b	.L7
+ 146              	.L8:
+ 147              		.loc 1 110 0 is_stmt 0 discriminator 2
+ 148 005e FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 149 0060 7A68     		ldr	r2, [r7, #4]
+ 150 0062 1344     		add	r3, r3, r2
+ 151 0064 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+ 152 0066 BB7B     		ldrb	r3, [r7, #14]
+ 153 0068 1344     		add	r3, r3, r2
+ 154 006a BB73     		strb	r3, [r7, #14]
+ 155 006c FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 156 006e 0133     		adds	r3, r3, #1
+ 157 0070 FB73     		strb	r3, [r7, #15]
+ 158              	.L7:
+ 159              		.loc 1 110 0 discriminator 1
+ 160 0072 FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 161 0074 062B     		cmp	r3, #6
+ 162 0076 F2D9     		bls	.L8
+ 111:../tasks/usb/usbd_cdc_interface.c **** 	  if(sum != USB_Rx_Buffer[HDR_SIZE-1]) {
+ 163              		.loc 1 111 0 is_stmt 1
+ 164 0078 7B68     		ldr	r3, [r7, #4]
+ 165 007a 0733     		adds	r3, r3, #7
+ 166 007c 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 167 007e BA7B     		ldrb	r2, [r7, #14]	@ zero_extendqisi2
+ 168 0080 9A42     		cmp	r2, r3
+ 169 0082 01D0     		beq	.L9
+ 112:../tasks/usb/usbd_cdc_interface.c **** 		  return FALSE;
+ 170              		.loc 1 112 0
+ 171 0084 0023     		movs	r3, #0
+ 172 0086 2CE0     		b	.L4
+ 173              	.L9:
+ 113:../tasks/usb/usbd_cdc_interface.c **** 	  }
+ 114:../tasks/usb/usbd_cdc_interface.c ****   // ----------- ..расчет CRC для игнора ошибочных данных ---------------------
+ 115:../tasks/usb/usbd_cdc_interface.c ****   comd            	= USB_Rx_Buffer[1];
+ 174              		.loc 1 115 0
+ 175 0088 7B68     		ldr	r3, [r7, #4]
+ 176 008a 5A78     		ldrb	r2, [r3, #1]	@ zero_extendqisi2
+ 177 008c 40F20003 		movw	r3, #:lower16:comd
+ 178 0090 C0F20003 		movt	r3, #:upper16:comd
+ 179 0094 1A70     		strb	r2, [r3]
+ 116:../tasks/usb/usbd_cdc_interface.c ****   data_size 		= (uint16_t)(USB_Rx_Buffer[2] << 7) | USB_Rx_Buffer[3];
+ 180              		.loc 1 116 0
+ 181 0096 7B68     		ldr	r3, [r7, #4]
+ 182 0098 0233     		adds	r3, r3, #2
+ 183 009a 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 184 009c DB01     		lsls	r3, r3, #7
+ 185 009e 9AB2     		uxth	r2, r3
+ 186 00a0 7B68     		ldr	r3, [r7, #4]
+ 187 00a2 0333     		adds	r3, r3, #3
+ 188 00a4 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 189 00a6 1343     		orrs	r3, r3, r2
+ 190 00a8 9AB2     		uxth	r2, r3
+ 191 00aa 40F20003 		movw	r3, #:lower16:data_size
+ 192 00ae C0F20003 		movt	r3, #:upper16:data_size
+ 193 00b2 1A80     		strh	r2, [r3]	@ movhi
+ 117:../tasks/usb/usbd_cdc_interface.c ****   cnt_back       	= (uint16_t)(USB_Rx_Buffer[4] << 7) | USB_Rx_Buffer[5];
+ 194              		.loc 1 117 0
+ 195 00b4 7B68     		ldr	r3, [r7, #4]
+ 196 00b6 0433     		adds	r3, r3, #4
+ 197 00b8 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 198 00ba DB01     		lsls	r3, r3, #7
+ 199 00bc 9AB2     		uxth	r2, r3
+ 200 00be 7B68     		ldr	r3, [r7, #4]
+ 201 00c0 0533     		adds	r3, r3, #5
+ 202 00c2 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 203 00c4 1343     		orrs	r3, r3, r2
+ 204 00c6 9AB2     		uxth	r2, r3
+ 205 00c8 40F20003 		movw	r3, #:lower16:cnt_back
+ 206 00cc C0F20003 		movt	r3, #:upper16:cnt_back
+ 207 00d0 1A80     		strh	r2, [r3]	@ movhi
+ 118:../tasks/usb/usbd_cdc_interface.c ****   timeout        	= USB_Rx_Buffer[6];
+ 208              		.loc 1 118 0
+ 209 00d2 7B68     		ldr	r3, [r7, #4]
+ 210 00d4 9A79     		ldrb	r2, [r3, #6]	@ zero_extendqisi2
+ 211 00d6 40F20003 		movw	r3, #:lower16:timeout
+ 212 00da C0F20003 		movt	r3, #:upper16:timeout
+ 213 00de 1A70     		strb	r2, [r3]
+ 119:../tasks/usb/usbd_cdc_interface.c **** 
+ 120:../tasks/usb/usbd_cdc_interface.c ****   return TRUE;
+ 214              		.loc 1 120 0
+ 215 00e0 0123     		movs	r3, #1
+ 216              	.L4:
+ 217 00e2 5BB2     		sxtb	r3, r3
+ 121:../tasks/usb/usbd_cdc_interface.c **** 
+ 122:../tasks/usb/usbd_cdc_interface.c **** }
+ 218              		.loc 1 122 0
+ 219 00e4 1846     		mov	r0, r3
+ 220 00e6 1437     		adds	r7, r7, #20
+ 221 00e8 BD46     		mov	sp, r7
+ 222              		@ sp needed
+ 223 00ea 5DF8047B 		ldr	r7, [sp], #4
+ 224 00ee 7047     		bx	lr
+ 225              		.cfi_endproc
+ 226              	.LFE56:
+ 228              		.align	2
+ 229              		.thumb
+ 230              		.thumb_func
+ 232              	CDC_Itf_Init:
+ 233              	.LFB57:
+ 123:../tasks/usb/usbd_cdc_interface.c **** /**
+ 124:../tasks/usb/usbd_cdc_interface.c ****   * @brief  CDC_Itf_Init
+ 125:../tasks/usb/usbd_cdc_interface.c ****   *         Initializes the CDC media low layer
+ 126:../tasks/usb/usbd_cdc_interface.c ****   * @param  None
+ 127:../tasks/usb/usbd_cdc_interface.c ****   * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
+ 128:../tasks/usb/usbd_cdc_interface.c ****   */
+ 129:../tasks/usb/usbd_cdc_interface.c **** static int8_t CDC_Itf_Init(void)
+ 130:../tasks/usb/usbd_cdc_interface.c **** {
+ 234              		.loc 1 130 0
+ 235              		.cfi_startproc
+ 236              		@ args = 0, pretend = 0, frame = 0
+ 237              		@ frame_needed = 1, uses_anonymous_args = 0
+ 238 00f0 80B5     		push	{r7, lr}
+ 239              		.cfi_def_cfa_offset 8
+ 240              		.cfi_offset 7, -8
+ 241              		.cfi_offset 14, -4
+ 242 00f2 00AF     		add	r7, sp, #0
+ 243              		.cfi_def_cfa_register 7
+ 131:../tasks/usb/usbd_cdc_interface.c **** 	  USBD_CDC_SetTxBuffer(&USBD_Device, USBTxBuffer, 0);
+ 244              		.loc 1 131 0
+ 245 00f4 40F20000 		movw	r0, #:lower16:USBD_Device
+ 246 00f8 C0F20000 		movt	r0, #:upper16:USBD_Device
+ 247 00fc 40F20001 		movw	r1, #:lower16:USBTxBuffer
+ 248 0100 C0F20001 		movt	r1, #:upper16:USBTxBuffer
+ 249 0104 0022     		movs	r2, #0
+ 250 0106 FFF7FEFF 		bl	USBD_CDC_SetTxBuffer
+ 132:../tasks/usb/usbd_cdc_interface.c **** 	  USBD_CDC_SetRxBuffer(&USBD_Device, USBRxBuffer);
+ 251              		.loc 1 132 0
+ 252 010a 40F20000 		movw	r0, #:lower16:USBD_Device
+ 253 010e C0F20000 		movt	r0, #:upper16:USBD_Device
+ 254 0112 40F20001 		movw	r1, #:lower16:USBRxBuffer
+ 255 0116 C0F20001 		movt	r1, #:upper16:USBRxBuffer
+ 256 011a FFF7FEFF 		bl	USBD_CDC_SetRxBuffer
+ 133:../tasks/usb/usbd_cdc_interface.c **** 
+ 134:../tasks/usb/usbd_cdc_interface.c ****   return (USBD_OK);
+ 257              		.loc 1 134 0
+ 258 011e 0023     		movs	r3, #0
+ 259 0120 5BB2     		sxtb	r3, r3
+ 135:../tasks/usb/usbd_cdc_interface.c **** }
+ 260              		.loc 1 135 0
+ 261 0122 1846     		mov	r0, r3
+ 262 0124 80BD     		pop	{r7, pc}
+ 263              		.cfi_endproc
+ 264              	.LFE57:
+ 266 0126 00BF     		.align	2
+ 267              		.thumb
+ 268              		.thumb_func
+ 270              	CDC_Itf_DeInit:
+ 271              	.LFB58:
+ 136:../tasks/usb/usbd_cdc_interface.c **** 
+ 137:../tasks/usb/usbd_cdc_interface.c **** /**
+ 138:../tasks/usb/usbd_cdc_interface.c ****   * @brief  CDC_Itf_DeInit
+ 139:../tasks/usb/usbd_cdc_interface.c ****   *         DeInitializes the CDC media low layer
+ 140:../tasks/usb/usbd_cdc_interface.c ****   * @param  None
+ 141:../tasks/usb/usbd_cdc_interface.c ****   * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
+ 142:../tasks/usb/usbd_cdc_interface.c ****   */
+ 143:../tasks/usb/usbd_cdc_interface.c **** static int8_t CDC_Itf_DeInit(void)
+ 144:../tasks/usb/usbd_cdc_interface.c **** {
+ 272              		.loc 1 144 0
+ 273              		.cfi_startproc
+ 274              		@ args = 0, pretend = 0, frame = 0
+ 275              		@ frame_needed = 1, uses_anonymous_args = 0
+ 276              		@ link register save eliminated.
+ 277 0128 80B4     		push	{r7}
+ 278              		.cfi_def_cfa_offset 4
+ 279              		.cfi_offset 7, -4
+ 280 012a 00AF     		add	r7, sp, #0
+ 281              		.cfi_def_cfa_register 7
+ 145:../tasks/usb/usbd_cdc_interface.c **** 
+ 146:../tasks/usb/usbd_cdc_interface.c ****   return (USBD_OK);
+ 282              		.loc 1 146 0
+ 283 012c 0023     		movs	r3, #0
+ 284 012e 5BB2     		sxtb	r3, r3
+ 147:../tasks/usb/usbd_cdc_interface.c **** }
+ 285              		.loc 1 147 0
+ 286 0130 1846     		mov	r0, r3
+ 287 0132 BD46     		mov	sp, r7
+ 288              		@ sp needed
+ 289 0134 5DF8047B 		ldr	r7, [sp], #4
+ 290 0138 7047     		bx	lr
+ 291              		.cfi_endproc
+ 292              	.LFE58:
+ 294 013a 00BF     		.align	2
+ 295              		.thumb
+ 296              		.thumb_func
+ 298              	CDC_Itf_Control:
+ 299              	.LFB59:
+ 148:../tasks/usb/usbd_cdc_interface.c **** 
+ 149:../tasks/usb/usbd_cdc_interface.c **** /**
+ 150:../tasks/usb/usbd_cdc_interface.c ****   * @brief  CDC_Itf_Control
+ 151:../tasks/usb/usbd_cdc_interface.c ****   *         Manage the CDC class requests
+ 152:../tasks/usb/usbd_cdc_interface.c ****   * @param  Cmd: Command code            
+ 153:../tasks/usb/usbd_cdc_interface.c ****   * @param  Buf: Buffer containing command data (request parameters)
+ 154:../tasks/usb/usbd_cdc_interface.c ****   * @param  Len: Number of data to be sent (in bytes)
+ 155:../tasks/usb/usbd_cdc_interface.c ****   * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
+ 156:../tasks/usb/usbd_cdc_interface.c ****   */
+ 157:../tasks/usb/usbd_cdc_interface.c **** static int8_t CDC_Itf_Control (uint8_t cmd, uint8_t* pbuf, uint16_t length)
+ 158:../tasks/usb/usbd_cdc_interface.c **** { 
+ 300              		.loc 1 158 0
+ 301              		.cfi_startproc
+ 302              		@ args = 0, pretend = 0, frame = 8
+ 303              		@ frame_needed = 1, uses_anonymous_args = 0
+ 304              		@ link register save eliminated.
+ 305 013c 80B4     		push	{r7}
+ 306              		.cfi_def_cfa_offset 4
+ 307              		.cfi_offset 7, -4
+ 308 013e 83B0     		sub	sp, sp, #12
+ 309              		.cfi_def_cfa_offset 16
+ 310 0140 00AF     		add	r7, sp, #0
+ 311              		.cfi_def_cfa_register 7
+ 312 0142 3960     		str	r1, [r7]
+ 313 0144 1346     		mov	r3, r2
+ 314 0146 0246     		mov	r2, r0
+ 315 0148 FA71     		strb	r2, [r7, #7]
+ 316 014a BB80     		strh	r3, [r7, #4]	@ movhi
+ 159:../tasks/usb/usbd_cdc_interface.c ****   return (USBD_OK);
+ 317              		.loc 1 159 0
+ 318 014c 0023     		movs	r3, #0
+ 319 014e 5BB2     		sxtb	r3, r3
+ 160:../tasks/usb/usbd_cdc_interface.c **** }
+ 320              		.loc 1 160 0
+ 321 0150 1846     		mov	r0, r3
+ 322 0152 0C37     		adds	r7, r7, #12
+ 323 0154 BD46     		mov	sp, r7
+ 324              		@ sp needed
+ 325 0156 5DF8047B 		ldr	r7, [sp], #4
+ 326 015a 7047     		bx	lr
+ 327              		.cfi_endproc
+ 328              	.LFE59:
+ 330              		.align	2
+ 331              		.thumb
+ 332              		.thumb_func
+ 334              	CDC_Itf_Receive:
+ 335              	.LFB60:
+ 161:../tasks/usb/usbd_cdc_interface.c **** 
+ 162:../tasks/usb/usbd_cdc_interface.c **** 
+ 163:../tasks/usb/usbd_cdc_interface.c **** /**
+ 164:../tasks/usb/usbd_cdc_interface.c ****   * @brief  CDC_Itf_DataRx
+ 165:../tasks/usb/usbd_cdc_interface.c ****   *         Data received over USB OUT endpoint are sent over CDC interface 
+ 166:../tasks/usb/usbd_cdc_interface.c ****   *         through this function.
+ 167:../tasks/usb/usbd_cdc_interface.c ****   * @param  Buf: Buffer of data to be transmitted
+ 168:../tasks/usb/usbd_cdc_interface.c ****   * @param  Len: Number of data received (in bytes)
+ 169:../tasks/usb/usbd_cdc_interface.c ****   * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
+ 170:../tasks/usb/usbd_cdc_interface.c ****   */
+ 171:../tasks/usb/usbd_cdc_interface.c **** static int8_t CDC_Itf_Receive(uint8_t* Buf, uint32_t *Len)
+ 172:../tasks/usb/usbd_cdc_interface.c **** {
+ 336              		.loc 1 172 0
+ 337              		.cfi_startproc
+ 338              		@ args = 0, pretend = 0, frame = 16
+ 339              		@ frame_needed = 1, uses_anonymous_args = 0
+ 340 015c 80B5     		push	{r7, lr}
+ 341              		.cfi_def_cfa_offset 8
+ 342              		.cfi_offset 7, -8
+ 343              		.cfi_offset 14, -4
+ 344 015e 84B0     		sub	sp, sp, #16
+ 345              		.cfi_def_cfa_offset 24
+ 346 0160 00AF     		add	r7, sp, #0
+ 347              		.cfi_def_cfa_register 7
+ 348 0162 7860     		str	r0, [r7, #4]
+ 349 0164 3960     		str	r1, [r7]
+ 173:../tasks/usb/usbd_cdc_interface.c **** uint8_t			result,resultInternalTransfer;
+ 174:../tasks/usb/usbd_cdc_interface.c **** int8_t			HeaderStatus;
+ 175:../tasks/usb/usbd_cdc_interface.c **** uint8_t			offsetlocal = 0;
+ 350              		.loc 1 175 0
+ 351 0166 0023     		movs	r3, #0
+ 352 0168 7B73     		strb	r3, [r7, #13]
+ 176:../tasks/usb/usbd_cdc_interface.c **** uint16_t		countlocal;
+ 177:../tasks/usb/usbd_cdc_interface.c **** 
+ 178:../tasks/usb/usbd_cdc_interface.c **** 	if (state != ST_SEND_TO_PC)
+ 353              		.loc 1 178 0
+ 354 016a 40F20003 		movw	r3, #:lower16:state
+ 355 016e C0F20003 		movt	r3, #:upper16:state
+ 356 0172 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 357 0174 022B     		cmp	r3, #2
+ 358 0176 08D0     		beq	.L17
+ 179:../tasks/usb/usbd_cdc_interface.c **** 		HeaderStatus = decode_hdr(Buf,*Len);				// парсим пакет смотрим кто он, что он....
+ 359              		.loc 1 179 0
+ 360 0178 3B68     		ldr	r3, [r7]
+ 361 017a 1B68     		ldr	r3, [r3]
+ 362 017c DBB2     		uxtb	r3, r3
+ 363 017e 7868     		ldr	r0, [r7, #4]
+ 364 0180 1946     		mov	r1, r3
+ 365 0182 FFF74FFF 		bl	decode_hdr
+ 366 0186 0346     		mov	r3, r0
+ 367 0188 BB73     		strb	r3, [r7, #14]
+ 368              	.L17:
+ 180:../tasks/usb/usbd_cdc_interface.c **** 
+ 181:../tasks/usb/usbd_cdc_interface.c **** 	if (state == ST_WAIT_PACKET_HDR){
+ 369              		.loc 1 181 0
+ 370 018a 40F20003 		movw	r3, #:lower16:state
+ 371 018e C0F20003 		movt	r3, #:upper16:state
+ 372 0192 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 373 0194 002B     		cmp	r3, #0
+ 374 0196 48D1     		bne	.L18
+ 182:../tasks/usb/usbd_cdc_interface.c **** 		  if (!HeaderStatus){								// ожидаем хедер а пришеол мусор
+ 375              		.loc 1 182 0
+ 376 0198 97F90E30 		ldrsb	r3, [r7, #14]
+ 377 019c 002B     		cmp	r3, #0
+ 378 019e 06D1     		bne	.L19
+ 183:../tasks/usb/usbd_cdc_interface.c **** 			  From_USBpacket = FALSE;
+ 379              		.loc 1 183 0
+ 380 01a0 40F20003 		movw	r3, #:lower16:From_USBpacket
+ 381 01a4 C0F20003 		movt	r3, #:upper16:From_USBpacket
+ 382 01a8 0022     		movs	r2, #0
+ 383 01aa 1A70     		strb	r2, [r3]
+ 384 01ac 4CE0     		b	.L22
+ 385              	.L19:
+ 184:../tasks/usb/usbd_cdc_interface.c **** 		  }else
+ 185:../tasks/usb/usbd_cdc_interface.c **** 		  if (HeaderStatus){								// ожидаем хедер он и пришел
+ 386              		.loc 1 185 0
+ 387 01ae 97F90E30 		ldrsb	r3, [r7, #14]
+ 388 01b2 002B     		cmp	r3, #0
+ 389 01b4 48D0     		beq	.L22
+ 186:../tasks/usb/usbd_cdc_interface.c **** 			  if(comd == Line485CMD_CHECK)							// команда проверки
+ 390              		.loc 1 186 0
+ 391 01b6 40F20003 		movw	r3, #:lower16:comd
+ 392 01ba C0F20003 		movt	r3, #:upper16:comd
+ 393 01be 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 394 01c0 002B     		cmp	r3, #0
+ 395 01c2 17D1     		bne	.L21
+ 187:../tasks/usb/usbd_cdc_interface.c **** 			  {
+ 188:../tasks/usb/usbd_cdc_interface.c **** 				  send_ack();
+ 396              		.loc 1 188 0
+ 397 01c4 FFF7FEFF 		bl	send_ack
+ 189:../tasks/usb/usbd_cdc_interface.c **** 				  result = CDC_Itf_Transmit(USBTxBuffer, USB_Tx_Buffer_Size_For_Out);
+ 398              		.loc 1 189 0
+ 399 01c8 40F20003 		movw	r3, #:lower16:USB_Tx_Buffer_Size_For_Out
+ 400 01cc C0F20003 		movt	r3, #:upper16:USB_Tx_Buffer_Size_For_Out
+ 401 01d0 1B68     		ldr	r3, [r3]
+ 402 01d2 9BB2     		uxth	r3, r3
+ 403 01d4 40F20000 		movw	r0, #:lower16:USBTxBuffer
+ 404 01d8 C0F20000 		movt	r0, #:upper16:USBTxBuffer
+ 405 01dc 1946     		mov	r1, r3
+ 406 01de 00F089F8 		bl	CDC_Itf_Transmit
+ 407 01e2 0346     		mov	r3, r0
+ 408 01e4 FB73     		strb	r3, [r7, #15]
+ 190:../tasks/usb/usbd_cdc_interface.c **** 
+ 191:../tasks/usb/usbd_cdc_interface.c **** 				  From_USBpacket = FALSE;					// после выхода ненадо работать по запросуUSB
+ 409              		.loc 1 191 0
+ 410 01e6 40F20003 		movw	r3, #:lower16:From_USBpacket
+ 411 01ea C0F20003 		movt	r3, #:upper16:From_USBpacket
+ 412 01ee 0022     		movs	r2, #0
+ 413 01f0 1A70     		strb	r2, [r3]
+ 414 01f2 29E0     		b	.L22
+ 415              	.L21:
+ 192:../tasks/usb/usbd_cdc_interface.c **** 			  } else
+ 193:../tasks/usb/usbd_cdc_interface.c **** 			  if(comd != Line485CMD_CHECK)							// команда проверки
+ 416              		.loc 1 193 0
+ 417 01f4 40F20003 		movw	r3, #:lower16:comd
+ 418 01f8 C0F20003 		movt	r3, #:upper16:comd
+ 419 01fc 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 420 01fe 002B     		cmp	r3, #0
+ 421 0200 22D0     		beq	.L22
+ 194:../tasks/usb/usbd_cdc_interface.c **** 			  {												// все остальные команды
+ 195:../tasks/usb/usbd_cdc_interface.c **** 				  HEAD = TRUE;								// указываем что это хедер
+ 422              		.loc 1 195 0
+ 423 0202 40F20003 		movw	r3, #:lower16:HEAD
+ 424 0206 C0F20003 		movt	r3, #:upper16:HEAD
+ 425 020a 0122     		movs	r2, #1
+ 426 020c 1A70     		strb	r2, [r3]
+ 196:../tasks/usb/usbd_cdc_interface.c **** 				  offsetlocal = HDR_SIZE;
+ 427              		.loc 1 196 0
+ 428 020e 0823     		movs	r3, #8
+ 429 0210 7B73     		strb	r3, [r7, #13]
+ 197:../tasks/usb/usbd_cdc_interface.c **** 				  countlocal = *Len - HDR_SIZE;
+ 430              		.loc 1 197 0
+ 431 0212 3B68     		ldr	r3, [r7]
+ 432 0214 1B68     		ldr	r3, [r3]
+ 433 0216 9BB2     		uxth	r3, r3
+ 434 0218 083B     		subs	r3, r3, #8
+ 435 021a 7B81     		strh	r3, [r7, #10]	@ movhi
+ 198:../tasks/usb/usbd_cdc_interface.c **** 				  From_USBpacket = TRUE;
+ 436              		.loc 1 198 0
+ 437 021c 40F20003 		movw	r3, #:lower16:From_USBpacket
+ 438 0220 C0F20003 		movt	r3, #:upper16:From_USBpacket
+ 439 0224 0122     		movs	r2, #1
+ 440 0226 1A70     		strb	r2, [r3]
+ 441 0228 0EE0     		b	.L22
+ 442              	.L18:
+ 199:../tasks/usb/usbd_cdc_interface.c **** 			  }
+ 200:../tasks/usb/usbd_cdc_interface.c **** 		  }
+ 201:../tasks/usb/usbd_cdc_interface.c **** 
+ 202:../tasks/usb/usbd_cdc_interface.c **** 	}else	//(state == ST_SEND_TO_PC
+ 203:../tasks/usb/usbd_cdc_interface.c **** 	{
+ 204:../tasks/usb/usbd_cdc_interface.c **** 		HEAD = FALSE;
+ 443              		.loc 1 204 0
+ 444 022a 40F20003 		movw	r3, #:lower16:HEAD
+ 445 022e C0F20003 		movt	r3, #:upper16:HEAD
+ 446 0232 0022     		movs	r2, #0
+ 447 0234 1A70     		strb	r2, [r3]
+ 205:../tasks/usb/usbd_cdc_interface.c **** 		countlocal = *Len;
+ 448              		.loc 1 205 0
+ 449 0236 3B68     		ldr	r3, [r7]
+ 450 0238 1B68     		ldr	r3, [r3]
+ 451 023a 7B81     		strh	r3, [r7, #10]	@ movhi
+ 206:../tasks/usb/usbd_cdc_interface.c **** 		From_USBpacket = TRUE;
+ 452              		.loc 1 206 0
+ 453 023c 40F20003 		movw	r3, #:lower16:From_USBpacket
+ 454 0240 C0F20003 		movt	r3, #:upper16:From_USBpacket
+ 455 0244 0122     		movs	r2, #1
+ 456 0246 1A70     		strb	r2, [r3]
+ 457              	.L22:
+ 207:../tasks/usb/usbd_cdc_interface.c **** 	}
+ 208:../tasks/usb/usbd_cdc_interface.c **** 
+ 209:../tasks/usb/usbd_cdc_interface.c **** 	if (From_USBpacket){																			// если был запрос из USB то нужно его запров отослать
+ 458              		.loc 1 209 0
+ 459 0248 40F20003 		movw	r3, #:lower16:From_USBpacket
+ 460 024c C0F20003 		movt	r3, #:upper16:From_USBpacket
+ 461 0250 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 462 0252 002B     		cmp	r3, #0
+ 463 0254 42D0     		beq	.L23
+ 210:../tasks/usb/usbd_cdc_interface.c **** 																									// в шину с очередным сеансом мониторинга и
+ 211:../tasks/usb/usbd_cdc_interface.c **** 																									// по окончанию получить ответ и вернуть в шину
+ 212:../tasks/usb/usbd_cdc_interface.c **** 	if (state == ST_WAIT_PACKET_HDR){
+ 464              		.loc 1 212 0
+ 465 0256 40F20003 		movw	r3, #:lower16:state
+ 466 025a C0F20003 		movt	r3, #:upper16:state
+ 467 025e 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 468 0260 002B     		cmp	r3, #0
+ 469 0262 1BD1     		bne	.L24
+ 213:../tasks/usb/usbd_cdc_interface.c **** 		resultInternalTransfer = TRUE;//strela_ext_ctrl((uint8_t*)USB_Rx_Buffer+offsetlocal, countlocal, 
+ 470              		.loc 1 213 0
+ 471 0264 0123     		movs	r3, #1
+ 472 0266 7B72     		strb	r3, [r7, #9]
+ 214:../tasks/usb/usbd_cdc_interface.c **** 		  if (!resultInternalTransfer) {															// если не дописан или недочитан файл.
+ 473              		.loc 1 214 0
+ 474 0268 7B7A     		ldrb	r3, [r7, #9]	@ zero_extendqisi2
+ 475 026a 002B     		cmp	r3, #0
+ 476 026c 06D1     		bne	.L25
+ 215:../tasks/usb/usbd_cdc_interface.c **** 				  state = ST_SEND_TO_PC;															// на длинные пакеты ответ не даем. Дадим по окончанию в
+ 477              		.loc 1 215 0
+ 478 026e 40F20003 		movw	r3, #:lower16:state
+ 479 0272 C0F20003 		movt	r3, #:upper16:state
+ 480 0276 0222     		movs	r2, #2
+ 481 0278 1A70     		strb	r2, [r3]
+ 482 027a 29E0     		b	.L27
+ 483              	.L25:
+ 216:../tasks/usb/usbd_cdc_interface.c **** 			   } else {
+ 217:../tasks/usb/usbd_cdc_interface.c **** 				  result = CDC_Itf_Transmit(USBTxBuffer, USB_Tx_Buffer_Size_For_Out);
+ 484              		.loc 1 217 0
+ 485 027c 40F20003 		movw	r3, #:lower16:USB_Tx_Buffer_Size_For_Out
+ 486 0280 C0F20003 		movt	r3, #:upper16:USB_Tx_Buffer_Size_For_Out
+ 487 0284 1B68     		ldr	r3, [r3]
+ 488 0286 9BB2     		uxth	r3, r3
+ 489 0288 40F20000 		movw	r0, #:lower16:USBTxBuffer
+ 490 028c C0F20000 		movt	r0, #:upper16:USBTxBuffer
+ 491 0290 1946     		mov	r1, r3
+ 492 0292 00F02FF8 		bl	CDC_Itf_Transmit
+ 493 0296 0346     		mov	r3, r0
+ 494 0298 FB73     		strb	r3, [r7, #15]
+ 495 029a 19E0     		b	.L27
+ 496              	.L24:
+ 218:../tasks/usb/usbd_cdc_interface.c **** 			   }
+ 219:../tasks/usb/usbd_cdc_interface.c **** 
+ 220:../tasks/usb/usbd_cdc_interface.c **** 	}else
+ 221:../tasks/usb/usbd_cdc_interface.c **** //		if (state == ST_SEND_TO_PC)
+ 222:../tasks/usb/usbd_cdc_interface.c **** 			{																						// если не хэдер то дописываем данные но уже без оффсета
+ 223:../tasks/usb/usbd_cdc_interface.c **** 				resultInternalTransfer = TRUE;//strela_ext_ctrl((uint8_t*)USB_Rx_Buffer, countlocal, FALSE);
+ 497              		.loc 1 223 0
+ 498 029c 0123     		movs	r3, #1
+ 499 029e 7B72     		strb	r3, [r7, #9]
+ 224:../tasks/usb/usbd_cdc_interface.c **** 				if (resultInternalTransfer) {
+ 500              		.loc 1 224 0
+ 501 02a0 7B7A     		ldrb	r3, [r7, #9]	@ zero_extendqisi2
+ 502 02a2 002B     		cmp	r3, #0
+ 503 02a4 14D0     		beq	.L27
+ 225:../tasks/usb/usbd_cdc_interface.c **** 					state = ST_WAIT_PACKET_HDR;														// если передали весь фай то указываем хедер
+ 504              		.loc 1 225 0
+ 505 02a6 40F20003 		movw	r3, #:lower16:state
+ 506 02aa C0F20003 		movt	r3, #:upper16:state
+ 507 02ae 0022     		movs	r2, #0
+ 508 02b0 1A70     		strb	r2, [r3]
+ 226:../tasks/usb/usbd_cdc_interface.c **** 					 result = CDC_Itf_Transmit(USBTxBuffer, USB_Tx_Buffer_Size_For_Out);			// посути нужно давать 
+ 509              		.loc 1 226 0
+ 510 02b2 40F20003 		movw	r3, #:lower16:USB_Tx_Buffer_Size_For_Out
+ 511 02b6 C0F20003 		movt	r3, #:upper16:USB_Tx_Buffer_Size_For_Out
+ 512 02ba 1B68     		ldr	r3, [r3]
+ 513 02bc 9BB2     		uxth	r3, r3
+ 514 02be 40F20000 		movw	r0, #:lower16:USBTxBuffer
+ 515 02c2 C0F20000 		movt	r0, #:upper16:USBTxBuffer
+ 516 02c6 1946     		mov	r1, r3
+ 517 02c8 00F014F8 		bl	CDC_Itf_Transmit
+ 518 02cc 0346     		mov	r3, r0
+ 519 02ce FB73     		strb	r3, [r7, #15]
+ 520              	.L27:
+ 227:../tasks/usb/usbd_cdc_interface.c **** 
+ 228:../tasks/usb/usbd_cdc_interface.c **** 				}
+ 229:../tasks/usb/usbd_cdc_interface.c **** 			}
+ 230:../tasks/usb/usbd_cdc_interface.c **** 
+ 231:../tasks/usb/usbd_cdc_interface.c **** 	 From_USBpacket	= FALSE;
+ 521              		.loc 1 231 0
+ 522 02d0 40F20003 		movw	r3, #:lower16:From_USBpacket
+ 523 02d4 C0F20003 		movt	r3, #:upper16:From_USBpacket
+ 524 02d8 0022     		movs	r2, #0
+ 525 02da 1A70     		strb	r2, [r3]
+ 526              	.L23:
+ 232:../tasks/usb/usbd_cdc_interface.c **** 	}
+ 233:../tasks/usb/usbd_cdc_interface.c **** 
+ 234:../tasks/usb/usbd_cdc_interface.c **** 
+ 235:../tasks/usb/usbd_cdc_interface.c **** ///		for (i=0;i<*Len;i++)	WH1604A_print_hex_xx(i/16,(i % 16)*2,Buf[i]);
+ 236:../tasks/usb/usbd_cdc_interface.c **** 
+ 237:../tasks/usb/usbd_cdc_interface.c **** 	USBD_CDC_ReceivePacket(&USBD_Device);
+ 527              		.loc 1 237 0
+ 528 02dc 40F20000 		movw	r0, #:lower16:USBD_Device
+ 529 02e0 C0F20000 		movt	r0, #:upper16:USBD_Device
+ 530 02e4 FFF7FEFF 		bl	USBD_CDC_ReceivePacket
+ 238:../tasks/usb/usbd_cdc_interface.c **** 
+ 239:../tasks/usb/usbd_cdc_interface.c **** 	return result;
+ 531              		.loc 1 239 0
+ 532 02e8 FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 533 02ea 5BB2     		sxtb	r3, r3
+ 240:../tasks/usb/usbd_cdc_interface.c **** }
+ 534              		.loc 1 240 0
+ 535 02ec 1846     		mov	r0, r3
+ 536 02ee 1037     		adds	r7, r7, #16
+ 537 02f0 BD46     		mov	sp, r7
+ 538              		@ sp needed
+ 539 02f2 80BD     		pop	{r7, pc}
+ 540              		.cfi_endproc
+ 541              	.LFE60:
+ 543              		.align	2
+ 544              		.thumb
+ 545              		.thumb_func
+ 547              	CDC_Itf_Transmit:
+ 548              	.LFB61:
+ 241:../tasks/usb/usbd_cdc_interface.c **** 
+ 242:../tasks/usb/usbd_cdc_interface.c **** static int8_t CDC_Itf_Transmit(uint8_t* Buf, uint16_t Len)
+ 243:../tasks/usb/usbd_cdc_interface.c **** {
+ 549              		.loc 1 243 0
+ 550              		.cfi_startproc
+ 551              		@ args = 0, pretend = 0, frame = 8
+ 552              		@ frame_needed = 1, uses_anonymous_args = 0
+ 553 02f4 80B5     		push	{r7, lr}
+ 554              		.cfi_def_cfa_offset 8
+ 555              		.cfi_offset 7, -8
+ 556              		.cfi_offset 14, -4
+ 557 02f6 82B0     		sub	sp, sp, #8
+ 558              		.cfi_def_cfa_offset 16
+ 559 02f8 00AF     		add	r7, sp, #0
+ 560              		.cfi_def_cfa_register 7
+ 561 02fa 7860     		str	r0, [r7, #4]
+ 562 02fc 0B46     		mov	r3, r1
+ 563 02fe 7B80     		strh	r3, [r7, #2]	@ movhi
+ 244:../tasks/usb/usbd_cdc_interface.c **** 
+ 245:../tasks/usb/usbd_cdc_interface.c **** 	  memcpy(USBTxBuffer,Buf,Len);
+ 564              		.loc 1 245 0
+ 565 0300 7B88     		ldrh	r3, [r7, #2]
+ 566 0302 40F20000 		movw	r0, #:lower16:USBTxBuffer
+ 567 0306 C0F20000 		movt	r0, #:upper16:USBTxBuffer
+ 568 030a 7968     		ldr	r1, [r7, #4]
+ 569 030c 1A46     		mov	r2, r3
+ 570 030e FFF7FEFF 		bl	memcpy
+ 246:../tasks/usb/usbd_cdc_interface.c **** 
+ 247:../tasks/usb/usbd_cdc_interface.c **** 	  USBD_CDC_SetTxBuffer(&USBD_Device, USBTxBuffer, Len);
+ 571              		.loc 1 247 0
+ 572 0312 7B88     		ldrh	r3, [r7, #2]
+ 573 0314 40F20000 		movw	r0, #:lower16:USBD_Device
+ 574 0318 C0F20000 		movt	r0, #:upper16:USBD_Device
+ 575 031c 40F20001 		movw	r1, #:lower16:USBTxBuffer
+ 576 0320 C0F20001 		movt	r1, #:upper16:USBTxBuffer
+ 577 0324 1A46     		mov	r2, r3
+ 578 0326 FFF7FEFF 		bl	USBD_CDC_SetTxBuffer
+ 248:../tasks/usb/usbd_cdc_interface.c **** 	  return (USBD_CDC_TransmitPacket(&USBD_Device));
+ 579              		.loc 1 248 0
+ 580 032a 40F20000 		movw	r0, #:lower16:USBD_Device
+ 581 032e C0F20000 		movt	r0, #:upper16:USBD_Device
+ 582 0332 FFF7FEFF 		bl	USBD_CDC_TransmitPacket
+ 583 0336 0346     		mov	r3, r0
+ 584 0338 DBB2     		uxtb	r3, r3
+ 585 033a 5BB2     		sxtb	r3, r3
+ 249:../tasks/usb/usbd_cdc_interface.c **** 
+ 250:../tasks/usb/usbd_cdc_interface.c **** }
+ 586              		.loc 1 250 0
+ 587 033c 1846     		mov	r0, r3
+ 588 033e 0837     		adds	r7, r7, #8
+ 589 0340 BD46     		mov	sp, r7
+ 590              		@ sp needed
+ 591 0342 80BD     		pop	{r7, pc}
+ 592              		.cfi_endproc
+ 593              	.LFE61:
+ 595              	.Letext0:
+ 596              		.file 2 "c:\\program files (x86)\\codesourcery\\arm-none-eabi\\include\\stdint.h"
+ 597              		.file 3 "D:\\workspace\\console800480\\system/stm32f217xx.h"
+ 598              		.file 4 "D:\\workspace\\console800480/main.h"
+ 599              		.file 5 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_hal_def.h"
+ 600              		.file 6 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_hal_dma.h"
+ 601              		.file 7 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_ll_sdmmc.h"
+ 602              		.file 8 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_hal_sd.h"
+ 603              		.file 9 "D:\\workspace\\console800480\\tasks\\usb\\STM32_USB_Device_Library\\Core\\Inc/usbd_def.h"
+ 604              		.file 10 "D:\\workspace\\console800480\\tasks\\usb\\STM32_USB_Device_Library\\Class\\CDC\\Inc/usbd
+ 605              		.file 11 "../tasks/usb/usb_task.h"
+ 606              		.file 12 "D:\\workspace\\console800480\\system/core_cm3.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 usbd_cdc_interface.c
+                            *COM*:00000060 uSdHandle
+                            *COM*:00000058 SD_CardInfo
+                            *COM*:00000002 data_size
+                            *COM*:00000002 cnt_back
+                            *COM*:00000001 timeout
+                            *COM*:00000001 comd
+C:\Users\sagok\AppData\Local\Temp\ccVsC80W.s:28     .bss:00000000 state
+C:\Users\sagok\AppData\Local\Temp\ccVsC80W.s:29     .bss:00000000 $d
+C:\Users\sagok\AppData\Local\Temp\ccVsC80W.s:33     .bss:00000001 From_USBpacket
+C:\Users\sagok\AppData\Local\Temp\ccVsC80W.s:38     .bss:00000002 HEAD
+                            *COM*:00000040 USBRxBuffer
+                            *COM*:00008000 USBTxBuffer
+                            *COM*:00000004 BuffLength
+                            *COM*:00000004 USB_Tx_Buffer_Size_For_Out
+C:\Users\sagok\AppData\Local\Temp\ccVsC80W.s:49     .data:00000000 USBD_CDC_fops
+C:\Users\sagok\AppData\Local\Temp\ccVsC80W.s:46     .data:00000000 $d
+C:\Users\sagok\AppData\Local\Temp\ccVsC80W.s:232    .text:000000f0 CDC_Itf_Init
+C:\Users\sagok\AppData\Local\Temp\ccVsC80W.s:270    .text:00000128 CDC_Itf_DeInit
+C:\Users\sagok\AppData\Local\Temp\ccVsC80W.s:298    .text:0000013c CDC_Itf_Control
+C:\Users\sagok\AppData\Local\Temp\ccVsC80W.s:334    .text:0000015c CDC_Itf_Receive
+C:\Users\sagok\AppData\Local\Temp\ccVsC80W.s:55     .text:00000000 $t
+C:\Users\sagok\AppData\Local\Temp\ccVsC80W.s:60     .text:00000000 send_ack
+C:\Users\sagok\AppData\Local\Temp\ccVsC80W.s:95     .text:00000024 decode_hdr
+C:\Users\sagok\AppData\Local\Temp\ccVsC80W.s:547    .text:000002f4 CDC_Itf_Transmit
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.1.7f551ac7fcad8b79b9df4bfdaa536673
+                           .group:00000000 wm4.stm32f2xx_hal_conf.h.40.007126baefb9f966c36646edbf8040d2
+                           .group:00000000 wm4.stm32f2xx.h.57.5ec1581efc43612c411d33a8686e9ec7
+                           .group:00000000 wm4.stm32f217xx.h.52.9c940d76d00294b78837dc334c172fdd
+                           .group:00000000 wm4.core_cm3.h.32.49180ccb4d36cabd2d7016d2a51d91ae
+                           .group:00000000 wm4.newlib.h.8.384a112feabb3bef7b573ae48cde2e3b
+                           .group:00000000 wm4.features.h.22.6a4ca7cd053637cc1d0db6c16f39b2d7
+                           .group:00000000 wm4.config.h.183.aa62afef667fb61d15fa64c48beb2f14
+                           .group:00000000 wm4._ansi.h.23.5644b60c990a4800b02a6e654e88f93a
+                           .group:00000000 wm4.stdint.h.20.54ad762faa59e3c05491630641c8d8bf
+                           .group:00000000 wm4.core_cmInstr.h.25.f50f886f2edf670cf199b35fd96f5c91
+                           .group:00000000 wm4.core_cm3.h.130.63ab2348a6eed0fdb318040d970b676c
+                           .group:00000000 wm4.stm32f217xx.h.978.a5c681952b2f704a0e7f2ba21d08adf5
+                           .group:00000000 wm4.stm32f2xx.h.142.bc2155a1f7498bab16371e38413a9e41
+                           .group:00000000 wm4.stm32f2xx_hal_def.h.74.8ad2dc8aa82c4fd02e5aeaae592641ba
+                           .group:00000000 wm4.stm32f2xx_hal_rcc.h.142.ec0f91cc6576a6acebd17e6dd85829ae
+                           .group:00000000 wm4.stm32f2xx_hal_rcc_ex.h.40.0829033e864455c6bdd0db01f8ba5a50
+                           .group:00000000 wm4.stm32f2xx_hal_gpio.h.40.ba64e0bb94d9a68835f80159f39a86f1
+                           .group:00000000 wm4.stm32f2xx_hal_gpio_ex.h.40.24e547fd402281923f446b510381083f
+                           .group:00000000 wm4.stm32f2xx_hal_dma.h.40.5d9732ace2a21a4526ce8f0c52428fff
+                           .group:00000000 wm4.stm32f2xx_hal_cortex.h.40.e10263d2ec5d4fa79b4180ce1a38aff1
+                           .group:00000000 wm4.stm32f2xx_hal_adc.h.40.89ac8b78113cac4cf63847587daabac9
+                           .group:00000000 wm4.stm32f2xx_hal_adc_ex.h.40.7de68ed256ef25526ee31cc017f2c291
+                           .group:00000000 wm4.stm32f2xx_hal_flash.h.40.c3171719ce015e9cff20c795e44e886d
+                           .group:00000000 wm4.stm32f2xx_hal_flash_ex.h.40.7389508bd24a0aeb077bde0c9fb651eb
+                           .group:00000000 wm4.stm32f2xx_ll_fsmc.h.40.c1c32f2e1862f4dd342bd9b80fb895bb
+                           .group:00000000 wm4.stm32f2xx_hal_pwr.h.40.812df32e5c31b609a128e9db0eb4cbd0
+                           .group:00000000 wm4.stm32f2xx_hal_rtc.h.40.850fda5fe2cce8797446913dee18382f
+                           .group:00000000 wm4.stm32f2xx_hal_rtc_ex.h.40.f3e0c408e3bf4e8a0352d7ec9a18a822
+                           .group:00000000 wm4.stm32f2xx_ll_sdmmc.h.40.3719ab487c4b77401c572f459adf6eb7
+                           .group:00000000 wm4.stm32f2xx_hal_sd.h.58.760215394dcc316161a6482c0af9b866
+                           .group:00000000 wm4.stm32f2xx_hal_spi.h.40.7984243dbaba8b21c6392998a47e6987
+                           .group:00000000 wm4.stm32f2xx_hal_tim.h.40.d79172f25d0e9a15dc346aba8515bdd6
+                           .group:00000000 wm4.stm32f2xx_hal_tim_ex.h.40.361f280a7a3f60b4b238bb99ca728d83
+                           .group:00000000 wm4.stm32f2xx_hal_uart.h.40.d74def561ae6f78f40f477c8426ecbef
+                           .group:00000000 wm4.stm32f2xx_ll_usb.h.40.9b0206a05bc6ce3bec1648b51f22cb81
+                           .group:00000000 wm4.stm32f2xx_hal_pcd.h.99.11faba414c39e357b2f23364912d0605
+                           .group:00000000 wm4.stm32f2xx_hal_hcd.h.40.44ee5e972983ae0139ddbacdc75c44ef
+                           .group:00000000 wm4.stm32f2xx_hal.h.64.ed79ee83e52b151b3c365392b398f866
+                           .group:00000000 wm4.stdio.h.31.7c0e28c411445f3f9c5b11accf882760
+                           .group:00000000 wm4.stddef.h.184.159df79b4ca79c76561572a55985524c
+                           .group:00000000 wm4.stdarg.h.34.3a23a216c0c293b3d2ea2e89281481e6
+                           .group:00000000 wm4._default_types.h.6.5e12cd604db8ce00b62bb2f02708eaf3
+                           .group:00000000 wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea
+                           .group:00000000 wm4._types.h.59.db8450f33c1f6150c0372fa1091a887a
+                           .group:00000000 wm4.stddef.h.348.9a99de77b6ba3b4278b57e9cc6d6e349
+                           .group:00000000 wm4.reent.h.16.567d760e6ae9ad7f917851a308bd7a57
+                           .group:00000000 wm4.types.h.23.0d949686bbcadd1621462d4fa1f884f9
+                           .group:00000000 wm4.stddef.h.39.7e3d906ac58942e0b374c527445f5de5
+                           .group:00000000 wm4.types.h.2.e9cec8c90ab35f77d9f499e06ae02400
+                           .group:00000000 wm4.types.h.80.5759fe41f87f5211a5952dfb1fc64f19
+                           .group:00000000 wm4.stdio.h.2.4aa87247282eca6c8f36f9de33d8df1a
+                           .group:00000000 wm4.stdio.h.64.f9f1bb6b0d3d7e12f6a27968d859709c
+                           .group:00000000 wm4.stdlib.h.18.8bab2fb43ac4e90235390733c30a4530
+                           .group:00000000 wm4.stddef.h.158.a7efb00f6cbc6f43213b50e183c9830c
+                           .group:00000000 wm4.alloca.h.8.dfc0c703c47ec3e69746825b17d9e66d
+                           .group:00000000 wm4.stdlib.h.55.7091a050e07f1c4abd225630fe3d62f1
+                           .group:00000000 wm4.cdefs.h.56.efab90f4d89fbc41d6b3a5c5fb0d3d0f
+                           .group:00000000 wm4.string.h.15.dab3980bf35408a4c507182805e2de3a
+                           .group:00000000 wm4.string.h.126.6ff3aa59129e7f66b2c273baf353e066
+                           .group:00000000 wm4.Display.h.39.49592f1e6d055d6383457fd20cdd98de
+                           .group:00000000 wm4.usbd_conf.h.42.6b5dabdfef26be13dabbf5c06e1837cb
+                           .group:00000000 wm4.usbd_def.h.54.f0a777e557f44b0cdc32a86cdf6d44e8
+                           .group:00000000 wm4.usbd_cdc.h.48.93470a15f0b6146c8b31621ae3de674b
+                           .group:00000000 wm4.LEDs.h.9.36ffa4b30bd168dc58d64fa6e53a9a30
+
+UNDEFINED SYMBOLS
+USBD_Device
+USBD_CDC_SetTxBuffer
+USBD_CDC_SetRxBuffer
+USBD_CDC_ReceivePacket
+memcpy
+USBD_CDC_TransmitPacket

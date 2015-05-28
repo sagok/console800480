@@ -1,0 +1,592 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"Board_ts.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.comm	uSdHandle,96,4
+  19              		.comm	SD_CardInfo,88,8
+  20              		.bss
+  21              		.align	2
+  22              	ts_driver:
+  23 0000 00000000 		.space	4
+  24              		.align	1
+  25              	ts_x_boundary:
+  26 0004 0000     		.space	2
+  27              		.align	1
+  28              	ts_y_boundary:
+  29 0006 0000     		.space	2
+  30              	ts_orientation:
+  31 0008 00       		.space	1
+  32              		.text
+  33              		.align	2
+  34              		.global	BSP_TS_Init
+  35              		.thumb
+  36              		.thumb_func
+  38              	BSP_TS_Init:
+  39              	.LFB55:
+  40              		.file 1 "../tasks/display/Board_ts.c"
+   1:../tasks/display/Board_ts.c **** /**
+   2:../tasks/display/Board_ts.c ****   ******************************************************************************
+   3:../tasks/display/Board_ts.c ****   * @file    stm322xg_eval_ts.c
+   4:../tasks/display/Board_ts.c ****   * @author  MCD Application Team
+   5:../tasks/display/Board_ts.c ****   * @version V6.1.0
+   6:../tasks/display/Board_ts.c ****   * @date    13-March-2014
+   7:../tasks/display/Board_ts.c ****   * @brief   This file provides a set of functions needed to manage the touch 
+   8:../tasks/display/Board_ts.c ****   *          screen on STM322xG-EVAL evaluation board.
+   9:../tasks/display/Board_ts.c ****   ******************************************************************************
+  10:../tasks/display/Board_ts.c ****   * @attention
+  11:../tasks/display/Board_ts.c ****   *
+  12:../tasks/display/Board_ts.c ****   * <h2><center>&copy; COPYRIGHT(c) 2014 STMicroelectronics</center></h2>
+  13:../tasks/display/Board_ts.c ****   *
+  14:../tasks/display/Board_ts.c ****   * Redistribution and use in source and binary forms, with or without modification,
+  15:../tasks/display/Board_ts.c ****   * are permitted provided that the following conditions are met:
+  16:../tasks/display/Board_ts.c ****   *   1. Redistributions of source code must retain the above copyright notice,
+  17:../tasks/display/Board_ts.c ****   *      this list of conditions and the following disclaimer.
+  18:../tasks/display/Board_ts.c ****   *   2. Redistributions in binary form must reproduce the above copyright notice,
+  19:../tasks/display/Board_ts.c ****   *      this list of conditions and the following disclaimer in the documentation
+  20:../tasks/display/Board_ts.c ****   *      and/or other materials provided with the distribution.
+  21:../tasks/display/Board_ts.c ****   *   3. Neither the name of STMicroelectronics nor the names of its contributors
+  22:../tasks/display/Board_ts.c ****   *      may be used to endorse or promote products derived from this software
+  23:../tasks/display/Board_ts.c ****   *      without specific prior written permission.
+  24:../tasks/display/Board_ts.c ****   *
+  25:../tasks/display/Board_ts.c ****   * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  26:../tasks/display/Board_ts.c ****   * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  27:../tasks/display/Board_ts.c ****   * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+  28:../tasks/display/Board_ts.c ****   * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+  29:../tasks/display/Board_ts.c ****   * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+  30:../tasks/display/Board_ts.c ****   * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+  31:../tasks/display/Board_ts.c ****   * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+  32:../tasks/display/Board_ts.c ****   * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+  33:../tasks/display/Board_ts.c ****   * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  34:../tasks/display/Board_ts.c ****   * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  35:../tasks/display/Board_ts.c ****   *
+  36:../tasks/display/Board_ts.c ****   ******************************************************************************
+  37:../tasks/display/Board_ts.c ****   */ 
+  38:../tasks/display/Board_ts.c ****   
+  39:../tasks/display/Board_ts.c **** /* File Info : -----------------------------------------------------------------
+  40:../tasks/display/Board_ts.c ****                                    User NOTES
+  41:../tasks/display/Board_ts.c **** 1. How To use this driver:
+  42:../tasks/display/Board_ts.c **** --------------------------
+  43:../tasks/display/Board_ts.c ****    - This driver is used to drive the touch screen module of the STM322xG-EVAL 
+  44:../tasks/display/Board_ts.c ****      evaluation board on the ILI9325 LCD mounted on MB785 daughter board .
+  45:../tasks/display/Board_ts.c ****    - The STMPE811 IO expander device component driver must be included with this 
+  46:../tasks/display/Board_ts.c ****      driver in order to run the TS module commanded by the IO expander device 
+  47:../tasks/display/Board_ts.c ****      mounted on the evaluation board.
+  48:../tasks/display/Board_ts.c **** 
+  49:../tasks/display/Board_ts.c **** 2. Driver description:
+  50:../tasks/display/Board_ts.c **** ---------------------
+  51:../tasks/display/Board_ts.c ****   + Initialization steps:
+  52:../tasks/display/Board_ts.c ****      o Initialize the TS module using the BSP_TS_Init() function. This 
+  53:../tasks/display/Board_ts.c ****        function includes the MSP layer hardware resources initialization and the
+  54:../tasks/display/Board_ts.c ****        communication layer configuration to start the TS use. The LCD size properties
+  55:../tasks/display/Board_ts.c ****        (x and y) are passed as parameters.
+  56:../tasks/display/Board_ts.c ****      o If TS interrupt mode is desired, you must configure the TS interrupt mode
+  57:../tasks/display/Board_ts.c ****        by calling the function BSP_TS_ITConfig(). The TS interrupt mode is generated
+  58:../tasks/display/Board_ts.c ****        as an external interrupt whenever a touch is detected. 
+  59:../tasks/display/Board_ts.c ****   
+  60:../tasks/display/Board_ts.c ****   + Touch screen use
+  61:../tasks/display/Board_ts.c ****      o The touch screen state is captured whenever the function BSP_TS_GetState() is 
+  62:../tasks/display/Board_ts.c ****        used. This function returns information about the last LCD touch occurred
+  63:../tasks/display/Board_ts.c ****        in the TS_StateTypeDef structure.
+  64:../tasks/display/Board_ts.c ****      o If TS interrupt mode is used, the function BSP_TS_ITGetStatus() is needed to get
+  65:../tasks/display/Board_ts.c ****        the interrupt status. To clear the IT pending bits, you should call the 
+  66:../tasks/display/Board_ts.c ****        function BSP_TS_ITClear().
+  67:../tasks/display/Board_ts.c ****      o The IT is handled using the corresponding external interrupt IRQ handler,
+  68:../tasks/display/Board_ts.c ****        the user IT callback treatment is implemented on the same external interrupt
+  69:../tasks/display/Board_ts.c ****        callback.
+  70:../tasks/display/Board_ts.c ****  
+  71:../tasks/display/Board_ts.c **** ------------------------------------------------------------------------------*/   
+  72:../tasks/display/Board_ts.c **** 
+  73:../tasks/display/Board_ts.c **** /* Includes ------------------------------------------------------------------*/
+  74:../tasks/display/Board_ts.c **** #include "Board_ts.h"
+  75:../tasks/display/Board_ts.c **** 
+  76:../tasks/display/Board_ts.c **** #ifdef	TS_Mode_Internal
+  77:../tasks/display/Board_ts.c **** 	#include "InternalTS.h"							// драйвер тачскрина на внутренних АЦП
+  78:../tasks/display/Board_ts.c **** #elif	TS_Mode_ADS7843
+  79:../tasks/display/Board_ts.c **** 	#include "ADS7843_TS.h"
+  80:../tasks/display/Board_ts.c **** #endif
+  81:../tasks/display/Board_ts.c **** 
+  82:../tasks/display/Board_ts.c **** #include "stm32f2xx_hal.h"
+  83:../tasks/display/Board_ts.c **** 
+  84:../tasks/display/Board_ts.c **** /* Private typedef -----------------------------------------------------------*/
+  85:../tasks/display/Board_ts.c ****   
+  86:../tasks/display/Board_ts.c **** /* Private define ------------------------------------------------------------*/
+  87:../tasks/display/Board_ts.c **** 
+  88:../tasks/display/Board_ts.c **** /* Private macro -------------------------------------------------------------*/
+  89:../tasks/display/Board_ts.c **** 
+  90:../tasks/display/Board_ts.c **** /* Private variables ---------------------------------------------------------*/
+  91:../tasks/display/Board_ts.c **** 
+  92:../tasks/display/Board_ts.c **** static TS_DrvTypeDef *ts_driver;
+  93:../tasks/display/Board_ts.c **** static uint16_t ts_x_boundary, ts_y_boundary; 
+  94:../tasks/display/Board_ts.c **** static uint8_t  ts_orientation;
+  95:../tasks/display/Board_ts.c **** 
+  96:../tasks/display/Board_ts.c **** /* ---------------------------------------------------------------------------*/
+  97:../tasks/display/Board_ts.c **** uint8_t BSP_TS_Init(uint16_t xSize, uint16_t ySize)
+  98:../tasks/display/Board_ts.c **** {
+  41              		.loc 1 98 0
+  42              		.cfi_startproc
+  43              		@ args = 0, pretend = 0, frame = 16
+  44              		@ frame_needed = 1, uses_anonymous_args = 0
+  45 0000 80B5     		push	{r7, lr}
+  46              		.cfi_def_cfa_offset 8
+  47              		.cfi_offset 7, -8
+  48              		.cfi_offset 14, -4
+  49 0002 84B0     		sub	sp, sp, #16
+  50              		.cfi_def_cfa_offset 24
+  51 0004 00AF     		add	r7, sp, #0
+  52              		.cfi_def_cfa_register 7
+  53 0006 0246     		mov	r2, r0
+  54 0008 0B46     		mov	r3, r1
+  55 000a FA80     		strh	r2, [r7, #6]	@ movhi
+  56 000c BB80     		strh	r3, [r7, #4]	@ movhi
+  99:../tasks/display/Board_ts.c ****   uint8_t ret = TS_ERROR;
+  57              		.loc 1 99 0
+  58 000e 0123     		movs	r3, #1
+  59 0010 FB73     		strb	r3, [r7, #15]
+ 100:../tasks/display/Board_ts.c ****   
+ 101:../tasks/display/Board_ts.c ****   if(1)
+ 102:../tasks/display/Board_ts.c ****   {
+ 103:../tasks/display/Board_ts.c ****     /* Initialize the TS driver structure */
+ 104:../tasks/display/Board_ts.c **** #ifdef	TS_Mode_Internal
+ 105:../tasks/display/Board_ts.c **** //    ts_driver = &Internal_ts_drv;						// драйвер тачскрина на внутренних АЦП
+ 106:../tasks/display/Board_ts.c **** #elif	TS_Mode_ADS7843
+ 107:../tasks/display/Board_ts.c **** 	  ts_driver = &ADS7843_ts_drv;
+  60              		.loc 1 107 0
+  61 0012 40F20003 		movw	r3, #:lower16:ts_driver
+  62 0016 C0F20003 		movt	r3, #:upper16:ts_driver
+  63 001a 40F20002 		movw	r2, #:lower16:ADS7843_ts_drv
+  64 001e C0F20002 		movt	r2, #:upper16:ADS7843_ts_drv
+  65 0022 1A60     		str	r2, [r3]
+ 108:../tasks/display/Board_ts.c **** #endif
+ 109:../tasks/display/Board_ts.c ****     /* Initialize x and y positions boundaries */
+ 110:../tasks/display/Board_ts.c ****     ts_x_boundary  = xSize;
+  66              		.loc 1 110 0
+  67 0024 40F20003 		movw	r3, #:lower16:ts_x_boundary
+  68 0028 C0F20003 		movt	r3, #:upper16:ts_x_boundary
+  69 002c FA88     		ldrh	r2, [r7, #6]	@ movhi
+  70 002e 1A80     		strh	r2, [r3]	@ movhi
+ 111:../tasks/display/Board_ts.c ****     ts_y_boundary  = ySize;
+  71              		.loc 1 111 0
+  72 0030 40F20003 		movw	r3, #:lower16:ts_y_boundary
+  73 0034 C0F20003 		movt	r3, #:upper16:ts_y_boundary
+  74 0038 BA88     		ldrh	r2, [r7, #4]	@ movhi
+  75 003a 1A80     		strh	r2, [r3]	@ movhi
+ 112:../tasks/display/Board_ts.c ****     ts_orientation = TS_SWAP_NONE;//TS_SWAP_XY;
+  76              		.loc 1 112 0
+  77 003c 40F20003 		movw	r3, #:lower16:ts_orientation
+  78 0040 C0F20003 		movt	r3, #:upper16:ts_orientation
+  79 0044 0022     		movs	r2, #0
+  80 0046 1A70     		strb	r2, [r3]
+ 113:../tasks/display/Board_ts.c ****     ret = TS_OK;
+  81              		.loc 1 113 0
+  82 0048 0023     		movs	r3, #0
+  83 004a FB73     		strb	r3, [r7, #15]
+ 114:../tasks/display/Board_ts.c ****   }
+ 115:../tasks/display/Board_ts.c ****   
+ 116:../tasks/display/Board_ts.c ****   if(ret == TS_OK)
+  84              		.loc 1 116 0
+  85 004c FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+  86 004e 002B     		cmp	r3, #0
+  87 0050 0FD1     		bne	.L2
+ 117:../tasks/display/Board_ts.c ****   {
+ 118:../tasks/display/Board_ts.c ****     /* Initialize the LL TS Driver */
+ 119:../tasks/display/Board_ts.c ****     ts_driver->Init(TS_adres);
+  88              		.loc 1 119 0
+  89 0052 40F20003 		movw	r3, #:lower16:ts_driver
+  90 0056 C0F20003 		movt	r3, #:upper16:ts_driver
+  91 005a 1B68     		ldr	r3, [r3]
+  92 005c 1B68     		ldr	r3, [r3]
+  93 005e 0120     		movs	r0, #1
+  94 0060 9847     		blx	r3
+ 120:../tasks/display/Board_ts.c ****     ts_driver->Start(TS_adres);
+  95              		.loc 1 120 0
+  96 0062 40F20003 		movw	r3, #:lower16:ts_driver
+  97 0066 C0F20003 		movt	r3, #:upper16:ts_driver
+  98 006a 1B68     		ldr	r3, [r3]
+  99 006c 5B68     		ldr	r3, [r3, #4]
+ 100 006e 0120     		movs	r0, #1
+ 101 0070 9847     		blx	r3
+ 102              	.L2:
+ 121:../tasks/display/Board_ts.c ****   }  
+ 122:../tasks/display/Board_ts.c ****   
+ 123:../tasks/display/Board_ts.c ****   return ret;
+ 103              		.loc 1 123 0
+ 104 0072 FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 124:../tasks/display/Board_ts.c **** }
+ 105              		.loc 1 124 0
+ 106 0074 1846     		mov	r0, r3
+ 107 0076 1037     		adds	r7, r7, #16
+ 108 0078 BD46     		mov	sp, r7
+ 109              		@ sp needed
+ 110 007a 80BD     		pop	{r7, pc}
+ 111              		.cfi_endproc
+ 112              	.LFE55:
+ 114              		.align	2
+ 115              		.global	BSP_TS_GetState
+ 116              		.thumb
+ 117              		.thumb_func
+ 119              	BSP_TS_GetState:
+ 120              	.LFB56:
+ 125:../tasks/display/Board_ts.c **** 
+ 126:../tasks/display/Board_ts.c **** /**
+ 127:../tasks/display/Board_ts.c ****   * @brief  Returns status and positions of the touch screen.
+ 128:../tasks/display/Board_ts.c ****   * @param  TS_State: Pointer to touch screen current state structure
+ 129:../tasks/display/Board_ts.c ****   * @retval TS_OK: if all initializations are OK. Other value if error.
+ 130:../tasks/display/Board_ts.c ****   */
+ 131:../tasks/display/Board_ts.c **** uint8_t BSP_TS_GetState(TS_StateTypeDef *TS_State)
+ 132:../tasks/display/Board_ts.c **** {
+ 121              		.loc 1 132 0
+ 122              		.cfi_startproc
+ 123              		@ args = 0, pretend = 0, frame = 24
+ 124              		@ frame_needed = 1, uses_anonymous_args = 0
+ 125 007c 80B5     		push	{r7, lr}
+ 126              		.cfi_def_cfa_offset 8
+ 127              		.cfi_offset 7, -8
+ 128              		.cfi_offset 14, -4
+ 129 007e 86B0     		sub	sp, sp, #24
+ 130              		.cfi_def_cfa_offset 32
+ 131 0080 00AF     		add	r7, sp, #0
+ 132              		.cfi_def_cfa_register 7
+ 133 0082 7860     		str	r0, [r7, #4]
+ 133:../tasks/display/Board_ts.c ****   static uint32_t _x = 0, _y = 0;
+ 134:../tasks/display/Board_ts.c ****   uint16_t xDiff, yDiff , x , y;
+ 135:../tasks/display/Board_ts.c ****   uint16_t swap;
+ 136:../tasks/display/Board_ts.c ****   
+ 137:../tasks/display/Board_ts.c ****   TS_State->TouchDetected = ts_driver->DetectTouch(TS_adres);
+ 134              		.loc 1 137 0
+ 135 0084 40F20003 		movw	r3, #:lower16:ts_driver
+ 136 0088 C0F20003 		movt	r3, #:upper16:ts_driver
+ 137 008c 1B68     		ldr	r3, [r3]
+ 138 008e 9B68     		ldr	r3, [r3, #8]
+ 139 0090 0120     		movs	r0, #1
+ 140 0092 9847     		blx	r3
+ 141 0094 0346     		mov	r3, r0
+ 142 0096 1A46     		mov	r2, r3
+ 143 0098 7B68     		ldr	r3, [r7, #4]
+ 144 009a 1A80     		strh	r2, [r3]	@ movhi
+ 138:../tasks/display/Board_ts.c **** 
+ 139:../tasks/display/Board_ts.c **** //  printf("TouchDetected: %d \n",TS_State->TouchDetected);
+ 140:../tasks/display/Board_ts.c **** 
+ 141:../tasks/display/Board_ts.c ****    if(TS_State->TouchDetected)
+ 145              		.loc 1 141 0
+ 146 009c 7B68     		ldr	r3, [r7, #4]
+ 147 009e 1B88     		ldrh	r3, [r3]
+ 148 00a0 002B     		cmp	r3, #0
+ 149 00a2 00F0A680 		beq	.L5
+ 142:../tasks/display/Board_ts.c ****    {
+ 143:../tasks/display/Board_ts.c ****     ts_driver->GetXY(TS_adres, &x, &y);
+ 150              		.loc 1 143 0
+ 151 00a6 40F20003 		movw	r3, #:lower16:ts_driver
+ 152 00aa C0F20003 		movt	r3, #:upper16:ts_driver
+ 153 00ae 1B68     		ldr	r3, [r3]
+ 154 00b0 DB68     		ldr	r3, [r3, #12]
+ 155 00b2 07F11001 		add	r1, r7, #16
+ 156 00b6 07F10E02 		add	r2, r7, #14
+ 157 00ba 0120     		movs	r0, #1
+ 158 00bc 9847     		blx	r3
+ 144:../tasks/display/Board_ts.c **** 
+ 145:../tasks/display/Board_ts.c ****     if(ts_orientation & TS_SWAP_X)
+ 159              		.loc 1 145 0
+ 160 00be 40F20003 		movw	r3, #:lower16:ts_orientation
+ 161 00c2 C0F20003 		movt	r3, #:upper16:ts_orientation
+ 162 00c6 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 163 00c8 03F00103 		and	r3, r3, #1
+ 164 00cc 002B     		cmp	r3, #0
+ 165 00ce 05D0     		beq	.L6
+ 146:../tasks/display/Board_ts.c ****     {
+ 147:../tasks/display/Board_ts.c ****       x = 4096 - x;  
+ 166              		.loc 1 147 0
+ 167 00d0 3B8A     		ldrh	r3, [r7, #16]
+ 168 00d2 C3F58053 		rsb	r3, r3, #4096
+ 169 00d6 9BB2     		uxth	r3, r3
+ 170 00d8 3B82     		strh	r3, [r7, #16]	@ movhi
+ 171 00da 1DE0     		b	.L7
+ 172              	.L6:
+ 148:../tasks/display/Board_ts.c ****     }
+ 149:../tasks/display/Board_ts.c ****     else
+ 150:../tasks/display/Board_ts.c ****     if(ts_orientation & TS_SWAP_Y)
+ 173              		.loc 1 150 0
+ 174 00dc 40F20003 		movw	r3, #:lower16:ts_orientation
+ 175 00e0 C0F20003 		movt	r3, #:upper16:ts_orientation
+ 176 00e4 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 177 00e6 03F00203 		and	r3, r3, #2
+ 178 00ea 002B     		cmp	r3, #0
+ 179 00ec 05D0     		beq	.L8
+ 151:../tasks/display/Board_ts.c ****     {
+ 152:../tasks/display/Board_ts.c ****       y = 4096 - y;
+ 180              		.loc 1 152 0
+ 181 00ee FB89     		ldrh	r3, [r7, #14]
+ 182 00f0 C3F58053 		rsb	r3, r3, #4096
+ 183 00f4 9BB2     		uxth	r3, r3
+ 184 00f6 FB81     		strh	r3, [r7, #14]	@ movhi
+ 185 00f8 0EE0     		b	.L7
+ 186              	.L8:
+ 153:../tasks/display/Board_ts.c ****     }
+ 154:../tasks/display/Board_ts.c ****     else
+ 155:../tasks/display/Board_ts.c ****     if(ts_orientation & TS_SWAP_XY)
+ 187              		.loc 1 155 0
+ 188 00fa 40F20003 		movw	r3, #:lower16:ts_orientation
+ 189 00fe C0F20003 		movt	r3, #:upper16:ts_orientation
+ 190 0102 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 191 0104 03F00403 		and	r3, r3, #4
+ 192 0108 002B     		cmp	r3, #0
+ 193 010a 05D0     		beq	.L7
+ 156:../tasks/display/Board_ts.c ****     {
+ 157:../tasks/display/Board_ts.c ****       swap = y; 
+ 194              		.loc 1 157 0
+ 195 010c FB89     		ldrh	r3, [r7, #14]	@ movhi
+ 196 010e 7B82     		strh	r3, [r7, #18]	@ movhi
+ 158:../tasks/display/Board_ts.c ****       y = x;      
+ 197              		.loc 1 158 0
+ 198 0110 3B8A     		ldrh	r3, [r7, #16]
+ 199 0112 FB81     		strh	r3, [r7, #14]	@ movhi
+ 159:../tasks/display/Board_ts.c ****       x = swap;      
+ 200              		.loc 1 159 0
+ 201 0114 7B8A     		ldrh	r3, [r7, #18]	@ movhi
+ 202 0116 3B82     		strh	r3, [r7, #16]	@ movhi
+ 203              	.L7:
+ 160:../tasks/display/Board_ts.c ****     }
+ 161:../tasks/display/Board_ts.c ****     	if (x > _x) xDiff=x - _x; else xDiff=_x - x;
+ 204              		.loc 1 161 0
+ 205 0118 3B8A     		ldrh	r3, [r7, #16]
+ 206 011a 1A46     		mov	r2, r3
+ 207 011c 40F20003 		movw	r3, #:lower16:_x.9313
+ 208 0120 C0F20003 		movt	r3, #:upper16:_x.9313
+ 209 0124 1B68     		ldr	r3, [r3]
+ 210 0126 9A42     		cmp	r2, r3
+ 211 0128 09D9     		bls	.L9
+ 212              		.loc 1 161 0 is_stmt 0 discriminator 1
+ 213 012a 3A8A     		ldrh	r2, [r7, #16]
+ 214 012c 40F20003 		movw	r3, #:lower16:_x.9313
+ 215 0130 C0F20003 		movt	r3, #:upper16:_x.9313
+ 216 0134 1B68     		ldr	r3, [r3]
+ 217 0136 9BB2     		uxth	r3, r3
+ 218 0138 D31A     		subs	r3, r2, r3
+ 219 013a FB82     		strh	r3, [r7, #22]	@ movhi
+ 220 013c 08E0     		b	.L10
+ 221              	.L9:
+ 222              		.loc 1 161 0 discriminator 2
+ 223 013e 40F20003 		movw	r3, #:lower16:_x.9313
+ 224 0142 C0F20003 		movt	r3, #:upper16:_x.9313
+ 225 0146 1B68     		ldr	r3, [r3]
+ 226 0148 9AB2     		uxth	r2, r3
+ 227 014a 3B8A     		ldrh	r3, [r7, #16]
+ 228 014c D31A     		subs	r3, r2, r3
+ 229 014e FB82     		strh	r3, [r7, #22]	@ movhi
+ 230              	.L10:
+ 162:../tasks/display/Board_ts.c ****     	if (y > _y) yDiff=y - _y; else yDiff=_y - y;
+ 231              		.loc 1 162 0 is_stmt 1
+ 232 0150 FB89     		ldrh	r3, [r7, #14]
+ 233 0152 1A46     		mov	r2, r3
+ 234 0154 40F20003 		movw	r3, #:lower16:_y.9314
+ 235 0158 C0F20003 		movt	r3, #:upper16:_y.9314
+ 236 015c 1B68     		ldr	r3, [r3]
+ 237 015e 9A42     		cmp	r2, r3
+ 238 0160 09D9     		bls	.L11
+ 239              		.loc 1 162 0 is_stmt 0 discriminator 1
+ 240 0162 FA89     		ldrh	r2, [r7, #14]
+ 241 0164 40F20003 		movw	r3, #:lower16:_y.9314
+ 242 0168 C0F20003 		movt	r3, #:upper16:_y.9314
+ 243 016c 1B68     		ldr	r3, [r3]
+ 244 016e 9BB2     		uxth	r3, r3
+ 245 0170 D31A     		subs	r3, r2, r3
+ 246 0172 BB82     		strh	r3, [r7, #20]	@ movhi
+ 247 0174 08E0     		b	.L12
+ 248              	.L11:
+ 249              		.loc 1 162 0 discriminator 2
+ 250 0176 40F20003 		movw	r3, #:lower16:_y.9314
+ 251 017a C0F20003 		movt	r3, #:upper16:_y.9314
+ 252 017e 1B68     		ldr	r3, [r3]
+ 253 0180 9AB2     		uxth	r2, r3
+ 254 0182 FB89     		ldrh	r3, [r7, #14]
+ 255 0184 D31A     		subs	r3, r2, r3
+ 256 0186 BB82     		strh	r3, [r7, #20]	@ movhi
+ 257              	.L12:
+ 163:../tasks/display/Board_ts.c **** 
+ 164:../tasks/display/Board_ts.c ****  //   xDiff = x > _x? (x - _x): (_x - x);
+ 165:../tasks/display/Board_ts.c **** //    yDiff = y > _y? (y - _y): (_y - y);
+ 166:../tasks/display/Board_ts.c ****     
+ 167:../tasks/display/Board_ts.c ****     if (xDiff + yDiff > 5)
+ 258              		.loc 1 167 0 is_stmt 1
+ 259 0188 FA8A     		ldrh	r2, [r7, #22]
+ 260 018a BB8A     		ldrh	r3, [r7, #20]
+ 261 018c 1344     		add	r3, r3, r2
+ 262 018e 052B     		cmp	r3, #5
+ 263 0190 0DDD     		ble	.L13
+ 168:../tasks/display/Board_ts.c ****     {
+ 169:../tasks/display/Board_ts.c ****       _x = x;
+ 264              		.loc 1 169 0
+ 265 0192 3B8A     		ldrh	r3, [r7, #16]
+ 266 0194 1A46     		mov	r2, r3
+ 267 0196 40F20003 		movw	r3, #:lower16:_x.9313
+ 268 019a C0F20003 		movt	r3, #:upper16:_x.9313
+ 269 019e 1A60     		str	r2, [r3]
+ 170:../tasks/display/Board_ts.c ****       _y = y; 
+ 270              		.loc 1 170 0
+ 271 01a0 FB89     		ldrh	r3, [r7, #14]
+ 272 01a2 1A46     		mov	r2, r3
+ 273 01a4 40F20003 		movw	r3, #:lower16:_y.9314
+ 274 01a8 C0F20003 		movt	r3, #:upper16:_y.9314
+ 275 01ac 1A60     		str	r2, [r3]
+ 276              	.L13:
+ 171:../tasks/display/Board_ts.c ****     }
+ 172:../tasks/display/Board_ts.c ****     
+ 173:../tasks/display/Board_ts.c ****     TS_State->x = (ts_x_boundary * _x) >> 12;
+ 277              		.loc 1 173 0
+ 278 01ae 40F20003 		movw	r3, #:lower16:ts_x_boundary
+ 279 01b2 C0F20003 		movt	r3, #:upper16:ts_x_boundary
+ 280 01b6 1B88     		ldrh	r3, [r3]
+ 281 01b8 1A46     		mov	r2, r3
+ 282 01ba 40F20003 		movw	r3, #:lower16:_x.9313
+ 283 01be C0F20003 		movt	r3, #:upper16:_x.9313
+ 284 01c2 1B68     		ldr	r3, [r3]
+ 285 01c4 03FB02F3 		mul	r3, r3, r2
+ 286 01c8 1B0B     		lsrs	r3, r3, #12
+ 287 01ca 9AB2     		uxth	r2, r3
+ 288 01cc 7B68     		ldr	r3, [r7, #4]
+ 289 01ce 5A80     		strh	r2, [r3, #2]	@ movhi
+ 174:../tasks/display/Board_ts.c ****     TS_State->y = (ts_y_boundary * _y) >> 12; 
+ 290              		.loc 1 174 0
+ 291 01d0 40F20003 		movw	r3, #:lower16:ts_y_boundary
+ 292 01d4 C0F20003 		movt	r3, #:upper16:ts_y_boundary
+ 293 01d8 1B88     		ldrh	r3, [r3]
+ 294 01da 1A46     		mov	r2, r3
+ 295 01dc 40F20003 		movw	r3, #:lower16:_y.9314
+ 296 01e0 C0F20003 		movt	r3, #:upper16:_y.9314
+ 297 01e4 1B68     		ldr	r3, [r3]
+ 298 01e6 03FB02F3 		mul	r3, r3, r2
+ 299 01ea 1B0B     		lsrs	r3, r3, #12
+ 300 01ec 9AB2     		uxth	r2, r3
+ 301 01ee 7B68     		ldr	r3, [r7, #4]
+ 302 01f0 9A80     		strh	r2, [r3, #4]	@ movhi
+ 303              	.L5:
+ 175:../tasks/display/Board_ts.c ****    }
+ 176:../tasks/display/Board_ts.c **** 
+ 177:../tasks/display/Board_ts.c ****   return TS_OK;
+ 304              		.loc 1 177 0
+ 305 01f2 0023     		movs	r3, #0
+ 178:../tasks/display/Board_ts.c **** }
+ 306              		.loc 1 178 0
+ 307 01f4 1846     		mov	r0, r3
+ 308 01f6 1837     		adds	r7, r7, #24
+ 309 01f8 BD46     		mov	sp, r7
+ 310              		@ sp needed
+ 311 01fa 80BD     		pop	{r7, pc}
+ 312              		.cfi_endproc
+ 313              	.LFE56:
+ 315              		.bss
+ 316 0009 000000   		.align	2
+ 317              	_x.9313:
+ 318 000c 00000000 		.space	4
+ 319              		.align	2
+ 320              	_y.9314:
+ 321 0010 00000000 		.space	4
+ 322              		.text
+ 323              	.Letext0:
+ 324              		.file 2 "c:\\program files (x86)\\codesourcery\\arm-none-eabi\\include\\stdint.h"
+ 325              		.file 3 "D:\\workspace\\console800480\\system/stm32f217xx.h"
+ 326              		.file 4 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_hal_def.h"
+ 327              		.file 5 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_hal_dma.h"
+ 328              		.file 6 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_ll_sdmmc.h"
+ 329              		.file 7 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_hal_sd.h"
+ 330              		.file 8 "../tasks/display/Board_ts.h"
+ 331              		.file 9 "../tasks/display/ts.h"
+ 332              		.file 10 "D:\\workspace\\console800480\\system/core_cm3.h"
+ 333              		.file 11 "D:\\workspace\\console800480/main.h"
+ 334              		.file 12 "../tasks/display/ADS7843_TS.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 Board_ts.c
+                            *COM*:00000060 uSdHandle
+                            *COM*:00000058 SD_CardInfo
+C:\Users\sagok\AppData\Local\Temp\ccIeiNmc.s:21     .bss:00000000 $d
+C:\Users\sagok\AppData\Local\Temp\ccIeiNmc.s:22     .bss:00000000 ts_driver
+C:\Users\sagok\AppData\Local\Temp\ccIeiNmc.s:25     .bss:00000004 ts_x_boundary
+C:\Users\sagok\AppData\Local\Temp\ccIeiNmc.s:28     .bss:00000006 ts_y_boundary
+C:\Users\sagok\AppData\Local\Temp\ccIeiNmc.s:30     .bss:00000008 ts_orientation
+C:\Users\sagok\AppData\Local\Temp\ccIeiNmc.s:33     .text:00000000 $t
+C:\Users\sagok\AppData\Local\Temp\ccIeiNmc.s:38     .text:00000000 BSP_TS_Init
+C:\Users\sagok\AppData\Local\Temp\ccIeiNmc.s:119    .text:0000007c BSP_TS_GetState
+C:\Users\sagok\AppData\Local\Temp\ccIeiNmc.s:317    .bss:0000000c _x.9313
+C:\Users\sagok\AppData\Local\Temp\ccIeiNmc.s:320    .bss:00000010 _y.9314
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.1.7f551ac7fcad8b79b9df4bfdaa536673
+                           .group:00000000 wm4.stm32f2xx_hal_conf.h.40.007126baefb9f966c36646edbf8040d2
+                           .group:00000000 wm4.stm32f2xx.h.57.5ec1581efc43612c411d33a8686e9ec7
+                           .group:00000000 wm4.stm32f217xx.h.52.9c940d76d00294b78837dc334c172fdd
+                           .group:00000000 wm4.core_cm3.h.32.49180ccb4d36cabd2d7016d2a51d91ae
+                           .group:00000000 wm4.newlib.h.8.384a112feabb3bef7b573ae48cde2e3b
+                           .group:00000000 wm4.features.h.22.6a4ca7cd053637cc1d0db6c16f39b2d7
+                           .group:00000000 wm4.config.h.183.aa62afef667fb61d15fa64c48beb2f14
+                           .group:00000000 wm4._ansi.h.23.5644b60c990a4800b02a6e654e88f93a
+                           .group:00000000 wm4.stdint.h.20.54ad762faa59e3c05491630641c8d8bf
+                           .group:00000000 wm4.core_cmInstr.h.25.f50f886f2edf670cf199b35fd96f5c91
+                           .group:00000000 wm4.core_cm3.h.130.63ab2348a6eed0fdb318040d970b676c
+                           .group:00000000 wm4.stm32f217xx.h.978.a5c681952b2f704a0e7f2ba21d08adf5
+                           .group:00000000 wm4.stm32f2xx.h.142.bc2155a1f7498bab16371e38413a9e41
+                           .group:00000000 wm4.stm32f2xx_hal_def.h.74.8ad2dc8aa82c4fd02e5aeaae592641ba
+                           .group:00000000 wm4.stm32f2xx_hal_rcc.h.142.ec0f91cc6576a6acebd17e6dd85829ae
+                           .group:00000000 wm4.stm32f2xx_hal_rcc_ex.h.40.0829033e864455c6bdd0db01f8ba5a50
+                           .group:00000000 wm4.stm32f2xx_hal_gpio.h.40.ba64e0bb94d9a68835f80159f39a86f1
+                           .group:00000000 wm4.stm32f2xx_hal_gpio_ex.h.40.24e547fd402281923f446b510381083f
+                           .group:00000000 wm4.stm32f2xx_hal_dma.h.40.5d9732ace2a21a4526ce8f0c52428fff
+                           .group:00000000 wm4.stm32f2xx_hal_cortex.h.40.e10263d2ec5d4fa79b4180ce1a38aff1
+                           .group:00000000 wm4.stm32f2xx_hal_adc.h.40.89ac8b78113cac4cf63847587daabac9
+                           .group:00000000 wm4.stm32f2xx_hal_adc_ex.h.40.7de68ed256ef25526ee31cc017f2c291
+                           .group:00000000 wm4.stm32f2xx_hal_flash.h.40.c3171719ce015e9cff20c795e44e886d
+                           .group:00000000 wm4.stm32f2xx_hal_flash_ex.h.40.7389508bd24a0aeb077bde0c9fb651eb
+                           .group:00000000 wm4.stm32f2xx_ll_fsmc.h.40.c1c32f2e1862f4dd342bd9b80fb895bb
+                           .group:00000000 wm4.stm32f2xx_hal_pwr.h.40.812df32e5c31b609a128e9db0eb4cbd0
+                           .group:00000000 wm4.stm32f2xx_hal_rtc.h.40.850fda5fe2cce8797446913dee18382f
+                           .group:00000000 wm4.stm32f2xx_hal_rtc_ex.h.40.f3e0c408e3bf4e8a0352d7ec9a18a822
+                           .group:00000000 wm4.stm32f2xx_ll_sdmmc.h.40.3719ab487c4b77401c572f459adf6eb7
+                           .group:00000000 wm4.stm32f2xx_hal_sd.h.58.760215394dcc316161a6482c0af9b866
+                           .group:00000000 wm4.stm32f2xx_hal_spi.h.40.7984243dbaba8b21c6392998a47e6987
+                           .group:00000000 wm4.stm32f2xx_hal_tim.h.40.d79172f25d0e9a15dc346aba8515bdd6
+                           .group:00000000 wm4.stm32f2xx_hal_tim_ex.h.40.361f280a7a3f60b4b238bb99ca728d83
+                           .group:00000000 wm4.stm32f2xx_hal_uart.h.40.d74def561ae6f78f40f477c8426ecbef
+                           .group:00000000 wm4.stm32f2xx_ll_usb.h.40.9b0206a05bc6ce3bec1648b51f22cb81
+                           .group:00000000 wm4.stm32f2xx_hal_pcd.h.99.11faba414c39e357b2f23364912d0605
+                           .group:00000000 wm4.stm32f2xx_hal_hcd.h.40.44ee5e972983ae0139ddbacdc75c44ef
+                           .group:00000000 wm4.stm32f2xx_hal.h.64.ed79ee83e52b151b3c365392b398f866
+                           .group:00000000 wm4.stdio.h.31.7c0e28c411445f3f9c5b11accf882760
+                           .group:00000000 wm4.stddef.h.184.159df79b4ca79c76561572a55985524c
+                           .group:00000000 wm4.stdarg.h.34.3a23a216c0c293b3d2ea2e89281481e6
+                           .group:00000000 wm4._default_types.h.6.5e12cd604db8ce00b62bb2f02708eaf3
+                           .group:00000000 wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea
+                           .group:00000000 wm4._types.h.59.db8450f33c1f6150c0372fa1091a887a
+                           .group:00000000 wm4.stddef.h.348.9a99de77b6ba3b4278b57e9cc6d6e349
+                           .group:00000000 wm4.reent.h.16.567d760e6ae9ad7f917851a308bd7a57
+                           .group:00000000 wm4.types.h.23.0d949686bbcadd1621462d4fa1f884f9
+                           .group:00000000 wm4.stddef.h.39.7e3d906ac58942e0b374c527445f5de5
+                           .group:00000000 wm4.types.h.2.e9cec8c90ab35f77d9f499e06ae02400
+                           .group:00000000 wm4.types.h.80.5759fe41f87f5211a5952dfb1fc64f19
+                           .group:00000000 wm4.stdio.h.2.4aa87247282eca6c8f36f9de33d8df1a
+                           .group:00000000 wm4.stdio.h.64.f9f1bb6b0d3d7e12f6a27968d859709c
+                           .group:00000000 wm4.stdlib.h.18.8bab2fb43ac4e90235390733c30a4530
+                           .group:00000000 wm4.stddef.h.158.a7efb00f6cbc6f43213b50e183c9830c
+                           .group:00000000 wm4.alloca.h.8.dfc0c703c47ec3e69746825b17d9e66d
+                           .group:00000000 wm4.stdlib.h.55.7091a050e07f1c4abd225630fe3d62f1
+                           .group:00000000 wm4.cdefs.h.56.efab90f4d89fbc41d6b3a5c5fb0d3d0f
+                           .group:00000000 wm4.string.h.15.dab3980bf35408a4c507182805e2de3a
+                           .group:00000000 wm4.string.h.126.6ff3aa59129e7f66b2c273baf353e066
+                           .group:00000000 wm4.Display.h.39.49592f1e6d055d6383457fd20cdd98de
+                           .group:00000000 wm4.usbd_conf.h.42.6b5dabdfef26be13dabbf5c06e1837cb
+                           .group:00000000 wm4.usbd_def.h.54.f0a777e557f44b0cdc32a86cdf6d44e8
+                           .group:00000000 wm4.usbd_cdc.h.48.93470a15f0b6146c8b31621ae3de674b
+                           .group:00000000 wm4.Board_ts.h.46.a510333d746bfc1307a5056869dd3dec
+                           .group:00000000 wm4.ADS7843_TS.h.60.5447ee5bfeeab537372be7be33333aa0
+
+UNDEFINED SYMBOLS
+ADS7843_ts_drv

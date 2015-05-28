@@ -1,0 +1,1277 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"usbd_desc.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.global	APDKC_Desc
+  19              		.data
+  20              		.align	2
+  23              	APDKC_Desc:
+  24 0000 00000000 		.word	USBD_APDKC_DeviceDescriptor
+  25 0004 00000000 		.word	USBD_APDKC_LangIDStrDescriptor
+  26 0008 00000000 		.word	USBD_APDKC_ManufacturerStrDescriptor
+  27 000c 00000000 		.word	USBD_APDKC_ProductStrDescriptor
+  28 0010 00000000 		.word	USBD_APDKC_SerialStrDescriptor
+  29 0014 00000000 		.word	USBD_APDKC_ConfigStrDescriptor
+  30 0018 00000000 		.word	USBD_APDKC_InterfaceStrDescriptor
+  31              		.global	MSC_Desc
+  32              		.align	2
+  35              	MSC_Desc:
+  36 001c 00000000 		.word	USBD_MSC_DeviceDescriptor
+  37 0020 00000000 		.word	USBD_MSC_LangIDStrDescriptor
+  38 0024 00000000 		.word	USBD_MSC_ManufacturerStrDescriptor
+  39 0028 00000000 		.word	USBD_MSC_ProductStrDescriptor
+  40 002c 00000000 		.word	USBD_MSC_SerialStrDescriptor
+  41 0030 00000000 		.word	USBD_MSC_ConfigStrDescriptor
+  42 0034 00000000 		.word	USBD_MSC_InterfaceStrDescriptor
+  43              		.global	hUSBDDeviceDesc
+  44              		.align	2
+  47              	hUSBDDeviceDesc:
+  48 0038 12       		.byte	18
+  49 0039 01       		.byte	1
+  50 003a 00       		.byte	0
+  51 003b 02       		.byte	2
+  52 003c 00       		.byte	0
+  53 003d 00       		.byte	0
+  54 003e 00       		.byte	0
+  55 003f 40       		.byte	64
+  56 0040 83       		.byte	-125
+  57 0041 04       		.byte	4
+  58 0042 30       		.byte	48
+  59 0043 57       		.byte	87
+  60 0044 00       		.byte	0
+  61 0045 01       		.byte	1
+  62 0046 01       		.byte	1
+  63 0047 02       		.byte	2
+  64 0048 03       		.byte	3
+  65 0049 01       		.byte	1
+  66              		.global	hUSBDMSCDeviceDesc
+  67 004a 0000     		.align	2
+  70              	hUSBDMSCDeviceDesc:
+  71 004c 12       		.byte	18
+  72 004d 01       		.byte	1
+  73 004e 00       		.byte	0
+  74 004f 02       		.byte	2
+  75 0050 00       		.byte	0
+  76 0051 00       		.byte	0
+  77 0052 00       		.byte	0
+  78 0053 40       		.byte	64
+  79 0054 83       		.byte	-125
+  80 0055 04       		.byte	4
+  81 0056 30       		.byte	48
+  82 0057 57       		.byte	87
+  83 0058 00       		.byte	0
+  84 0059 01       		.byte	1
+  85 005a 01       		.byte	1
+  86 005b 02       		.byte	2
+  87 005c 03       		.byte	3
+  88 005d 01       		.byte	1
+  89              		.global	USBD_LangIDDesc
+  90 005e 0000     		.align	2
+  93              	USBD_LangIDDesc:
+  94 0060 04       		.byte	4
+  95 0061 03       		.byte	3
+  96 0062 09       		.byte	9
+  97 0063 04       		.byte	4
+  98              		.comm	USBD_StrDesc,256,4
+  99              		.comm	USBD_MSCStrDesc,256,4
+ 100              		.text
+ 101              		.align	2
+ 102              		.global	USBD_APDKC_DeviceDescriptor
+ 103              		.thumb
+ 104              		.thumb_func
+ 106              	USBD_APDKC_DeviceDescriptor:
+ 107              	.LFB55:
+ 108              		.file 1 "../tasks/usb/usbd_desc.c"
+   1:../tasks/usb/usbd_desc.c **** /**
+   2:../tasks/usb/usbd_desc.c ****  ******************************************************************************
+   3:../tasks/usb/usbd_desc.c ****  * @file    USB_Device/CDC_Standalone/Src/usbd_desc.c
+   4:../tasks/usb/usbd_desc.c ****  * @author  MCD Application Team
+   5:../tasks/usb/usbd_desc.c ****  * @version V1.1.0
+   6:../tasks/usb/usbd_desc.c ****  * @date    13-March-2014
+   7:../tasks/usb/usbd_desc.c ****  * @brief   This file provides the USBD descriptors and string formating method.
+   8:../tasks/usb/usbd_desc.c ****  ******************************************************************************
+   9:../tasks/usb/usbd_desc.c ****  * @attention
+  10:../tasks/usb/usbd_desc.c ****  *
+  11:../tasks/usb/usbd_desc.c ****  * <h2><center>&copy; COPYRIGHT(c) 2014 STMicroelectronics</center></h2>
+  12:../tasks/usb/usbd_desc.c ****  *
+  13:../tasks/usb/usbd_desc.c ****  * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+  14:../tasks/usb/usbd_desc.c ****  * You may not use this file except in compliance with the License.
+  15:../tasks/usb/usbd_desc.c ****  * You may obtain a copy of the License at:
+  16:../tasks/usb/usbd_desc.c ****  *
+  17:../tasks/usb/usbd_desc.c ****  *        http://www.st.com/software_license_agreement_liberty_v2
+  18:../tasks/usb/usbd_desc.c ****  *
+  19:../tasks/usb/usbd_desc.c ****  * Unless required by applicable law or agreed to in writing, software
+  20:../tasks/usb/usbd_desc.c ****  * distributed under the License is distributed on an "AS IS" BASIS,
+  21:../tasks/usb/usbd_desc.c ****  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  22:../tasks/usb/usbd_desc.c ****  * See the License for the specific language governing permissions and
+  23:../tasks/usb/usbd_desc.c ****  * limitations under the License.
+  24:../tasks/usb/usbd_desc.c ****  *
+  25:../tasks/usb/usbd_desc.c ****  ******************************************************************************
+  26:../tasks/usb/usbd_desc.c ****  */
+  27:../tasks/usb/usbd_desc.c **** 
+  28:../tasks/usb/usbd_desc.c **** /* Includes ------------------------------------------------------------------*/
+  29:../tasks/usb/usbd_desc.c **** #include "usbd_core.h"
+  30:../tasks/usb/usbd_desc.c **** #include "usbd_desc.h"
+  31:../tasks/usb/usbd_desc.c **** #include "usbd_conf.h"
+  32:../tasks/usb/usbd_desc.c **** 
+  33:../tasks/usb/usbd_desc.c **** /* Private typedef -----------------------------------------------------------*/
+  34:../tasks/usb/usbd_desc.c **** /* Private define ------------------------------------------------------------*/
+  35:../tasks/usb/usbd_desc.c **** #define USBD_VID                      0x0483
+  36:../tasks/usb/usbd_desc.c **** #define USBD_PID                      0xFFF0
+  37:../tasks/usb/usbd_desc.c **** #define USBD_LANGID_STRING            0x0409
+  38:../tasks/usb/usbd_desc.c **** #define USBD_MANUFACTURER_STRING      "BEMN"
+  39:../tasks/usb/usbd_desc.c **** #define USBD_PRODUCT_HS_STRING        "STRELA-M (APDKC-01) HS"		//STRELA-M (APDKC-01)
+  40:../tasks/usb/usbd_desc.c **** #define USBD_SERIALNUMBER_HS_STRING   "Rev.03"			//STM3210
+  41:../tasks/usb/usbd_desc.c **** #define USBD_PRODUCT_FS_STRING        "STRELA-M (APDKC-01) FS"
+  42:../tasks/usb/usbd_desc.c **** #define USBD_SERIALNUMBER_FS_STRING   "Rev.03"
+  43:../tasks/usb/usbd_desc.c **** #define USBD_CONFIGURATION_HS_STRING  "APDKC Config HS"
+  44:../tasks/usb/usbd_desc.c **** #define USBD_INTERFACE_HS_STRING      "APDKC Interface HS"
+  45:../tasks/usb/usbd_desc.c **** #define USBD_CONFIGURATION_FS_STRING  "APDKC Config FS"
+  46:../tasks/usb/usbd_desc.c **** #define USBD_INTERFACE_FS_STRING      "APDKC Interface FS"
+  47:../tasks/usb/usbd_desc.c **** 
+  48:../tasks/usb/usbd_desc.c **** #define USBD_VID                      0x0483
+  49:../tasks/usb/usbd_desc.c **** #define USBD_PID                      0x5730
+  50:../tasks/usb/usbd_desc.c **** #define USBD_MSCPRODUCT_HS_STRING      "STM32 AUDIO Streaming in HS Mode"
+  51:../tasks/usb/usbd_desc.c **** //#define USBD_SERIALNUMBER_HS_STRING   "00000000034E"
+  52:../tasks/usb/usbd_desc.c **** #define USBD_MSCPRODUCT_FS_STRING     "STM32 AUDIO Streaming in FS Mode"
+  53:../tasks/usb/usbd_desc.c **** //#define USBD_SERIALNUMBER_FS_STRING   "00000000034F"
+  54:../tasks/usb/usbd_desc.c **** #define USBD_MSCCONFIGURATION_HS_STRING  "AUDIO Config"
+  55:../tasks/usb/usbd_desc.c **** #define USBD_MSCINTERFACE_HS_STRING      "AUDIO Interface"
+  56:../tasks/usb/usbd_desc.c **** #define USBD_MSCCONFIGURATION_FS_STRING  "AUDIO Config"
+  57:../tasks/usb/usbd_desc.c **** #define USBD_MSCINTERFACE_FS_STRING      "AUDIO Interface"
+  58:../tasks/usb/usbd_desc.c **** 
+  59:../tasks/usb/usbd_desc.c **** /* Private macro -------------------------------------------------------------*/
+  60:../tasks/usb/usbd_desc.c **** /* Private function prototypes -----------------------------------------------*/
+  61:../tasks/usb/usbd_desc.c **** uint8_t *USBD_APDKC_DeviceDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
+  62:../tasks/usb/usbd_desc.c **** uint8_t *USBD_APDKC_LangIDStrDescriptor(USBD_SpeedTypeDef speed,uint16_t *length);
+  63:../tasks/usb/usbd_desc.c **** uint8_t *USBD_APDKC_ManufacturerStrDescriptor(USBD_SpeedTypeDef speed,uint16_t *length);
+  64:../tasks/usb/usbd_desc.c **** uint8_t *USBD_APDKC_ProductStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
+  65:../tasks/usb/usbd_desc.c **** uint8_t *USBD_APDKC_SerialStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
+  66:../tasks/usb/usbd_desc.c **** uint8_t *USBD_APDKC_ConfigStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
+  67:../tasks/usb/usbd_desc.c **** uint8_t *USBD_APDKC_InterfaceStrDescriptor(USBD_SpeedTypeDef speed,	uint16_t *length);
+  68:../tasks/usb/usbd_desc.c **** #ifdef USB_SUPPORT_USER_STRING_DESC
+  69:../tasks/usb/usbd_desc.c **** uint8_t *USBD_APDKC_USRStringDesc (USBD_SpeedTypeDef speed, uint8_t idx, uint16_t *length);
+  70:../tasks/usb/usbd_desc.c **** #endif /* USB_SUPPORT_USER_STRING_DESC */  
+  71:../tasks/usb/usbd_desc.c **** 
+  72:../tasks/usb/usbd_desc.c **** 
+  73:../tasks/usb/usbd_desc.c **** uint8_t *USBD_MSC_DeviceDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
+  74:../tasks/usb/usbd_desc.c **** uint8_t *USBD_MSC_LangIDStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
+  75:../tasks/usb/usbd_desc.c **** uint8_t *USBD_MSC_ManufacturerStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
+  76:../tasks/usb/usbd_desc.c **** uint8_t *USBD_MSC_ProductStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
+  77:../tasks/usb/usbd_desc.c **** uint8_t *USBD_MSC_SerialStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
+  78:../tasks/usb/usbd_desc.c **** uint8_t *USBD_MSC_ConfigStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
+  79:../tasks/usb/usbd_desc.c **** uint8_t *USBD_MSC_InterfaceStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
+  80:../tasks/usb/usbd_desc.c **** #ifdef USB_SUPPORT_USER_STRING_DESC
+  81:../tasks/usb/usbd_desc.c **** uint8_t *USBD_MSC_USRStringDesc(USBD_SpeedTypeDef speed, uint8_t idx, uint16_t *length);
+  82:../tasks/usb/usbd_desc.c **** #endif /* USB_SUPPORT_USER_STRING_DESC */
+  83:../tasks/usb/usbd_desc.c **** 
+  84:../tasks/usb/usbd_desc.c **** /* Private variables ---------------------------------------------------------*/
+  85:../tasks/usb/usbd_desc.c **** USBD_DescriptorsTypeDef APDKC_Desc = {
+  86:../tasks/usb/usbd_desc.c **** 		USBD_APDKC_DeviceDescriptor,
+  87:../tasks/usb/usbd_desc.c **** 		USBD_APDKC_LangIDStrDescriptor,
+  88:../tasks/usb/usbd_desc.c **** 		USBD_APDKC_ManufacturerStrDescriptor,
+  89:../tasks/usb/usbd_desc.c **** 		USBD_APDKC_ProductStrDescriptor,
+  90:../tasks/usb/usbd_desc.c **** 		USBD_APDKC_SerialStrDescriptor,
+  91:../tasks/usb/usbd_desc.c **** 		USBD_APDKC_ConfigStrDescriptor,
+  92:../tasks/usb/usbd_desc.c **** 		USBD_APDKC_InterfaceStrDescriptor,
+  93:../tasks/usb/usbd_desc.c **** };
+  94:../tasks/usb/usbd_desc.c **** 
+  95:../tasks/usb/usbd_desc.c **** USBD_DescriptorsTypeDef MSC_Desc = {
+  96:../tasks/usb/usbd_desc.c ****   USBD_MSC_DeviceDescriptor,
+  97:../tasks/usb/usbd_desc.c ****   USBD_MSC_LangIDStrDescriptor,
+  98:../tasks/usb/usbd_desc.c ****   USBD_MSC_ManufacturerStrDescriptor,
+  99:../tasks/usb/usbd_desc.c ****   USBD_MSC_ProductStrDescriptor,
+ 100:../tasks/usb/usbd_desc.c ****   USBD_MSC_SerialStrDescriptor,
+ 101:../tasks/usb/usbd_desc.c ****   USBD_MSC_ConfigStrDescriptor,
+ 102:../tasks/usb/usbd_desc.c ****   USBD_MSC_InterfaceStrDescriptor,
+ 103:../tasks/usb/usbd_desc.c **** };
+ 104:../tasks/usb/usbd_desc.c **** 
+ 105:../tasks/usb/usbd_desc.c **** 
+ 106:../tasks/usb/usbd_desc.c **** /* USB Standard Device Descriptor */
+ 107:../tasks/usb/usbd_desc.c **** #if defined ( __ICCARM__ ) /*!< IAR Compiler */
+ 108:../tasks/usb/usbd_desc.c **** #pragma data_alignment=4
+ 109:../tasks/usb/usbd_desc.c **** #endif
+ 110:../tasks/usb/usbd_desc.c **** __ALIGN_BEGIN uint8_t hUSBDDeviceDesc[USB_LEN_DEV_DESC] __ALIGN_END = { 0x12, /* bLength */
+ 111:../tasks/usb/usbd_desc.c **** USB_DESC_TYPE_DEVICE, /* bDescriptorType */
+ 112:../tasks/usb/usbd_desc.c **** 0x00, /* bcdUSB */
+ 113:../tasks/usb/usbd_desc.c **** 0x02, 0x00, /* bDeviceClass */
+ 114:../tasks/usb/usbd_desc.c **** 0x00, /* bDeviceSubClass */
+ 115:../tasks/usb/usbd_desc.c **** 0x00, /* bDeviceProtocol */
+ 116:../tasks/usb/usbd_desc.c **** USB_MAX_EP0_SIZE, /* bMaxPacketSize */
+ 117:../tasks/usb/usbd_desc.c **** LOBYTE(USBD_VID), /* idVendor */
+ 118:../tasks/usb/usbd_desc.c **** HIBYTE(USBD_VID), /* idVendor */
+ 119:../tasks/usb/usbd_desc.c **** LOBYTE(USBD_PID), /* idVendor */
+ 120:../tasks/usb/usbd_desc.c **** HIBYTE(USBD_PID), /* idVendor */
+ 121:../tasks/usb/usbd_desc.c **** 0x00, /* bcdDevice rel. 2.00 */
+ 122:../tasks/usb/usbd_desc.c **** 0x01, USBD_IDX_MFC_STR, /* Index of manufacturer string */
+ 123:../tasks/usb/usbd_desc.c **** USBD_IDX_PRODUCT_STR, /* Index of product string */
+ 124:../tasks/usb/usbd_desc.c **** USBD_IDX_SERIAL_STR, /* Index of serial number string */
+ 125:../tasks/usb/usbd_desc.c **** USBD_MAX_NUM_CONFIGURATION /* bNumConfigurations */
+ 126:../tasks/usb/usbd_desc.c **** }; /* USB_DeviceDescriptor */
+ 127:../tasks/usb/usbd_desc.c **** 
+ 128:../tasks/usb/usbd_desc.c **** __ALIGN_BEGIN uint8_t hUSBDMSCDeviceDesc[USB_LEN_DEV_DESC] __ALIGN_END = { 0x12, /* bLength */
+ 129:../tasks/usb/usbd_desc.c **** USB_DESC_TYPE_DEVICE, /* bDescriptorType */
+ 130:../tasks/usb/usbd_desc.c **** 0x00, /* bcdUSB */
+ 131:../tasks/usb/usbd_desc.c **** 0x02, 0x00, /* bDeviceClass */
+ 132:../tasks/usb/usbd_desc.c **** 0x00, /* bDeviceSubClass */
+ 133:../tasks/usb/usbd_desc.c **** 0x00, /* bDeviceProtocol */
+ 134:../tasks/usb/usbd_desc.c **** USB_MAX_EP0_SIZE, /* bMaxPacketSize */
+ 135:../tasks/usb/usbd_desc.c **** LOBYTE(USBD_VID), /* idVendor */
+ 136:../tasks/usb/usbd_desc.c **** HIBYTE(USBD_VID), /* idVendor */
+ 137:../tasks/usb/usbd_desc.c **** LOBYTE(USBD_PID), /* idVendor */
+ 138:../tasks/usb/usbd_desc.c **** HIBYTE(USBD_PID), /* idVendor */
+ 139:../tasks/usb/usbd_desc.c **** 0x00, /* bcdDevice rel. 2.00 */
+ 140:../tasks/usb/usbd_desc.c **** 0x01, USBD_IDX_MFC_STR, /* Index of manufacturer string */
+ 141:../tasks/usb/usbd_desc.c **** USBD_IDX_PRODUCT_STR, /* Index of product string */
+ 142:../tasks/usb/usbd_desc.c **** USBD_IDX_SERIAL_STR, /* Index of serial number string */
+ 143:../tasks/usb/usbd_desc.c **** USBD_MAX_NUM_CONFIGURATION /* bNumConfigurations */
+ 144:../tasks/usb/usbd_desc.c **** }; /* USB_DeviceDescriptor */
+ 145:../tasks/usb/usbd_desc.c **** 
+ 146:../tasks/usb/usbd_desc.c **** /* USB Standard Device Descriptor */
+ 147:../tasks/usb/usbd_desc.c **** #if defined ( __ICCARM__ ) /*!< IAR Compiler */
+ 148:../tasks/usb/usbd_desc.c **** #pragma data_alignment=4
+ 149:../tasks/usb/usbd_desc.c **** #endif
+ 150:../tasks/usb/usbd_desc.c **** __ALIGN_BEGIN uint8_t USBD_LangIDDesc[USB_LEN_LANGID_STR_DESC] __ALIGN_END = {
+ 151:../tasks/usb/usbd_desc.c **** 		USB_LEN_LANGID_STR_DESC, USB_DESC_TYPE_STRING,
+ 152:../tasks/usb/usbd_desc.c **** 		LOBYTE(USBD_LANGID_STRING), HIBYTE(USBD_LANGID_STRING), };
+ 153:../tasks/usb/usbd_desc.c **** 
+ 154:../tasks/usb/usbd_desc.c **** #if defined ( __ICCARM__ ) /*!< IAR Compiler */
+ 155:../tasks/usb/usbd_desc.c **** #pragma data_alignment=4
+ 156:../tasks/usb/usbd_desc.c **** #endif
+ 157:../tasks/usb/usbd_desc.c **** __ALIGN_BEGIN uint8_t USBD_StrDesc[USBD_MAX_STR_DESC_SIZ] __ALIGN_END;
+ 158:../tasks/usb/usbd_desc.c **** __ALIGN_BEGIN uint8_t USBD_MSCStrDesc[USBD_MAX_STR_DESC_SIZ] __ALIGN_END;
+ 159:../tasks/usb/usbd_desc.c **** 
+ 160:../tasks/usb/usbd_desc.c **** /* Private functions ---------------------------------------------------------*/
+ 161:../tasks/usb/usbd_desc.c **** 
+ 162:../tasks/usb/usbd_desc.c **** /**
+ 163:../tasks/usb/usbd_desc.c ****  * @brief  Returns the device descriptor.
+ 164:../tasks/usb/usbd_desc.c ****  * @param  speed: Current device speed
+ 165:../tasks/usb/usbd_desc.c ****  * @param  length: Pointer to data length variable
+ 166:../tasks/usb/usbd_desc.c ****  * @retval Pointer to descriptor buffer
+ 167:../tasks/usb/usbd_desc.c ****  */
+ 168:../tasks/usb/usbd_desc.c **** uint8_t *USBD_APDKC_DeviceDescriptor(USBD_SpeedTypeDef speed, uint16_t *length) {
+ 109              		.loc 1 168 0
+ 110              		.cfi_startproc
+ 111              		@ args = 0, pretend = 0, frame = 8
+ 112              		@ frame_needed = 1, uses_anonymous_args = 0
+ 113              		@ link register save eliminated.
+ 114 0000 80B4     		push	{r7}
+ 115              		.cfi_def_cfa_offset 4
+ 116              		.cfi_offset 7, -4
+ 117 0002 83B0     		sub	sp, sp, #12
+ 118              		.cfi_def_cfa_offset 16
+ 119 0004 00AF     		add	r7, sp, #0
+ 120              		.cfi_def_cfa_register 7
+ 121 0006 0346     		mov	r3, r0
+ 122 0008 3960     		str	r1, [r7]
+ 123 000a FB71     		strb	r3, [r7, #7]
+ 169:../tasks/usb/usbd_desc.c **** 	*length = sizeof(hUSBDDeviceDesc);
+ 124              		.loc 1 169 0
+ 125 000c 3B68     		ldr	r3, [r7]
+ 126 000e 1222     		movs	r2, #18
+ 127 0010 1A80     		strh	r2, [r3]	@ movhi
+ 170:../tasks/usb/usbd_desc.c **** 	return hUSBDDeviceDesc;
+ 128              		.loc 1 170 0
+ 129 0012 40F20003 		movw	r3, #:lower16:hUSBDDeviceDesc
+ 130 0016 C0F20003 		movt	r3, #:upper16:hUSBDDeviceDesc
+ 171:../tasks/usb/usbd_desc.c **** }
+ 131              		.loc 1 171 0
+ 132 001a 1846     		mov	r0, r3
+ 133 001c 0C37     		adds	r7, r7, #12
+ 134 001e BD46     		mov	sp, r7
+ 135              		@ sp needed
+ 136 0020 5DF8047B 		ldr	r7, [sp], #4
+ 137 0024 7047     		bx	lr
+ 138              		.cfi_endproc
+ 139              	.LFE55:
+ 141 0026 00BF     		.align	2
+ 142              		.global	USBD_MSC_DeviceDescriptor
+ 143              		.thumb
+ 144              		.thumb_func
+ 146              	USBD_MSC_DeviceDescriptor:
+ 147              	.LFB56:
+ 172:../tasks/usb/usbd_desc.c **** 
+ 173:../tasks/usb/usbd_desc.c **** uint8_t *USBD_MSC_DeviceDescriptor(USBD_SpeedTypeDef speed, uint16_t *length)
+ 174:../tasks/usb/usbd_desc.c **** {
+ 148              		.loc 1 174 0
+ 149              		.cfi_startproc
+ 150              		@ args = 0, pretend = 0, frame = 8
+ 151              		@ frame_needed = 1, uses_anonymous_args = 0
+ 152              		@ link register save eliminated.
+ 153 0028 80B4     		push	{r7}
+ 154              		.cfi_def_cfa_offset 4
+ 155              		.cfi_offset 7, -4
+ 156 002a 83B0     		sub	sp, sp, #12
+ 157              		.cfi_def_cfa_offset 16
+ 158 002c 00AF     		add	r7, sp, #0
+ 159              		.cfi_def_cfa_register 7
+ 160 002e 0346     		mov	r3, r0
+ 161 0030 3960     		str	r1, [r7]
+ 162 0032 FB71     		strb	r3, [r7, #7]
+ 175:../tasks/usb/usbd_desc.c ****   *length = sizeof(hUSBDMSCDeviceDesc);
+ 163              		.loc 1 175 0
+ 164 0034 3B68     		ldr	r3, [r7]
+ 165 0036 1222     		movs	r2, #18
+ 166 0038 1A80     		strh	r2, [r3]	@ movhi
+ 176:../tasks/usb/usbd_desc.c ****   return hUSBDMSCDeviceDesc;
+ 167              		.loc 1 176 0
+ 168 003a 40F20003 		movw	r3, #:lower16:hUSBDMSCDeviceDesc
+ 169 003e C0F20003 		movt	r3, #:upper16:hUSBDMSCDeviceDesc
+ 177:../tasks/usb/usbd_desc.c **** }
+ 170              		.loc 1 177 0
+ 171 0042 1846     		mov	r0, r3
+ 172 0044 0C37     		adds	r7, r7, #12
+ 173 0046 BD46     		mov	sp, r7
+ 174              		@ sp needed
+ 175 0048 5DF8047B 		ldr	r7, [sp], #4
+ 176 004c 7047     		bx	lr
+ 177              		.cfi_endproc
+ 178              	.LFE56:
+ 180 004e 00BF     		.align	2
+ 181              		.global	USBD_APDKC_LangIDStrDescriptor
+ 182              		.thumb
+ 183              		.thumb_func
+ 185              	USBD_APDKC_LangIDStrDescriptor:
+ 186              	.LFB57:
+ 178:../tasks/usb/usbd_desc.c **** 
+ 179:../tasks/usb/usbd_desc.c **** 
+ 180:../tasks/usb/usbd_desc.c **** /**
+ 181:../tasks/usb/usbd_desc.c ****  * @brief  Returns the LangID string descriptor.
+ 182:../tasks/usb/usbd_desc.c ****  * @param  speed: Current device speed
+ 183:../tasks/usb/usbd_desc.c ****  * @param  length: Pointer to data length variable
+ 184:../tasks/usb/usbd_desc.c ****  * @retval Pointer to descriptor buffer
+ 185:../tasks/usb/usbd_desc.c ****  */
+ 186:../tasks/usb/usbd_desc.c **** uint8_t *USBD_APDKC_LangIDStrDescriptor(USBD_SpeedTypeDef speed,
+ 187:../tasks/usb/usbd_desc.c **** 		uint16_t *length) {
+ 187              		.loc 1 187 0
+ 188              		.cfi_startproc
+ 189              		@ args = 0, pretend = 0, frame = 8
+ 190              		@ frame_needed = 1, uses_anonymous_args = 0
+ 191              		@ link register save eliminated.
+ 192 0050 80B4     		push	{r7}
+ 193              		.cfi_def_cfa_offset 4
+ 194              		.cfi_offset 7, -4
+ 195 0052 83B0     		sub	sp, sp, #12
+ 196              		.cfi_def_cfa_offset 16
+ 197 0054 00AF     		add	r7, sp, #0
+ 198              		.cfi_def_cfa_register 7
+ 199 0056 0346     		mov	r3, r0
+ 200 0058 3960     		str	r1, [r7]
+ 201 005a FB71     		strb	r3, [r7, #7]
+ 188:../tasks/usb/usbd_desc.c **** 	*length = sizeof(USBD_LangIDDesc);
+ 202              		.loc 1 188 0
+ 203 005c 3B68     		ldr	r3, [r7]
+ 204 005e 0422     		movs	r2, #4
+ 205 0060 1A80     		strh	r2, [r3]	@ movhi
+ 189:../tasks/usb/usbd_desc.c **** 	return USBD_LangIDDesc;
+ 206              		.loc 1 189 0
+ 207 0062 40F20003 		movw	r3, #:lower16:USBD_LangIDDesc
+ 208 0066 C0F20003 		movt	r3, #:upper16:USBD_LangIDDesc
+ 190:../tasks/usb/usbd_desc.c **** }
+ 209              		.loc 1 190 0
+ 210 006a 1846     		mov	r0, r3
+ 211 006c 0C37     		adds	r7, r7, #12
+ 212 006e BD46     		mov	sp, r7
+ 213              		@ sp needed
+ 214 0070 5DF8047B 		ldr	r7, [sp], #4
+ 215 0074 7047     		bx	lr
+ 216              		.cfi_endproc
+ 217              	.LFE57:
+ 219 0076 00BF     		.align	2
+ 220              		.global	USBD_MSC_LangIDStrDescriptor
+ 221              		.thumb
+ 222              		.thumb_func
+ 224              	USBD_MSC_LangIDStrDescriptor:
+ 225              	.LFB58:
+ 191:../tasks/usb/usbd_desc.c **** 
+ 192:../tasks/usb/usbd_desc.c **** uint8_t *USBD_MSC_LangIDStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length)
+ 193:../tasks/usb/usbd_desc.c **** {
+ 226              		.loc 1 193 0
+ 227              		.cfi_startproc
+ 228              		@ args = 0, pretend = 0, frame = 8
+ 229              		@ frame_needed = 1, uses_anonymous_args = 0
+ 230              		@ link register save eliminated.
+ 231 0078 80B4     		push	{r7}
+ 232              		.cfi_def_cfa_offset 4
+ 233              		.cfi_offset 7, -4
+ 234 007a 83B0     		sub	sp, sp, #12
+ 235              		.cfi_def_cfa_offset 16
+ 236 007c 00AF     		add	r7, sp, #0
+ 237              		.cfi_def_cfa_register 7
+ 238 007e 0346     		mov	r3, r0
+ 239 0080 3960     		str	r1, [r7]
+ 240 0082 FB71     		strb	r3, [r7, #7]
+ 194:../tasks/usb/usbd_desc.c ****   *length = sizeof(USBD_LangIDDesc);
+ 241              		.loc 1 194 0
+ 242 0084 3B68     		ldr	r3, [r7]
+ 243 0086 0422     		movs	r2, #4
+ 244 0088 1A80     		strh	r2, [r3]	@ movhi
+ 195:../tasks/usb/usbd_desc.c ****   return USBD_LangIDDesc;
+ 245              		.loc 1 195 0
+ 246 008a 40F20003 		movw	r3, #:lower16:USBD_LangIDDesc
+ 247 008e C0F20003 		movt	r3, #:upper16:USBD_LangIDDesc
+ 196:../tasks/usb/usbd_desc.c **** }
+ 248              		.loc 1 196 0
+ 249 0092 1846     		mov	r0, r3
+ 250 0094 0C37     		adds	r7, r7, #12
+ 251 0096 BD46     		mov	sp, r7
+ 252              		@ sp needed
+ 253 0098 5DF8047B 		ldr	r7, [sp], #4
+ 254 009c 7047     		bx	lr
+ 255              		.cfi_endproc
+ 256              	.LFE58:
+ 258              		.section	.rodata
+ 259              		.align	2
+ 260              	.LC0:
+ 261 0000 53545245 		.ascii	"STRELA-M (APDKC-01) HS\000"
+ 261      4C412D4D 
+ 261      20284150 
+ 261      444B432D 
+ 261      30312920 
+ 262 0017 00       		.align	2
+ 263              	.LC1:
+ 264 0018 53545245 		.ascii	"STRELA-M (APDKC-01) FS\000"
+ 264      4C412D4D 
+ 264      20284150 
+ 264      444B432D 
+ 264      30312920 
+ 265              		.text
+ 266 009e 00BF     		.align	2
+ 267              		.global	USBD_APDKC_ProductStrDescriptor
+ 268              		.thumb
+ 269              		.thumb_func
+ 271              	USBD_APDKC_ProductStrDescriptor:
+ 272              	.LFB59:
+ 197:../tasks/usb/usbd_desc.c **** 
+ 198:../tasks/usb/usbd_desc.c **** 
+ 199:../tasks/usb/usbd_desc.c **** /**
+ 200:../tasks/usb/usbd_desc.c ****  * @brief  Returns the product string descriptor.
+ 201:../tasks/usb/usbd_desc.c ****  * @param  speed: Current device speed
+ 202:../tasks/usb/usbd_desc.c ****  * @param  length: Pointer to data length variable
+ 203:../tasks/usb/usbd_desc.c ****  * @retval Pointer to descriptor buffer
+ 204:../tasks/usb/usbd_desc.c ****  */
+ 205:../tasks/usb/usbd_desc.c **** uint8_t *USBD_APDKC_ProductStrDescriptor(USBD_SpeedTypeDef speed,
+ 206:../tasks/usb/usbd_desc.c **** 		uint16_t *length) {
+ 273              		.loc 1 206 0
+ 274              		.cfi_startproc
+ 275              		@ args = 0, pretend = 0, frame = 8
+ 276              		@ frame_needed = 1, uses_anonymous_args = 0
+ 277 00a0 80B5     		push	{r7, lr}
+ 278              		.cfi_def_cfa_offset 8
+ 279              		.cfi_offset 7, -8
+ 280              		.cfi_offset 14, -4
+ 281 00a2 82B0     		sub	sp, sp, #8
+ 282              		.cfi_def_cfa_offset 16
+ 283 00a4 00AF     		add	r7, sp, #0
+ 284              		.cfi_def_cfa_register 7
+ 285 00a6 0346     		mov	r3, r0
+ 286 00a8 3960     		str	r1, [r7]
+ 287 00aa FB71     		strb	r3, [r7, #7]
+ 207:../tasks/usb/usbd_desc.c **** 	if (speed == 0) {
+ 288              		.loc 1 207 0
+ 289 00ac FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 290 00ae 002B     		cmp	r3, #0
+ 291 00b0 0BD1     		bne	.L10
+ 208:../tasks/usb/usbd_desc.c **** 		USBD_GetString((uint8_t *) USBD_PRODUCT_HS_STRING, USBD_StrDesc,
+ 292              		.loc 1 208 0
+ 293 00b2 40F20000 		movw	r0, #:lower16:.LC0
+ 294 00b6 C0F20000 		movt	r0, #:upper16:.LC0
+ 295 00ba 40F20001 		movw	r1, #:lower16:USBD_StrDesc
+ 296 00be C0F20001 		movt	r1, #:upper16:USBD_StrDesc
+ 297 00c2 3A68     		ldr	r2, [r7]
+ 298 00c4 FFF7FEFF 		bl	USBD_GetString
+ 299 00c8 0AE0     		b	.L11
+ 300              	.L10:
+ 209:../tasks/usb/usbd_desc.c **** 				length);
+ 210:../tasks/usb/usbd_desc.c **** 	} else {
+ 211:../tasks/usb/usbd_desc.c **** 		USBD_GetString((uint8_t *) USBD_PRODUCT_FS_STRING, USBD_StrDesc,
+ 301              		.loc 1 211 0
+ 302 00ca 40F20000 		movw	r0, #:lower16:.LC1
+ 303 00ce C0F20000 		movt	r0, #:upper16:.LC1
+ 304 00d2 40F20001 		movw	r1, #:lower16:USBD_StrDesc
+ 305 00d6 C0F20001 		movt	r1, #:upper16:USBD_StrDesc
+ 306 00da 3A68     		ldr	r2, [r7]
+ 307 00dc FFF7FEFF 		bl	USBD_GetString
+ 308              	.L11:
+ 212:../tasks/usb/usbd_desc.c **** 				length);
+ 213:../tasks/usb/usbd_desc.c **** 	}
+ 214:../tasks/usb/usbd_desc.c **** 	return USBD_StrDesc;
+ 309              		.loc 1 214 0
+ 310 00e0 40F20003 		movw	r3, #:lower16:USBD_StrDesc
+ 311 00e4 C0F20003 		movt	r3, #:upper16:USBD_StrDesc
+ 215:../tasks/usb/usbd_desc.c **** }
+ 312              		.loc 1 215 0
+ 313 00e8 1846     		mov	r0, r3
+ 314 00ea 0837     		adds	r7, r7, #8
+ 315 00ec BD46     		mov	sp, r7
+ 316              		@ sp needed
+ 317 00ee 80BD     		pop	{r7, pc}
+ 318              		.cfi_endproc
+ 319              	.LFE59:
+ 321              		.section	.rodata
+ 322 002f 00       		.align	2
+ 323              	.LC2:
+ 324 0030 53544D33 		.ascii	"STM32 AUDIO Streaming in HS Mode\000"
+ 324      32204155 
+ 324      44494F20 
+ 324      53747265 
+ 324      616D696E 
+ 325 0051 000000   		.align	2
+ 326              	.LC3:
+ 327 0054 53544D33 		.ascii	"STM32 AUDIO Streaming in FS Mode\000"
+ 327      32204155 
+ 327      44494F20 
+ 327      53747265 
+ 327      616D696E 
+ 328              		.text
+ 329              		.align	2
+ 330              		.global	USBD_MSC_ProductStrDescriptor
+ 331              		.thumb
+ 332              		.thumb_func
+ 334              	USBD_MSC_ProductStrDescriptor:
+ 335              	.LFB60:
+ 216:../tasks/usb/usbd_desc.c **** 
+ 217:../tasks/usb/usbd_desc.c **** uint8_t *USBD_MSC_ProductStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length)
+ 218:../tasks/usb/usbd_desc.c **** {
+ 336              		.loc 1 218 0
+ 337              		.cfi_startproc
+ 338              		@ args = 0, pretend = 0, frame = 8
+ 339              		@ frame_needed = 1, uses_anonymous_args = 0
+ 340 00f0 80B5     		push	{r7, lr}
+ 341              		.cfi_def_cfa_offset 8
+ 342              		.cfi_offset 7, -8
+ 343              		.cfi_offset 14, -4
+ 344 00f2 82B0     		sub	sp, sp, #8
+ 345              		.cfi_def_cfa_offset 16
+ 346 00f4 00AF     		add	r7, sp, #0
+ 347              		.cfi_def_cfa_register 7
+ 348 00f6 0346     		mov	r3, r0
+ 349 00f8 3960     		str	r1, [r7]
+ 350 00fa FB71     		strb	r3, [r7, #7]
+ 219:../tasks/usb/usbd_desc.c ****   if(speed == 0)
+ 351              		.loc 1 219 0
+ 352 00fc FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 353 00fe 002B     		cmp	r3, #0
+ 354 0100 0BD1     		bne	.L14
+ 220:../tasks/usb/usbd_desc.c ****   {
+ 221:../tasks/usb/usbd_desc.c ****     USBD_GetString((uint8_t *)USBD_MSCPRODUCT_HS_STRING, USBD_MSCStrDesc, length);
+ 355              		.loc 1 221 0
+ 356 0102 40F20000 		movw	r0, #:lower16:.LC2
+ 357 0106 C0F20000 		movt	r0, #:upper16:.LC2
+ 358 010a 40F20001 		movw	r1, #:lower16:USBD_MSCStrDesc
+ 359 010e C0F20001 		movt	r1, #:upper16:USBD_MSCStrDesc
+ 360 0112 3A68     		ldr	r2, [r7]
+ 361 0114 FFF7FEFF 		bl	USBD_GetString
+ 362 0118 0AE0     		b	.L15
+ 363              	.L14:
+ 222:../tasks/usb/usbd_desc.c ****   }
+ 223:../tasks/usb/usbd_desc.c ****   else
+ 224:../tasks/usb/usbd_desc.c ****   {
+ 225:../tasks/usb/usbd_desc.c ****     USBD_GetString((uint8_t *)USBD_MSCPRODUCT_FS_STRING, USBD_MSCStrDesc, length);
+ 364              		.loc 1 225 0
+ 365 011a 40F20000 		movw	r0, #:lower16:.LC3
+ 366 011e C0F20000 		movt	r0, #:upper16:.LC3
+ 367 0122 40F20001 		movw	r1, #:lower16:USBD_MSCStrDesc
+ 368 0126 C0F20001 		movt	r1, #:upper16:USBD_MSCStrDesc
+ 369 012a 3A68     		ldr	r2, [r7]
+ 370 012c FFF7FEFF 		bl	USBD_GetString
+ 371              	.L15:
+ 226:../tasks/usb/usbd_desc.c ****   }
+ 227:../tasks/usb/usbd_desc.c ****   return USBD_StrDesc;
+ 372              		.loc 1 227 0
+ 373 0130 40F20003 		movw	r3, #:lower16:USBD_StrDesc
+ 374 0134 C0F20003 		movt	r3, #:upper16:USBD_StrDesc
+ 228:../tasks/usb/usbd_desc.c **** }
+ 375              		.loc 1 228 0
+ 376 0138 1846     		mov	r0, r3
+ 377 013a 0837     		adds	r7, r7, #8
+ 378 013c BD46     		mov	sp, r7
+ 379              		@ sp needed
+ 380 013e 80BD     		pop	{r7, pc}
+ 381              		.cfi_endproc
+ 382              	.LFE60:
+ 384              		.section	.rodata
+ 385 0075 000000   		.align	2
+ 386              	.LC4:
+ 387 0078 42454D4E 		.ascii	"BEMN\000"
+ 387      00
+ 388              		.text
+ 389              		.align	2
+ 390              		.global	USBD_APDKC_ManufacturerStrDescriptor
+ 391              		.thumb
+ 392              		.thumb_func
+ 394              	USBD_APDKC_ManufacturerStrDescriptor:
+ 395              	.LFB61:
+ 229:../tasks/usb/usbd_desc.c **** 
+ 230:../tasks/usb/usbd_desc.c **** 
+ 231:../tasks/usb/usbd_desc.c **** /**
+ 232:../tasks/usb/usbd_desc.c ****  * @brief  Returns the manufacturer string descriptor.
+ 233:../tasks/usb/usbd_desc.c ****  * @param  speed: Current device speed
+ 234:../tasks/usb/usbd_desc.c ****  * @param  length: Pointer to data length variable
+ 235:../tasks/usb/usbd_desc.c ****  * @retval Pointer to descriptor buffer
+ 236:../tasks/usb/usbd_desc.c ****  */
+ 237:../tasks/usb/usbd_desc.c **** uint8_t *USBD_APDKC_ManufacturerStrDescriptor(USBD_SpeedTypeDef speed,
+ 238:../tasks/usb/usbd_desc.c **** 		uint16_t *length) {
+ 396              		.loc 1 238 0
+ 397              		.cfi_startproc
+ 398              		@ args = 0, pretend = 0, frame = 8
+ 399              		@ frame_needed = 1, uses_anonymous_args = 0
+ 400 0140 80B5     		push	{r7, lr}
+ 401              		.cfi_def_cfa_offset 8
+ 402              		.cfi_offset 7, -8
+ 403              		.cfi_offset 14, -4
+ 404 0142 82B0     		sub	sp, sp, #8
+ 405              		.cfi_def_cfa_offset 16
+ 406 0144 00AF     		add	r7, sp, #0
+ 407              		.cfi_def_cfa_register 7
+ 408 0146 0346     		mov	r3, r0
+ 409 0148 3960     		str	r1, [r7]
+ 410 014a FB71     		strb	r3, [r7, #7]
+ 239:../tasks/usb/usbd_desc.c **** 	USBD_GetString((uint8_t *) USBD_MANUFACTURER_STRING, USBD_StrDesc, length);
+ 411              		.loc 1 239 0
+ 412 014c 40F20000 		movw	r0, #:lower16:.LC4
+ 413 0150 C0F20000 		movt	r0, #:upper16:.LC4
+ 414 0154 40F20001 		movw	r1, #:lower16:USBD_StrDesc
+ 415 0158 C0F20001 		movt	r1, #:upper16:USBD_StrDesc
+ 416 015c 3A68     		ldr	r2, [r7]
+ 417 015e FFF7FEFF 		bl	USBD_GetString
+ 240:../tasks/usb/usbd_desc.c **** 	return USBD_StrDesc;
+ 418              		.loc 1 240 0
+ 419 0162 40F20003 		movw	r3, #:lower16:USBD_StrDesc
+ 420 0166 C0F20003 		movt	r3, #:upper16:USBD_StrDesc
+ 241:../tasks/usb/usbd_desc.c **** }
+ 421              		.loc 1 241 0
+ 422 016a 1846     		mov	r0, r3
+ 423 016c 0837     		adds	r7, r7, #8
+ 424 016e BD46     		mov	sp, r7
+ 425              		@ sp needed
+ 426 0170 80BD     		pop	{r7, pc}
+ 427              		.cfi_endproc
+ 428              	.LFE61:
+ 430 0172 00BF     		.align	2
+ 431              		.global	USBD_MSC_ManufacturerStrDescriptor
+ 432              		.thumb
+ 433              		.thumb_func
+ 435              	USBD_MSC_ManufacturerStrDescriptor:
+ 436              	.LFB62:
+ 242:../tasks/usb/usbd_desc.c **** uint8_t *USBD_MSC_ManufacturerStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length)
+ 243:../tasks/usb/usbd_desc.c **** {
+ 437              		.loc 1 243 0
+ 438              		.cfi_startproc
+ 439              		@ args = 0, pretend = 0, frame = 8
+ 440              		@ frame_needed = 1, uses_anonymous_args = 0
+ 441 0174 80B5     		push	{r7, lr}
+ 442              		.cfi_def_cfa_offset 8
+ 443              		.cfi_offset 7, -8
+ 444              		.cfi_offset 14, -4
+ 445 0176 82B0     		sub	sp, sp, #8
+ 446              		.cfi_def_cfa_offset 16
+ 447 0178 00AF     		add	r7, sp, #0
+ 448              		.cfi_def_cfa_register 7
+ 449 017a 0346     		mov	r3, r0
+ 450 017c 3960     		str	r1, [r7]
+ 451 017e FB71     		strb	r3, [r7, #7]
+ 244:../tasks/usb/usbd_desc.c ****   USBD_GetString((uint8_t *)USBD_MANUFACTURER_STRING, USBD_StrDesc, length);
+ 452              		.loc 1 244 0
+ 453 0180 40F20000 		movw	r0, #:lower16:.LC4
+ 454 0184 C0F20000 		movt	r0, #:upper16:.LC4
+ 455 0188 40F20001 		movw	r1, #:lower16:USBD_StrDesc
+ 456 018c C0F20001 		movt	r1, #:upper16:USBD_StrDesc
+ 457 0190 3A68     		ldr	r2, [r7]
+ 458 0192 FFF7FEFF 		bl	USBD_GetString
+ 245:../tasks/usb/usbd_desc.c ****   return USBD_StrDesc;
+ 459              		.loc 1 245 0
+ 460 0196 40F20003 		movw	r3, #:lower16:USBD_StrDesc
+ 461 019a C0F20003 		movt	r3, #:upper16:USBD_StrDesc
+ 246:../tasks/usb/usbd_desc.c **** }
+ 462              		.loc 1 246 0
+ 463 019e 1846     		mov	r0, r3
+ 464 01a0 0837     		adds	r7, r7, #8
+ 465 01a2 BD46     		mov	sp, r7
+ 466              		@ sp needed
+ 467 01a4 80BD     		pop	{r7, pc}
+ 468              		.cfi_endproc
+ 469              	.LFE62:
+ 471              		.section	.rodata
+ 472 007d 000000   		.align	2
+ 473              	.LC5:
+ 474 0080 5265762E 		.ascii	"Rev.03\000"
+ 474      303300
+ 475              		.text
+ 476 01a6 00BF     		.align	2
+ 477              		.global	USBD_APDKC_SerialStrDescriptor
+ 478              		.thumb
+ 479              		.thumb_func
+ 481              	USBD_APDKC_SerialStrDescriptor:
+ 482              	.LFB63:
+ 247:../tasks/usb/usbd_desc.c **** /**
+ 248:../tasks/usb/usbd_desc.c ****  * @brief  Returns the serial number string descriptor.
+ 249:../tasks/usb/usbd_desc.c ****  * @param  speed: Current device speed
+ 250:../tasks/usb/usbd_desc.c ****  * @param  length: Pointer to data length variable
+ 251:../tasks/usb/usbd_desc.c ****  * @retval Pointer to descriptor buffer
+ 252:../tasks/usb/usbd_desc.c ****  */
+ 253:../tasks/usb/usbd_desc.c **** uint8_t *USBD_APDKC_SerialStrDescriptor(USBD_SpeedTypeDef speed,
+ 254:../tasks/usb/usbd_desc.c **** 		uint16_t *length) {
+ 483              		.loc 1 254 0
+ 484              		.cfi_startproc
+ 485              		@ args = 0, pretend = 0, frame = 8
+ 486              		@ frame_needed = 1, uses_anonymous_args = 0
+ 487 01a8 80B5     		push	{r7, lr}
+ 488              		.cfi_def_cfa_offset 8
+ 489              		.cfi_offset 7, -8
+ 490              		.cfi_offset 14, -4
+ 491 01aa 82B0     		sub	sp, sp, #8
+ 492              		.cfi_def_cfa_offset 16
+ 493 01ac 00AF     		add	r7, sp, #0
+ 494              		.cfi_def_cfa_register 7
+ 495 01ae 0346     		mov	r3, r0
+ 496 01b0 3960     		str	r1, [r7]
+ 497 01b2 FB71     		strb	r3, [r7, #7]
+ 255:../tasks/usb/usbd_desc.c **** 	if (speed == USBD_SPEED_HIGH) {
+ 498              		.loc 1 255 0
+ 499 01b4 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 500 01b6 002B     		cmp	r3, #0
+ 501 01b8 0BD1     		bne	.L22
+ 256:../tasks/usb/usbd_desc.c **** 		USBD_GetString((uint8_t *) USBD_SERIALNUMBER_HS_STRING, USBD_StrDesc,
+ 502              		.loc 1 256 0
+ 503 01ba 40F20000 		movw	r0, #:lower16:.LC5
+ 504 01be C0F20000 		movt	r0, #:upper16:.LC5
+ 505 01c2 40F20001 		movw	r1, #:lower16:USBD_StrDesc
+ 506 01c6 C0F20001 		movt	r1, #:upper16:USBD_StrDesc
+ 507 01ca 3A68     		ldr	r2, [r7]
+ 508 01cc FFF7FEFF 		bl	USBD_GetString
+ 509 01d0 0AE0     		b	.L23
+ 510              	.L22:
+ 257:../tasks/usb/usbd_desc.c **** 				length);
+ 258:../tasks/usb/usbd_desc.c **** 	} else {
+ 259:../tasks/usb/usbd_desc.c **** 		USBD_GetString((uint8_t *) USBD_SERIALNUMBER_FS_STRING, USBD_StrDesc,
+ 511              		.loc 1 259 0
+ 512 01d2 40F20000 		movw	r0, #:lower16:.LC5
+ 513 01d6 C0F20000 		movt	r0, #:upper16:.LC5
+ 514 01da 40F20001 		movw	r1, #:lower16:USBD_StrDesc
+ 515 01de C0F20001 		movt	r1, #:upper16:USBD_StrDesc
+ 516 01e2 3A68     		ldr	r2, [r7]
+ 517 01e4 FFF7FEFF 		bl	USBD_GetString
+ 518              	.L23:
+ 260:../tasks/usb/usbd_desc.c **** 				length);
+ 261:../tasks/usb/usbd_desc.c **** 	}
+ 262:../tasks/usb/usbd_desc.c **** 	return USBD_StrDesc;
+ 519              		.loc 1 262 0
+ 520 01e8 40F20003 		movw	r3, #:lower16:USBD_StrDesc
+ 521 01ec C0F20003 		movt	r3, #:upper16:USBD_StrDesc
+ 263:../tasks/usb/usbd_desc.c **** }
+ 522              		.loc 1 263 0
+ 523 01f0 1846     		mov	r0, r3
+ 524 01f2 0837     		adds	r7, r7, #8
+ 525 01f4 BD46     		mov	sp, r7
+ 526              		@ sp needed
+ 527 01f6 80BD     		pop	{r7, pc}
+ 528              		.cfi_endproc
+ 529              	.LFE63:
+ 531              		.align	2
+ 532              		.global	USBD_MSC_SerialStrDescriptor
+ 533              		.thumb
+ 534              		.thumb_func
+ 536              	USBD_MSC_SerialStrDescriptor:
+ 537              	.LFB64:
+ 264:../tasks/usb/usbd_desc.c **** 
+ 265:../tasks/usb/usbd_desc.c **** uint8_t *USBD_MSC_SerialStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length)
+ 266:../tasks/usb/usbd_desc.c **** {
+ 538              		.loc 1 266 0
+ 539              		.cfi_startproc
+ 540              		@ args = 0, pretend = 0, frame = 8
+ 541              		@ frame_needed = 1, uses_anonymous_args = 0
+ 542 01f8 80B5     		push	{r7, lr}
+ 543              		.cfi_def_cfa_offset 8
+ 544              		.cfi_offset 7, -8
+ 545              		.cfi_offset 14, -4
+ 546 01fa 82B0     		sub	sp, sp, #8
+ 547              		.cfi_def_cfa_offset 16
+ 548 01fc 00AF     		add	r7, sp, #0
+ 549              		.cfi_def_cfa_register 7
+ 550 01fe 0346     		mov	r3, r0
+ 551 0200 3960     		str	r1, [r7]
+ 552 0202 FB71     		strb	r3, [r7, #7]
+ 267:../tasks/usb/usbd_desc.c ****   if(speed == USBD_SPEED_HIGH)
+ 553              		.loc 1 267 0
+ 554 0204 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 555 0206 002B     		cmp	r3, #0
+ 556 0208 0BD1     		bne	.L26
+ 268:../tasks/usb/usbd_desc.c ****   {
+ 269:../tasks/usb/usbd_desc.c ****     USBD_GetString((uint8_t *)USBD_SERIALNUMBER_HS_STRING, USBD_StrDesc, length);
+ 557              		.loc 1 269 0
+ 558 020a 40F20000 		movw	r0, #:lower16:.LC5
+ 559 020e C0F20000 		movt	r0, #:upper16:.LC5
+ 560 0212 40F20001 		movw	r1, #:lower16:USBD_StrDesc
+ 561 0216 C0F20001 		movt	r1, #:upper16:USBD_StrDesc
+ 562 021a 3A68     		ldr	r2, [r7]
+ 563 021c FFF7FEFF 		bl	USBD_GetString
+ 564 0220 0AE0     		b	.L27
+ 565              	.L26:
+ 270:../tasks/usb/usbd_desc.c ****   }
+ 271:../tasks/usb/usbd_desc.c ****   else
+ 272:../tasks/usb/usbd_desc.c ****   {
+ 273:../tasks/usb/usbd_desc.c ****     USBD_GetString((uint8_t *)USBD_SERIALNUMBER_FS_STRING, USBD_StrDesc, length);
+ 566              		.loc 1 273 0
+ 567 0222 40F20000 		movw	r0, #:lower16:.LC5
+ 568 0226 C0F20000 		movt	r0, #:upper16:.LC5
+ 569 022a 40F20001 		movw	r1, #:lower16:USBD_StrDesc
+ 570 022e C0F20001 		movt	r1, #:upper16:USBD_StrDesc
+ 571 0232 3A68     		ldr	r2, [r7]
+ 572 0234 FFF7FEFF 		bl	USBD_GetString
+ 573              	.L27:
+ 274:../tasks/usb/usbd_desc.c ****   }
+ 275:../tasks/usb/usbd_desc.c ****   return USBD_StrDesc;
+ 574              		.loc 1 275 0
+ 575 0238 40F20003 		movw	r3, #:lower16:USBD_StrDesc
+ 576 023c C0F20003 		movt	r3, #:upper16:USBD_StrDesc
+ 276:../tasks/usb/usbd_desc.c **** }
+ 577              		.loc 1 276 0
+ 578 0240 1846     		mov	r0, r3
+ 579 0242 0837     		adds	r7, r7, #8
+ 580 0244 BD46     		mov	sp, r7
+ 581              		@ sp needed
+ 582 0246 80BD     		pop	{r7, pc}
+ 583              		.cfi_endproc
+ 584              	.LFE64:
+ 586              		.section	.rodata
+ 587 0087 00       		.align	2
+ 588              	.LC6:
+ 589 0088 4150444B 		.ascii	"APDKC Config HS\000"
+ 589      4320436F 
+ 589      6E666967 
+ 589      20485300 
+ 590              		.align	2
+ 591              	.LC7:
+ 592 0098 4150444B 		.ascii	"APDKC Config FS\000"
+ 592      4320436F 
+ 592      6E666967 
+ 592      20465300 
+ 593              		.text
+ 594              		.align	2
+ 595              		.global	USBD_APDKC_ConfigStrDescriptor
+ 596              		.thumb
+ 597              		.thumb_func
+ 599              	USBD_APDKC_ConfigStrDescriptor:
+ 600              	.LFB65:
+ 277:../tasks/usb/usbd_desc.c **** /**
+ 278:../tasks/usb/usbd_desc.c ****  * @brief  Returns the configuration string descriptor.
+ 279:../tasks/usb/usbd_desc.c ****  * @param  speed: Current device speed
+ 280:../tasks/usb/usbd_desc.c ****  * @param  length: Pointer to data length variable
+ 281:../tasks/usb/usbd_desc.c ****  * @retval Pointer to descriptor buffer
+ 282:../tasks/usb/usbd_desc.c ****  */
+ 283:../tasks/usb/usbd_desc.c **** uint8_t *USBD_APDKC_ConfigStrDescriptor(USBD_SpeedTypeDef speed,
+ 284:../tasks/usb/usbd_desc.c **** 		uint16_t *length) {
+ 601              		.loc 1 284 0
+ 602              		.cfi_startproc
+ 603              		@ args = 0, pretend = 0, frame = 8
+ 604              		@ frame_needed = 1, uses_anonymous_args = 0
+ 605 0248 80B5     		push	{r7, lr}
+ 606              		.cfi_def_cfa_offset 8
+ 607              		.cfi_offset 7, -8
+ 608              		.cfi_offset 14, -4
+ 609 024a 82B0     		sub	sp, sp, #8
+ 610              		.cfi_def_cfa_offset 16
+ 611 024c 00AF     		add	r7, sp, #0
+ 612              		.cfi_def_cfa_register 7
+ 613 024e 0346     		mov	r3, r0
+ 614 0250 3960     		str	r1, [r7]
+ 615 0252 FB71     		strb	r3, [r7, #7]
+ 285:../tasks/usb/usbd_desc.c **** 	if (speed == USBD_SPEED_HIGH) {
+ 616              		.loc 1 285 0
+ 617 0254 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 618 0256 002B     		cmp	r3, #0
+ 619 0258 0BD1     		bne	.L30
+ 286:../tasks/usb/usbd_desc.c **** 		USBD_GetString((uint8_t *) USBD_CONFIGURATION_HS_STRING, USBD_StrDesc,
+ 620              		.loc 1 286 0
+ 621 025a 40F20000 		movw	r0, #:lower16:.LC6
+ 622 025e C0F20000 		movt	r0, #:upper16:.LC6
+ 623 0262 40F20001 		movw	r1, #:lower16:USBD_StrDesc
+ 624 0266 C0F20001 		movt	r1, #:upper16:USBD_StrDesc
+ 625 026a 3A68     		ldr	r2, [r7]
+ 626 026c FFF7FEFF 		bl	USBD_GetString
+ 627 0270 0AE0     		b	.L31
+ 628              	.L30:
+ 287:../tasks/usb/usbd_desc.c **** 				length);
+ 288:../tasks/usb/usbd_desc.c **** 	} else {
+ 289:../tasks/usb/usbd_desc.c **** 		USBD_GetString((uint8_t *) USBD_CONFIGURATION_FS_STRING, USBD_StrDesc,
+ 629              		.loc 1 289 0
+ 630 0272 40F20000 		movw	r0, #:lower16:.LC7
+ 631 0276 C0F20000 		movt	r0, #:upper16:.LC7
+ 632 027a 40F20001 		movw	r1, #:lower16:USBD_StrDesc
+ 633 027e C0F20001 		movt	r1, #:upper16:USBD_StrDesc
+ 634 0282 3A68     		ldr	r2, [r7]
+ 635 0284 FFF7FEFF 		bl	USBD_GetString
+ 636              	.L31:
+ 290:../tasks/usb/usbd_desc.c **** 				length);
+ 291:../tasks/usb/usbd_desc.c **** 	}
+ 292:../tasks/usb/usbd_desc.c **** 	return USBD_StrDesc;
+ 637              		.loc 1 292 0
+ 638 0288 40F20003 		movw	r3, #:lower16:USBD_StrDesc
+ 639 028c C0F20003 		movt	r3, #:upper16:USBD_StrDesc
+ 293:../tasks/usb/usbd_desc.c **** }
+ 640              		.loc 1 293 0
+ 641 0290 1846     		mov	r0, r3
+ 642 0292 0837     		adds	r7, r7, #8
+ 643 0294 BD46     		mov	sp, r7
+ 644              		@ sp needed
+ 645 0296 80BD     		pop	{r7, pc}
+ 646              		.cfi_endproc
+ 647              	.LFE65:
+ 649              		.section	.rodata
+ 650              		.align	2
+ 651              	.LC8:
+ 652 00a8 41554449 		.ascii	"AUDIO Config\000"
+ 652      4F20436F 
+ 652      6E666967 
+ 652      00
+ 653              		.text
+ 654              		.align	2
+ 655              		.global	USBD_MSC_ConfigStrDescriptor
+ 656              		.thumb
+ 657              		.thumb_func
+ 659              	USBD_MSC_ConfigStrDescriptor:
+ 660              	.LFB66:
+ 294:../tasks/usb/usbd_desc.c **** 
+ 295:../tasks/usb/usbd_desc.c **** uint8_t *USBD_MSC_ConfigStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length)
+ 296:../tasks/usb/usbd_desc.c **** {
+ 661              		.loc 1 296 0
+ 662              		.cfi_startproc
+ 663              		@ args = 0, pretend = 0, frame = 8
+ 664              		@ frame_needed = 1, uses_anonymous_args = 0
+ 665 0298 80B5     		push	{r7, lr}
+ 666              		.cfi_def_cfa_offset 8
+ 667              		.cfi_offset 7, -8
+ 668              		.cfi_offset 14, -4
+ 669 029a 82B0     		sub	sp, sp, #8
+ 670              		.cfi_def_cfa_offset 16
+ 671 029c 00AF     		add	r7, sp, #0
+ 672              		.cfi_def_cfa_register 7
+ 673 029e 0346     		mov	r3, r0
+ 674 02a0 3960     		str	r1, [r7]
+ 675 02a2 FB71     		strb	r3, [r7, #7]
+ 297:../tasks/usb/usbd_desc.c ****   if(speed == USBD_SPEED_HIGH)
+ 676              		.loc 1 297 0
+ 677 02a4 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 678 02a6 002B     		cmp	r3, #0
+ 679 02a8 0BD1     		bne	.L34
+ 298:../tasks/usb/usbd_desc.c ****   {
+ 299:../tasks/usb/usbd_desc.c ****     USBD_GetString((uint8_t *)USBD_MSCCONFIGURATION_HS_STRING, USBD_StrDesc, length);
+ 680              		.loc 1 299 0
+ 681 02aa 40F20000 		movw	r0, #:lower16:.LC8
+ 682 02ae C0F20000 		movt	r0, #:upper16:.LC8
+ 683 02b2 40F20001 		movw	r1, #:lower16:USBD_StrDesc
+ 684 02b6 C0F20001 		movt	r1, #:upper16:USBD_StrDesc
+ 685 02ba 3A68     		ldr	r2, [r7]
+ 686 02bc FFF7FEFF 		bl	USBD_GetString
+ 687 02c0 0AE0     		b	.L35
+ 688              	.L34:
+ 300:../tasks/usb/usbd_desc.c ****   }
+ 301:../tasks/usb/usbd_desc.c ****   else
+ 302:../tasks/usb/usbd_desc.c ****   {
+ 303:../tasks/usb/usbd_desc.c ****     USBD_GetString((uint8_t *)USBD_MSCCONFIGURATION_FS_STRING, USBD_StrDesc, length);
+ 689              		.loc 1 303 0
+ 690 02c2 40F20000 		movw	r0, #:lower16:.LC8
+ 691 02c6 C0F20000 		movt	r0, #:upper16:.LC8
+ 692 02ca 40F20001 		movw	r1, #:lower16:USBD_StrDesc
+ 693 02ce C0F20001 		movt	r1, #:upper16:USBD_StrDesc
+ 694 02d2 3A68     		ldr	r2, [r7]
+ 695 02d4 FFF7FEFF 		bl	USBD_GetString
+ 696              	.L35:
+ 304:../tasks/usb/usbd_desc.c ****   }
+ 305:../tasks/usb/usbd_desc.c ****   return USBD_StrDesc;
+ 697              		.loc 1 305 0
+ 698 02d8 40F20003 		movw	r3, #:lower16:USBD_StrDesc
+ 699 02dc C0F20003 		movt	r3, #:upper16:USBD_StrDesc
+ 306:../tasks/usb/usbd_desc.c **** }
+ 700              		.loc 1 306 0
+ 701 02e0 1846     		mov	r0, r3
+ 702 02e2 0837     		adds	r7, r7, #8
+ 703 02e4 BD46     		mov	sp, r7
+ 704              		@ sp needed
+ 705 02e6 80BD     		pop	{r7, pc}
+ 706              		.cfi_endproc
+ 707              	.LFE66:
+ 709              		.section	.rodata
+ 710 00b5 000000   		.align	2
+ 711              	.LC9:
+ 712 00b8 4150444B 		.ascii	"APDKC Interface HS\000"
+ 712      4320496E 
+ 712      74657266 
+ 712      61636520 
+ 712      485300
+ 713 00cb 00       		.align	2
+ 714              	.LC10:
+ 715 00cc 4150444B 		.ascii	"APDKC Interface FS\000"
+ 715      4320496E 
+ 715      74657266 
+ 715      61636520 
+ 715      465300
+ 716              		.text
+ 717              		.align	2
+ 718              		.global	USBD_APDKC_InterfaceStrDescriptor
+ 719              		.thumb
+ 720              		.thumb_func
+ 722              	USBD_APDKC_InterfaceStrDescriptor:
+ 723              	.LFB67:
+ 307:../tasks/usb/usbd_desc.c **** 
+ 308:../tasks/usb/usbd_desc.c **** /**
+ 309:../tasks/usb/usbd_desc.c ****  * @brief  Returns the interface string descriptor.
+ 310:../tasks/usb/usbd_desc.c ****  * @param  speed: Current device speed
+ 311:../tasks/usb/usbd_desc.c ****  * @param  length: Pointer to data length variable
+ 312:../tasks/usb/usbd_desc.c ****  * @retval Pointer to descriptor buffer
+ 313:../tasks/usb/usbd_desc.c ****  */
+ 314:../tasks/usb/usbd_desc.c **** uint8_t *USBD_APDKC_InterfaceStrDescriptor(USBD_SpeedTypeDef speed,
+ 315:../tasks/usb/usbd_desc.c **** 		uint16_t *length) {
+ 724              		.loc 1 315 0
+ 725              		.cfi_startproc
+ 726              		@ args = 0, pretend = 0, frame = 8
+ 727              		@ frame_needed = 1, uses_anonymous_args = 0
+ 728 02e8 80B5     		push	{r7, lr}
+ 729              		.cfi_def_cfa_offset 8
+ 730              		.cfi_offset 7, -8
+ 731              		.cfi_offset 14, -4
+ 732 02ea 82B0     		sub	sp, sp, #8
+ 733              		.cfi_def_cfa_offset 16
+ 734 02ec 00AF     		add	r7, sp, #0
+ 735              		.cfi_def_cfa_register 7
+ 736 02ee 0346     		mov	r3, r0
+ 737 02f0 3960     		str	r1, [r7]
+ 738 02f2 FB71     		strb	r3, [r7, #7]
+ 316:../tasks/usb/usbd_desc.c **** 	if (speed == 0) {
+ 739              		.loc 1 316 0
+ 740 02f4 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 741 02f6 002B     		cmp	r3, #0
+ 742 02f8 0BD1     		bne	.L38
+ 317:../tasks/usb/usbd_desc.c **** 		USBD_GetString((uint8_t *) USBD_INTERFACE_HS_STRING, USBD_StrDesc,
+ 743              		.loc 1 317 0
+ 744 02fa 40F20000 		movw	r0, #:lower16:.LC9
+ 745 02fe C0F20000 		movt	r0, #:upper16:.LC9
+ 746 0302 40F20001 		movw	r1, #:lower16:USBD_StrDesc
+ 747 0306 C0F20001 		movt	r1, #:upper16:USBD_StrDesc
+ 748 030a 3A68     		ldr	r2, [r7]
+ 749 030c FFF7FEFF 		bl	USBD_GetString
+ 750 0310 0AE0     		b	.L39
+ 751              	.L38:
+ 318:../tasks/usb/usbd_desc.c **** 				length);
+ 319:../tasks/usb/usbd_desc.c **** 	} else {
+ 320:../tasks/usb/usbd_desc.c **** 		USBD_GetString((uint8_t *) USBD_INTERFACE_FS_STRING, USBD_StrDesc,
+ 752              		.loc 1 320 0
+ 753 0312 40F20000 		movw	r0, #:lower16:.LC10
+ 754 0316 C0F20000 		movt	r0, #:upper16:.LC10
+ 755 031a 40F20001 		movw	r1, #:lower16:USBD_StrDesc
+ 756 031e C0F20001 		movt	r1, #:upper16:USBD_StrDesc
+ 757 0322 3A68     		ldr	r2, [r7]
+ 758 0324 FFF7FEFF 		bl	USBD_GetString
+ 759              	.L39:
+ 321:../tasks/usb/usbd_desc.c **** 				length);
+ 322:../tasks/usb/usbd_desc.c **** 	}
+ 323:../tasks/usb/usbd_desc.c **** 	return USBD_StrDesc;
+ 760              		.loc 1 323 0
+ 761 0328 40F20003 		movw	r3, #:lower16:USBD_StrDesc
+ 762 032c C0F20003 		movt	r3, #:upper16:USBD_StrDesc
+ 324:../tasks/usb/usbd_desc.c **** }
+ 763              		.loc 1 324 0
+ 764 0330 1846     		mov	r0, r3
+ 765 0332 0837     		adds	r7, r7, #8
+ 766 0334 BD46     		mov	sp, r7
+ 767              		@ sp needed
+ 768 0336 80BD     		pop	{r7, pc}
+ 769              		.cfi_endproc
+ 770              	.LFE67:
+ 772              		.section	.rodata
+ 773 00df 00       		.align	2
+ 774              	.LC11:
+ 775 00e0 41554449 		.ascii	"AUDIO Interface\000"
+ 775      4F20496E 
+ 775      74657266 
+ 775      61636500 
+ 776              		.text
+ 777              		.align	2
+ 778              		.global	USBD_MSC_InterfaceStrDescriptor
+ 779              		.thumb
+ 780              		.thumb_func
+ 782              	USBD_MSC_InterfaceStrDescriptor:
+ 783              	.LFB68:
+ 325:../tasks/usb/usbd_desc.c **** 
+ 326:../tasks/usb/usbd_desc.c **** uint8_t *USBD_MSC_InterfaceStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length)
+ 327:../tasks/usb/usbd_desc.c **** {
+ 784              		.loc 1 327 0
+ 785              		.cfi_startproc
+ 786              		@ args = 0, pretend = 0, frame = 8
+ 787              		@ frame_needed = 1, uses_anonymous_args = 0
+ 788 0338 80B5     		push	{r7, lr}
+ 789              		.cfi_def_cfa_offset 8
+ 790              		.cfi_offset 7, -8
+ 791              		.cfi_offset 14, -4
+ 792 033a 82B0     		sub	sp, sp, #8
+ 793              		.cfi_def_cfa_offset 16
+ 794 033c 00AF     		add	r7, sp, #0
+ 795              		.cfi_def_cfa_register 7
+ 796 033e 0346     		mov	r3, r0
+ 797 0340 3960     		str	r1, [r7]
+ 798 0342 FB71     		strb	r3, [r7, #7]
+ 328:../tasks/usb/usbd_desc.c ****   if(speed == 0)
+ 799              		.loc 1 328 0
+ 800 0344 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 801 0346 002B     		cmp	r3, #0
+ 802 0348 0BD1     		bne	.L42
+ 329:../tasks/usb/usbd_desc.c ****   {
+ 330:../tasks/usb/usbd_desc.c ****     USBD_GetString((uint8_t *)USBD_MSCINTERFACE_HS_STRING, USBD_StrDesc, length);
+ 803              		.loc 1 330 0
+ 804 034a 40F20000 		movw	r0, #:lower16:.LC11
+ 805 034e C0F20000 		movt	r0, #:upper16:.LC11
+ 806 0352 40F20001 		movw	r1, #:lower16:USBD_StrDesc
+ 807 0356 C0F20001 		movt	r1, #:upper16:USBD_StrDesc
+ 808 035a 3A68     		ldr	r2, [r7]
+ 809 035c FFF7FEFF 		bl	USBD_GetString
+ 810 0360 0AE0     		b	.L43
+ 811              	.L42:
+ 331:../tasks/usb/usbd_desc.c ****   }
+ 332:../tasks/usb/usbd_desc.c ****   else
+ 333:../tasks/usb/usbd_desc.c ****   {
+ 334:../tasks/usb/usbd_desc.c ****     USBD_GetString((uint8_t *)USBD_MSCINTERFACE_FS_STRING, USBD_StrDesc, length);
+ 812              		.loc 1 334 0
+ 813 0362 40F20000 		movw	r0, #:lower16:.LC11
+ 814 0366 C0F20000 		movt	r0, #:upper16:.LC11
+ 815 036a 40F20001 		movw	r1, #:lower16:USBD_StrDesc
+ 816 036e C0F20001 		movt	r1, #:upper16:USBD_StrDesc
+ 817 0372 3A68     		ldr	r2, [r7]
+ 818 0374 FFF7FEFF 		bl	USBD_GetString
+ 819              	.L43:
+ 335:../tasks/usb/usbd_desc.c ****   }
+ 336:../tasks/usb/usbd_desc.c ****   return USBD_StrDesc;
+ 820              		.loc 1 336 0
+ 821 0378 40F20003 		movw	r3, #:lower16:USBD_StrDesc
+ 822 037c C0F20003 		movt	r3, #:upper16:USBD_StrDesc
+ 337:../tasks/usb/usbd_desc.c **** }
+ 823              		.loc 1 337 0
+ 824 0380 1846     		mov	r0, r3
+ 825 0382 0837     		adds	r7, r7, #8
+ 826 0384 BD46     		mov	sp, r7
+ 827              		@ sp needed
+ 828 0386 80BD     		pop	{r7, pc}
+ 829              		.cfi_endproc
+ 830              	.LFE68:
+ 832              	.Letext0:
+ 833              		.file 2 "c:\\program files (x86)\\codesourcery\\arm-none-eabi\\include\\stdint.h"
+ 834              		.file 3 "D:\\workspace\\console800480\\tasks\\usb\\STM32_USB_Device_Library\\Core\\Inc/usbd_def.h"
+ 835              		.file 4 "D:\\workspace\\console800480\\system/core_cm3.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 usbd_desc.c
+C:\Users\sagok\AppData\Local\Temp\ccyRUpuE.s:23     .data:00000000 APDKC_Desc
+C:\Users\sagok\AppData\Local\Temp\ccyRUpuE.s:20     .data:00000000 $d
+C:\Users\sagok\AppData\Local\Temp\ccyRUpuE.s:106    .text:00000000 USBD_APDKC_DeviceDescriptor
+C:\Users\sagok\AppData\Local\Temp\ccyRUpuE.s:185    .text:00000050 USBD_APDKC_LangIDStrDescriptor
+C:\Users\sagok\AppData\Local\Temp\ccyRUpuE.s:394    .text:00000140 USBD_APDKC_ManufacturerStrDescriptor
+C:\Users\sagok\AppData\Local\Temp\ccyRUpuE.s:271    .text:000000a0 USBD_APDKC_ProductStrDescriptor
+C:\Users\sagok\AppData\Local\Temp\ccyRUpuE.s:481    .text:000001a8 USBD_APDKC_SerialStrDescriptor
+C:\Users\sagok\AppData\Local\Temp\ccyRUpuE.s:599    .text:00000248 USBD_APDKC_ConfigStrDescriptor
+C:\Users\sagok\AppData\Local\Temp\ccyRUpuE.s:722    .text:000002e8 USBD_APDKC_InterfaceStrDescriptor
+C:\Users\sagok\AppData\Local\Temp\ccyRUpuE.s:35     .data:0000001c MSC_Desc
+C:\Users\sagok\AppData\Local\Temp\ccyRUpuE.s:146    .text:00000028 USBD_MSC_DeviceDescriptor
+C:\Users\sagok\AppData\Local\Temp\ccyRUpuE.s:224    .text:00000078 USBD_MSC_LangIDStrDescriptor
+C:\Users\sagok\AppData\Local\Temp\ccyRUpuE.s:435    .text:00000174 USBD_MSC_ManufacturerStrDescriptor
+C:\Users\sagok\AppData\Local\Temp\ccyRUpuE.s:334    .text:000000f0 USBD_MSC_ProductStrDescriptor
+C:\Users\sagok\AppData\Local\Temp\ccyRUpuE.s:536    .text:000001f8 USBD_MSC_SerialStrDescriptor
+C:\Users\sagok\AppData\Local\Temp\ccyRUpuE.s:659    .text:00000298 USBD_MSC_ConfigStrDescriptor
+C:\Users\sagok\AppData\Local\Temp\ccyRUpuE.s:782    .text:00000338 USBD_MSC_InterfaceStrDescriptor
+C:\Users\sagok\AppData\Local\Temp\ccyRUpuE.s:47     .data:00000038 hUSBDDeviceDesc
+C:\Users\sagok\AppData\Local\Temp\ccyRUpuE.s:70     .data:0000004c hUSBDMSCDeviceDesc
+C:\Users\sagok\AppData\Local\Temp\ccyRUpuE.s:93     .data:00000060 USBD_LangIDDesc
+                            *COM*:00000100 USBD_StrDesc
+                            *COM*:00000100 USBD_MSCStrDesc
+C:\Users\sagok\AppData\Local\Temp\ccyRUpuE.s:101    .text:00000000 $t
+C:\Users\sagok\AppData\Local\Temp\ccyRUpuE.s:259    .rodata:00000000 $d
+C:\Users\sagok\AppData\Local\Temp\ccyRUpuE.s:260    .rodata:00000000 .LC0
+C:\Users\sagok\AppData\Local\Temp\ccyRUpuE.s:263    .rodata:00000018 .LC1
+C:\Users\sagok\AppData\Local\Temp\ccyRUpuE.s:323    .rodata:00000030 .LC2
+C:\Users\sagok\AppData\Local\Temp\ccyRUpuE.s:326    .rodata:00000054 .LC3
+C:\Users\sagok\AppData\Local\Temp\ccyRUpuE.s:386    .rodata:00000078 .LC4
+C:\Users\sagok\AppData\Local\Temp\ccyRUpuE.s:473    .rodata:00000080 .LC5
+C:\Users\sagok\AppData\Local\Temp\ccyRUpuE.s:588    .rodata:00000088 .LC6
+C:\Users\sagok\AppData\Local\Temp\ccyRUpuE.s:591    .rodata:00000098 .LC7
+C:\Users\sagok\AppData\Local\Temp\ccyRUpuE.s:651    .rodata:000000a8 .LC8
+C:\Users\sagok\AppData\Local\Temp\ccyRUpuE.s:711    .rodata:000000b8 .LC9
+C:\Users\sagok\AppData\Local\Temp\ccyRUpuE.s:714    .rodata:000000cc .LC10
+C:\Users\sagok\AppData\Local\Temp\ccyRUpuE.s:774    .rodata:000000e0 .LC11
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.1.7f551ac7fcad8b79b9df4bfdaa536673
+                           .group:00000000 wm4.stm32f2xx_hal_conf.h.40.007126baefb9f966c36646edbf8040d2
+                           .group:00000000 wm4.stm32f2xx.h.57.5ec1581efc43612c411d33a8686e9ec7
+                           .group:00000000 wm4.stm32f217xx.h.52.9c940d76d00294b78837dc334c172fdd
+                           .group:00000000 wm4.core_cm3.h.32.49180ccb4d36cabd2d7016d2a51d91ae
+                           .group:00000000 wm4.newlib.h.8.384a112feabb3bef7b573ae48cde2e3b
+                           .group:00000000 wm4.features.h.22.6a4ca7cd053637cc1d0db6c16f39b2d7
+                           .group:00000000 wm4.config.h.183.aa62afef667fb61d15fa64c48beb2f14
+                           .group:00000000 wm4._ansi.h.23.5644b60c990a4800b02a6e654e88f93a
+                           .group:00000000 wm4.stdint.h.20.54ad762faa59e3c05491630641c8d8bf
+                           .group:00000000 wm4.core_cmInstr.h.25.f50f886f2edf670cf199b35fd96f5c91
+                           .group:00000000 wm4.core_cm3.h.130.63ab2348a6eed0fdb318040d970b676c
+                           .group:00000000 wm4.stm32f217xx.h.978.a5c681952b2f704a0e7f2ba21d08adf5
+                           .group:00000000 wm4.stm32f2xx.h.142.bc2155a1f7498bab16371e38413a9e41
+                           .group:00000000 wm4.stm32f2xx_hal_def.h.74.8ad2dc8aa82c4fd02e5aeaae592641ba
+                           .group:00000000 wm4.stm32f2xx_hal_rcc.h.142.ec0f91cc6576a6acebd17e6dd85829ae
+                           .group:00000000 wm4.stm32f2xx_hal_rcc_ex.h.40.0829033e864455c6bdd0db01f8ba5a50
+                           .group:00000000 wm4.stm32f2xx_hal_gpio.h.40.ba64e0bb94d9a68835f80159f39a86f1
+                           .group:00000000 wm4.stm32f2xx_hal_gpio_ex.h.40.24e547fd402281923f446b510381083f
+                           .group:00000000 wm4.stm32f2xx_hal_dma.h.40.5d9732ace2a21a4526ce8f0c52428fff
+                           .group:00000000 wm4.stm32f2xx_hal_cortex.h.40.e10263d2ec5d4fa79b4180ce1a38aff1
+                           .group:00000000 wm4.stm32f2xx_hal_adc.h.40.89ac8b78113cac4cf63847587daabac9
+                           .group:00000000 wm4.stm32f2xx_hal_adc_ex.h.40.7de68ed256ef25526ee31cc017f2c291
+                           .group:00000000 wm4.stm32f2xx_hal_flash.h.40.c3171719ce015e9cff20c795e44e886d
+                           .group:00000000 wm4.stm32f2xx_hal_flash_ex.h.40.7389508bd24a0aeb077bde0c9fb651eb
+                           .group:00000000 wm4.stm32f2xx_ll_fsmc.h.40.c1c32f2e1862f4dd342bd9b80fb895bb
+                           .group:00000000 wm4.stm32f2xx_hal_pwr.h.40.812df32e5c31b609a128e9db0eb4cbd0
+                           .group:00000000 wm4.stm32f2xx_hal_rtc.h.40.850fda5fe2cce8797446913dee18382f
+                           .group:00000000 wm4.stm32f2xx_hal_rtc_ex.h.40.f3e0c408e3bf4e8a0352d7ec9a18a822
+                           .group:00000000 wm4.stm32f2xx_ll_sdmmc.h.40.3719ab487c4b77401c572f459adf6eb7
+                           .group:00000000 wm4.stm32f2xx_hal_sd.h.58.760215394dcc316161a6482c0af9b866
+                           .group:00000000 wm4.stm32f2xx_hal_spi.h.40.7984243dbaba8b21c6392998a47e6987
+                           .group:00000000 wm4.stm32f2xx_hal_tim.h.40.d79172f25d0e9a15dc346aba8515bdd6
+                           .group:00000000 wm4.stm32f2xx_hal_tim_ex.h.40.361f280a7a3f60b4b238bb99ca728d83
+                           .group:00000000 wm4.stm32f2xx_hal_uart.h.40.d74def561ae6f78f40f477c8426ecbef
+                           .group:00000000 wm4.stm32f2xx_ll_usb.h.40.9b0206a05bc6ce3bec1648b51f22cb81
+                           .group:00000000 wm4.stm32f2xx_hal_pcd.h.99.11faba414c39e357b2f23364912d0605
+                           .group:00000000 wm4.stm32f2xx_hal_hcd.h.40.44ee5e972983ae0139ddbacdc75c44ef
+                           .group:00000000 wm4.stm32f2xx_hal.h.64.ed79ee83e52b151b3c365392b398f866
+                           .group:00000000 wm4.stdio.h.31.7c0e28c411445f3f9c5b11accf882760
+                           .group:00000000 wm4.stddef.h.184.159df79b4ca79c76561572a55985524c
+                           .group:00000000 wm4.stdarg.h.34.3a23a216c0c293b3d2ea2e89281481e6
+                           .group:00000000 wm4._default_types.h.6.5e12cd604db8ce00b62bb2f02708eaf3
+                           .group:00000000 wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea
+                           .group:00000000 wm4._types.h.59.db8450f33c1f6150c0372fa1091a887a
+                           .group:00000000 wm4.stddef.h.348.9a99de77b6ba3b4278b57e9cc6d6e349
+                           .group:00000000 wm4.reent.h.16.567d760e6ae9ad7f917851a308bd7a57
+                           .group:00000000 wm4.types.h.23.0d949686bbcadd1621462d4fa1f884f9
+                           .group:00000000 wm4.stddef.h.39.7e3d906ac58942e0b374c527445f5de5
+                           .group:00000000 wm4.types.h.2.e9cec8c90ab35f77d9f499e06ae02400
+                           .group:00000000 wm4.types.h.80.5759fe41f87f5211a5952dfb1fc64f19
+                           .group:00000000 wm4.stdio.h.2.4aa87247282eca6c8f36f9de33d8df1a
+                           .group:00000000 wm4.stdio.h.64.f9f1bb6b0d3d7e12f6a27968d859709c
+                           .group:00000000 wm4.stdlib.h.18.8bab2fb43ac4e90235390733c30a4530
+                           .group:00000000 wm4.stddef.h.158.a7efb00f6cbc6f43213b50e183c9830c
+                           .group:00000000 wm4.alloca.h.8.dfc0c703c47ec3e69746825b17d9e66d
+                           .group:00000000 wm4.stdlib.h.55.7091a050e07f1c4abd225630fe3d62f1
+                           .group:00000000 wm4.cdefs.h.56.efab90f4d89fbc41d6b3a5c5fb0d3d0f
+                           .group:00000000 wm4.string.h.15.dab3980bf35408a4c507182805e2de3a
+                           .group:00000000 wm4.string.h.126.6ff3aa59129e7f66b2c273baf353e066
+                           .group:00000000 wm4.Display.h.39.49592f1e6d055d6383457fd20cdd98de
+                           .group:00000000 wm4.usbd_conf.h.42.6b5dabdfef26be13dabbf5c06e1837cb
+                           .group:00000000 wm4.usbd_def.h.31.c6dc8a88074757ab7e1498fc76ddfad4
+
+UNDEFINED SYMBOLS
+USBD_GetString

@@ -1,0 +1,408 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"ff_gen_drv.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.global	disk
+  19              		.bss
+  20              		.align	2
+  23              	disk:
+  24 0000 00000000 		.space	16
+  24      00000000 
+  24      00000000 
+  24      00000000 
+  25              		.text
+  26              		.align	2
+  27              		.global	FATFS_LinkDriver
+  28              		.thumb
+  29              		.thumb_func
+  31              	FATFS_LinkDriver:
+  32              	.LFB55:
+  33              		.file 1 "../tasks/SDMMC/ff_gen_drv.c"
+   1:../tasks/SDMMC/ff_gen_drv.c **** /**
+   2:../tasks/SDMMC/ff_gen_drv.c ****   ******************************************************************************
+   3:../tasks/SDMMC/ff_gen_drv.c ****   * @file    ff_gen_drv.c 
+   4:../tasks/SDMMC/ff_gen_drv.c ****   * @author  MCD Application Team
+   5:../tasks/SDMMC/ff_gen_drv.c ****   * @version V1.0.0
+   6:../tasks/SDMMC/ff_gen_drv.c ****   * @date    18-February-2014
+   7:../tasks/SDMMC/ff_gen_drv.c ****   * @brief   FatFs generic low level driver.
+   8:../tasks/SDMMC/ff_gen_drv.c ****   ******************************************************************************
+   9:../tasks/SDMMC/ff_gen_drv.c ****   * @attention
+  10:../tasks/SDMMC/ff_gen_drv.c ****   *
+  11:../tasks/SDMMC/ff_gen_drv.c ****   * <h2><center>&copy; COPYRIGHT 2014 STMicroelectronics</center></h2>
+  12:../tasks/SDMMC/ff_gen_drv.c ****   *
+  13:../tasks/SDMMC/ff_gen_drv.c ****   * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+  14:../tasks/SDMMC/ff_gen_drv.c ****   * You may not use this file except in compliance with the License.
+  15:../tasks/SDMMC/ff_gen_drv.c ****   * You may obtain a copy of the License at:
+  16:../tasks/SDMMC/ff_gen_drv.c ****   *
+  17:../tasks/SDMMC/ff_gen_drv.c ****   *        http://www.st.com/software_license_agreement_liberty_v2
+  18:../tasks/SDMMC/ff_gen_drv.c ****   *
+  19:../tasks/SDMMC/ff_gen_drv.c ****   * Unless required by applicable law or agreed to in writing, software 
+  20:../tasks/SDMMC/ff_gen_drv.c ****   * distributed under the License is distributed on an "AS IS" BASIS, 
+  21:../tasks/SDMMC/ff_gen_drv.c ****   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  22:../tasks/SDMMC/ff_gen_drv.c ****   * See the License for the specific language governing permissions and
+  23:../tasks/SDMMC/ff_gen_drv.c ****   * limitations under the License.
+  24:../tasks/SDMMC/ff_gen_drv.c ****   *
+  25:../tasks/SDMMC/ff_gen_drv.c ****   ******************************************************************************
+  26:../tasks/SDMMC/ff_gen_drv.c ****   */ 
+  27:../tasks/SDMMC/ff_gen_drv.c **** 
+  28:../tasks/SDMMC/ff_gen_drv.c **** /* Includes ------------------------------------------------------------------*/
+  29:../tasks/SDMMC/ff_gen_drv.c **** #include "ff_gen_drv.h"
+  30:../tasks/SDMMC/ff_gen_drv.c **** 
+  31:../tasks/SDMMC/ff_gen_drv.c **** /* Private typedef -----------------------------------------------------------*/
+  32:../tasks/SDMMC/ff_gen_drv.c **** /* Private define ------------------------------------------------------------*/
+  33:../tasks/SDMMC/ff_gen_drv.c **** /* Private variables ---------------------------------------------------------*/
+  34:../tasks/SDMMC/ff_gen_drv.c **** Disk_drvTypeDef  disk = {0};
+  35:../tasks/SDMMC/ff_gen_drv.c **** 
+  36:../tasks/SDMMC/ff_gen_drv.c **** /* Private function prototypes -----------------------------------------------*/
+  37:../tasks/SDMMC/ff_gen_drv.c **** /* Private functions ---------------------------------------------------------*/
+  38:../tasks/SDMMC/ff_gen_drv.c **** 
+  39:../tasks/SDMMC/ff_gen_drv.c **** /**
+  40:../tasks/SDMMC/ff_gen_drv.c ****   * @brief  Links a compatible diskio driver and increments the number of active
+  41:../tasks/SDMMC/ff_gen_drv.c ****   *         linked drivers.          
+  42:../tasks/SDMMC/ff_gen_drv.c ****   * @note   The number of linked drivers (volumes) is up to 10 due to FatFs limits
+  43:../tasks/SDMMC/ff_gen_drv.c ****   * @param  drv: pointer to the disk IO Driver structure
+  44:../tasks/SDMMC/ff_gen_drv.c ****   * @param  path: pointer to the logical drive path 
+  45:../tasks/SDMMC/ff_gen_drv.c ****   * @retval Returns 0 in case of success, otherwise 1.
+  46:../tasks/SDMMC/ff_gen_drv.c ****   */
+  47:../tasks/SDMMC/ff_gen_drv.c **** uint8_t FATFS_LinkDriver(Diskio_drvTypeDef *drv, char *path)
+  48:../tasks/SDMMC/ff_gen_drv.c **** {
+  34              		.loc 1 48 0
+  35              		.cfi_startproc
+  36              		@ args = 0, pretend = 0, frame = 16
+  37              		@ frame_needed = 1, uses_anonymous_args = 0
+  38              		@ link register save eliminated.
+  39 0000 80B4     		push	{r7}
+  40              		.cfi_def_cfa_offset 4
+  41              		.cfi_offset 7, -4
+  42 0002 85B0     		sub	sp, sp, #20
+  43              		.cfi_def_cfa_offset 24
+  44 0004 00AF     		add	r7, sp, #0
+  45              		.cfi_def_cfa_register 7
+  46 0006 7860     		str	r0, [r7, #4]
+  47 0008 3960     		str	r1, [r7]
+  49:../tasks/SDMMC/ff_gen_drv.c ****   uint8_t ret = 1;
+  48              		.loc 1 49 0
+  49 000a 0123     		movs	r3, #1
+  50 000c FB73     		strb	r3, [r7, #15]
+  50:../tasks/SDMMC/ff_gen_drv.c ****   uint8_t DiskNum = 0;
+  51              		.loc 1 50 0
+  52 000e 0023     		movs	r3, #0
+  53 0010 BB73     		strb	r3, [r7, #14]
+  51:../tasks/SDMMC/ff_gen_drv.c ****   if(disk.nbr <= _VOLUMES)
+  54              		.loc 1 51 0
+  55 0012 40F20003 		movw	r3, #:lower16:disk
+  56 0016 C0F20003 		movt	r3, #:upper16:disk
+  57 001a 1B7B     		ldrb	r3, [r3, #12]
+  58 001c DBB2     		uxtb	r3, r3
+  59 001e 032B     		cmp	r3, #3
+  60 0020 30D8     		bhi	.L2
+  52:../tasks/SDMMC/ff_gen_drv.c ****   {
+  53:../tasks/SDMMC/ff_gen_drv.c ****     disk.drv[disk.nbr] = drv;  
+  61              		.loc 1 53 0
+  62 0022 40F20003 		movw	r3, #:lower16:disk
+  63 0026 C0F20003 		movt	r3, #:upper16:disk
+  64 002a 1B7B     		ldrb	r3, [r3, #12]
+  65 002c DBB2     		uxtb	r3, r3
+  66 002e 1A46     		mov	r2, r3
+  67 0030 40F20003 		movw	r3, #:lower16:disk
+  68 0034 C0F20003 		movt	r3, #:upper16:disk
+  69 0038 7968     		ldr	r1, [r7, #4]
+  70 003a 43F82210 		str	r1, [r3, r2, lsl #2]
+  54:../tasks/SDMMC/ff_gen_drv.c ****     DiskNum = disk.nbr++;
+  71              		.loc 1 54 0
+  72 003e 40F20003 		movw	r3, #:lower16:disk
+  73 0042 C0F20003 		movt	r3, #:upper16:disk
+  74 0046 1B7B     		ldrb	r3, [r3, #12]
+  75 0048 DBB2     		uxtb	r3, r3
+  76 004a 1A46     		mov	r2, r3
+  77 004c 531C     		adds	r3, r2, #1
+  78 004e D9B2     		uxtb	r1, r3
+  79 0050 40F20003 		movw	r3, #:lower16:disk
+  80 0054 C0F20003 		movt	r3, #:upper16:disk
+  81 0058 1973     		strb	r1, [r3, #12]
+  82 005a 1346     		mov	r3, r2
+  83 005c BB73     		strb	r3, [r7, #14]
+  55:../tasks/SDMMC/ff_gen_drv.c ****     path[0] = DiskNum + '0';
+  84              		.loc 1 55 0
+  85 005e BB7B     		ldrb	r3, [r7, #14]
+  86 0060 3033     		adds	r3, r3, #48
+  87 0062 DAB2     		uxtb	r2, r3
+  88 0064 3B68     		ldr	r3, [r7]
+  89 0066 1A70     		strb	r2, [r3]
+  56:../tasks/SDMMC/ff_gen_drv.c ****     path[1] = ':';
+  90              		.loc 1 56 0
+  91 0068 3B68     		ldr	r3, [r7]
+  92 006a 0133     		adds	r3, r3, #1
+  93 006c 3A22     		movs	r2, #58
+  94 006e 1A70     		strb	r2, [r3]
+  57:../tasks/SDMMC/ff_gen_drv.c ****     path[2] = '/';
+  95              		.loc 1 57 0
+  96 0070 3B68     		ldr	r3, [r7]
+  97 0072 0233     		adds	r3, r3, #2
+  98 0074 2F22     		movs	r2, #47
+  99 0076 1A70     		strb	r2, [r3]
+  58:../tasks/SDMMC/ff_gen_drv.c ****     path[3] = 0;
+ 100              		.loc 1 58 0
+ 101 0078 3B68     		ldr	r3, [r7]
+ 102 007a 0333     		adds	r3, r3, #3
+ 103 007c 0022     		movs	r2, #0
+ 104 007e 1A70     		strb	r2, [r3]
+  59:../tasks/SDMMC/ff_gen_drv.c ****     ret = 0;
+ 105              		.loc 1 59 0
+ 106 0080 0023     		movs	r3, #0
+ 107 0082 FB73     		strb	r3, [r7, #15]
+ 108              	.L2:
+  60:../tasks/SDMMC/ff_gen_drv.c ****   }
+  61:../tasks/SDMMC/ff_gen_drv.c ****   return ret;
+ 109              		.loc 1 61 0
+ 110 0084 FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+  62:../tasks/SDMMC/ff_gen_drv.c **** }
+ 111              		.loc 1 62 0
+ 112 0086 1846     		mov	r0, r3
+ 113 0088 1437     		adds	r7, r7, #20
+ 114 008a BD46     		mov	sp, r7
+ 115              		@ sp needed
+ 116 008c 5DF8047B 		ldr	r7, [sp], #4
+ 117 0090 7047     		bx	lr
+ 118              		.cfi_endproc
+ 119              	.LFE55:
+ 121 0092 00BF     		.align	2
+ 122              		.global	FATFS_UnLinkDriver
+ 123              		.thumb
+ 124              		.thumb_func
+ 126              	FATFS_UnLinkDriver:
+ 127              	.LFB56:
+  63:../tasks/SDMMC/ff_gen_drv.c **** 
+  64:../tasks/SDMMC/ff_gen_drv.c **** /**
+  65:../tasks/SDMMC/ff_gen_drv.c ****   * @brief  Unlinks a diskio driver and decrements the number of active linked
+  66:../tasks/SDMMC/ff_gen_drv.c ****   *         drivers.
+  67:../tasks/SDMMC/ff_gen_drv.c ****   * @param  path: pointer to the logical drive path  
+  68:../tasks/SDMMC/ff_gen_drv.c ****   * @retval Returns 0 in case of success, otherwise 1.
+  69:../tasks/SDMMC/ff_gen_drv.c ****   */
+  70:../tasks/SDMMC/ff_gen_drv.c **** uint8_t FATFS_UnLinkDriver(char *path)
+  71:../tasks/SDMMC/ff_gen_drv.c **** { 
+ 128              		.loc 1 71 0
+ 129              		.cfi_startproc
+ 130              		@ args = 0, pretend = 0, frame = 16
+ 131              		@ frame_needed = 1, uses_anonymous_args = 0
+ 132              		@ link register save eliminated.
+ 133 0094 80B4     		push	{r7}
+ 134              		.cfi_def_cfa_offset 4
+ 135              		.cfi_offset 7, -4
+ 136 0096 85B0     		sub	sp, sp, #20
+ 137              		.cfi_def_cfa_offset 24
+ 138 0098 00AF     		add	r7, sp, #0
+ 139              		.cfi_def_cfa_register 7
+ 140 009a 7860     		str	r0, [r7, #4]
+  72:../tasks/SDMMC/ff_gen_drv.c ****   uint8_t DiskNum = 0;
+ 141              		.loc 1 72 0
+ 142 009c 0023     		movs	r3, #0
+ 143 009e BB73     		strb	r3, [r7, #14]
+  73:../tasks/SDMMC/ff_gen_drv.c ****   uint8_t ret = 1;
+ 144              		.loc 1 73 0
+ 145 00a0 0123     		movs	r3, #1
+ 146 00a2 FB73     		strb	r3, [r7, #15]
+  74:../tasks/SDMMC/ff_gen_drv.c ****   
+  75:../tasks/SDMMC/ff_gen_drv.c ****   if(disk.nbr >= 1)
+ 147              		.loc 1 75 0
+ 148 00a4 40F20003 		movw	r3, #:lower16:disk
+ 149 00a8 C0F20003 		movt	r3, #:upper16:disk
+ 150 00ac 1B7B     		ldrb	r3, [r3, #12]
+ 151 00ae DBB2     		uxtb	r3, r3
+ 152 00b0 002B     		cmp	r3, #0
+ 153 00b2 22D0     		beq	.L5
+  76:../tasks/SDMMC/ff_gen_drv.c ****   {    
+  77:../tasks/SDMMC/ff_gen_drv.c ****     DiskNum = path[0] - '0';
+ 154              		.loc 1 77 0
+ 155 00b4 7B68     		ldr	r3, [r7, #4]
+ 156 00b6 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 157 00b8 303B     		subs	r3, r3, #48
+ 158 00ba BB73     		strb	r3, [r7, #14]
+  78:../tasks/SDMMC/ff_gen_drv.c ****     if(DiskNum <= disk.nbr)
+ 159              		.loc 1 78 0
+ 160 00bc 40F20003 		movw	r3, #:lower16:disk
+ 161 00c0 C0F20003 		movt	r3, #:upper16:disk
+ 162 00c4 1B7B     		ldrb	r3, [r3, #12]
+ 163 00c6 DBB2     		uxtb	r3, r3
+ 164 00c8 BA7B     		ldrb	r2, [r7, #14]	@ zero_extendqisi2
+ 165 00ca 9A42     		cmp	r2, r3
+ 166 00cc 15D8     		bhi	.L5
+  79:../tasks/SDMMC/ff_gen_drv.c ****     {
+  80:../tasks/SDMMC/ff_gen_drv.c ****       disk.drv[disk.nbr--] = 0;
+ 167              		.loc 1 80 0
+ 168 00ce 40F20003 		movw	r3, #:lower16:disk
+ 169 00d2 C0F20003 		movt	r3, #:upper16:disk
+ 170 00d6 1B7B     		ldrb	r3, [r3, #12]
+ 171 00d8 DAB2     		uxtb	r2, r3
+ 172 00da 531E     		subs	r3, r2, #1
+ 173 00dc D9B2     		uxtb	r1, r3
+ 174 00de 40F20003 		movw	r3, #:lower16:disk
+ 175 00e2 C0F20003 		movt	r3, #:upper16:disk
+ 176 00e6 1973     		strb	r1, [r3, #12]
+ 177 00e8 40F20003 		movw	r3, #:lower16:disk
+ 178 00ec C0F20003 		movt	r3, #:upper16:disk
+ 179 00f0 0021     		movs	r1, #0
+ 180 00f2 43F82210 		str	r1, [r3, r2, lsl #2]
+  81:../tasks/SDMMC/ff_gen_drv.c ****       ret = 0;
+ 181              		.loc 1 81 0
+ 182 00f6 0023     		movs	r3, #0
+ 183 00f8 FB73     		strb	r3, [r7, #15]
+ 184              	.L5:
+  82:../tasks/SDMMC/ff_gen_drv.c ****     }
+  83:../tasks/SDMMC/ff_gen_drv.c ****   }
+  84:../tasks/SDMMC/ff_gen_drv.c ****   
+  85:../tasks/SDMMC/ff_gen_drv.c ****   return ret;
+ 185              		.loc 1 85 0
+ 186 00fa FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+  86:../tasks/SDMMC/ff_gen_drv.c **** }
+ 187              		.loc 1 86 0
+ 188 00fc 1846     		mov	r0, r3
+ 189 00fe 1437     		adds	r7, r7, #20
+ 190 0100 BD46     		mov	sp, r7
+ 191              		@ sp needed
+ 192 0102 5DF8047B 		ldr	r7, [sp], #4
+ 193 0106 7047     		bx	lr
+ 194              		.cfi_endproc
+ 195              	.LFE56:
+ 197              		.align	2
+ 198              		.global	FATFS_GetAttachedDriversNbr
+ 199              		.thumb
+ 200              		.thumb_func
+ 202              	FATFS_GetAttachedDriversNbr:
+ 203              	.LFB57:
+  87:../tasks/SDMMC/ff_gen_drv.c **** 
+  88:../tasks/SDMMC/ff_gen_drv.c **** /**
+  89:../tasks/SDMMC/ff_gen_drv.c ****   * @brief  Gets number of linked drivers to the FatFs module.
+  90:../tasks/SDMMC/ff_gen_drv.c ****   * @param  None
+  91:../tasks/SDMMC/ff_gen_drv.c ****   * @retval Number of attached drivers.
+  92:../tasks/SDMMC/ff_gen_drv.c ****   */
+  93:../tasks/SDMMC/ff_gen_drv.c **** uint8_t FATFS_GetAttachedDriversNbr(void)
+  94:../tasks/SDMMC/ff_gen_drv.c **** {
+ 204              		.loc 1 94 0
+ 205              		.cfi_startproc
+ 206              		@ args = 0, pretend = 0, frame = 0
+ 207              		@ frame_needed = 1, uses_anonymous_args = 0
+ 208              		@ link register save eliminated.
+ 209 0108 80B4     		push	{r7}
+ 210              		.cfi_def_cfa_offset 4
+ 211              		.cfi_offset 7, -4
+ 212 010a 00AF     		add	r7, sp, #0
+ 213              		.cfi_def_cfa_register 7
+  95:../tasks/SDMMC/ff_gen_drv.c ****   return disk.nbr;
+ 214              		.loc 1 95 0
+ 215 010c 40F20003 		movw	r3, #:lower16:disk
+ 216 0110 C0F20003 		movt	r3, #:upper16:disk
+ 217 0114 1B7B     		ldrb	r3, [r3, #12]
+ 218 0116 DBB2     		uxtb	r3, r3
+  96:../tasks/SDMMC/ff_gen_drv.c **** }
+ 219              		.loc 1 96 0
+ 220 0118 1846     		mov	r0, r3
+ 221 011a BD46     		mov	sp, r7
+ 222              		@ sp needed
+ 223 011c 5DF8047B 		ldr	r7, [sp], #4
+ 224 0120 7047     		bx	lr
+ 225              		.cfi_endproc
+ 226              	.LFE57:
+ 228              	.Letext0:
+ 229              		.file 2 "../tasks/SDMMC/integer.h"
+ 230              		.file 3 "../tasks/SDMMC/diskio.h"
+ 231              		.file 4 "c:\\program files (x86)\\codesourcery\\arm-none-eabi\\include\\stdint.h"
+ 232              		.file 5 "../tasks/SDMMC/ff_gen_drv.h"
+ 233              		.file 6 "D:\\workspace\\console800480\\system/core_cm3.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 ff_gen_drv.c
+C:\Users\sagok\AppData\Local\Temp\ccWyI7Jb.s:23     .bss:00000000 disk
+C:\Users\sagok\AppData\Local\Temp\ccWyI7Jb.s:20     .bss:00000000 $d
+C:\Users\sagok\AppData\Local\Temp\ccWyI7Jb.s:26     .text:00000000 $t
+C:\Users\sagok\AppData\Local\Temp\ccWyI7Jb.s:31     .text:00000000 FATFS_LinkDriver
+C:\Users\sagok\AppData\Local\Temp\ccWyI7Jb.s:126    .text:00000094 FATFS_UnLinkDriver
+C:\Users\sagok\AppData\Local\Temp\ccWyI7Jb.s:202    .text:00000108 FATFS_GetAttachedDriversNbr
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.1.7f551ac7fcad8b79b9df4bfdaa536673
+                           .group:00000000 wm4.diskio.h.6.8da7330f9b93c43e88f440080fbc00d0
+                           .group:00000000 wm4.diskio.h.43.17c6f92f3f6ff58b941e8553c0aeafe2
+                           .group:00000000 wm4.stm32f2xx_hal_conf.h.40.007126baefb9f966c36646edbf8040d2
+                           .group:00000000 wm4.stm32f2xx.h.57.5ec1581efc43612c411d33a8686e9ec7
+                           .group:00000000 wm4.stm32f217xx.h.52.9c940d76d00294b78837dc334c172fdd
+                           .group:00000000 wm4.core_cm3.h.32.49180ccb4d36cabd2d7016d2a51d91ae
+                           .group:00000000 wm4.newlib.h.8.384a112feabb3bef7b573ae48cde2e3b
+                           .group:00000000 wm4.features.h.22.6a4ca7cd053637cc1d0db6c16f39b2d7
+                           .group:00000000 wm4.config.h.183.aa62afef667fb61d15fa64c48beb2f14
+                           .group:00000000 wm4._ansi.h.23.5644b60c990a4800b02a6e654e88f93a
+                           .group:00000000 wm4.stdint.h.20.54ad762faa59e3c05491630641c8d8bf
+                           .group:00000000 wm4.core_cmInstr.h.25.f50f886f2edf670cf199b35fd96f5c91
+                           .group:00000000 wm4.core_cm3.h.130.63ab2348a6eed0fdb318040d970b676c
+                           .group:00000000 wm4.stm32f217xx.h.978.a5c681952b2f704a0e7f2ba21d08adf5
+                           .group:00000000 wm4.stm32f2xx.h.142.bc2155a1f7498bab16371e38413a9e41
+                           .group:00000000 wm4.stm32f2xx_hal_def.h.74.8ad2dc8aa82c4fd02e5aeaae592641ba
+                           .group:00000000 wm4.stm32f2xx_hal_rcc.h.142.ec0f91cc6576a6acebd17e6dd85829ae
+                           .group:00000000 wm4.stm32f2xx_hal_rcc_ex.h.40.0829033e864455c6bdd0db01f8ba5a50
+                           .group:00000000 wm4.stm32f2xx_hal_gpio.h.40.ba64e0bb94d9a68835f80159f39a86f1
+                           .group:00000000 wm4.stm32f2xx_hal_gpio_ex.h.40.24e547fd402281923f446b510381083f
+                           .group:00000000 wm4.stm32f2xx_hal_dma.h.40.5d9732ace2a21a4526ce8f0c52428fff
+                           .group:00000000 wm4.stm32f2xx_hal_cortex.h.40.e10263d2ec5d4fa79b4180ce1a38aff1
+                           .group:00000000 wm4.stm32f2xx_hal_adc.h.40.89ac8b78113cac4cf63847587daabac9
+                           .group:00000000 wm4.stm32f2xx_hal_adc_ex.h.40.7de68ed256ef25526ee31cc017f2c291
+                           .group:00000000 wm4.stm32f2xx_hal_flash.h.40.c3171719ce015e9cff20c795e44e886d
+                           .group:00000000 wm4.stm32f2xx_hal_flash_ex.h.40.7389508bd24a0aeb077bde0c9fb651eb
+                           .group:00000000 wm4.stm32f2xx_ll_fsmc.h.40.c1c32f2e1862f4dd342bd9b80fb895bb
+                           .group:00000000 wm4.stm32f2xx_hal_pwr.h.40.812df32e5c31b609a128e9db0eb4cbd0
+                           .group:00000000 wm4.stm32f2xx_hal_rtc.h.40.850fda5fe2cce8797446913dee18382f
+                           .group:00000000 wm4.stm32f2xx_hal_rtc_ex.h.40.f3e0c408e3bf4e8a0352d7ec9a18a822
+                           .group:00000000 wm4.stm32f2xx_ll_sdmmc.h.40.3719ab487c4b77401c572f459adf6eb7
+                           .group:00000000 wm4.stm32f2xx_hal_sd.h.58.760215394dcc316161a6482c0af9b866
+                           .group:00000000 wm4.stm32f2xx_hal_spi.h.40.7984243dbaba8b21c6392998a47e6987
+                           .group:00000000 wm4.stm32f2xx_hal_tim.h.40.d79172f25d0e9a15dc346aba8515bdd6
+                           .group:00000000 wm4.stm32f2xx_hal_tim_ex.h.40.361f280a7a3f60b4b238bb99ca728d83
+                           .group:00000000 wm4.stm32f2xx_hal_uart.h.40.d74def561ae6f78f40f477c8426ecbef
+                           .group:00000000 wm4.stm32f2xx_ll_usb.h.40.9b0206a05bc6ce3bec1648b51f22cb81
+                           .group:00000000 wm4.stm32f2xx_hal_pcd.h.99.11faba414c39e357b2f23364912d0605
+                           .group:00000000 wm4.stm32f2xx_hal_hcd.h.40.44ee5e972983ae0139ddbacdc75c44ef
+                           .group:00000000 wm4.stm32f2xx_hal.h.64.ed79ee83e52b151b3c365392b398f866
+                           .group:00000000 wm4.stdio.h.31.7c0e28c411445f3f9c5b11accf882760
+                           .group:00000000 wm4.stddef.h.184.159df79b4ca79c76561572a55985524c
+                           .group:00000000 wm4.stdarg.h.34.3a23a216c0c293b3d2ea2e89281481e6
+                           .group:00000000 wm4._default_types.h.6.5e12cd604db8ce00b62bb2f02708eaf3
+                           .group:00000000 wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea
+                           .group:00000000 wm4._types.h.59.db8450f33c1f6150c0372fa1091a887a
+                           .group:00000000 wm4.stddef.h.348.9a99de77b6ba3b4278b57e9cc6d6e349
+                           .group:00000000 wm4.reent.h.16.567d760e6ae9ad7f917851a308bd7a57
+                           .group:00000000 wm4.types.h.23.0d949686bbcadd1621462d4fa1f884f9
+                           .group:00000000 wm4.stddef.h.39.7e3d906ac58942e0b374c527445f5de5
+                           .group:00000000 wm4.types.h.2.e9cec8c90ab35f77d9f499e06ae02400
+                           .group:00000000 wm4.types.h.80.5759fe41f87f5211a5952dfb1fc64f19
+                           .group:00000000 wm4.stdio.h.2.4aa87247282eca6c8f36f9de33d8df1a
+                           .group:00000000 wm4.stdio.h.64.f9f1bb6b0d3d7e12f6a27968d859709c
+                           .group:00000000 wm4.stdlib.h.18.8bab2fb43ac4e90235390733c30a4530
+                           .group:00000000 wm4.stddef.h.158.a7efb00f6cbc6f43213b50e183c9830c
+                           .group:00000000 wm4.alloca.h.8.dfc0c703c47ec3e69746825b17d9e66d
+                           .group:00000000 wm4.stdlib.h.55.7091a050e07f1c4abd225630fe3d62f1
+                           .group:00000000 wm4.cdefs.h.56.efab90f4d89fbc41d6b3a5c5fb0d3d0f
+                           .group:00000000 wm4.string.h.15.dab3980bf35408a4c507182805e2de3a
+                           .group:00000000 wm4.string.h.126.6ff3aa59129e7f66b2c273baf353e066
+                           .group:00000000 wm4.LEDs.h.9.36ffa4b30bd168dc58d64fa6e53a9a30
+                           .group:00000000 wm4.usbh_conf.h.41.d72a4a1e5e10d8f062cf3fa4bcd8aa54
+                           .group:00000000 wm4.usbh_def.h.42.e5773f0fe2e07d0c2c7284f319cefcfb
+                           .group:00000000 wm4.usbh_ioreq.h.53.3586266a62e1adb6014256f47bfe28ae
+                           .group:00000000 wm4.usbh_ctlreq.h.30.baf76fe1032fc0ccc3b759e321acc69d
+                           .group:00000000 wm4.usbh_core.h.60.126ed10f424484efe8e3332cf8789488
+                           .group:00000000 wm4.usbh_msc_bot.h.150.7a573dd4700e98f78a08f0e60cd8a2e8
+                           .group:00000000 wm4.usbh_msc_scsi.h.30.7ac65aef8ad2b1cb473eb44388537ea2
+                           .group:00000000 wm4.usbh_msc.h.92.1eaed72009e45245618cff3cc0ab5900
+                           .group:00000000 wm4.ffconf.h.19.cf478c53f215b23144e0b163e0b92c6c
+                           .group:00000000 wm4.ff.h.45.ea85cd9763a25d97ae88799c83ef7c63
+
+NO UNDEFINED SYMBOLS

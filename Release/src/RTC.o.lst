@@ -1,0 +1,735 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"RTC.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.align	2
+  19              		.global	Init_RTC
+  20              		.thumb
+  21              		.thumb_func
+  23              	Init_RTC:
+  24              	.LFB55:
+  25              		.file 1 "../src/RTC.c"
+   1:../src/RTC.c  **** /*
+   2:../src/RTC.c  ****  * RTC.c
+   3:../src/RTC.c  ****  *
+   4:../src/RTC.c  ****  *  Created on: 04.03.2015
+   5:../src/RTC.c  ****  *      Author: sagok
+   6:../src/RTC.c  ****  */
+   7:../src/RTC.c  **** 
+   8:../src/RTC.c  **** 
+   9:../src/RTC.c  **** /**
+  10:../src/RTC.c  ****   * @brief  Configure the current time and date.
+  11:../src/RTC.c  ****   * @param  None
+  12:../src/RTC.c  ****   * @retval None
+  13:../src/RTC.c  ****   */
+  14:../src/RTC.c  **** 
+  15:../src/RTC.c  **** /* Includes ------------------------------------------------------------------*/
+  16:../src/RTC.c  **** #include <stdio.h>
+  17:../src/RTC.c  **** #include <stdint.h>
+  18:../src/RTC.c  **** 
+  19:../src/RTC.c  **** /* Scheduler includes. */
+  20:../src/RTC.c  **** #include "FreeRTOS.h"
+  21:../src/RTC.c  **** #include "task.h"
+  22:../src/RTC.c  **** #include "queue.h"
+  23:../src/RTC.c  **** #include "semphr.h"
+  24:../src/RTC.c  **** #include "timers.h"
+  25:../src/RTC.c  **** 
+  26:../src/RTC.c  **** #include "stm32f2xx_hal.h"
+  27:../src/RTC.c  **** #include "RTC.h"
+  28:../src/RTC.c  **** #include "LEDs.h"
+  29:../src/RTC.c  **** 
+  30:../src/RTC.c  **** /* Private typedef -----------------------------------------------------------*/
+  31:../src/RTC.c  **** /* Private define ------------------------------------------------------------*/
+  32:../src/RTC.c  **** /* Private macro -------------------------------------------------------------*/
+  33:../src/RTC.c  **** /* Private variables ---------------------------------------------------------*/
+  34:../src/RTC.c  **** /* Buffers used for displaying Time and Date */
+  35:../src/RTC.c  **** 
+  36:../src/RTC.c  **** static void Error_Handler(void);
+  37:../src/RTC.c  **** 
+  38:../src/RTC.c  **** /* RTC handler declaration */
+  39:../src/RTC.c  **** extern RTC_HandleTypeDef RtcHandle;
+  40:../src/RTC.c  **** 
+  41:../src/RTC.c  **** 
+  42:../src/RTC.c  **** void Init_RTC(void){
+  26              		.loc 1 42 0
+  27              		.cfi_startproc
+  28              		@ args = 0, pretend = 0, frame = 0
+  29              		@ frame_needed = 1, uses_anonymous_args = 0
+  30 0000 80B5     		push	{r7, lr}
+  31              		.cfi_def_cfa_offset 8
+  32              		.cfi_offset 7, -8
+  33              		.cfi_offset 14, -4
+  34 0002 00AF     		add	r7, sp, #0
+  35              		.cfi_def_cfa_register 7
+  43:../src/RTC.c  **** 
+  44:../src/RTC.c  **** 	  /*##-1- Configure the RTC peripheral #######################################*/
+  45:../src/RTC.c  **** 	  /* Configure RTC prescaler and RTC data registers */
+  46:../src/RTC.c  **** 	  /* RTC configured as follow:
+  47:../src/RTC.c  **** 	      - Hour Format    = Format 24
+  48:../src/RTC.c  **** 	      - Asynch Prediv  = Value according to source clock
+  49:../src/RTC.c  **** 	      - Synch Prediv   = Value according to source clock
+  50:../src/RTC.c  **** 	      - OutPut         = Output Disable
+  51:../src/RTC.c  **** 	      - OutPutPolarity = High Polarity
+  52:../src/RTC.c  **** 	      - OutPutType     = Open Drain */
+  53:../src/RTC.c  **** 	  RtcHandle.Init.HourFormat = RTC_HOURFORMAT_24;
+  36              		.loc 1 53 0
+  37 0004 40F20003 		movw	r3, #:lower16:RtcHandle
+  38 0008 C0F20003 		movt	r3, #:upper16:RtcHandle
+  39 000c 0022     		movs	r2, #0
+  40 000e 5A60     		str	r2, [r3, #4]
+  54:../src/RTC.c  **** 	  RtcHandle.Init.AsynchPrediv = RTC_ASYNCH_PREDIV;
+  41              		.loc 1 54 0
+  42 0010 40F20003 		movw	r3, #:lower16:RtcHandle
+  43 0014 C0F20003 		movt	r3, #:upper16:RtcHandle
+  44 0018 7F22     		movs	r2, #127
+  45 001a 9A60     		str	r2, [r3, #8]
+  55:../src/RTC.c  **** 	  RtcHandle.Init.SynchPrediv = RTC_SYNCH_PREDIV;
+  46              		.loc 1 55 0
+  47 001c 40F20003 		movw	r3, #:lower16:RtcHandle
+  48 0020 C0F20003 		movt	r3, #:upper16:RtcHandle
+  49 0024 FF22     		movs	r2, #255
+  50 0026 DA60     		str	r2, [r3, #12]
+  56:../src/RTC.c  **** 	  RtcHandle.Init.OutPut = RTC_OUTPUT_DISABLE;
+  51              		.loc 1 56 0
+  52 0028 40F20003 		movw	r3, #:lower16:RtcHandle
+  53 002c C0F20003 		movt	r3, #:upper16:RtcHandle
+  54 0030 0022     		movs	r2, #0
+  55 0032 1A61     		str	r2, [r3, #16]
+  57:../src/RTC.c  **** 	  RtcHandle.Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
+  56              		.loc 1 57 0
+  57 0034 40F20003 		movw	r3, #:lower16:RtcHandle
+  58 0038 C0F20003 		movt	r3, #:upper16:RtcHandle
+  59 003c 0022     		movs	r2, #0
+  60 003e 5A61     		str	r2, [r3, #20]
+  58:../src/RTC.c  **** 	  RtcHandle.Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
+  61              		.loc 1 58 0
+  62 0040 40F20003 		movw	r3, #:lower16:RtcHandle
+  63 0044 C0F20003 		movt	r3, #:upper16:RtcHandle
+  64 0048 0022     		movs	r2, #0
+  65 004a 9A61     		str	r2, [r3, #24]
+  59:../src/RTC.c  **** 	  RtcHandle.Instance = RTC;
+  66              		.loc 1 59 0
+  67 004c 40F20003 		movw	r3, #:lower16:RtcHandle
+  68 0050 C0F20003 		movt	r3, #:upper16:RtcHandle
+  69 0054 4FF42052 		mov	r2, #10240
+  70 0058 C4F20002 		movt	r2, 16384
+  71 005c 1A60     		str	r2, [r3]
+  60:../src/RTC.c  **** 
+  61:../src/RTC.c  **** 	  if (HAL_RTC_Init(&RtcHandle) != HAL_OK)
+  72              		.loc 1 61 0
+  73 005e 40F20000 		movw	r0, #:lower16:RtcHandle
+  74 0062 C0F20000 		movt	r0, #:upper16:RtcHandle
+  75 0066 FFF7FEFF 		bl	HAL_RTC_Init
+  76 006a 0346     		mov	r3, r0
+  77 006c 002B     		cmp	r3, #0
+  78 006e 01D0     		beq	.L2
+  62:../src/RTC.c  **** 	  {
+  63:../src/RTC.c  **** 	    /* Initialization Error */
+  64:../src/RTC.c  **** 	    Error_Handler();
+  79              		.loc 1 64 0
+  80 0070 00F0E4F8 		bl	Error_Handler
+  81              	.L2:
+  65:../src/RTC.c  **** 	  }
+  66:../src/RTC.c  **** //	  else   printf("[RTC_Calendar] Initialization ok...\n");
+  67:../src/RTC.c  **** 
+  68:../src/RTC.c  **** 
+  69:../src/RTC.c  **** 	  /*##-2- Check if Data stored in BackUp register0: No Need to reconfigure RTC#*/
+  70:../src/RTC.c  **** 	  /* Read the Back Up Register 0 Data */
+  71:../src/RTC.c  **** 	  if (HAL_RTCEx_BKUPRead(&RtcHandle, RTC_BKP_DR0) != 0x32F2)
+  82              		.loc 1 71 0
+  83 0074 40F20000 		movw	r0, #:lower16:RtcHandle
+  84 0078 C0F20000 		movt	r0, #:upper16:RtcHandle
+  85 007c 0021     		movs	r1, #0
+  86 007e FFF7FEFF 		bl	HAL_RTCEx_BKUPRead
+  87 0082 0246     		mov	r2, r0
+  88 0084 43F2F223 		movw	r3, #13042
+  89 0088 9A42     		cmp	r2, r3
+  90 008a 02D0     		beq	.L3
+  72:../src/RTC.c  **** 	  {
+  73:../src/RTC.c  **** 	    /* Configure RTC Calendar */
+  74:../src/RTC.c  **** 	    RTC_CalendarConfig();
+  91              		.loc 1 74 0
+  92 008c FFF7FEFF 		bl	RTC_CalendarConfig
+  93 0090 15E0     		b	.L1
+  94              	.L3:
+  75:../src/RTC.c  **** 	  }
+  76:../src/RTC.c  **** 	  else
+  77:../src/RTC.c  **** 	  {
+  78:../src/RTC.c  **** 	    /* Check if the Power On Reset flag is set */
+  79:../src/RTC.c  **** 	    if (__HAL_RCC_GET_FLAG(RCC_FLAG_PORRST) != RESET)
+  95              		.loc 1 79 0
+  96 0092 4FF46053 		mov	r3, #14336
+  97 0096 C4F20203 		movt	r3, 16386
+  98 009a 5B6F     		ldr	r3, [r3, #116]
+  80:../src/RTC.c  **** 	    {
+  81:../src/RTC.c  **** 	      /* Turn on LED2: Power on reset occured */
+  82:../src/RTC.c  **** //	      BSP_LED_On(LED2);
+  83:../src/RTC.c  **** 	    }
+  84:../src/RTC.c  **** 	    /* Check if Pin Reset flag is set */
+  85:../src/RTC.c  **** 	    if (__HAL_RCC_GET_FLAG(RCC_FLAG_PINRST) != RESET)
+  99              		.loc 1 85 0
+ 100 009c 4FF46053 		mov	r3, #14336
+ 101 00a0 C4F20203 		movt	r3, 16386
+ 102 00a4 5B6F     		ldr	r3, [r3, #116]
+  86:../src/RTC.c  **** 	    {
+  87:../src/RTC.c  **** 	      /* Turn on LED4: External reset occured */
+  88:../src/RTC.c  **** //	      BSP_LED_On(LED4);
+  89:../src/RTC.c  **** 	    }
+  90:../src/RTC.c  **** 	    /* Clear source Reset Flag */
+  91:../src/RTC.c  **** 	    __HAL_RCC_CLEAR_RESET_FLAGS();
+ 103              		.loc 1 91 0
+ 104 00a6 4FF46053 		mov	r3, #14336
+ 105 00aa C4F20203 		movt	r3, 16386
+ 106 00ae 4FF46052 		mov	r2, #14336
+ 107 00b2 C4F20202 		movt	r2, 16386
+ 108 00b6 526F     		ldr	r2, [r2, #116]
+ 109 00b8 42F08072 		orr	r2, r2, #16777216
+ 110 00bc 5A67     		str	r2, [r3, #116]
+ 111              	.L1:
+  92:../src/RTC.c  **** 	  }
+  93:../src/RTC.c  **** 
+  94:../src/RTC.c  **** }
+ 112              		.loc 1 94 0
+ 113 00be 80BD     		pop	{r7, pc}
+ 114              		.cfi_endproc
+ 115              	.LFE55:
+ 117              		.align	2
+ 118              		.global	RTC_CalendarConfig
+ 119              		.thumb
+ 120              		.thumb_func
+ 122              	RTC_CalendarConfig:
+ 123              	.LFB56:
+  95:../src/RTC.c  **** 
+  96:../src/RTC.c  **** 
+  97:../src/RTC.c  **** void RTC_CalendarConfig(void)
+  98:../src/RTC.c  **** {
+ 124              		.loc 1 98 0
+ 125              		.cfi_startproc
+ 126              		@ args = 0, pretend = 0, frame = 16
+ 127              		@ frame_needed = 1, uses_anonymous_args = 0
+ 128 00c0 80B5     		push	{r7, lr}
+ 129              		.cfi_def_cfa_offset 8
+ 130              		.cfi_offset 7, -8
+ 131              		.cfi_offset 14, -4
+ 132 00c2 84B0     		sub	sp, sp, #16
+ 133              		.cfi_def_cfa_offset 24
+ 134 00c4 00AF     		add	r7, sp, #0
+ 135              		.cfi_def_cfa_register 7
+  99:../src/RTC.c  ****   RTC_DateTypeDef sdatestructure;
+ 100:../src/RTC.c  ****   RTC_TimeTypeDef stimestructure;
+ 101:../src/RTC.c  **** 
+ 102:../src/RTC.c  ****   /*##-1- Configure the Date #################################################*/
+ 103:../src/RTC.c  ****   /* Set Date: Tuesday February 18th 2014 */
+ 104:../src/RTC.c  ****   sdatestructure.Year = 0x15;
+ 136              		.loc 1 104 0
+ 137 00c6 1523     		movs	r3, #21
+ 138 00c8 FB73     		strb	r3, [r7, #15]
+ 105:../src/RTC.c  ****   sdatestructure.Month = RTC_MONTH_MARCH;
+ 139              		.loc 1 105 0
+ 140 00ca 0323     		movs	r3, #3
+ 141 00cc 7B73     		strb	r3, [r7, #13]
+ 106:../src/RTC.c  ****   sdatestructure.Date = 0x05;
+ 142              		.loc 1 106 0
+ 143 00ce 0523     		movs	r3, #5
+ 144 00d0 BB73     		strb	r3, [r7, #14]
+ 107:../src/RTC.c  ****   sdatestructure.WeekDay = RTC_WEEKDAY_SATURDAY;
+ 145              		.loc 1 107 0
+ 146 00d2 0623     		movs	r3, #6
+ 147 00d4 3B73     		strb	r3, [r7, #12]
+ 108:../src/RTC.c  **** 
+ 109:../src/RTC.c  ****   if(HAL_RTC_SetDate(&RtcHandle,&sdatestructure,FORMAT_BCD) != HAL_OK)
+ 148              		.loc 1 109 0
+ 149 00d6 07F10C03 		add	r3, r7, #12
+ 150 00da 40F20000 		movw	r0, #:lower16:RtcHandle
+ 151 00de C0F20000 		movt	r0, #:upper16:RtcHandle
+ 152 00e2 1946     		mov	r1, r3
+ 153 00e4 0122     		movs	r2, #1
+ 154 00e6 FFF7FEFF 		bl	HAL_RTC_SetDate
+ 155 00ea 0346     		mov	r3, r0
+ 156 00ec 002B     		cmp	r3, #0
+ 157 00ee 01D0     		beq	.L6
+ 110:../src/RTC.c  ****   {
+ 111:../src/RTC.c  ****     /* Initialization Error */
+ 112:../src/RTC.c  ****     Error_Handler();
+ 158              		.loc 1 112 0
+ 159 00f0 00F0A4F8 		bl	Error_Handler
+ 160              	.L6:
+ 113:../src/RTC.c  ****   }
+ 114:../src/RTC.c  **** 
+ 115:../src/RTC.c  ****   /*##-2- Configure the Time #################################################*/
+ 116:../src/RTC.c  ****   /* Set Time: 02:00:00 */
+ 117:../src/RTC.c  ****   stimestructure.Hours = 0x09;
+ 161              		.loc 1 117 0
+ 162 00f4 0923     		movs	r3, #9
+ 163 00f6 3B70     		strb	r3, [r7]
+ 118:../src/RTC.c  ****   stimestructure.Minutes = 0x24;
+ 164              		.loc 1 118 0
+ 165 00f8 2423     		movs	r3, #36
+ 166 00fa 7B70     		strb	r3, [r7, #1]
+ 119:../src/RTC.c  ****   stimestructure.Seconds = 0x00;
+ 167              		.loc 1 119 0
+ 168 00fc 0023     		movs	r3, #0
+ 169 00fe BB70     		strb	r3, [r7, #2]
+ 120:../src/RTC.c  ****   stimestructure.TimeFormat = RTC_HOURFORMAT12_AM;
+ 170              		.loc 1 120 0
+ 171 0100 0023     		movs	r3, #0
+ 172 0102 FB70     		strb	r3, [r7, #3]
+ 121:../src/RTC.c  ****   stimestructure.DayLightSaving = RTC_DAYLIGHTSAVING_NONE ;
+ 173              		.loc 1 121 0
+ 174 0104 0023     		movs	r3, #0
+ 175 0106 7B60     		str	r3, [r7, #4]
+ 122:../src/RTC.c  ****   stimestructure.StoreOperation = RTC_STOREOPERATION_RESET;
+ 176              		.loc 1 122 0
+ 177 0108 0023     		movs	r3, #0
+ 178 010a BB60     		str	r3, [r7, #8]
+ 123:../src/RTC.c  **** 
+ 124:../src/RTC.c  ****   if (HAL_RTC_SetTime(&RtcHandle, &stimestructure, FORMAT_BCD) != HAL_OK)
+ 179              		.loc 1 124 0
+ 180 010c 3B46     		mov	r3, r7
+ 181 010e 40F20000 		movw	r0, #:lower16:RtcHandle
+ 182 0112 C0F20000 		movt	r0, #:upper16:RtcHandle
+ 183 0116 1946     		mov	r1, r3
+ 184 0118 0122     		movs	r2, #1
+ 185 011a FFF7FEFF 		bl	HAL_RTC_SetTime
+ 186 011e 0346     		mov	r3, r0
+ 187 0120 002B     		cmp	r3, #0
+ 188 0122 01D0     		beq	.L7
+ 125:../src/RTC.c  ****   {
+ 126:../src/RTC.c  ****     /* Initialization Error */
+ 127:../src/RTC.c  ****     Error_Handler();
+ 189              		.loc 1 127 0
+ 190 0124 00F08AF8 		bl	Error_Handler
+ 191              	.L7:
+ 128:../src/RTC.c  ****   }
+ 129:../src/RTC.c  **** 
+ 130:../src/RTC.c  ****   /*##-3- Writes a data in a RTC Backup data Register0 #######################*/
+ 131:../src/RTC.c  ****   HAL_RTCEx_BKUPWrite(&RtcHandle, RTC_BKP_DR0, 0x32F2);
+ 192              		.loc 1 131 0
+ 193 0128 40F20000 		movw	r0, #:lower16:RtcHandle
+ 194 012c C0F20000 		movt	r0, #:upper16:RtcHandle
+ 195 0130 0021     		movs	r1, #0
+ 196 0132 43F2F222 		movw	r2, #13042
+ 197 0136 FFF7FEFF 		bl	HAL_RTCEx_BKUPWrite
+ 132:../src/RTC.c  **** }
+ 198              		.loc 1 132 0
+ 199 013a 1037     		adds	r7, r7, #16
+ 200 013c BD46     		mov	sp, r7
+ 201              		@ sp needed
+ 202 013e 80BD     		pop	{r7, pc}
+ 203              		.cfi_endproc
+ 204              	.LFE56:
+ 206              		.section	.rodata
+ 207              		.align	2
+ 208              	.LC0:
+ 209 0000 25302E32 		.ascii	"%0.2d:%0.2d:%0.2d\000"
+ 209      643A2530 
+ 209      2E32643A 
+ 209      25302E32 
+ 209      6400
+ 210 0012 0000     		.align	2
+ 211              	.LC1:
+ 212 0014 25302E32 		.ascii	"%0.2d-%0.2d-%0.2d\000"
+ 212      642D2530 
+ 212      2E32642D 
+ 212      25302E32 
+ 212      6400
+ 213              		.text
+ 214              		.align	2
+ 215              		.global	RTC_CalendarShow
+ 216              		.thumb
+ 217              		.thumb_func
+ 219              	RTC_CalendarShow:
+ 220              	.LFB57:
+ 133:../src/RTC.c  **** 
+ 134:../src/RTC.c  **** /**
+ 135:../src/RTC.c  ****   * @brief  Display the current time and date.
+ 136:../src/RTC.c  ****   * @param  showtime : pointer to buffer
+ 137:../src/RTC.c  ****   * @param  showdate : pointer to buffer
+ 138:../src/RTC.c  ****   * @retval None
+ 139:../src/RTC.c  ****   */
+ 140:../src/RTC.c  **** void RTC_CalendarShow(uint8_t *showtime, uint8_t *showdate)
+ 141:../src/RTC.c  **** {
+ 221              		.loc 1 141 0
+ 222              		.cfi_startproc
+ 223              		@ args = 0, pretend = 0, frame = 24
+ 224              		@ frame_needed = 1, uses_anonymous_args = 0
+ 225 0140 80B5     		push	{r7, lr}
+ 226              		.cfi_def_cfa_offset 8
+ 227              		.cfi_offset 7, -8
+ 228              		.cfi_offset 14, -4
+ 229 0142 88B0     		sub	sp, sp, #32
+ 230              		.cfi_def_cfa_offset 40
+ 231 0144 02AF     		add	r7, sp, #8
+ 232              		.cfi_def_cfa 7, 32
+ 233 0146 7860     		str	r0, [r7, #4]
+ 234 0148 3960     		str	r1, [r7]
+ 142:../src/RTC.c  ****   RTC_DateTypeDef sdatestructureget;
+ 143:../src/RTC.c  ****   RTC_TimeTypeDef stimestructureget;
+ 144:../src/RTC.c  **** 
+ 145:../src/RTC.c  ****   /* Get the RTC current Time */
+ 146:../src/RTC.c  ****   HAL_RTC_GetTime(&RtcHandle, &stimestructureget, FORMAT_BIN);
+ 235              		.loc 1 146 0
+ 236 014a 07F10803 		add	r3, r7, #8
+ 237 014e 40F20000 		movw	r0, #:lower16:RtcHandle
+ 238 0152 C0F20000 		movt	r0, #:upper16:RtcHandle
+ 239 0156 1946     		mov	r1, r3
+ 240 0158 0022     		movs	r2, #0
+ 241 015a FFF7FEFF 		bl	HAL_RTC_GetTime
+ 147:../src/RTC.c  ****   /* Get the RTC current Date */
+ 148:../src/RTC.c  ****   HAL_RTC_GetDate(&RtcHandle, &sdatestructureget, FORMAT_BIN);
+ 242              		.loc 1 148 0
+ 243 015e 07F11403 		add	r3, r7, #20
+ 244 0162 40F20000 		movw	r0, #:lower16:RtcHandle
+ 245 0166 C0F20000 		movt	r0, #:upper16:RtcHandle
+ 246 016a 1946     		mov	r1, r3
+ 247 016c 0022     		movs	r2, #0
+ 248 016e FFF7FEFF 		bl	HAL_RTC_GetDate
+ 149:../src/RTC.c  **** 
+ 150:../src/RTC.c  ****   /* Display time Format : hh:mm:ss */
+ 151:../src/RTC.c  **** //  printf(" %0.2d:%0.2d:%0.2d ", stimestructureget.Hours, stimestructureget.Minutes, stimestructur
+ 152:../src/RTC.c  **** //  printf(" %0.2d-%0.2d-%0.2d \n", sdatestructureget.Date, sdatestructureget.Month,  2000 + sdates
+ 153:../src/RTC.c  **** 
+ 154:../src/RTC.c  ****  sprintf((char *)showtime, "%0.2d:%0.2d:%0.2d", stimestructureget.Hours, stimestructureget.Minutes,
+ 249              		.loc 1 154 0
+ 250 0172 3B7A     		ldrb	r3, [r7, #8]	@ zero_extendqisi2
+ 251 0174 1A46     		mov	r2, r3
+ 252 0176 7B7A     		ldrb	r3, [r7, #9]	@ zero_extendqisi2
+ 253 0178 B97A     		ldrb	r1, [r7, #10]	@ zero_extendqisi2
+ 254 017a 0091     		str	r1, [sp]
+ 255 017c 7868     		ldr	r0, [r7, #4]
+ 256 017e 40F20001 		movw	r1, #:lower16:.LC0
+ 257 0182 C0F20001 		movt	r1, #:upper16:.LC0
+ 258 0186 FFF7FEFF 		bl	sprintf
+ 155:../src/RTC.c  ****   /* Display date Format : mm-dd-yy */
+ 156:../src/RTC.c  ****  sprintf((char *)showdate, "%0.2d-%0.2d-%0.2d", sdatestructureget.Date, sdatestructureget.Month, 20
+ 259              		.loc 1 156 0
+ 260 018a BB7D     		ldrb	r3, [r7, #22]	@ zero_extendqisi2
+ 261 018c 1A46     		mov	r2, r3
+ 262 018e 7B7D     		ldrb	r3, [r7, #21]	@ zero_extendqisi2
+ 263 0190 F97D     		ldrb	r1, [r7, #23]	@ zero_extendqisi2
+ 264 0192 01F5FA61 		add	r1, r1, #2000
+ 265 0196 0091     		str	r1, [sp]
+ 266 0198 3868     		ldr	r0, [r7]
+ 267 019a 40F20001 		movw	r1, #:lower16:.LC1
+ 268 019e C0F20001 		movt	r1, #:upper16:.LC1
+ 269 01a2 FFF7FEFF 		bl	sprintf
+ 157:../src/RTC.c  **** }
+ 270              		.loc 1 157 0
+ 271 01a6 1837     		adds	r7, r7, #24
+ 272 01a8 BD46     		mov	sp, r7
+ 273              		@ sp needed
+ 274 01aa 80BD     		pop	{r7, pc}
+ 275              		.cfi_endproc
+ 276              	.LFE57:
+ 278              		.section	.rodata
+ 279 0026 0000     		.align	2
+ 280              	.LC2:
+ 281 0028 5254435F 		.ascii	"RTC_GetTime: %0.2d:%0.2d:%0.2d \012\000"
+ 281      47657454 
+ 281      696D653A 
+ 281      2025302E 
+ 281      32643A25 
+ 282              		.text
+ 283              		.align	2
+ 284              		.global	RTC_GetTime
+ 285              		.thumb
+ 286              		.thumb_func
+ 288              	RTC_GetTime:
+ 289              	.LFB58:
+ 158:../src/RTC.c  **** 
+ 159:../src/RTC.c  **** /*****************************************************************
+ 160:../src/RTC.c  **** * RTC_GetTime получаем время от часов в uint8_t
+ 161:../src/RTC.c  **** ******************************************************************/
+ 162:../src/RTC.c  **** void RTC_GetTime(uint8_t *Hours, uint8_t *Minutes, uint8_t *Seconds)
+ 163:../src/RTC.c  **** {
+ 290              		.loc 1 163 0
+ 291              		.cfi_startproc
+ 292              		@ args = 0, pretend = 0, frame = 40
+ 293              		@ frame_needed = 1, uses_anonymous_args = 0
+ 294 01ac 80B5     		push	{r7, lr}
+ 295              		.cfi_def_cfa_offset 8
+ 296              		.cfi_offset 7, -8
+ 297              		.cfi_offset 14, -4
+ 298 01ae 8AB0     		sub	sp, sp, #40
+ 299              		.cfi_def_cfa_offset 48
+ 300 01b0 00AF     		add	r7, sp, #0
+ 301              		.cfi_def_cfa_register 7
+ 302 01b2 F860     		str	r0, [r7, #12]
+ 303 01b4 B960     		str	r1, [r7, #8]
+ 304 01b6 7A60     		str	r2, [r7, #4]
+ 164:../src/RTC.c  ****   RTC_TimeTypeDef stimestructureget;
+ 165:../src/RTC.c  **** 
+ 166:../src/RTC.c  ****   /* Get the RTC current Time */
+ 167:../src/RTC.c  ****   HAL_RTC_GetTime(&RtcHandle, &stimestructureget, FORMAT_BIN);
+ 305              		.loc 1 167 0
+ 306 01b8 07F11003 		add	r3, r7, #16
+ 307 01bc 40F20000 		movw	r0, #:lower16:RtcHandle
+ 308 01c0 C0F20000 		movt	r0, #:upper16:RtcHandle
+ 309 01c4 1946     		mov	r1, r3
+ 310 01c6 0022     		movs	r2, #0
+ 311 01c8 FFF7FEFF 		bl	HAL_RTC_GetTime
+ 168:../src/RTC.c  **** 
+ 169:../src/RTC.c  ****   Hours   = stimestructureget.Hours;
+ 312              		.loc 1 169 0
+ 313 01cc 3B7C     		ldrb	r3, [r7, #16]	@ zero_extendqisi2
+ 314 01ce 7B62     		str	r3, [r7, #36]
+ 170:../src/RTC.c  ****   Minutes = stimestructureget.Minutes;
+ 315              		.loc 1 170 0
+ 316 01d0 7B7C     		ldrb	r3, [r7, #17]	@ zero_extendqisi2
+ 317 01d2 3B62     		str	r3, [r7, #32]
+ 171:../src/RTC.c  ****   Seconds = stimestructureget.Seconds;
+ 318              		.loc 1 171 0
+ 319 01d4 BB7C     		ldrb	r3, [r7, #18]	@ zero_extendqisi2
+ 320 01d6 FB61     		str	r3, [r7, #28]
+ 172:../src/RTC.c  **** 
+ 173:../src/RTC.c  ****     printf("RTC_GetTime: %0.2d:%0.2d:%0.2d \n", Hours, Minutes, Seconds);
+ 321              		.loc 1 173 0
+ 322 01d8 40F20000 		movw	r0, #:lower16:.LC2
+ 323 01dc C0F20000 		movt	r0, #:upper16:.LC2
+ 324 01e0 796A     		ldr	r1, [r7, #36]
+ 325 01e2 3A6A     		ldr	r2, [r7, #32]
+ 326 01e4 FB69     		ldr	r3, [r7, #28]
+ 327 01e6 FFF7FEFF 		bl	printf
+ 174:../src/RTC.c  **** 
+ 175:../src/RTC.c  **** }
+ 328              		.loc 1 175 0
+ 329 01ea 2837     		adds	r7, r7, #40
+ 330 01ec BD46     		mov	sp, r7
+ 331              		@ sp needed
+ 332 01ee 80BD     		pop	{r7, pc}
+ 333              		.cfi_endproc
+ 334              	.LFE58:
+ 336              		.align	2
+ 337              		.global	RTC_GetDate
+ 338              		.thumb
+ 339              		.thumb_func
+ 341              	RTC_GetDate:
+ 342              	.LFB59:
+ 176:../src/RTC.c  **** /*****************************************************************
+ 177:../src/RTC.c  **** * RTC_GetDate получаем время от часов в uint8_t
+ 178:../src/RTC.c  **** ******************************************************************/
+ 179:../src/RTC.c  **** void RTC_GetDate(uint8_t *Date, uint8_t *Month, uint8_t *Year )
+ 180:../src/RTC.c  **** {
+ 343              		.loc 1 180 0
+ 344              		.cfi_startproc
+ 345              		@ args = 0, pretend = 0, frame = 32
+ 346              		@ frame_needed = 1, uses_anonymous_args = 0
+ 347 01f0 80B5     		push	{r7, lr}
+ 348              		.cfi_def_cfa_offset 8
+ 349              		.cfi_offset 7, -8
+ 350              		.cfi_offset 14, -4
+ 351 01f2 88B0     		sub	sp, sp, #32
+ 352              		.cfi_def_cfa_offset 40
+ 353 01f4 00AF     		add	r7, sp, #0
+ 354              		.cfi_def_cfa_register 7
+ 355 01f6 F860     		str	r0, [r7, #12]
+ 356 01f8 B960     		str	r1, [r7, #8]
+ 357 01fa 7A60     		str	r2, [r7, #4]
+ 181:../src/RTC.c  ****   RTC_DateTypeDef sdatestructureget;
+ 182:../src/RTC.c  **** 
+ 183:../src/RTC.c  ****   /* Get the RTC current Date */
+ 184:../src/RTC.c  ****   HAL_RTC_GetDate(&RtcHandle, &sdatestructureget, FORMAT_BIN);
+ 358              		.loc 1 184 0
+ 359 01fc 07F11003 		add	r3, r7, #16
+ 360 0200 40F20000 		movw	r0, #:lower16:RtcHandle
+ 361 0204 C0F20000 		movt	r0, #:upper16:RtcHandle
+ 362 0208 1946     		mov	r1, r3
+ 363 020a 0022     		movs	r2, #0
+ 364 020c FFF7FEFF 		bl	HAL_RTC_GetDate
+ 185:../src/RTC.c  **** 
+ 186:../src/RTC.c  ****   Date = sdatestructureget.Date; if (!Date) Date=1;
+ 365              		.loc 1 186 0
+ 366 0210 BB7C     		ldrb	r3, [r7, #18]	@ zero_extendqisi2
+ 367 0212 FB61     		str	r3, [r7, #28]
+ 368 0214 FB69     		ldr	r3, [r7, #28]
+ 369 0216 002B     		cmp	r3, #0
+ 370 0218 01D1     		bne	.L11
+ 371              		.loc 1 186 0 is_stmt 0 discriminator 1
+ 372 021a 0123     		movs	r3, #1
+ 373 021c FB61     		str	r3, [r7, #28]
+ 374              	.L11:
+ 187:../src/RTC.c  ****   Month = sdatestructureget.Month; if (!Month) Month=1;
+ 375              		.loc 1 187 0 is_stmt 1
+ 376 021e 7B7C     		ldrb	r3, [r7, #17]	@ zero_extendqisi2
+ 377 0220 BB61     		str	r3, [r7, #24]
+ 378 0222 BB69     		ldr	r3, [r7, #24]
+ 379 0224 002B     		cmp	r3, #0
+ 380 0226 01D1     		bne	.L12
+ 381              		.loc 1 187 0 is_stmt 0 discriminator 1
+ 382 0228 0123     		movs	r3, #1
+ 383 022a BB61     		str	r3, [r7, #24]
+ 384              	.L12:
+ 188:../src/RTC.c  ****   Year = 2000 + sdatestructureget.Year;
+ 385              		.loc 1 188 0 is_stmt 1
+ 386 022c FB7C     		ldrb	r3, [r7, #19]	@ zero_extendqisi2
+ 387 022e 03F5FA63 		add	r3, r3, #2000
+ 388 0232 7B61     		str	r3, [r7, #20]
+ 189:../src/RTC.c  **** }
+ 389              		.loc 1 189 0
+ 390 0234 2037     		adds	r7, r7, #32
+ 391 0236 BD46     		mov	sp, r7
+ 392              		@ sp needed
+ 393 0238 80BD     		pop	{r7, pc}
+ 394              		.cfi_endproc
+ 395              	.LFE59:
+ 397              		.section	.rodata
+ 398 0049 000000   		.align	2
+ 399              	.LC3:
+ 400 004c 4552524F 		.ascii	"ERROR: [RTC_Calendar] Error_Handler\000"
+ 400      523A205B 
+ 400      5254435F 
+ 400      43616C65 
+ 400      6E646172 
+ 401              		.text
+ 402 023a 00BF     		.align	2
+ 403              		.thumb
+ 404              		.thumb_func
+ 406              	Error_Handler:
+ 407              	.LFB60:
+ 190:../src/RTC.c  **** 
+ 191:../src/RTC.c  **** /*****************************************************************
+ 192:../src/RTC.c  **** * @brief  This function is executed in case of error occurrence.
+ 193:../src/RTC.c  **** ******************************************************************/
+ 194:../src/RTC.c  **** static void Error_Handler(void)
+ 195:../src/RTC.c  **** {
+ 408              		.loc 1 195 0
+ 409              		.cfi_startproc
+ 410              		@ args = 0, pretend = 0, frame = 0
+ 411              		@ frame_needed = 1, uses_anonymous_args = 0
+ 412 023c 80B5     		push	{r7, lr}
+ 413              		.cfi_def_cfa_offset 8
+ 414              		.cfi_offset 7, -8
+ 415              		.cfi_offset 14, -4
+ 416 023e 00AF     		add	r7, sp, #0
+ 417              		.cfi_def_cfa_register 7
+ 196:../src/RTC.c  ****   TST_High(TST4);
+ 418              		.loc 1 196 0
+ 419 0240 0220     		movs	r0, #2
+ 420 0242 FFF7FEFF 		bl	TST_High
+ 197:../src/RTC.c  ****   printf("ERROR: [RTC_Calendar] Error_Handler\n");
+ 421              		.loc 1 197 0
+ 422 0246 40F20000 		movw	r0, #:lower16:.LC3
+ 423 024a C0F20000 		movt	r0, #:upper16:.LC3
+ 424 024e FFF7FEFF 		bl	puts
+ 425              	.L14:
+ 198:../src/RTC.c  ****   while(1)  {  }
+ 426              		.loc 1 198 0 discriminator 1
+ 427 0252 FEE7     		b	.L14
+ 428              		.cfi_endproc
+ 429              	.LFE60:
+ 431              	.Letext0:
+ 432              		.file 2 "c:\\program files (x86)\\codesourcery\\arm-none-eabi\\include\\stdint.h"
+ 433              		.file 3 "D:\\workspace\\console800480\\system/stm32f217xx.h"
+ 434              		.file 4 "D:\\workspace\\console800480\\system/stm32f2xx.h"
+ 435              		.file 5 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_hal_def.h"
+ 436              		.file 6 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_hal_rtc.h"
+ 437              		.file 7 "../src/LEDs.h"
+ 438              		.file 8 "D:\\workspace\\console800480\\system/core_cm3.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 RTC.c
+C:\Users\sagok\AppData\Local\Temp\ccflqDtH.s:18     .text:00000000 $t
+C:\Users\sagok\AppData\Local\Temp\ccflqDtH.s:23     .text:00000000 Init_RTC
+C:\Users\sagok\AppData\Local\Temp\ccflqDtH.s:406    .text:0000023c Error_Handler
+C:\Users\sagok\AppData\Local\Temp\ccflqDtH.s:122    .text:000000c0 RTC_CalendarConfig
+C:\Users\sagok\AppData\Local\Temp\ccflqDtH.s:207    .rodata:00000000 $d
+C:\Users\sagok\AppData\Local\Temp\ccflqDtH.s:208    .rodata:00000000 .LC0
+C:\Users\sagok\AppData\Local\Temp\ccflqDtH.s:211    .rodata:00000014 .LC1
+C:\Users\sagok\AppData\Local\Temp\ccflqDtH.s:219    .text:00000140 RTC_CalendarShow
+C:\Users\sagok\AppData\Local\Temp\ccflqDtH.s:280    .rodata:00000028 .LC2
+C:\Users\sagok\AppData\Local\Temp\ccflqDtH.s:288    .text:000001ac RTC_GetTime
+C:\Users\sagok\AppData\Local\Temp\ccflqDtH.s:341    .text:000001f0 RTC_GetDate
+C:\Users\sagok\AppData\Local\Temp\ccflqDtH.s:399    .rodata:0000004c .LC3
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.1.7f551ac7fcad8b79b9df4bfdaa536673
+                           .group:00000000 wm4.newlib.h.8.384a112feabb3bef7b573ae48cde2e3b
+                           .group:00000000 wm4.features.h.22.6a4ca7cd053637cc1d0db6c16f39b2d7
+                           .group:00000000 wm4.config.h.183.aa62afef667fb61d15fa64c48beb2f14
+                           .group:00000000 wm4._ansi.h.23.5644b60c990a4800b02a6e654e88f93a
+                           .group:00000000 wm4.stdio.h.31.7c0e28c411445f3f9c5b11accf882760
+                           .group:00000000 wm4.stddef.h.184.159df79b4ca79c76561572a55985524c
+                           .group:00000000 wm4.stdarg.h.34.3a23a216c0c293b3d2ea2e89281481e6
+                           .group:00000000 wm4._default_types.h.6.5e12cd604db8ce00b62bb2f02708eaf3
+                           .group:00000000 wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea
+                           .group:00000000 wm4._types.h.59.db8450f33c1f6150c0372fa1091a887a
+                           .group:00000000 wm4.stddef.h.348.9a99de77b6ba3b4278b57e9cc6d6e349
+                           .group:00000000 wm4.reent.h.16.567d760e6ae9ad7f917851a308bd7a57
+                           .group:00000000 wm4.types.h.23.0d949686bbcadd1621462d4fa1f884f9
+                           .group:00000000 wm4.stddef.h.39.7e3d906ac58942e0b374c527445f5de5
+                           .group:00000000 wm4.types.h.2.e9cec8c90ab35f77d9f499e06ae02400
+                           .group:00000000 wm4.types.h.80.5759fe41f87f5211a5952dfb1fc64f19
+                           .group:00000000 wm4.stdio.h.2.4aa87247282eca6c8f36f9de33d8df1a
+                           .group:00000000 wm4.stdio.h.64.f9f1bb6b0d3d7e12f6a27968d859709c
+                           .group:00000000 wm4.stdint.h.10.90b695f550ca6cc3fb08fa83baf01e05
+                           .group:00000000 wm4.projdefs.h.67.1891ed3aab788f154f6e7a8ff42f2cfd
+                           .group:00000000 wm4.FreeRTOSConfig.h.51.b259e2e835793b5f31e6fb224a543b76
+                           .group:00000000 wm4.portmacro.h.68.b9ad41c1c2fd3fb36d97939d17ebacd9
+                           .group:00000000 wm4.portable.h.325.a31e8973a246cd28421ddb595e37fd13
+                           .group:00000000 wm4.mpu_wrappers.h.67.4bcfd12ce15e5313ce3efd77400f8168
+                           .group:00000000 wm4.FreeRTOS.h.177.d801ec107caaf24697618049ed7605b1
+                           .group:00000000 wm4.list.h.96.eaa3d29743bd681933f9f5e726c756a1
+                           .group:00000000 wm4.task.h.84.ff846741c7bdac87bd4a7636d5320d68
+                           .group:00000000 wm4.queue.h.68.1266563298ebacb4a83c08ead1e4111f
+                           .group:00000000 wm4.semphr.h.77.cfc41285e8d228b828c00c3fce52801f
+                           .group:00000000 wm4.timers.h.92.7e7e1a9bf65701faf3dfc9cf90e720c0
+                           .group:00000000 wm4.stm32f2xx_hal_conf.h.40.007126baefb9f966c36646edbf8040d2
+                           .group:00000000 wm4.stm32f2xx.h.57.5ec1581efc43612c411d33a8686e9ec7
+                           .group:00000000 wm4.stm32f217xx.h.52.9c940d76d00294b78837dc334c172fdd
+                           .group:00000000 wm4.core_cm3.h.32.49180ccb4d36cabd2d7016d2a51d91ae
+                           .group:00000000 wm4.core_cmInstr.h.25.f50f886f2edf670cf199b35fd96f5c91
+                           .group:00000000 wm4.core_cm3.h.130.63ab2348a6eed0fdb318040d970b676c
+                           .group:00000000 wm4.stm32f217xx.h.978.a5c681952b2f704a0e7f2ba21d08adf5
+                           .group:00000000 wm4.stm32f2xx.h.142.bc2155a1f7498bab16371e38413a9e41
+                           .group:00000000 wm4.stm32f2xx_hal_def.h.77.f01e0b08acb70880298bffe6e4d93d24
+                           .group:00000000 wm4.stm32f2xx_hal_rcc.h.142.ec0f91cc6576a6acebd17e6dd85829ae
+                           .group:00000000 wm4.stm32f2xx_hal_rcc_ex.h.40.0829033e864455c6bdd0db01f8ba5a50
+                           .group:00000000 wm4.stm32f2xx_hal_gpio.h.40.ba64e0bb94d9a68835f80159f39a86f1
+                           .group:00000000 wm4.stm32f2xx_hal_gpio_ex.h.40.24e547fd402281923f446b510381083f
+                           .group:00000000 wm4.stm32f2xx_hal_dma.h.40.5d9732ace2a21a4526ce8f0c52428fff
+                           .group:00000000 wm4.stm32f2xx_hal_cortex.h.40.e10263d2ec5d4fa79b4180ce1a38aff1
+                           .group:00000000 wm4.stm32f2xx_hal_adc.h.40.89ac8b78113cac4cf63847587daabac9
+                           .group:00000000 wm4.stm32f2xx_hal_adc_ex.h.40.7de68ed256ef25526ee31cc017f2c291
+                           .group:00000000 wm4.stm32f2xx_hal_flash.h.40.c3171719ce015e9cff20c795e44e886d
+                           .group:00000000 wm4.stm32f2xx_hal_flash_ex.h.40.7389508bd24a0aeb077bde0c9fb651eb
+                           .group:00000000 wm4.stm32f2xx_ll_fsmc.h.40.c1c32f2e1862f4dd342bd9b80fb895bb
+                           .group:00000000 wm4.stm32f2xx_hal_pwr.h.40.812df32e5c31b609a128e9db0eb4cbd0
+                           .group:00000000 wm4.stm32f2xx_hal_rtc.h.40.850fda5fe2cce8797446913dee18382f
+                           .group:00000000 wm4.stm32f2xx_hal_rtc_ex.h.40.f3e0c408e3bf4e8a0352d7ec9a18a822
+                           .group:00000000 wm4.stm32f2xx_ll_sdmmc.h.40.3719ab487c4b77401c572f459adf6eb7
+                           .group:00000000 wm4.stm32f2xx_hal_sd.h.58.760215394dcc316161a6482c0af9b866
+                           .group:00000000 wm4.stm32f2xx_hal_spi.h.40.7984243dbaba8b21c6392998a47e6987
+                           .group:00000000 wm4.stm32f2xx_hal_tim.h.40.d79172f25d0e9a15dc346aba8515bdd6
+                           .group:00000000 wm4.stm32f2xx_hal_tim_ex.h.40.361f280a7a3f60b4b238bb99ca728d83
+                           .group:00000000 wm4.stm32f2xx_hal_uart.h.40.d74def561ae6f78f40f477c8426ecbef
+                           .group:00000000 wm4.stm32f2xx_ll_usb.h.40.9b0206a05bc6ce3bec1648b51f22cb81
+                           .group:00000000 wm4.stm32f2xx_hal_pcd.h.99.11faba414c39e357b2f23364912d0605
+                           .group:00000000 wm4.stm32f2xx_hal_hcd.h.40.44ee5e972983ae0139ddbacdc75c44ef
+                           .group:00000000 wm4.stm32f2xx_hal.h.64.ed79ee83e52b151b3c365392b398f866
+                           .group:00000000 wm4.RTC.h.9.d2e9f8e3c405bedc3cda5764e7f71017
+                           .group:00000000 wm4.LEDs.h.9.36ffa4b30bd168dc58d64fa6e53a9a30
+
+UNDEFINED SYMBOLS
+RtcHandle
+HAL_RTC_Init
+HAL_RTCEx_BKUPRead
+HAL_RTC_SetDate
+HAL_RTC_SetTime
+HAL_RTCEx_BKUPWrite
+HAL_RTC_GetTime
+HAL_RTC_GetDate
+sprintf
+printf
+TST_High
+puts

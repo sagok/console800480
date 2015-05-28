@@ -1,0 +1,2371 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"stm32f2xx_hal_flash_ex.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.align	2
+  19              		.global	HAL_FLASHEx_Erase
+  20              		.thumb
+  21              		.thumb_func
+  23              	HAL_FLASHEx_Erase:
+  24              	.LFB55:
+  25              		.file 1 "../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c"
+   1:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** /**
+   2:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   ******************************************************************************
+   3:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @file    stm32f2xx_hal_flash_ex.c
+   4:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @author  MCD Application Team
+   5:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @version V1.0.1
+   6:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @date    25-March-2014
+   7:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @brief   Extended FLASH HAL module driver.
+   8:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *          This file provides firmware functions to manage the following 
+   9:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *          functionalities of the FLASH extension peripheral:
+  10:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *           + Extended programming operations functions
+  11:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *  
+  12:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   @verbatim
+  13:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   ==============================================================================
+  14:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****                    ##### Flash Extension features #####
+  15:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   ==============================================================================
+  16:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****            
+  17:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****                       ##### How to use this driver #####
+  18:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   ==============================================================================
+  19:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   [..] This driver provides functions to configure and program the FLASH memory 
+  20:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****        of all STM32F2xx devices. It includes
+  21:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****       (#) FLASH Memory Erase functions: 
+  22:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****            (++) Lock and Unlock the FLASH interface using HAL_FLASH_Unlock() and 
+  23:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****                 HAL_FLASH_Lock() functions
+  24:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****            (++) Erase function: Erase sector, erase all sectors
+  25:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****            (++) There is two mode of erase :
+  26:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****              (+++) Polling Mode using HAL_FLASHEx_Erase()
+  27:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****              (+++) Interrupt Mode using HAL_FLASHEx_Erase_IT()
+  28:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****              
+  29:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****       (#) Option Bytes Programming functions: Use HAL_FLASHEx_OBProgram() to :
+  30:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****            (++) Set/Reset the write protection
+  31:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****            (++) Set the Read protection Level
+  32:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****            (++) Set the BOR level
+  33:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****            (++) Program the user Option Bytes
+  34:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   
+  35:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   @endverbatim
+  36:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   ******************************************************************************
+  37:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @attention
+  38:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *
+  39:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * <h2><center>&copy; COPYRIGHT(c) 2014 STMicroelectronics</center></h2>
+  40:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *
+  41:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * Redistribution and use in source and binary forms, with or without modification,
+  42:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * are permitted provided that the following conditions are met:
+  43:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *   1. Redistributions of source code must retain the above copyright notice,
+  44:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *      this list of conditions and the following disclaimer.
+  45:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *   2. Redistributions in binary form must reproduce the above copyright notice,
+  46:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *      this list of conditions and the following disclaimer in the documentation
+  47:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *      and/or other materials provided with the distribution.
+  48:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *   3. Neither the name of STMicroelectronics nor the names of its contributors
+  49:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *      may be used to endorse or promote products derived from this software
+  50:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *      without specific prior written permission.
+  51:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *
+  52:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  53:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  54:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+  55:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+  56:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+  57:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+  58:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+  59:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+  60:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  61:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  62:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *
+  63:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   ******************************************************************************
+  64:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   */ 
+  65:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+  66:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** /* Includes ------------------------------------------------------------------*/
+  67:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** #include "stm32f2xx_hal.h"
+  68:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+  69:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** /** @addtogroup STM32F2xx_HAL_Driver
+  70:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @{
+  71:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   */
+  72:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+  73:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** /** @defgroup FLASHEx
+  74:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @brief FLASH HAL Extension module driver
+  75:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @{
+  76:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   */
+  77:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+  78:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** #ifdef HAL_FLASH_MODULE_ENABLED
+  79:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+  80:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** /* Private typedef -----------------------------------------------------------*/
+  81:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** /* Private define ------------------------------------------------------------*/
+  82:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** #define SECTOR_MASK               ((uint32_t)0xFFFFFF07)
+  83:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+  84:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** #define HAL_FLASH_TIMEOUT_VALUE   ((uint32_t)50000)/* 50 s */
+  85:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** /* Private macro -------------------------------------------------------------*/
+  86:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** /* Private variables ---------------------------------------------------------*/
+  87:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** extern FLASH_ProcessTypeDef pFlash;
+  88:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+  89:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** /* Private function prototypes -----------------------------------------------*/
+  90:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** /* Option bytes control */
+  91:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** static void               FLASH_MassErase(uint8_t VoltageRange);
+  92:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** static HAL_StatusTypeDef  FLASH_OB_EnableWRP(uint32_t WRPSector);
+  93:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** static HAL_StatusTypeDef  FLASH_OB_DisableWRP(uint32_t WRPSector);
+  94:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** static HAL_StatusTypeDef  FLASH_OB_RDP_LevelConfig(uint8_t Level);
+  95:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** static HAL_StatusTypeDef  FLASH_OB_UserConfig(uint8_t Iwdg, uint8_t Stop, uint8_t Stdby);
+  96:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** static HAL_StatusTypeDef  FLASH_OB_BOR_LevelConfig(uint8_t Level);
+  97:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** static uint8_t            FLASH_OB_GetUser(void);
+  98:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** static uint16_t           FLASH_OB_GetWRP(void);
+  99:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** static FlagStatus         FLASH_OB_GetRDP(void);
+ 100:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** static uint8_t            FLASH_OB_GetBOR(void);
+ 101:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 102:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** /* Private functions ---------------------------------------------------------*/
+ 103:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** extern HAL_StatusTypeDef         FLASH_WaitForLastOperation(uint32_t Timeout);
+ 104:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 105:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** /** @defgroup FLASHEx_Private_Functions Extended FLASH Private functions
+ 106:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @{
+ 107:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   */
+ 108:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 109:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** /** @defgroup FLASHEx_Group1 Extended IO operation functions
+ 110:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****  *  @brief   Extended IO operation functions 
+ 111:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****  *
+ 112:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** @verbatim   
+ 113:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****  ===============================================================================
+ 114:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****                 ##### Extended programming operation functions #####
+ 115:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****  ===============================================================================  
+ 116:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     [..]
+ 117:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     This subsection provides a set of functions allowing to manage the Extension FLASH 
+ 118:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     programming operations Operations.
+ 119:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 120:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** @endverbatim
+ 121:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @{
+ 122:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   */
+ 123:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** /**
+ 124:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @brief  Perform a mass erase or erase the specified FLASH memory sectors 
+ 125:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @param[in]  pEraseInit: pointer to an FLASH_EraseInitTypeDef structure that
+ 126:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *         contains the configuration information for the erasing.
+ 127:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * 
+ 128:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @param[out]  SectorError: pointer to variable  that
+ 129:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *         contains the configuration information on faulty sector in case of error 
+ 130:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *         (0xFFFFFFFF means that all the sectors have been correctly erased)
+ 131:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * 
+ 132:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @retval HAL_StatusTypeDef HAL Status
+ 133:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   */
+ 134:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** HAL_StatusTypeDef HAL_FLASHEx_Erase(FLASH_EraseInitTypeDef *pEraseInit, uint32_t *SectorError)
+ 135:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** {
+  26              		.loc 1 135 0
+  27              		.cfi_startproc
+  28              		@ args = 0, pretend = 0, frame = 16
+  29              		@ frame_needed = 1, uses_anonymous_args = 0
+  30 0000 80B5     		push	{r7, lr}
+  31              		.cfi_def_cfa_offset 8
+  32              		.cfi_offset 7, -8
+  33              		.cfi_offset 14, -4
+  34 0002 84B0     		sub	sp, sp, #16
+  35              		.cfi_def_cfa_offset 24
+  36 0004 00AF     		add	r7, sp, #0
+  37              		.cfi_def_cfa_register 7
+  38 0006 7860     		str	r0, [r7, #4]
+  39 0008 3960     		str	r1, [r7]
+ 136:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   HAL_StatusTypeDef status = HAL_ERROR;
+  40              		.loc 1 136 0
+  41 000a 0123     		movs	r3, #1
+  42 000c FB73     		strb	r3, [r7, #15]
+ 137:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   uint32_t index = 0;
+  43              		.loc 1 137 0
+  44 000e 0023     		movs	r3, #0
+  45 0010 BB60     		str	r3, [r7, #8]
+ 138:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   
+ 139:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /* Process Locked */
+ 140:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   __HAL_LOCK(&pFlash);
+  46              		.loc 1 140 0
+  47 0012 40F20003 		movw	r3, #:lower16:pFlash
+  48 0016 C0F20003 		movt	r3, #:upper16:pFlash
+  49 001a 1B7D     		ldrb	r3, [r3, #20]	@ zero_extendqisi2
+  50 001c 012B     		cmp	r3, #1
+  51 001e 01D1     		bne	.L2
+  52              		.loc 1 140 0 is_stmt 0 discriminator 1
+  53 0020 0223     		movs	r3, #2
+  54 0022 71E0     		b	.L3
+  55              	.L2:
+  56              		.loc 1 140 0 discriminator 2
+  57 0024 40F20003 		movw	r3, #:lower16:pFlash
+  58 0028 C0F20003 		movt	r3, #:upper16:pFlash
+  59 002c 0122     		movs	r2, #1
+  60 002e 1A75     		strb	r2, [r3, #20]
+ 141:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 142:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /* Check the parameters */
+ 143:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   assert_param(IS_TYPEERASE(pEraseInit->TypeErase));
+ 144:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 145:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /* Wait for last operation to be completed */
+ 146:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   status = FLASH_WaitForLastOperation((uint32_t)HAL_FLASH_TIMEOUT_VALUE);
+  61              		.loc 1 146 0 is_stmt 1 discriminator 2
+  62 0030 4CF25030 		movw	r0, #50000
+  63 0034 FFF7FEFF 		bl	FLASH_WaitForLastOperation
+  64 0038 0346     		mov	r3, r0
+  65 003a FB73     		strb	r3, [r7, #15]
+ 147:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 148:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   if (status == HAL_OK)
+  66              		.loc 1 148 0 discriminator 2
+  67 003c FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+  68 003e 002B     		cmp	r3, #0
+  69 0040 5BD1     		bne	.L4
+ 149:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   {
+ 150:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     /*Initialization of SectorError variable*/
+ 151:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     *SectorError = 0xFFFFFFFF;
+  70              		.loc 1 151 0
+  71 0042 3B68     		ldr	r3, [r7]
+  72 0044 4FF0FF32 		mov	r2, #-1
+  73 0048 1A60     		str	r2, [r3]
+ 152:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     
+ 153:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     if (pEraseInit->TypeErase == TYPEERASE_MASSERASE)
+  74              		.loc 1 153 0
+  75 004a 7B68     		ldr	r3, [r7, #4]
+  76 004c 1B68     		ldr	r3, [r3]
+  77 004e 012B     		cmp	r3, #1
+  78 0050 18D1     		bne	.L5
+ 154:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     {
+ 155:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****       /*Mass erase to be done*/
+ 156:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****       FLASH_MassErase((uint8_t) pEraseInit->VoltageRange);
+  79              		.loc 1 156 0
+  80 0052 7B68     		ldr	r3, [r7, #4]
+  81 0054 DB68     		ldr	r3, [r3, #12]
+  82 0056 DBB2     		uxtb	r3, r3
+  83 0058 1846     		mov	r0, r3
+  84 005a 00F05BF9 		bl	FLASH_MassErase
+ 157:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 158:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****       /* Wait for last operation to be completed */
+ 159:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****       status = FLASH_WaitForLastOperation((uint32_t)HAL_FLASH_TIMEOUT_VALUE);
+  85              		.loc 1 159 0
+  86 005e 4CF25030 		movw	r0, #50000
+  87 0062 FFF7FEFF 		bl	FLASH_WaitForLastOperation
+  88 0066 0346     		mov	r3, r0
+  89 0068 FB73     		strb	r3, [r7, #15]
+ 160:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****       
+ 161:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****       /* if the erase operation is completed, disable the MER Bit */
+ 162:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****       FLASH->CR &= (~FLASH_CR_MER);
+  90              		.loc 1 162 0
+  91 006a 4FF47053 		mov	r3, #15360
+  92 006e C4F20203 		movt	r3, 16386
+  93 0072 4FF47052 		mov	r2, #15360
+  94 0076 C4F20202 		movt	r2, 16386
+  95 007a 1269     		ldr	r2, [r2, #16]
+  96 007c 22F00402 		bic	r2, r2, #4
+  97 0080 1A61     		str	r2, [r3, #16]
+  98 0082 3AE0     		b	.L4
+  99              	.L5:
+ 163:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     }
+ 164:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     else
+ 165:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     {
+ 166:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****       /* Check the parameters */
+ 167:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****       assert_param(IS_NBSECTORS(pEraseInit->NbSectors + pEraseInit->Sector));
+ 168:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 169:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****       /* Erase by sector by sector to be done*/
+ 170:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****       for(index = pEraseInit->Sector; index < (pEraseInit->NbSectors + pEraseInit->Sector); index++
+ 100              		.loc 1 170 0
+ 101 0084 7B68     		ldr	r3, [r7, #4]
+ 102 0086 5B68     		ldr	r3, [r3, #4]
+ 103 0088 BB60     		str	r3, [r7, #8]
+ 104 008a 2EE0     		b	.L6
+ 105              	.L8:
+ 171:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****       {
+ 172:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****         FLASH_Erase_Sector(index, (uint8_t) pEraseInit->VoltageRange);
+ 106              		.loc 1 172 0
+ 107 008c 7B68     		ldr	r3, [r7, #4]
+ 108 008e DB68     		ldr	r3, [r3, #12]
+ 109 0090 DBB2     		uxtb	r3, r3
+ 110 0092 B868     		ldr	r0, [r7, #8]
+ 111 0094 1946     		mov	r1, r3
+ 112 0096 FFF7FEFF 		bl	FLASH_Erase_Sector
+ 173:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 174:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****         /* Wait for last operation to be completed */
+ 175:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****         status = FLASH_WaitForLastOperation((uint32_t)HAL_FLASH_TIMEOUT_VALUE);
+ 113              		.loc 1 175 0
+ 114 009a 4CF25030 		movw	r0, #50000
+ 115 009e FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 116 00a2 0346     		mov	r3, r0
+ 117 00a4 FB73     		strb	r3, [r7, #15]
+ 176:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****         
+ 177:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****         /* If the erase operation is completed, disable the SER Bit */
+ 178:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****         FLASH->CR &= (~FLASH_CR_SER);
+ 118              		.loc 1 178 0
+ 119 00a6 4FF47053 		mov	r3, #15360
+ 120 00aa C4F20203 		movt	r3, 16386
+ 121 00ae 4FF47052 		mov	r2, #15360
+ 122 00b2 C4F20202 		movt	r2, 16386
+ 123 00b6 1269     		ldr	r2, [r2, #16]
+ 124 00b8 22F00202 		bic	r2, r2, #2
+ 125 00bc 1A61     		str	r2, [r3, #16]
+ 179:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****         FLASH->CR &= SECTOR_MASK; 
+ 126              		.loc 1 179 0
+ 127 00be 4FF47053 		mov	r3, #15360
+ 128 00c2 C4F20203 		movt	r3, 16386
+ 129 00c6 4FF47052 		mov	r2, #15360
+ 130 00ca C4F20202 		movt	r2, 16386
+ 131 00ce 1269     		ldr	r2, [r2, #16]
+ 132 00d0 22F0F802 		bic	r2, r2, #248
+ 133 00d4 1A61     		str	r2, [r3, #16]
+ 180:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 181:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****         if (status != HAL_OK) 
+ 134              		.loc 1 181 0
+ 135 00d6 FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 136 00d8 002B     		cmp	r3, #0
+ 137 00da 03D0     		beq	.L7
+ 182:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****         {
+ 183:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****           /* In case of error, stop erase procedure and return the faulty sector*/
+ 184:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****           *SectorError = index;
+ 138              		.loc 1 184 0
+ 139 00dc 3B68     		ldr	r3, [r7]
+ 140 00de BA68     		ldr	r2, [r7, #8]
+ 141 00e0 1A60     		str	r2, [r3]
+ 185:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****           break;
+ 142              		.loc 1 185 0
+ 143 00e2 0AE0     		b	.L4
+ 144              	.L7:
+ 170:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****       {
+ 145              		.loc 1 170 0
+ 146 00e4 BB68     		ldr	r3, [r7, #8]
+ 147 00e6 0133     		adds	r3, r3, #1
+ 148 00e8 BB60     		str	r3, [r7, #8]
+ 149              	.L6:
+ 170:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****       {
+ 150              		.loc 1 170 0 is_stmt 0 discriminator 1
+ 151 00ea 7B68     		ldr	r3, [r7, #4]
+ 152 00ec 9A68     		ldr	r2, [r3, #8]
+ 153 00ee 7B68     		ldr	r3, [r7, #4]
+ 154 00f0 5B68     		ldr	r3, [r3, #4]
+ 155 00f2 1A44     		add	r2, r2, r3
+ 156 00f4 BB68     		ldr	r3, [r7, #8]
+ 157 00f6 9A42     		cmp	r2, r3
+ 158 00f8 C8D8     		bhi	.L8
+ 159              	.L4:
+ 186:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****         }
+ 187:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****       }
+ 188:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     }
+ 189:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   }
+ 190:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 191:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /* Process Unlocked */
+ 192:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   __HAL_UNLOCK(&pFlash);
+ 160              		.loc 1 192 0 is_stmt 1
+ 161 00fa 40F20003 		movw	r3, #:lower16:pFlash
+ 162 00fe C0F20003 		movt	r3, #:upper16:pFlash
+ 163 0102 0022     		movs	r2, #0
+ 164 0104 1A75     		strb	r2, [r3, #20]
+ 193:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 194:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   return status;
+ 165              		.loc 1 194 0
+ 166 0106 FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 167              	.L3:
+ 195:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** }
+ 168              		.loc 1 195 0
+ 169 0108 1846     		mov	r0, r3
+ 170 010a 1037     		adds	r7, r7, #16
+ 171 010c BD46     		mov	sp, r7
+ 172              		@ sp needed
+ 173 010e 80BD     		pop	{r7, pc}
+ 174              		.cfi_endproc
+ 175              	.LFE55:
+ 177              		.align	2
+ 178              		.global	HAL_FLASHEx_Erase_IT
+ 179              		.thumb
+ 180              		.thumb_func
+ 182              	HAL_FLASHEx_Erase_IT:
+ 183              	.LFB56:
+ 196:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 197:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** /**
+ 198:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @brief  Perform a mass erase or erase the specified FLASH memory sectors  with interrupt enable
+ 199:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @param  pEraseInit: pointer to an FLASH_EraseInitTypeDef structure that
+ 200:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *         contains the configuration information for the erasing.
+ 201:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * 
+ 202:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @retval HAL_StatusTypeDef HAL Status
+ 203:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   */
+ 204:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** HAL_StatusTypeDef HAL_FLASHEx_Erase_IT(FLASH_EraseInitTypeDef *pEraseInit)
+ 205:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** {
+ 184              		.loc 1 205 0
+ 185              		.cfi_startproc
+ 186              		@ args = 0, pretend = 0, frame = 16
+ 187              		@ frame_needed = 1, uses_anonymous_args = 0
+ 188 0110 80B5     		push	{r7, lr}
+ 189              		.cfi_def_cfa_offset 8
+ 190              		.cfi_offset 7, -8
+ 191              		.cfi_offset 14, -4
+ 192 0112 84B0     		sub	sp, sp, #16
+ 193              		.cfi_def_cfa_offset 24
+ 194 0114 00AF     		add	r7, sp, #0
+ 195              		.cfi_def_cfa_register 7
+ 196 0116 7860     		str	r0, [r7, #4]
+ 206:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   HAL_StatusTypeDef status = HAL_OK;
+ 197              		.loc 1 206 0
+ 198 0118 0023     		movs	r3, #0
+ 199 011a FB73     		strb	r3, [r7, #15]
+ 207:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 208:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /* Process Locked */
+ 209:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   __HAL_LOCK(&pFlash);
+ 200              		.loc 1 209 0
+ 201 011c 40F20003 		movw	r3, #:lower16:pFlash
+ 202 0120 C0F20003 		movt	r3, #:upper16:pFlash
+ 203 0124 1B7D     		ldrb	r3, [r3, #20]	@ zero_extendqisi2
+ 204 0126 012B     		cmp	r3, #1
+ 205 0128 01D1     		bne	.L10
+ 206              		.loc 1 209 0 is_stmt 0 discriminator 1
+ 207 012a 0223     		movs	r3, #2
+ 208 012c 5AE0     		b	.L11
+ 209              	.L10:
+ 210              		.loc 1 209 0 discriminator 2
+ 211 012e 40F20003 		movw	r3, #:lower16:pFlash
+ 212 0132 C0F20003 		movt	r3, #:upper16:pFlash
+ 213 0136 0122     		movs	r2, #1
+ 214 0138 1A75     		strb	r2, [r3, #20]
+ 210:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 211:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /* Check the parameters */
+ 212:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   assert_param(IS_TYPEERASE(pEraseInit->TypeErase));
+ 213:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 214:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /* Enable End of FLASH Operation interrupt */
+ 215:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   __HAL_FLASH_ENABLE_IT(FLASH_IT_EOP);
+ 215              		.loc 1 215 0 is_stmt 1 discriminator 2
+ 216 013a 4FF47053 		mov	r3, #15360
+ 217 013e C4F20203 		movt	r3, 16386
+ 218 0142 4FF47052 		mov	r2, #15360
+ 219 0146 C4F20202 		movt	r2, 16386
+ 220 014a 1269     		ldr	r2, [r2, #16]
+ 221 014c 42F08072 		orr	r2, r2, #16777216
+ 222 0150 1A61     		str	r2, [r3, #16]
+ 216:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   
+ 217:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /* Enable Error source interrupt */
+ 218:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   __HAL_FLASH_ENABLE_IT(FLASH_IT_ERR);
+ 223              		.loc 1 218 0 discriminator 2
+ 224 0152 4FF47053 		mov	r3, #15360
+ 225 0156 C4F20203 		movt	r3, 16386
+ 226 015a 4FF47052 		mov	r2, #15360
+ 227 015e C4F20202 		movt	r2, 16386
+ 228 0162 1269     		ldr	r2, [r2, #16]
+ 229 0164 42F00072 		orr	r2, r2, #33554432
+ 230 0168 1A61     		str	r2, [r3, #16]
+ 219:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   
+ 220:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /* Clear pending flags (if any) */  
+ 221:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   __HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_EOP    | FLASH_FLAG_OPERR | FLASH_FLAG_WRPERR |\
+ 231              		.loc 1 221 0 discriminator 2
+ 232 016a 4FF47053 		mov	r3, #15360
+ 233 016e C4F20203 		movt	r3, 16386
+ 234 0172 F322     		movs	r2, #243
+ 235 0174 DA60     		str	r2, [r3, #12]
+ 222:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****                          FLASH_FLAG_PGAERR | FLASH_FLAG_PGPERR| FLASH_FLAG_PGSERR);  
+ 223:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   
+ 224:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   if (pEraseInit->TypeErase == TYPEERASE_MASSERASE)
+ 236              		.loc 1 224 0 discriminator 2
+ 237 0176 7B68     		ldr	r3, [r7, #4]
+ 238 0178 1B68     		ldr	r3, [r3]
+ 239 017a 012B     		cmp	r3, #1
+ 240 017c 0CD1     		bne	.L12
+ 225:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   {
+ 226:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     /*Mass erase to be done*/
+ 227:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     pFlash.ProcedureOnGoing = FLASH_PROC_MASSERASE;
+ 241              		.loc 1 227 0
+ 242 017e 40F20003 		movw	r3, #:lower16:pFlash
+ 243 0182 C0F20003 		movt	r3, #:upper16:pFlash
+ 244 0186 0222     		movs	r2, #2
+ 245 0188 1A70     		strb	r2, [r3]
+ 228:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     FLASH_MassErase((uint8_t) pEraseInit->VoltageRange);
+ 246              		.loc 1 228 0
+ 247 018a 7B68     		ldr	r3, [r7, #4]
+ 248 018c DB68     		ldr	r3, [r3, #12]
+ 249 018e DBB2     		uxtb	r3, r3
+ 250 0190 1846     		mov	r0, r3
+ 251 0192 00F0BFF8 		bl	FLASH_MassErase
+ 252 0196 24E0     		b	.L13
+ 253              	.L12:
+ 229:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   }
+ 230:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   else
+ 231:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   {
+ 232:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     /* Erase by sector to be done*/
+ 233:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 234:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     /* Check the parameters */
+ 235:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     assert_param(IS_NBSECTORS(pEraseInit->NbSectors + pEraseInit->Sector));
+ 236:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 237:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     pFlash.ProcedureOnGoing = FLASH_PROC_SECTERASE;
+ 254              		.loc 1 237 0
+ 255 0198 40F20003 		movw	r3, #:lower16:pFlash
+ 256 019c C0F20003 		movt	r3, #:upper16:pFlash
+ 257 01a0 0122     		movs	r2, #1
+ 258 01a2 1A70     		strb	r2, [r3]
+ 238:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     pFlash.NbSectorsToErase = pEraseInit->NbSectors;
+ 259              		.loc 1 238 0
+ 260 01a4 7B68     		ldr	r3, [r7, #4]
+ 261 01a6 9A68     		ldr	r2, [r3, #8]
+ 262 01a8 40F20003 		movw	r3, #:lower16:pFlash
+ 263 01ac C0F20003 		movt	r3, #:upper16:pFlash
+ 264 01b0 5A60     		str	r2, [r3, #4]
+ 239:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     pFlash.Sector = pEraseInit->Sector;
+ 265              		.loc 1 239 0
+ 266 01b2 7B68     		ldr	r3, [r7, #4]
+ 267 01b4 5A68     		ldr	r2, [r3, #4]
+ 268 01b6 40F20003 		movw	r3, #:lower16:pFlash
+ 269 01ba C0F20003 		movt	r3, #:upper16:pFlash
+ 270 01be DA60     		str	r2, [r3, #12]
+ 240:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     pFlash.VoltageForErase = (uint8_t)pEraseInit->VoltageRange;
+ 271              		.loc 1 240 0
+ 272 01c0 7B68     		ldr	r3, [r7, #4]
+ 273 01c2 DB68     		ldr	r3, [r3, #12]
+ 274 01c4 DAB2     		uxtb	r2, r3
+ 275 01c6 40F20003 		movw	r3, #:lower16:pFlash
+ 276 01ca C0F20003 		movt	r3, #:upper16:pFlash
+ 277 01ce 1A72     		strb	r2, [r3, #8]
+ 241:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 242:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     /*Erase 1st sector and wait for IT*/
+ 243:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     FLASH_Erase_Sector(pEraseInit->Sector, pEraseInit->VoltageRange);
+ 278              		.loc 1 243 0
+ 279 01d0 7B68     		ldr	r3, [r7, #4]
+ 280 01d2 5A68     		ldr	r2, [r3, #4]
+ 281 01d4 7B68     		ldr	r3, [r7, #4]
+ 282 01d6 DB68     		ldr	r3, [r3, #12]
+ 283 01d8 DBB2     		uxtb	r3, r3
+ 284 01da 1046     		mov	r0, r2
+ 285 01dc 1946     		mov	r1, r3
+ 286 01de FFF7FEFF 		bl	FLASH_Erase_Sector
+ 287              	.L13:
+ 244:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   }
+ 245:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 246:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   return status;
+ 288              		.loc 1 246 0
+ 289 01e2 FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 290              	.L11:
+ 247:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** }
+ 291              		.loc 1 247 0
+ 292 01e4 1846     		mov	r0, r3
+ 293 01e6 1037     		adds	r7, r7, #16
+ 294 01e8 BD46     		mov	sp, r7
+ 295              		@ sp needed
+ 296 01ea 80BD     		pop	{r7, pc}
+ 297              		.cfi_endproc
+ 298              	.LFE56:
+ 300              		.align	2
+ 301              		.global	HAL_FLASHEx_OBProgram
+ 302              		.thumb
+ 303              		.thumb_func
+ 305              	HAL_FLASHEx_OBProgram:
+ 306              	.LFB57:
+ 248:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 249:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** /**
+ 250:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @brief   Program option bytes
+ 251:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @param  pOBInit: pointer to an FLASH_OBInitStruct structure that
+ 252:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *         contains the configuration information for the programming.
+ 253:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * 
+ 254:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @retval HAL_StatusTypeDef HAL Status
+ 255:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   */
+ 256:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** HAL_StatusTypeDef HAL_FLASHEx_OBProgram(FLASH_OBProgramInitTypeDef *pOBInit)
+ 257:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** {
+ 307              		.loc 1 257 0
+ 308              		.cfi_startproc
+ 309              		@ args = 0, pretend = 0, frame = 16
+ 310              		@ frame_needed = 1, uses_anonymous_args = 0
+ 311 01ec 80B5     		push	{r7, lr}
+ 312              		.cfi_def_cfa_offset 8
+ 313              		.cfi_offset 7, -8
+ 314              		.cfi_offset 14, -4
+ 315 01ee 84B0     		sub	sp, sp, #16
+ 316              		.cfi_def_cfa_offset 24
+ 317 01f0 00AF     		add	r7, sp, #0
+ 318              		.cfi_def_cfa_register 7
+ 319 01f2 7860     		str	r0, [r7, #4]
+ 258:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   HAL_StatusTypeDef status = HAL_ERROR;
+ 320              		.loc 1 258 0
+ 321 01f4 0123     		movs	r3, #1
+ 322 01f6 FB73     		strb	r3, [r7, #15]
+ 259:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   
+ 260:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /* Process Locked */
+ 261:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   __HAL_LOCK(&pFlash);
+ 323              		.loc 1 261 0
+ 324 01f8 40F20003 		movw	r3, #:lower16:pFlash
+ 325 01fc C0F20003 		movt	r3, #:upper16:pFlash
+ 326 0200 1B7D     		ldrb	r3, [r3, #20]	@ zero_extendqisi2
+ 327 0202 012B     		cmp	r3, #1
+ 328 0204 01D1     		bne	.L15
+ 329              		.loc 1 261 0 is_stmt 0 discriminator 1
+ 330 0206 0223     		movs	r3, #2
+ 331 0208 5DE0     		b	.L16
+ 332              	.L15:
+ 333              		.loc 1 261 0 discriminator 2
+ 334 020a 40F20003 		movw	r3, #:lower16:pFlash
+ 335 020e C0F20003 		movt	r3, #:upper16:pFlash
+ 336 0212 0122     		movs	r2, #1
+ 337 0214 1A75     		strb	r2, [r3, #20]
+ 262:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 263:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /* Check the parameters */
+ 264:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   assert_param(IS_OPTIONBYTE(pOBInit->OptionType));
+ 265:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 266:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /*Write protection configuration*/
+ 267:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   if((pOBInit->OptionType & OPTIONBYTE_WRP) == OPTIONBYTE_WRP)
+ 338              		.loc 1 267 0 is_stmt 1 discriminator 2
+ 339 0216 7B68     		ldr	r3, [r7, #4]
+ 340 0218 1B68     		ldr	r3, [r3]
+ 341 021a 03F00103 		and	r3, r3, #1
+ 342 021e 002B     		cmp	r3, #0
+ 343 0220 12D0     		beq	.L17
+ 268:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   {
+ 269:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     assert_param(IS_WRPSTATE(pOBInit->WRPState));
+ 270:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     if (pOBInit->WRPState == WRPSTATE_ENABLE)
+ 344              		.loc 1 270 0
+ 345 0222 7B68     		ldr	r3, [r7, #4]
+ 346 0224 5B68     		ldr	r3, [r3, #4]
+ 347 0226 012B     		cmp	r3, #1
+ 348 0228 07D1     		bne	.L18
+ 271:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     {
+ 272:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****       /*Enable of Write protection on the selected Sector*/
+ 273:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****       status = FLASH_OB_EnableWRP(pOBInit->WRPSector);
+ 349              		.loc 1 273 0
+ 350 022a 7B68     		ldr	r3, [r7, #4]
+ 351 022c 9B68     		ldr	r3, [r3, #8]
+ 352 022e 1846     		mov	r0, r3
+ 353 0230 00F024F9 		bl	FLASH_OB_EnableWRP
+ 354 0234 0346     		mov	r3, r0
+ 355 0236 FB73     		strb	r3, [r7, #15]
+ 356 0238 06E0     		b	.L17
+ 357              	.L18:
+ 274:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     }
+ 275:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     else
+ 276:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     {
+ 277:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****       /*Disable of Write protection on the selected Sector*/
+ 278:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****       status = FLASH_OB_DisableWRP(pOBInit->WRPSector);
+ 358              		.loc 1 278 0
+ 359 023a 7B68     		ldr	r3, [r7, #4]
+ 360 023c 9B68     		ldr	r3, [r3, #8]
+ 361 023e 1846     		mov	r0, r3
+ 362 0240 00F042F9 		bl	FLASH_OB_DisableWRP
+ 363 0244 0346     		mov	r3, r0
+ 364 0246 FB73     		strb	r3, [r7, #15]
+ 365              	.L17:
+ 279:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     }
+ 280:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   }
+ 281:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 282:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /*Read protection configuration*/
+ 283:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   if((pOBInit->OptionType & OPTIONBYTE_RDP) == OPTIONBYTE_RDP)
+ 366              		.loc 1 283 0
+ 367 0248 7B68     		ldr	r3, [r7, #4]
+ 368 024a 1B68     		ldr	r3, [r3]
+ 369 024c 03F00203 		and	r3, r3, #2
+ 370 0250 002B     		cmp	r3, #0
+ 371 0252 07D0     		beq	.L19
+ 284:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   {
+ 285:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     status = FLASH_OB_RDP_LevelConfig(pOBInit->RDPLevel);
+ 372              		.loc 1 285 0
+ 373 0254 7B68     		ldr	r3, [r7, #4]
+ 374 0256 DB68     		ldr	r3, [r3, #12]
+ 375 0258 DBB2     		uxtb	r3, r3
+ 376 025a 1846     		mov	r0, r3
+ 377 025c 00F058F9 		bl	FLASH_OB_RDP_LevelConfig
+ 378 0260 0346     		mov	r3, r0
+ 379 0262 FB73     		strb	r3, [r7, #15]
+ 380              	.L19:
+ 286:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   }
+ 287:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 288:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /*USER  configuration*/
+ 289:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   if((pOBInit->OptionType & OPTIONBYTE_USER) == OPTIONBYTE_USER)
+ 381              		.loc 1 289 0
+ 382 0264 7B68     		ldr	r3, [r7, #4]
+ 383 0266 1B68     		ldr	r3, [r3]
+ 384 0268 03F00403 		and	r3, r3, #4
+ 385 026c 002B     		cmp	r3, #0
+ 386 026e 15D0     		beq	.L20
+ 290:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   {
+ 291:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     status = FLASH_OB_UserConfig(pOBInit->USERConfig&OB_IWDG_SW, 
+ 387              		.loc 1 291 0
+ 388 0270 7B68     		ldr	r3, [r7, #4]
+ 389 0272 1B7D     		ldrb	r3, [r3, #20]	@ zero_extendqisi2
+ 390 0274 03F02003 		and	r3, r3, #32
+ 391 0278 D9B2     		uxtb	r1, r3
+ 292:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****                                      pOBInit->USERConfig&OB_STOP_NO_RST,
+ 392              		.loc 1 292 0
+ 393 027a 7B68     		ldr	r3, [r7, #4]
+ 394 027c 1B7D     		ldrb	r3, [r3, #20]	@ zero_extendqisi2
+ 291:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****                                      pOBInit->USERConfig&OB_STOP_NO_RST,
+ 395              		.loc 1 291 0
+ 396 027e 03F04003 		and	r3, r3, #64
+ 397 0282 DAB2     		uxtb	r2, r3
+ 293:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****                                      pOBInit->USERConfig&OB_STDBY_NO_RST);
+ 398              		.loc 1 293 0
+ 399 0284 7B68     		ldr	r3, [r7, #4]
+ 400 0286 1B7D     		ldrb	r3, [r3, #20]	@ zero_extendqisi2
+ 291:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****                                      pOBInit->USERConfig&OB_STOP_NO_RST,
+ 401              		.loc 1 291 0
+ 402 0288 23F07F03 		bic	r3, r3, #127
+ 403 028c DBB2     		uxtb	r3, r3
+ 404 028e 0846     		mov	r0, r1
+ 405 0290 1146     		mov	r1, r2
+ 406 0292 1A46     		mov	r2, r3
+ 407 0294 00F058F9 		bl	FLASH_OB_UserConfig
+ 408 0298 0346     		mov	r3, r0
+ 409 029a FB73     		strb	r3, [r7, #15]
+ 410              	.L20:
+ 294:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   }
+ 295:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 296:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /*BOR Level  configuration*/
+ 297:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   if((pOBInit->OptionType & OPTIONBYTE_BOR) == OPTIONBYTE_BOR)
+ 411              		.loc 1 297 0
+ 412 029c 7B68     		ldr	r3, [r7, #4]
+ 413 029e 1B68     		ldr	r3, [r3]
+ 414 02a0 03F00803 		and	r3, r3, #8
+ 415 02a4 002B     		cmp	r3, #0
+ 416 02a6 07D0     		beq	.L21
+ 298:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   {
+ 299:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     status = FLASH_OB_BOR_LevelConfig(pOBInit->BORLevel);
+ 417              		.loc 1 299 0
+ 418 02a8 7B68     		ldr	r3, [r7, #4]
+ 419 02aa 1B69     		ldr	r3, [r3, #16]
+ 420 02ac DBB2     		uxtb	r3, r3
+ 421 02ae 1846     		mov	r0, r3
+ 422 02b0 00F07EF9 		bl	FLASH_OB_BOR_LevelConfig
+ 423 02b4 0346     		mov	r3, r0
+ 424 02b6 FB73     		strb	r3, [r7, #15]
+ 425              	.L21:
+ 300:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   }
+ 301:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 302:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /* Process Unlocked */
+ 303:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   __HAL_UNLOCK(&pFlash);
+ 426              		.loc 1 303 0
+ 427 02b8 40F20003 		movw	r3, #:lower16:pFlash
+ 428 02bc C0F20003 		movt	r3, #:upper16:pFlash
+ 429 02c0 0022     		movs	r2, #0
+ 430 02c2 1A75     		strb	r2, [r3, #20]
+ 304:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 305:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   return status;
+ 431              		.loc 1 305 0
+ 432 02c4 FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 433              	.L16:
+ 306:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** }
+ 434              		.loc 1 306 0
+ 435 02c6 1846     		mov	r0, r3
+ 436 02c8 1037     		adds	r7, r7, #16
+ 437 02ca BD46     		mov	sp, r7
+ 438              		@ sp needed
+ 439 02cc 80BD     		pop	{r7, pc}
+ 440              		.cfi_endproc
+ 441              	.LFE57:
+ 443 02ce 00BF     		.align	2
+ 444              		.global	HAL_FLASHEx_OBGetConfig
+ 445              		.thumb
+ 446              		.thumb_func
+ 448              	HAL_FLASHEx_OBGetConfig:
+ 449              	.LFB58:
+ 307:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 308:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** /**
+ 309:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @brief   Get the Option byte configuration
+ 310:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @param  pOBInit: pointer to an FLASH_OBInitStruct structure that
+ 311:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *         contains the configuration information for the programming.
+ 312:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * 
+ 313:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @retval None
+ 314:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   */
+ 315:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** void HAL_FLASHEx_OBGetConfig(FLASH_OBProgramInitTypeDef *pOBInit)
+ 316:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** {
+ 450              		.loc 1 316 0
+ 451              		.cfi_startproc
+ 452              		@ args = 0, pretend = 0, frame = 8
+ 453              		@ frame_needed = 1, uses_anonymous_args = 0
+ 454 02d0 80B5     		push	{r7, lr}
+ 455              		.cfi_def_cfa_offset 8
+ 456              		.cfi_offset 7, -8
+ 457              		.cfi_offset 14, -4
+ 458 02d2 82B0     		sub	sp, sp, #8
+ 459              		.cfi_def_cfa_offset 16
+ 460 02d4 00AF     		add	r7, sp, #0
+ 461              		.cfi_def_cfa_register 7
+ 462 02d6 7860     		str	r0, [r7, #4]
+ 317:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   pOBInit->OptionType = OPTIONBYTE_WRP | OPTIONBYTE_RDP | OPTIONBYTE_USER | OPTIONBYTE_BOR;
+ 463              		.loc 1 317 0
+ 464 02d8 7B68     		ldr	r3, [r7, #4]
+ 465 02da 0F22     		movs	r2, #15
+ 466 02dc 1A60     		str	r2, [r3]
+ 318:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 319:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /*Get WRP*/
+ 320:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   pOBInit->WRPSector = FLASH_OB_GetWRP();
+ 467              		.loc 1 320 0
+ 468 02de 00F09FF9 		bl	FLASH_OB_GetWRP
+ 469 02e2 0346     		mov	r3, r0
+ 470 02e4 1A46     		mov	r2, r3
+ 471 02e6 7B68     		ldr	r3, [r7, #4]
+ 472 02e8 9A60     		str	r2, [r3, #8]
+ 321:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 322:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /*Get RDP Level*/
+ 323:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   pOBInit->RDPLevel = FLASH_OB_GetRDP();
+ 473              		.loc 1 323 0
+ 474 02ea 00F0A7F9 		bl	FLASH_OB_GetRDP
+ 475 02ee 0346     		mov	r3, r0
+ 476 02f0 1A46     		mov	r2, r3
+ 477 02f2 7B68     		ldr	r3, [r7, #4]
+ 478 02f4 DA60     		str	r2, [r3, #12]
+ 324:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 325:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /*Get USER*/
+ 326:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   pOBInit->USERConfig = FLASH_OB_GetUser();
+ 479              		.loc 1 326 0
+ 480 02f6 00F083F9 		bl	FLASH_OB_GetUser
+ 481 02fa 0346     		mov	r3, r0
+ 482 02fc 1A46     		mov	r2, r3
+ 483 02fe 7B68     		ldr	r3, [r7, #4]
+ 484 0300 1A75     		strb	r2, [r3, #20]
+ 327:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 328:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /*Get BOR Level*/
+ 329:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   pOBInit->BORLevel = FLASH_OB_GetBOR();
+ 485              		.loc 1 329 0
+ 486 0302 00F0B1F9 		bl	FLASH_OB_GetBOR
+ 487 0306 0346     		mov	r3, r0
+ 488 0308 1A46     		mov	r2, r3
+ 489 030a 7B68     		ldr	r3, [r7, #4]
+ 490 030c 1A61     		str	r2, [r3, #16]
+ 330:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** }
+ 491              		.loc 1 330 0
+ 492 030e 0837     		adds	r7, r7, #8
+ 493 0310 BD46     		mov	sp, r7
+ 494              		@ sp needed
+ 495 0312 80BD     		pop	{r7, pc}
+ 496              		.cfi_endproc
+ 497              	.LFE58:
+ 499              		.align	2
+ 500              		.thumb
+ 501              		.thumb_func
+ 503              	FLASH_MassErase:
+ 504              	.LFB59:
+ 331:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 332:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** /**
+ 333:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @brief  Mass erase of FLASH memory
+ 334:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @param  VoltageRange: The device voltage range which defines the erase parallelism.  
+ 335:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *          This parameter can be one of the following values:
+ 336:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *            @arg VOLTAGE_RANGE_1: when the device voltage range is 1.8V to 2.1V, 
+ 337:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *                                  the operation will be done by byte (8-bit) 
+ 338:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *            @arg VOLTAGE_RANGE_2: when the device voltage range is 2.1V to 2.7V,
+ 339:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *                                  the operation will be done by half word (16-bit)
+ 340:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *            @arg VOLTAGE_RANGE_3: when the device voltage range is 2.7V to 3.6V,
+ 341:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *                                  the operation will be done by word (32-bit)
+ 342:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *            @arg VOLTAGE_RANGE_4: when the device voltage range is 2.7V to 3.6V + External Vpp, 
+ 343:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *                                  the operation will be done by double word (64-bit)
+ 344:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *
+ 345:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @retval None
+ 346:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   */
+ 347:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** static void FLASH_MassErase(uint8_t VoltageRange)
+ 348:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** {
+ 505              		.loc 1 348 0
+ 506              		.cfi_startproc
+ 507              		@ args = 0, pretend = 0, frame = 16
+ 508              		@ frame_needed = 1, uses_anonymous_args = 0
+ 509              		@ link register save eliminated.
+ 510 0314 80B4     		push	{r7}
+ 511              		.cfi_def_cfa_offset 4
+ 512              		.cfi_offset 7, -4
+ 513 0316 85B0     		sub	sp, sp, #20
+ 514              		.cfi_def_cfa_offset 24
+ 515 0318 00AF     		add	r7, sp, #0
+ 516              		.cfi_def_cfa_register 7
+ 517 031a 0346     		mov	r3, r0
+ 518 031c FB71     		strb	r3, [r7, #7]
+ 349:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   uint32_t tmp_psize = 0;
+ 519              		.loc 1 349 0
+ 520 031e 0023     		movs	r3, #0
+ 521 0320 FB60     		str	r3, [r7, #12]
+ 350:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   
+ 351:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /* Check the parameters */
+ 352:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   assert_param(IS_VOLTAGERANGE(VoltageRange));
+ 353:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 354:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /* if the previous operation is completed, proceed to erase all sectors */
+ 355:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   FLASH->CR &= CR_PSIZE_MASK;
+ 522              		.loc 1 355 0
+ 523 0322 4FF47053 		mov	r3, #15360
+ 524 0326 C4F20203 		movt	r3, 16386
+ 525 032a 4FF47052 		mov	r2, #15360
+ 526 032e C4F20202 		movt	r2, 16386
+ 527 0332 1269     		ldr	r2, [r2, #16]
+ 528 0334 22F44072 		bic	r2, r2, #768
+ 529 0338 1A61     		str	r2, [r3, #16]
+ 356:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   FLASH->CR |= tmp_psize;
+ 530              		.loc 1 356 0
+ 531 033a 4FF47053 		mov	r3, #15360
+ 532 033e C4F20203 		movt	r3, 16386
+ 533 0342 4FF47052 		mov	r2, #15360
+ 534 0346 C4F20202 		movt	r2, 16386
+ 535 034a 1169     		ldr	r1, [r2, #16]
+ 536 034c FA68     		ldr	r2, [r7, #12]
+ 537 034e 0A43     		orrs	r2, r2, r1
+ 538 0350 1A61     		str	r2, [r3, #16]
+ 357:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   FLASH->CR |= FLASH_CR_MER;
+ 539              		.loc 1 357 0
+ 540 0352 4FF47053 		mov	r3, #15360
+ 541 0356 C4F20203 		movt	r3, 16386
+ 542 035a 4FF47052 		mov	r2, #15360
+ 543 035e C4F20202 		movt	r2, 16386
+ 544 0362 1269     		ldr	r2, [r2, #16]
+ 545 0364 42F00402 		orr	r2, r2, #4
+ 546 0368 1A61     		str	r2, [r3, #16]
+ 358:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   FLASH->CR |= FLASH_CR_STRT;
+ 547              		.loc 1 358 0
+ 548 036a 4FF47053 		mov	r3, #15360
+ 549 036e C4F20203 		movt	r3, 16386
+ 550 0372 4FF47052 		mov	r2, #15360
+ 551 0376 C4F20202 		movt	r2, 16386
+ 552 037a 1269     		ldr	r2, [r2, #16]
+ 553 037c 42F48032 		orr	r2, r2, #65536
+ 554 0380 1A61     		str	r2, [r3, #16]
+ 359:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** }
+ 555              		.loc 1 359 0
+ 556 0382 1437     		adds	r7, r7, #20
+ 557 0384 BD46     		mov	sp, r7
+ 558              		@ sp needed
+ 559 0386 5DF8047B 		ldr	r7, [sp], #4
+ 560 038a 7047     		bx	lr
+ 561              		.cfi_endproc
+ 562              	.LFE59:
+ 564              		.align	2
+ 565              		.global	FLASH_Erase_Sector
+ 566              		.thumb
+ 567              		.thumb_func
+ 569              	FLASH_Erase_Sector:
+ 570              	.LFB60:
+ 360:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 361:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** /**
+ 362:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @brief  Erase the specified FLASH memory sector
+ 363:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @param  Sector: FLASH sector to erase
+ 364:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *         The value of this parameter depend on device used within the same series      
+ 365:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @param  VoltageRange: The device voltage range which defines the erase parallelism.  
+ 366:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *          This parameter can be one of the following values:
+ 367:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *            @arg VOLTAGE_RANGE_1: when the device voltage range is 1.8V to 2.1V, 
+ 368:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *                                  the operation will be done by byte (8-bit) 
+ 369:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *            @arg VOLTAGE_RANGE_2: when the device voltage range is 2.1V to 2.7V,
+ 370:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *                                  the operation will be done by half word (16-bit)
+ 371:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *            @arg VOLTAGE_RANGE_3: when the device voltage range is 2.7V to 3.6V,
+ 372:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *                                  the operation will be done by word (32-bit)
+ 373:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *            @arg VOLTAGE_RANGE_4: when the device voltage range is 2.7V to 3.6V + External Vpp, 
+ 374:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *                                  the operation will be done by double word (64-bit)
+ 375:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * 
+ 376:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @retval None
+ 377:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   */
+ 378:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** void FLASH_Erase_Sector(uint32_t Sector, uint8_t VoltageRange)
+ 379:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** {
+ 571              		.loc 1 379 0
+ 572              		.cfi_startproc
+ 573              		@ args = 0, pretend = 0, frame = 32
+ 574              		@ frame_needed = 1, uses_anonymous_args = 0
+ 575              		@ link register save eliminated.
+ 576 038c 80B4     		push	{r7}
+ 577              		.cfi_def_cfa_offset 4
+ 578              		.cfi_offset 7, -4
+ 579 038e 89B0     		sub	sp, sp, #36
+ 580              		.cfi_def_cfa_offset 40
+ 581 0390 00AF     		add	r7, sp, #0
+ 582              		.cfi_def_cfa_register 7
+ 583 0392 7860     		str	r0, [r7, #4]
+ 584 0394 0B46     		mov	r3, r1
+ 585 0396 FB70     		strb	r3, [r7, #3]
+ 380:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   uint32_t tmp_psize = 0;
+ 586              		.loc 1 380 0
+ 587 0398 0023     		movs	r3, #0
+ 588 039a FB61     		str	r3, [r7, #28]
+ 381:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 382:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /* Check the parameters */
+ 383:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   assert_param(IS_FLASH_SECTOR(Sector));
+ 384:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   assert_param(IS_VOLTAGERANGE(VoltageRange));
+ 385:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   
+ 386:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   if(VoltageRange == VOLTAGE_RANGE_1)
+ 589              		.loc 1 386 0
+ 590 039c FB78     		ldrb	r3, [r7, #3]	@ zero_extendqisi2
+ 591 039e 002B     		cmp	r3, #0
+ 592 03a0 02D1     		bne	.L25
+ 387:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   {
+ 388:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****      tmp_psize = FLASH_PSIZE_BYTE;
+ 593              		.loc 1 388 0
+ 594 03a2 0023     		movs	r3, #0
+ 595 03a4 FB61     		str	r3, [r7, #28]
+ 596 03a6 10E0     		b	.L26
+ 597              	.L25:
+ 389:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   }
+ 390:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   else if(VoltageRange == VOLTAGE_RANGE_2)
+ 598              		.loc 1 390 0
+ 599 03a8 FB78     		ldrb	r3, [r7, #3]	@ zero_extendqisi2
+ 600 03aa 012B     		cmp	r3, #1
+ 601 03ac 03D1     		bne	.L27
+ 391:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   {
+ 392:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     tmp_psize = FLASH_PSIZE_HALF_WORD;
+ 602              		.loc 1 392 0
+ 603 03ae 4FF48073 		mov	r3, #256
+ 604 03b2 FB61     		str	r3, [r7, #28]
+ 605 03b4 09E0     		b	.L26
+ 606              	.L27:
+ 393:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   }
+ 394:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   else if(VoltageRange == VOLTAGE_RANGE_3)
+ 607              		.loc 1 394 0
+ 608 03b6 FB78     		ldrb	r3, [r7, #3]	@ zero_extendqisi2
+ 609 03b8 022B     		cmp	r3, #2
+ 610 03ba 03D1     		bne	.L28
+ 395:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   {
+ 396:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     tmp_psize = FLASH_PSIZE_WORD;
+ 611              		.loc 1 396 0
+ 612 03bc 4FF40073 		mov	r3, #512
+ 613 03c0 FB61     		str	r3, [r7, #28]
+ 614 03c2 02E0     		b	.L26
+ 615              	.L28:
+ 397:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   }
+ 398:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   else
+ 399:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   {
+ 400:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     tmp_psize = FLASH_PSIZE_DOUBLE_WORD;
+ 616              		.loc 1 400 0
+ 617 03c4 4FF44073 		mov	r3, #768
+ 618 03c8 FB61     		str	r3, [r7, #28]
+ 619              	.L26:
+ 401:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   }
+ 402:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 403:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /* Need to add offset of 4 when sector higher than FLASH_SECTOR_11 */
+ 404:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   if (Sector > FLASH_SECTOR_11) 
+ 620              		.loc 1 404 0
+ 621 03ca 7B68     		ldr	r3, [r7, #4]
+ 622 03cc 0B2B     		cmp	r3, #11
+ 623 03ce 02D9     		bls	.L29
+ 405:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   {
+ 406:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     Sector += 4;
+ 624              		.loc 1 406 0
+ 625 03d0 7B68     		ldr	r3, [r7, #4]
+ 626 03d2 0433     		adds	r3, r3, #4
+ 627 03d4 7B60     		str	r3, [r7, #4]
+ 628              	.L29:
+ 407:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   }
+ 408:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /* If the previous operation is completed, proceed to erase the sector */
+ 409:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   FLASH->CR &= CR_PSIZE_MASK;
+ 629              		.loc 1 409 0
+ 630 03d6 4FF47053 		mov	r3, #15360
+ 631 03da C4F20203 		movt	r3, 16386
+ 632 03de 4FF47052 		mov	r2, #15360
+ 633 03e2 C4F20202 		movt	r2, 16386
+ 634 03e6 1269     		ldr	r2, [r2, #16]
+ 635 03e8 22F44072 		bic	r2, r2, #768
+ 636 03ec 1A61     		str	r2, [r3, #16]
+ 410:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   FLASH->CR |= tmp_psize;
+ 637              		.loc 1 410 0
+ 638 03ee 4FF47053 		mov	r3, #15360
+ 639 03f2 C4F20203 		movt	r3, 16386
+ 640 03f6 4FF47052 		mov	r2, #15360
+ 641 03fa C4F20202 		movt	r2, 16386
+ 642 03fe 1169     		ldr	r1, [r2, #16]
+ 643 0400 FA69     		ldr	r2, [r7, #28]
+ 644 0402 0A43     		orrs	r2, r2, r1
+ 645 0404 1A61     		str	r2, [r3, #16]
+ 411:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   FLASH->CR &= SECTOR_MASK;
+ 646              		.loc 1 411 0
+ 647 0406 4FF47053 		mov	r3, #15360
+ 648 040a C4F20203 		movt	r3, 16386
+ 649 040e 4FF47052 		mov	r2, #15360
+ 650 0412 C4F20202 		movt	r2, 16386
+ 651 0416 1269     		ldr	r2, [r2, #16]
+ 652 0418 22F0F802 		bic	r2, r2, #248
+ 653 041c 1A61     		str	r2, [r3, #16]
+ 412:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   FLASH->CR |= FLASH_CR_SER | (Sector << POSITION_VAL(FLASH_CR_SNB));
+ 654              		.loc 1 412 0
+ 655 041e 4FF47053 		mov	r3, #15360
+ 656 0422 C4F20203 		movt	r3, 16386
+ 657 0426 4FF47052 		mov	r2, #15360
+ 658 042a C4F20202 		movt	r2, 16386
+ 659 042e 1169     		ldr	r1, [r2, #16]
+ 660 0430 F822     		movs	r2, #248
+ 661 0432 BA61     		str	r2, [r7, #24]
+ 662              	.LBB6:
+ 663              	.LBB7:
+ 664              		.file 2 "D:\\workspace\\console800480\\system/core_cmInstr.h"
+   1:D:\workspace\console800480\system\core_cmInstr.h **** /**************************************************************************//**
+   2:D:\workspace\console800480\system\core_cmInstr.h ****  * @file     core_cmInstr.h
+   3:D:\workspace\console800480\system\core_cmInstr.h ****  * @brief    CMSIS Cortex-M Core Instruction Access Header File
+   4:D:\workspace\console800480\system\core_cmInstr.h ****  * @version  V2.10
+   5:D:\workspace\console800480\system\core_cmInstr.h ****  * @date     19. July 2011
+   6:D:\workspace\console800480\system\core_cmInstr.h ****  *
+   7:D:\workspace\console800480\system\core_cmInstr.h ****  * @note
+   8:D:\workspace\console800480\system\core_cmInstr.h ****  * Copyright (C) 2009-2011 ARM Limited. All rights reserved.
+   9:D:\workspace\console800480\system\core_cmInstr.h ****  *
+  10:D:\workspace\console800480\system\core_cmInstr.h ****  * @par
+  11:D:\workspace\console800480\system\core_cmInstr.h ****  * ARM Limited (ARM) is supplying this software for use with Cortex-M 
+  12:D:\workspace\console800480\system\core_cmInstr.h ****  * processor based microcontrollers.  This file can be freely distributed 
+  13:D:\workspace\console800480\system\core_cmInstr.h ****  * within development tools that are supporting such ARM based processors. 
+  14:D:\workspace\console800480\system\core_cmInstr.h ****  *
+  15:D:\workspace\console800480\system\core_cmInstr.h ****  * @par
+  16:D:\workspace\console800480\system\core_cmInstr.h ****  * THIS SOFTWARE IS PROVIDED "AS IS".  NO WARRANTIES, WHETHER EXPRESS, IMPLIED
+  17:D:\workspace\console800480\system\core_cmInstr.h ****  * OR STATUTORY, INCLUDING, BUT NOT LIMITED TO, IMPLIED WARRANTIES OF
+  18:D:\workspace\console800480\system\core_cmInstr.h ****  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE APPLY TO THIS SOFTWARE.
+  19:D:\workspace\console800480\system\core_cmInstr.h ****  * ARM SHALL NOT, IN ANY CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL, OR
+  20:D:\workspace\console800480\system\core_cmInstr.h ****  * CONSEQUENTIAL DAMAGES, FOR ANY REASON WHATSOEVER.
+  21:D:\workspace\console800480\system\core_cmInstr.h ****  *
+  22:D:\workspace\console800480\system\core_cmInstr.h ****  ******************************************************************************/
+  23:D:\workspace\console800480\system\core_cmInstr.h **** 
+  24:D:\workspace\console800480\system\core_cmInstr.h **** #ifndef __CORE_CMINSTR_H
+  25:D:\workspace\console800480\system\core_cmInstr.h **** #define __CORE_CMINSTR_H
+  26:D:\workspace\console800480\system\core_cmInstr.h **** 
+  27:D:\workspace\console800480\system\core_cmInstr.h **** 
+  28:D:\workspace\console800480\system\core_cmInstr.h **** /* ##########################  Core Instruction Access  ######################### */
+  29:D:\workspace\console800480\system\core_cmInstr.h **** /** \defgroup CMSIS_Core_InstructionInterface CMSIS Core Instruction Interface
+  30:D:\workspace\console800480\system\core_cmInstr.h ****   Access to dedicated instructions
+  31:D:\workspace\console800480\system\core_cmInstr.h ****   @{
+  32:D:\workspace\console800480\system\core_cmInstr.h **** */
+  33:D:\workspace\console800480\system\core_cmInstr.h **** 
+  34:D:\workspace\console800480\system\core_cmInstr.h **** #if   defined ( __CC_ARM ) /*------------------RealView Compiler -----------------*/
+  35:D:\workspace\console800480\system\core_cmInstr.h **** /* ARM armcc specific functions */
+  36:D:\workspace\console800480\system\core_cmInstr.h **** 
+  37:D:\workspace\console800480\system\core_cmInstr.h **** #if (__ARMCC_VERSION < 400677)
+  38:D:\workspace\console800480\system\core_cmInstr.h ****   #error "Please use ARM Compiler Toolchain V4.0.677 or later!"
+  39:D:\workspace\console800480\system\core_cmInstr.h **** #endif
+  40:D:\workspace\console800480\system\core_cmInstr.h **** 
+  41:D:\workspace\console800480\system\core_cmInstr.h **** 
+  42:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  No Operation
+  43:D:\workspace\console800480\system\core_cmInstr.h **** 
+  44:D:\workspace\console800480\system\core_cmInstr.h ****     No Operation does nothing. This instruction can be used for code alignment purposes.
+  45:D:\workspace\console800480\system\core_cmInstr.h ****  */
+  46:D:\workspace\console800480\system\core_cmInstr.h **** #define __NOP                             __nop
+  47:D:\workspace\console800480\system\core_cmInstr.h **** 
+  48:D:\workspace\console800480\system\core_cmInstr.h **** 
+  49:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  Wait For Interrupt
+  50:D:\workspace\console800480\system\core_cmInstr.h **** 
+  51:D:\workspace\console800480\system\core_cmInstr.h ****     Wait For Interrupt is a hint instruction that suspends execution
+  52:D:\workspace\console800480\system\core_cmInstr.h ****     until one of a number of events occurs.
+  53:D:\workspace\console800480\system\core_cmInstr.h ****  */
+  54:D:\workspace\console800480\system\core_cmInstr.h **** #define __WFI                             __wfi
+  55:D:\workspace\console800480\system\core_cmInstr.h **** 
+  56:D:\workspace\console800480\system\core_cmInstr.h **** 
+  57:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  Wait For Event
+  58:D:\workspace\console800480\system\core_cmInstr.h **** 
+  59:D:\workspace\console800480\system\core_cmInstr.h ****     Wait For Event is a hint instruction that permits the processor to enter
+  60:D:\workspace\console800480\system\core_cmInstr.h ****     a low-power state until one of a number of events occurs.
+  61:D:\workspace\console800480\system\core_cmInstr.h ****  */
+  62:D:\workspace\console800480\system\core_cmInstr.h **** #define __WFE                             __wfe
+  63:D:\workspace\console800480\system\core_cmInstr.h **** 
+  64:D:\workspace\console800480\system\core_cmInstr.h **** 
+  65:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  Send Event
+  66:D:\workspace\console800480\system\core_cmInstr.h **** 
+  67:D:\workspace\console800480\system\core_cmInstr.h ****     Send Event is a hint instruction. It causes an event to be signaled to the CPU.
+  68:D:\workspace\console800480\system\core_cmInstr.h ****  */
+  69:D:\workspace\console800480\system\core_cmInstr.h **** #define __SEV                             __sev
+  70:D:\workspace\console800480\system\core_cmInstr.h **** 
+  71:D:\workspace\console800480\system\core_cmInstr.h **** 
+  72:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  Instruction Synchronization Barrier
+  73:D:\workspace\console800480\system\core_cmInstr.h **** 
+  74:D:\workspace\console800480\system\core_cmInstr.h ****     Instruction Synchronization Barrier flushes the pipeline in the processor, 
+  75:D:\workspace\console800480\system\core_cmInstr.h ****     so that all instructions following the ISB are fetched from cache or 
+  76:D:\workspace\console800480\system\core_cmInstr.h ****     memory, after the instruction has been completed.
+  77:D:\workspace\console800480\system\core_cmInstr.h ****  */
+  78:D:\workspace\console800480\system\core_cmInstr.h **** #define __ISB()                           __isb(0xF)
+  79:D:\workspace\console800480\system\core_cmInstr.h **** 
+  80:D:\workspace\console800480\system\core_cmInstr.h **** 
+  81:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  Data Synchronization Barrier
+  82:D:\workspace\console800480\system\core_cmInstr.h **** 
+  83:D:\workspace\console800480\system\core_cmInstr.h ****     This function acts as a special kind of Data Memory Barrier. 
+  84:D:\workspace\console800480\system\core_cmInstr.h ****     It completes when all explicit memory accesses before this instruction complete.
+  85:D:\workspace\console800480\system\core_cmInstr.h ****  */
+  86:D:\workspace\console800480\system\core_cmInstr.h **** #define __DSB()                           __dsb(0xF)
+  87:D:\workspace\console800480\system\core_cmInstr.h **** 
+  88:D:\workspace\console800480\system\core_cmInstr.h **** 
+  89:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  Data Memory Barrier
+  90:D:\workspace\console800480\system\core_cmInstr.h **** 
+  91:D:\workspace\console800480\system\core_cmInstr.h ****     This function ensures the apparent order of the explicit memory operations before 
+  92:D:\workspace\console800480\system\core_cmInstr.h ****     and after the instruction, without ensuring their completion.
+  93:D:\workspace\console800480\system\core_cmInstr.h ****  */
+  94:D:\workspace\console800480\system\core_cmInstr.h **** #define __DMB()                           __dmb(0xF)
+  95:D:\workspace\console800480\system\core_cmInstr.h **** 
+  96:D:\workspace\console800480\system\core_cmInstr.h **** 
+  97:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  Reverse byte order (32 bit)
+  98:D:\workspace\console800480\system\core_cmInstr.h **** 
+  99:D:\workspace\console800480\system\core_cmInstr.h ****     This function reverses the byte order in integer value.
+ 100:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 101:D:\workspace\console800480\system\core_cmInstr.h ****     \param [in]    value  Value to reverse
+ 102:D:\workspace\console800480\system\core_cmInstr.h ****     \return               Reversed value
+ 103:D:\workspace\console800480\system\core_cmInstr.h ****  */
+ 104:D:\workspace\console800480\system\core_cmInstr.h **** #define __REV                             __rev
+ 105:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 106:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 107:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  Reverse byte order (16 bit)
+ 108:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 109:D:\workspace\console800480\system\core_cmInstr.h ****     This function reverses the byte order in two unsigned short values.
+ 110:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 111:D:\workspace\console800480\system\core_cmInstr.h ****     \param [in]    value  Value to reverse
+ 112:D:\workspace\console800480\system\core_cmInstr.h ****     \return               Reversed value
+ 113:D:\workspace\console800480\system\core_cmInstr.h ****  */
+ 114:D:\workspace\console800480\system\core_cmInstr.h **** static __INLINE __ASM uint32_t __REV16(uint32_t value)
+ 115:D:\workspace\console800480\system\core_cmInstr.h **** {
+ 116:D:\workspace\console800480\system\core_cmInstr.h ****   rev16 r0, r0
+ 117:D:\workspace\console800480\system\core_cmInstr.h ****   bx lr
+ 118:D:\workspace\console800480\system\core_cmInstr.h **** }
+ 119:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 120:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 121:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  Reverse byte order in signed short value
+ 122:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 123:D:\workspace\console800480\system\core_cmInstr.h ****     This function reverses the byte order in a signed short value with sign extension to integer.
+ 124:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 125:D:\workspace\console800480\system\core_cmInstr.h ****     \param [in]    value  Value to reverse
+ 126:D:\workspace\console800480\system\core_cmInstr.h ****     \return               Reversed value
+ 127:D:\workspace\console800480\system\core_cmInstr.h ****  */
+ 128:D:\workspace\console800480\system\core_cmInstr.h **** static __INLINE __ASM int32_t __REVSH(int32_t value)
+ 129:D:\workspace\console800480\system\core_cmInstr.h **** {
+ 130:D:\workspace\console800480\system\core_cmInstr.h ****   revsh r0, r0
+ 131:D:\workspace\console800480\system\core_cmInstr.h ****   bx lr
+ 132:D:\workspace\console800480\system\core_cmInstr.h **** }
+ 133:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 134:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 135:D:\workspace\console800480\system\core_cmInstr.h **** #if       (__CORTEX_M >= 0x03)
+ 136:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 137:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  Reverse bit order of value
+ 138:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 139:D:\workspace\console800480\system\core_cmInstr.h ****     This function reverses the bit order of the given value.
+ 140:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 141:D:\workspace\console800480\system\core_cmInstr.h ****     \param [in]    value  Value to reverse
+ 142:D:\workspace\console800480\system\core_cmInstr.h ****     \return               Reversed value
+ 143:D:\workspace\console800480\system\core_cmInstr.h ****  */
+ 144:D:\workspace\console800480\system\core_cmInstr.h **** #define __RBIT                            __rbit
+ 145:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 146:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 147:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  LDR Exclusive (8 bit)
+ 148:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 149:D:\workspace\console800480\system\core_cmInstr.h ****     This function performs a exclusive LDR command for 8 bit value.
+ 150:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 151:D:\workspace\console800480\system\core_cmInstr.h ****     \param [in]    ptr  Pointer to data
+ 152:D:\workspace\console800480\system\core_cmInstr.h ****     \return             value of type uint8_t at (*ptr)
+ 153:D:\workspace\console800480\system\core_cmInstr.h ****  */
+ 154:D:\workspace\console800480\system\core_cmInstr.h **** #define __LDREXB(ptr)                     ((uint8_t ) __ldrex(ptr))
+ 155:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 156:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 157:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  LDR Exclusive (16 bit)
+ 158:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 159:D:\workspace\console800480\system\core_cmInstr.h ****     This function performs a exclusive LDR command for 16 bit values.
+ 160:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 161:D:\workspace\console800480\system\core_cmInstr.h ****     \param [in]    ptr  Pointer to data
+ 162:D:\workspace\console800480\system\core_cmInstr.h ****     \return        value of type uint16_t at (*ptr)
+ 163:D:\workspace\console800480\system\core_cmInstr.h ****  */
+ 164:D:\workspace\console800480\system\core_cmInstr.h **** #define __LDREXH(ptr)                     ((uint16_t) __ldrex(ptr))
+ 165:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 166:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 167:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  LDR Exclusive (32 bit)
+ 168:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 169:D:\workspace\console800480\system\core_cmInstr.h ****     This function performs a exclusive LDR command for 32 bit values.
+ 170:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 171:D:\workspace\console800480\system\core_cmInstr.h ****     \param [in]    ptr  Pointer to data
+ 172:D:\workspace\console800480\system\core_cmInstr.h ****     \return        value of type uint32_t at (*ptr)
+ 173:D:\workspace\console800480\system\core_cmInstr.h ****  */
+ 174:D:\workspace\console800480\system\core_cmInstr.h **** #define __LDREXW(ptr)                     ((uint32_t ) __ldrex(ptr))
+ 175:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 176:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 177:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  STR Exclusive (8 bit)
+ 178:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 179:D:\workspace\console800480\system\core_cmInstr.h ****     This function performs a exclusive STR command for 8 bit values.
+ 180:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 181:D:\workspace\console800480\system\core_cmInstr.h ****     \param [in]  value  Value to store
+ 182:D:\workspace\console800480\system\core_cmInstr.h ****     \param [in]    ptr  Pointer to location
+ 183:D:\workspace\console800480\system\core_cmInstr.h ****     \return          0  Function succeeded
+ 184:D:\workspace\console800480\system\core_cmInstr.h ****     \return          1  Function failed
+ 185:D:\workspace\console800480\system\core_cmInstr.h ****  */
+ 186:D:\workspace\console800480\system\core_cmInstr.h **** #define __STREXB(value, ptr)              __strex(value, ptr)
+ 187:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 188:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 189:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  STR Exclusive (16 bit)
+ 190:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 191:D:\workspace\console800480\system\core_cmInstr.h ****     This function performs a exclusive STR command for 16 bit values.
+ 192:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 193:D:\workspace\console800480\system\core_cmInstr.h ****     \param [in]  value  Value to store
+ 194:D:\workspace\console800480\system\core_cmInstr.h ****     \param [in]    ptr  Pointer to location
+ 195:D:\workspace\console800480\system\core_cmInstr.h ****     \return          0  Function succeeded
+ 196:D:\workspace\console800480\system\core_cmInstr.h ****     \return          1  Function failed
+ 197:D:\workspace\console800480\system\core_cmInstr.h ****  */
+ 198:D:\workspace\console800480\system\core_cmInstr.h **** #define __STREXH(value, ptr)              __strex(value, ptr)
+ 199:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 200:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 201:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  STR Exclusive (32 bit)
+ 202:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 203:D:\workspace\console800480\system\core_cmInstr.h ****     This function performs a exclusive STR command for 32 bit values.
+ 204:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 205:D:\workspace\console800480\system\core_cmInstr.h ****     \param [in]  value  Value to store
+ 206:D:\workspace\console800480\system\core_cmInstr.h ****     \param [in]    ptr  Pointer to location
+ 207:D:\workspace\console800480\system\core_cmInstr.h ****     \return          0  Function succeeded
+ 208:D:\workspace\console800480\system\core_cmInstr.h ****     \return          1  Function failed
+ 209:D:\workspace\console800480\system\core_cmInstr.h ****  */
+ 210:D:\workspace\console800480\system\core_cmInstr.h **** #define __STREXW(value, ptr)              __strex(value, ptr)
+ 211:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 212:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 213:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  Remove the exclusive lock
+ 214:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 215:D:\workspace\console800480\system\core_cmInstr.h ****     This function removes the exclusive lock which is created by LDREX.
+ 216:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 217:D:\workspace\console800480\system\core_cmInstr.h ****  */
+ 218:D:\workspace\console800480\system\core_cmInstr.h **** #define __CLREX                           __clrex
+ 219:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 220:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 221:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  Signed Saturate
+ 222:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 223:D:\workspace\console800480\system\core_cmInstr.h ****     This function saturates a signed value.
+ 224:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 225:D:\workspace\console800480\system\core_cmInstr.h ****     \param [in]  value  Value to be saturated
+ 226:D:\workspace\console800480\system\core_cmInstr.h ****     \param [in]    sat  Bit position to saturate to (1..32)
+ 227:D:\workspace\console800480\system\core_cmInstr.h ****     \return             Saturated value
+ 228:D:\workspace\console800480\system\core_cmInstr.h ****  */
+ 229:D:\workspace\console800480\system\core_cmInstr.h **** #define __SSAT                            __ssat
+ 230:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 231:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 232:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  Unsigned Saturate
+ 233:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 234:D:\workspace\console800480\system\core_cmInstr.h ****     This function saturates an unsigned value.
+ 235:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 236:D:\workspace\console800480\system\core_cmInstr.h ****     \param [in]  value  Value to be saturated
+ 237:D:\workspace\console800480\system\core_cmInstr.h ****     \param [in]    sat  Bit position to saturate to (0..31)
+ 238:D:\workspace\console800480\system\core_cmInstr.h ****     \return             Saturated value
+ 239:D:\workspace\console800480\system\core_cmInstr.h ****  */
+ 240:D:\workspace\console800480\system\core_cmInstr.h **** #define __USAT                            __usat
+ 241:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 242:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 243:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  Count leading zeros
+ 244:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 245:D:\workspace\console800480\system\core_cmInstr.h ****     This function counts the number of leading zeros of a data value.
+ 246:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 247:D:\workspace\console800480\system\core_cmInstr.h ****     \param [in]  value  Value to count the leading zeros
+ 248:D:\workspace\console800480\system\core_cmInstr.h ****     \return             number of leading zeros in value
+ 249:D:\workspace\console800480\system\core_cmInstr.h ****  */
+ 250:D:\workspace\console800480\system\core_cmInstr.h **** #define __CLZ                             __clz 
+ 251:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 252:D:\workspace\console800480\system\core_cmInstr.h **** #endif /* (__CORTEX_M >= 0x03) */
+ 253:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 254:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 255:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 256:D:\workspace\console800480\system\core_cmInstr.h **** #elif defined ( __ICCARM__ ) /*------------------ ICC Compiler -------------------*/
+ 257:D:\workspace\console800480\system\core_cmInstr.h **** /* IAR iccarm specific functions */
+ 258:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 259:D:\workspace\console800480\system\core_cmInstr.h **** #include <cmsis_iar.h>
+ 260:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 261:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 262:D:\workspace\console800480\system\core_cmInstr.h **** #elif defined ( __GNUC__ ) /*------------------ GNU Compiler ---------------------*/
+ 263:D:\workspace\console800480\system\core_cmInstr.h **** /* GNU gcc specific functions */
+ 264:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 265:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  No Operation
+ 266:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 267:D:\workspace\console800480\system\core_cmInstr.h ****     No Operation does nothing. This instruction can be used for code alignment purposes.
+ 268:D:\workspace\console800480\system\core_cmInstr.h ****  */
+ 269:D:\workspace\console800480\system\core_cmInstr.h **** __attribute__( ( always_inline ) ) static __INLINE void __NOP(void)
+ 270:D:\workspace\console800480\system\core_cmInstr.h **** {
+ 271:D:\workspace\console800480\system\core_cmInstr.h ****   __ASM volatile ("nop");
+ 272:D:\workspace\console800480\system\core_cmInstr.h **** }
+ 273:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 274:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 275:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  Wait For Interrupt
+ 276:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 277:D:\workspace\console800480\system\core_cmInstr.h ****     Wait For Interrupt is a hint instruction that suspends execution
+ 278:D:\workspace\console800480\system\core_cmInstr.h ****     until one of a number of events occurs.
+ 279:D:\workspace\console800480\system\core_cmInstr.h ****  */
+ 280:D:\workspace\console800480\system\core_cmInstr.h **** __attribute__( ( always_inline ) ) static __INLINE void __WFI(void)
+ 281:D:\workspace\console800480\system\core_cmInstr.h **** {
+ 282:D:\workspace\console800480\system\core_cmInstr.h ****   __ASM volatile ("wfi");
+ 283:D:\workspace\console800480\system\core_cmInstr.h **** }
+ 284:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 285:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 286:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  Wait For Event
+ 287:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 288:D:\workspace\console800480\system\core_cmInstr.h ****     Wait For Event is a hint instruction that permits the processor to enter
+ 289:D:\workspace\console800480\system\core_cmInstr.h ****     a low-power state until one of a number of events occurs.
+ 290:D:\workspace\console800480\system\core_cmInstr.h ****  */
+ 291:D:\workspace\console800480\system\core_cmInstr.h **** __attribute__( ( always_inline ) ) static __INLINE void __WFE(void)
+ 292:D:\workspace\console800480\system\core_cmInstr.h **** {
+ 293:D:\workspace\console800480\system\core_cmInstr.h ****   __ASM volatile ("wfe");
+ 294:D:\workspace\console800480\system\core_cmInstr.h **** }
+ 295:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 296:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 297:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  Send Event
+ 298:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 299:D:\workspace\console800480\system\core_cmInstr.h ****     Send Event is a hint instruction. It causes an event to be signaled to the CPU.
+ 300:D:\workspace\console800480\system\core_cmInstr.h ****  */
+ 301:D:\workspace\console800480\system\core_cmInstr.h **** __attribute__( ( always_inline ) ) static __INLINE void __SEV(void)
+ 302:D:\workspace\console800480\system\core_cmInstr.h **** {
+ 303:D:\workspace\console800480\system\core_cmInstr.h ****   __ASM volatile ("sev");
+ 304:D:\workspace\console800480\system\core_cmInstr.h **** }
+ 305:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 306:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 307:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  Instruction Synchronization Barrier
+ 308:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 309:D:\workspace\console800480\system\core_cmInstr.h ****     Instruction Synchronization Barrier flushes the pipeline in the processor, 
+ 310:D:\workspace\console800480\system\core_cmInstr.h ****     so that all instructions following the ISB are fetched from cache or 
+ 311:D:\workspace\console800480\system\core_cmInstr.h ****     memory, after the instruction has been completed.
+ 312:D:\workspace\console800480\system\core_cmInstr.h ****  */
+ 313:D:\workspace\console800480\system\core_cmInstr.h **** __attribute__( ( always_inline ) ) static __INLINE void __ISB(void)
+ 314:D:\workspace\console800480\system\core_cmInstr.h **** {
+ 315:D:\workspace\console800480\system\core_cmInstr.h ****   __ASM volatile ("isb");
+ 316:D:\workspace\console800480\system\core_cmInstr.h **** }
+ 317:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 318:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 319:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  Data Synchronization Barrier
+ 320:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 321:D:\workspace\console800480\system\core_cmInstr.h ****     This function acts as a special kind of Data Memory Barrier. 
+ 322:D:\workspace\console800480\system\core_cmInstr.h ****     It completes when all explicit memory accesses before this instruction complete.
+ 323:D:\workspace\console800480\system\core_cmInstr.h ****  */
+ 324:D:\workspace\console800480\system\core_cmInstr.h **** __attribute__( ( always_inline ) ) static __INLINE void __DSB(void)
+ 325:D:\workspace\console800480\system\core_cmInstr.h **** {
+ 326:D:\workspace\console800480\system\core_cmInstr.h ****   __ASM volatile ("dsb");
+ 327:D:\workspace\console800480\system\core_cmInstr.h **** }
+ 328:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 329:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 330:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  Data Memory Barrier
+ 331:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 332:D:\workspace\console800480\system\core_cmInstr.h ****     This function ensures the apparent order of the explicit memory operations before 
+ 333:D:\workspace\console800480\system\core_cmInstr.h ****     and after the instruction, without ensuring their completion.
+ 334:D:\workspace\console800480\system\core_cmInstr.h ****  */
+ 335:D:\workspace\console800480\system\core_cmInstr.h **** __attribute__( ( always_inline ) ) static __INLINE void __DMB(void)
+ 336:D:\workspace\console800480\system\core_cmInstr.h **** {
+ 337:D:\workspace\console800480\system\core_cmInstr.h ****   __ASM volatile ("dmb");
+ 338:D:\workspace\console800480\system\core_cmInstr.h **** }
+ 339:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 340:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 341:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  Reverse byte order (32 bit)
+ 342:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 343:D:\workspace\console800480\system\core_cmInstr.h ****     This function reverses the byte order in integer value.
+ 344:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 345:D:\workspace\console800480\system\core_cmInstr.h ****     \param [in]    value  Value to reverse
+ 346:D:\workspace\console800480\system\core_cmInstr.h ****     \return               Reversed value
+ 347:D:\workspace\console800480\system\core_cmInstr.h ****  */
+ 348:D:\workspace\console800480\system\core_cmInstr.h **** __attribute__( ( always_inline ) ) static __INLINE uint32_t __REV(uint32_t value)
+ 349:D:\workspace\console800480\system\core_cmInstr.h **** {
+ 350:D:\workspace\console800480\system\core_cmInstr.h ****   uint32_t result;
+ 351:D:\workspace\console800480\system\core_cmInstr.h ****   
+ 352:D:\workspace\console800480\system\core_cmInstr.h ****   __ASM volatile ("rev %0, %1" : "=r" (result) : "r" (value) );
+ 353:D:\workspace\console800480\system\core_cmInstr.h ****   return(result);
+ 354:D:\workspace\console800480\system\core_cmInstr.h **** }
+ 355:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 356:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 357:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  Reverse byte order (16 bit)
+ 358:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 359:D:\workspace\console800480\system\core_cmInstr.h ****     This function reverses the byte order in two unsigned short values.
+ 360:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 361:D:\workspace\console800480\system\core_cmInstr.h ****     \param [in]    value  Value to reverse
+ 362:D:\workspace\console800480\system\core_cmInstr.h ****     \return               Reversed value
+ 363:D:\workspace\console800480\system\core_cmInstr.h ****  */
+ 364:D:\workspace\console800480\system\core_cmInstr.h **** __attribute__( ( always_inline ) ) static __INLINE uint32_t __REV16(uint32_t value)
+ 365:D:\workspace\console800480\system\core_cmInstr.h **** {
+ 366:D:\workspace\console800480\system\core_cmInstr.h ****   uint32_t result;
+ 367:D:\workspace\console800480\system\core_cmInstr.h ****   
+ 368:D:\workspace\console800480\system\core_cmInstr.h ****   __ASM volatile ("rev16 %0, %1" : "=r" (result) : "r" (value) );
+ 369:D:\workspace\console800480\system\core_cmInstr.h ****   return(result);
+ 370:D:\workspace\console800480\system\core_cmInstr.h **** }
+ 371:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 372:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 373:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  Reverse byte order in signed short value
+ 374:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 375:D:\workspace\console800480\system\core_cmInstr.h ****     This function reverses the byte order in a signed short value with sign extension to integer.
+ 376:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 377:D:\workspace\console800480\system\core_cmInstr.h ****     \param [in]    value  Value to reverse
+ 378:D:\workspace\console800480\system\core_cmInstr.h ****     \return               Reversed value
+ 379:D:\workspace\console800480\system\core_cmInstr.h ****  */
+ 380:D:\workspace\console800480\system\core_cmInstr.h **** __attribute__( ( always_inline ) ) static __INLINE int32_t __REVSH(int32_t value)
+ 381:D:\workspace\console800480\system\core_cmInstr.h **** {
+ 382:D:\workspace\console800480\system\core_cmInstr.h ****   uint32_t result;
+ 383:D:\workspace\console800480\system\core_cmInstr.h ****   
+ 384:D:\workspace\console800480\system\core_cmInstr.h ****   __ASM volatile ("revsh %0, %1" : "=r" (result) : "r" (value) );
+ 385:D:\workspace\console800480\system\core_cmInstr.h ****   return(result);
+ 386:D:\workspace\console800480\system\core_cmInstr.h **** }
+ 387:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 388:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 389:D:\workspace\console800480\system\core_cmInstr.h **** #if       (__CORTEX_M >= 0x03)
+ 390:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 391:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  Reverse bit order of value
+ 392:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 393:D:\workspace\console800480\system\core_cmInstr.h ****     This function reverses the bit order of the given value.
+ 394:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 395:D:\workspace\console800480\system\core_cmInstr.h ****     \param [in]    value  Value to reverse
+ 396:D:\workspace\console800480\system\core_cmInstr.h ****     \return               Reversed value
+ 397:D:\workspace\console800480\system\core_cmInstr.h ****  */
+ 398:D:\workspace\console800480\system\core_cmInstr.h **** __attribute__( ( always_inline ) ) static __INLINE uint32_t __RBIT(uint32_t value)
+ 399:D:\workspace\console800480\system\core_cmInstr.h **** {
+ 400:D:\workspace\console800480\system\core_cmInstr.h ****   uint32_t result;
+ 401:D:\workspace\console800480\system\core_cmInstr.h ****   
+ 402:D:\workspace\console800480\system\core_cmInstr.h ****    __ASM volatile ("rbit %0, %1" : "=r" (result) : "r" (value) );
+ 665              		.loc 2 402 0
+ 666 0434 BA69     		ldr	r2, [r7, #24]
+ 667              	@ 402 "D:\workspace\console800480\system/core_cmInstr.h" 1
+ 668 0436 92FAA2F2 		rbit r2, r2
+ 669              	@ 0 "" 2
+ 670              		.thumb
+ 671 043a 7A61     		str	r2, [r7, #20]
+ 403:D:\workspace\console800480\system\core_cmInstr.h ****    return(result);
+ 672              		.loc 2 403 0
+ 673 043c 7A69     		ldr	r2, [r7, #20]
+ 674 043e 3A61     		str	r2, [r7, #16]
+ 675              	.LBE7:
+ 676              	.LBE6:
+ 677              	.LBB8:
+ 678              	.LBB9:
+ 404:D:\workspace\console800480\system\core_cmInstr.h **** }
+ 405:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 406:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 407:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  LDR Exclusive (8 bit)
+ 408:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 409:D:\workspace\console800480\system\core_cmInstr.h ****     This function performs a exclusive LDR command for 8 bit value.
+ 410:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 411:D:\workspace\console800480\system\core_cmInstr.h ****     \param [in]    ptr  Pointer to data
+ 412:D:\workspace\console800480\system\core_cmInstr.h ****     \return             value of type uint8_t at (*ptr)
+ 413:D:\workspace\console800480\system\core_cmInstr.h ****  */
+ 414:D:\workspace\console800480\system\core_cmInstr.h **** __attribute__( ( always_inline ) ) static __INLINE uint8_t __LDREXB(volatile uint8_t *addr)
+ 415:D:\workspace\console800480\system\core_cmInstr.h **** {
+ 416:D:\workspace\console800480\system\core_cmInstr.h ****     uint8_t result;
+ 417:D:\workspace\console800480\system\core_cmInstr.h ****   
+ 418:D:\workspace\console800480\system\core_cmInstr.h ****    __ASM volatile ("ldrexb %0, [%1]" : "=r" (result) : "r" (addr) );
+ 419:D:\workspace\console800480\system\core_cmInstr.h ****    return(result);
+ 420:D:\workspace\console800480\system\core_cmInstr.h **** }
+ 421:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 422:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 423:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  LDR Exclusive (16 bit)
+ 424:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 425:D:\workspace\console800480\system\core_cmInstr.h ****     This function performs a exclusive LDR command for 16 bit values.
+ 426:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 427:D:\workspace\console800480\system\core_cmInstr.h ****     \param [in]    ptr  Pointer to data
+ 428:D:\workspace\console800480\system\core_cmInstr.h ****     \return        value of type uint16_t at (*ptr)
+ 429:D:\workspace\console800480\system\core_cmInstr.h ****  */
+ 430:D:\workspace\console800480\system\core_cmInstr.h **** __attribute__( ( always_inline ) ) static __INLINE uint16_t __LDREXH(volatile uint16_t *addr)
+ 431:D:\workspace\console800480\system\core_cmInstr.h **** {
+ 432:D:\workspace\console800480\system\core_cmInstr.h ****     uint16_t result;
+ 433:D:\workspace\console800480\system\core_cmInstr.h ****   
+ 434:D:\workspace\console800480\system\core_cmInstr.h ****    __ASM volatile ("ldrexh %0, [%1]" : "=r" (result) : "r" (addr) );
+ 435:D:\workspace\console800480\system\core_cmInstr.h ****    return(result);
+ 436:D:\workspace\console800480\system\core_cmInstr.h **** }
+ 437:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 438:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 439:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  LDR Exclusive (32 bit)
+ 440:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 441:D:\workspace\console800480\system\core_cmInstr.h ****     This function performs a exclusive LDR command for 32 bit values.
+ 442:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 443:D:\workspace\console800480\system\core_cmInstr.h ****     \param [in]    ptr  Pointer to data
+ 444:D:\workspace\console800480\system\core_cmInstr.h ****     \return        value of type uint32_t at (*ptr)
+ 445:D:\workspace\console800480\system\core_cmInstr.h ****  */
+ 446:D:\workspace\console800480\system\core_cmInstr.h **** __attribute__( ( always_inline ) ) static __INLINE uint32_t __LDREXW(volatile uint32_t *addr)
+ 447:D:\workspace\console800480\system\core_cmInstr.h **** {
+ 448:D:\workspace\console800480\system\core_cmInstr.h ****     uint32_t result;
+ 449:D:\workspace\console800480\system\core_cmInstr.h ****   
+ 450:D:\workspace\console800480\system\core_cmInstr.h ****    __ASM volatile ("ldrex %0, [%1]" : "=r" (result) : "r" (addr) );
+ 451:D:\workspace\console800480\system\core_cmInstr.h ****    return(result);
+ 452:D:\workspace\console800480\system\core_cmInstr.h **** }
+ 453:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 454:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 455:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  STR Exclusive (8 bit)
+ 456:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 457:D:\workspace\console800480\system\core_cmInstr.h ****     This function performs a exclusive STR command for 8 bit values.
+ 458:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 459:D:\workspace\console800480\system\core_cmInstr.h ****     \param [in]  value  Value to store
+ 460:D:\workspace\console800480\system\core_cmInstr.h ****     \param [in]    ptr  Pointer to location
+ 461:D:\workspace\console800480\system\core_cmInstr.h ****     \return          0  Function succeeded
+ 462:D:\workspace\console800480\system\core_cmInstr.h ****     \return          1  Function failed
+ 463:D:\workspace\console800480\system\core_cmInstr.h ****  */
+ 464:D:\workspace\console800480\system\core_cmInstr.h **** __attribute__( ( always_inline ) ) static __INLINE uint32_t __STREXB(uint8_t value, volatile uint8_
+ 465:D:\workspace\console800480\system\core_cmInstr.h **** {
+ 466:D:\workspace\console800480\system\core_cmInstr.h ****    uint32_t result;
+ 467:D:\workspace\console800480\system\core_cmInstr.h ****   
+ 468:D:\workspace\console800480\system\core_cmInstr.h ****    __ASM volatile ("strexb %0, %2, [%1]" : "=r" (result) : "r" (addr), "r" (value) );
+ 469:D:\workspace\console800480\system\core_cmInstr.h ****    return(result);
+ 470:D:\workspace\console800480\system\core_cmInstr.h **** }
+ 471:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 472:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 473:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  STR Exclusive (16 bit)
+ 474:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 475:D:\workspace\console800480\system\core_cmInstr.h ****     This function performs a exclusive STR command for 16 bit values.
+ 476:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 477:D:\workspace\console800480\system\core_cmInstr.h ****     \param [in]  value  Value to store
+ 478:D:\workspace\console800480\system\core_cmInstr.h ****     \param [in]    ptr  Pointer to location
+ 479:D:\workspace\console800480\system\core_cmInstr.h ****     \return          0  Function succeeded
+ 480:D:\workspace\console800480\system\core_cmInstr.h ****     \return          1  Function failed
+ 481:D:\workspace\console800480\system\core_cmInstr.h ****  */
+ 482:D:\workspace\console800480\system\core_cmInstr.h **** __attribute__( ( always_inline ) ) static __INLINE uint32_t __STREXH(uint16_t value, volatile uint1
+ 483:D:\workspace\console800480\system\core_cmInstr.h **** {
+ 484:D:\workspace\console800480\system\core_cmInstr.h ****    uint32_t result;
+ 485:D:\workspace\console800480\system\core_cmInstr.h ****   
+ 486:D:\workspace\console800480\system\core_cmInstr.h ****    __ASM volatile ("strexh %0, %2, [%1]" : "=r" (result) : "r" (addr), "r" (value) );
+ 487:D:\workspace\console800480\system\core_cmInstr.h ****    return(result);
+ 488:D:\workspace\console800480\system\core_cmInstr.h **** }
+ 489:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 490:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 491:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  STR Exclusive (32 bit)
+ 492:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 493:D:\workspace\console800480\system\core_cmInstr.h ****     This function performs a exclusive STR command for 32 bit values.
+ 494:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 495:D:\workspace\console800480\system\core_cmInstr.h ****     \param [in]  value  Value to store
+ 496:D:\workspace\console800480\system\core_cmInstr.h ****     \param [in]    ptr  Pointer to location
+ 497:D:\workspace\console800480\system\core_cmInstr.h ****     \return          0  Function succeeded
+ 498:D:\workspace\console800480\system\core_cmInstr.h ****     \return          1  Function failed
+ 499:D:\workspace\console800480\system\core_cmInstr.h ****  */
+ 500:D:\workspace\console800480\system\core_cmInstr.h **** __attribute__( ( always_inline ) ) static __INLINE uint32_t __STREXW(uint32_t value, volatile uint3
+ 501:D:\workspace\console800480\system\core_cmInstr.h **** {
+ 502:D:\workspace\console800480\system\core_cmInstr.h ****    uint32_t result;
+ 503:D:\workspace\console800480\system\core_cmInstr.h ****   
+ 504:D:\workspace\console800480\system\core_cmInstr.h ****    __ASM volatile ("strex %0, %2, [%1]" : "=r" (result) : "r" (addr), "r" (value) );
+ 505:D:\workspace\console800480\system\core_cmInstr.h ****    return(result);
+ 506:D:\workspace\console800480\system\core_cmInstr.h **** }
+ 507:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 508:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 509:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  Remove the exclusive lock
+ 510:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 511:D:\workspace\console800480\system\core_cmInstr.h ****     This function removes the exclusive lock which is created by LDREX.
+ 512:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 513:D:\workspace\console800480\system\core_cmInstr.h ****  */
+ 514:D:\workspace\console800480\system\core_cmInstr.h **** __attribute__( ( always_inline ) ) static __INLINE void __CLREX(void)
+ 515:D:\workspace\console800480\system\core_cmInstr.h **** {
+ 516:D:\workspace\console800480\system\core_cmInstr.h ****   __ASM volatile ("clrex");
+ 517:D:\workspace\console800480\system\core_cmInstr.h **** }
+ 518:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 519:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 520:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  Signed Saturate
+ 521:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 522:D:\workspace\console800480\system\core_cmInstr.h ****     This function saturates a signed value.
+ 523:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 524:D:\workspace\console800480\system\core_cmInstr.h ****     \param [in]  value  Value to be saturated
+ 525:D:\workspace\console800480\system\core_cmInstr.h ****     \param [in]    sat  Bit position to saturate to (1..32)
+ 526:D:\workspace\console800480\system\core_cmInstr.h ****     \return             Saturated value
+ 527:D:\workspace\console800480\system\core_cmInstr.h ****  */
+ 528:D:\workspace\console800480\system\core_cmInstr.h **** #define __SSAT(ARG1,ARG2) \
+ 529:D:\workspace\console800480\system\core_cmInstr.h **** ({                          \
+ 530:D:\workspace\console800480\system\core_cmInstr.h ****   uint32_t __RES, __ARG1 = (ARG1); \
+ 531:D:\workspace\console800480\system\core_cmInstr.h ****   __ASM ("ssat %0, %1, %2" : "=r" (__RES) :  "I" (ARG2), "r" (__ARG1) ); \
+ 532:D:\workspace\console800480\system\core_cmInstr.h ****   __RES; \
+ 533:D:\workspace\console800480\system\core_cmInstr.h ****  })
+ 534:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 535:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 536:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  Unsigned Saturate
+ 537:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 538:D:\workspace\console800480\system\core_cmInstr.h ****     This function saturates an unsigned value.
+ 539:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 540:D:\workspace\console800480\system\core_cmInstr.h ****     \param [in]  value  Value to be saturated
+ 541:D:\workspace\console800480\system\core_cmInstr.h ****     \param [in]    sat  Bit position to saturate to (0..31)
+ 542:D:\workspace\console800480\system\core_cmInstr.h ****     \return             Saturated value
+ 543:D:\workspace\console800480\system\core_cmInstr.h ****  */
+ 544:D:\workspace\console800480\system\core_cmInstr.h **** #define __USAT(ARG1,ARG2) \
+ 545:D:\workspace\console800480\system\core_cmInstr.h **** ({                          \
+ 546:D:\workspace\console800480\system\core_cmInstr.h ****   uint32_t __RES, __ARG1 = (ARG1); \
+ 547:D:\workspace\console800480\system\core_cmInstr.h ****   __ASM ("usat %0, %1, %2" : "=r" (__RES) :  "I" (ARG2), "r" (__ARG1) ); \
+ 548:D:\workspace\console800480\system\core_cmInstr.h ****   __RES; \
+ 549:D:\workspace\console800480\system\core_cmInstr.h ****  })
+ 550:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 551:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 552:D:\workspace\console800480\system\core_cmInstr.h **** /** \brief  Count leading zeros
+ 553:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 554:D:\workspace\console800480\system\core_cmInstr.h ****     This function counts the number of leading zeros of a data value.
+ 555:D:\workspace\console800480\system\core_cmInstr.h **** 
+ 556:D:\workspace\console800480\system\core_cmInstr.h ****     \param [in]  value  Value to count the leading zeros
+ 557:D:\workspace\console800480\system\core_cmInstr.h ****     \return             number of leading zeros in value
+ 558:D:\workspace\console800480\system\core_cmInstr.h ****  */
+ 559:D:\workspace\console800480\system\core_cmInstr.h **** __attribute__( ( always_inline ) ) static __INLINE uint8_t __CLZ(uint32_t value)
+ 560:D:\workspace\console800480\system\core_cmInstr.h **** {
+ 561:D:\workspace\console800480\system\core_cmInstr.h ****   uint8_t result;
+ 562:D:\workspace\console800480\system\core_cmInstr.h ****   
+ 563:D:\workspace\console800480\system\core_cmInstr.h ****   __ASM volatile ("clz %0, %1" : "=r" (result) : "r" (value) );
+ 679              		.loc 2 563 0
+ 680 0440 3A69     		ldr	r2, [r7, #16]
+ 681              	@ 563 "D:\workspace\console800480\system/core_cmInstr.h" 1
+ 682 0442 B2FA82F2 		clz r2, r2
+ 683              	@ 0 "" 2
+ 684              		.thumb
+ 685 0446 FA73     		strb	r2, [r7, #15]
+ 564:D:\workspace\console800480\system\core_cmInstr.h ****   return(result);
+ 686              		.loc 2 564 0
+ 687 0448 FA7B     		ldrb	r2, [r7, #15]	@ zero_extendqisi2
+ 688              	.LBE9:
+ 689              	.LBE8:
+ 690              		.loc 1 412 0
+ 691 044a 7868     		ldr	r0, [r7, #4]
+ 692 044c 00FA02F2 		lsl	r2, r0, r2
+ 693 0450 0A43     		orrs	r2, r2, r1
+ 694 0452 42F00202 		orr	r2, r2, #2
+ 695 0456 1A61     		str	r2, [r3, #16]
+ 413:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   FLASH->CR |= FLASH_CR_STRT;
+ 696              		.loc 1 413 0
+ 697 0458 4FF47053 		mov	r3, #15360
+ 698 045c C4F20203 		movt	r3, 16386
+ 699 0460 4FF47052 		mov	r2, #15360
+ 700 0464 C4F20202 		movt	r2, 16386
+ 701 0468 1269     		ldr	r2, [r2, #16]
+ 702 046a 42F48032 		orr	r2, r2, #65536
+ 703 046e 1A61     		str	r2, [r3, #16]
+ 414:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** }
+ 704              		.loc 1 414 0
+ 705 0470 2437     		adds	r7, r7, #36
+ 706 0472 BD46     		mov	sp, r7
+ 707              		@ sp needed
+ 708 0474 5DF8047B 		ldr	r7, [sp], #4
+ 709 0478 7047     		bx	lr
+ 710              		.cfi_endproc
+ 711              	.LFE60:
+ 713 047a 00BF     		.align	2
+ 714              		.thumb
+ 715              		.thumb_func
+ 717              	FLASH_OB_EnableWRP:
+ 718              	.LFB61:
+ 415:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 416:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** /**
+ 417:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @brief  Enable the write protection of the desired sectors
+ 418:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *
+ 419:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @note   When the memory read protection level is selected (RDP level = 1), 
+ 420:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *         it is not possible to program or erase the flash sector i if CortexM3  
+ 421:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *         debug features are connected or boot code is executed in RAM, even if nWRPi = 1 
+ 422:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * 
+ 423:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @param  WRPSector: specifies the sector(s) to be write protected.
+ 424:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *         The value of this parameter depend on device used within the same series 
+ 425:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   
+ 426:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @retval HAL_StatusTypeDef HAL Status 
+ 427:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   */
+ 428:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** static HAL_StatusTypeDef FLASH_OB_EnableWRP(uint32_t WRPSector)
+ 429:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** {
+ 719              		.loc 1 429 0
+ 720              		.cfi_startproc
+ 721              		@ args = 0, pretend = 0, frame = 16
+ 722              		@ frame_needed = 1, uses_anonymous_args = 0
+ 723 047c 80B5     		push	{r7, lr}
+ 724              		.cfi_def_cfa_offset 8
+ 725              		.cfi_offset 7, -8
+ 726              		.cfi_offset 14, -4
+ 727 047e 84B0     		sub	sp, sp, #16
+ 728              		.cfi_def_cfa_offset 24
+ 729 0480 00AF     		add	r7, sp, #0
+ 730              		.cfi_def_cfa_register 7
+ 731 0482 7860     		str	r0, [r7, #4]
+ 430:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   HAL_StatusTypeDef status = HAL_OK;
+ 732              		.loc 1 430 0
+ 733 0484 0023     		movs	r3, #0
+ 734 0486 FB73     		strb	r3, [r7, #15]
+ 431:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   
+ 432:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /* Check the parameters */
+ 433:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   assert_param(IS_OB_WRP_SECTOR(WRPSector));
+ 434:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     
+ 435:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /* Wait for last operation to be completed */
+ 436:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   status = FLASH_WaitForLastOperation((uint32_t)HAL_FLASH_TIMEOUT_VALUE);
+ 735              		.loc 1 436 0
+ 736 0488 4CF25030 		movw	r0, #50000
+ 737 048c FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 738 0490 0346     		mov	r3, r0
+ 739 0492 FB73     		strb	r3, [r7, #15]
+ 437:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 438:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   if(status == HAL_OK)
+ 740              		.loc 1 438 0
+ 741 0494 FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 742 0496 002B     		cmp	r3, #0
+ 743 0498 10D1     		bne	.L33
+ 439:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   { 
+ 440:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     *(__IO uint16_t*)OPTCR_BYTE2_ADDRESS &= (~WRPSector);  
+ 744              		.loc 1 440 0
+ 745 049a 43F61643 		movw	r3, #15382
+ 746 049e C4F20203 		movt	r3, 16386
+ 747 04a2 43F61642 		movw	r2, #15382
+ 748 04a6 C4F20202 		movt	r2, 16386
+ 749 04aa 1288     		ldrh	r2, [r2]	@ movhi
+ 750 04ac 91B2     		uxth	r1, r2
+ 751 04ae 7A68     		ldr	r2, [r7, #4]
+ 752 04b0 92B2     		uxth	r2, r2
+ 753 04b2 D243     		mvns	r2, r2
+ 754 04b4 92B2     		uxth	r2, r2
+ 755 04b6 0A40     		ands	r2, r2, r1
+ 756 04b8 92B2     		uxth	r2, r2
+ 757 04ba 1A80     		strh	r2, [r3]	@ movhi
+ 758              	.L33:
+ 441:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   }
+ 442:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   
+ 443:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   return status;
+ 759              		.loc 1 443 0
+ 760 04bc FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 444:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** }
+ 761              		.loc 1 444 0
+ 762 04be 1846     		mov	r0, r3
+ 763 04c0 1037     		adds	r7, r7, #16
+ 764 04c2 BD46     		mov	sp, r7
+ 765              		@ sp needed
+ 766 04c4 80BD     		pop	{r7, pc}
+ 767              		.cfi_endproc
+ 768              	.LFE61:
+ 770 04c6 00BF     		.align	2
+ 771              		.thumb
+ 772              		.thumb_func
+ 774              	FLASH_OB_DisableWRP:
+ 775              	.LFB62:
+ 445:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 446:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** /**
+ 447:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @brief  Disable the write protection of the desired sectors
+ 448:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *
+ 449:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @note   When the memory read protection level is selected (RDP level = 1), 
+ 450:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *         it is not possible to program or erase the flash sector if CortexM3  
+ 451:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *         debug features are connected or boot code is executed in RAM, even if nWRPi = 1 
+ 452:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * 
+ 453:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @param  WRPSector: specifies the sector(s) to be write protected.
+ 454:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *         The value of this parameter depend on device used within the same series 
+ 455:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * 
+ 456:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *
+ 457:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @retval HAL_StatusTypeDef HAL Status 
+ 458:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   */
+ 459:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** static HAL_StatusTypeDef FLASH_OB_DisableWRP(uint32_t WRPSector)
+ 460:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** {
+ 776              		.loc 1 460 0
+ 777              		.cfi_startproc
+ 778              		@ args = 0, pretend = 0, frame = 16
+ 779              		@ frame_needed = 1, uses_anonymous_args = 0
+ 780 04c8 80B5     		push	{r7, lr}
+ 781              		.cfi_def_cfa_offset 8
+ 782              		.cfi_offset 7, -8
+ 783              		.cfi_offset 14, -4
+ 784 04ca 84B0     		sub	sp, sp, #16
+ 785              		.cfi_def_cfa_offset 24
+ 786 04cc 00AF     		add	r7, sp, #0
+ 787              		.cfi_def_cfa_register 7
+ 788 04ce 7860     		str	r0, [r7, #4]
+ 461:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   HAL_StatusTypeDef status = HAL_OK;
+ 789              		.loc 1 461 0
+ 790 04d0 0023     		movs	r3, #0
+ 791 04d2 FB73     		strb	r3, [r7, #15]
+ 462:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   
+ 463:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /* Check the parameters */
+ 464:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   assert_param(IS_OB_WRP_SECTOR(WRPSector));
+ 465:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     
+ 466:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /* Wait for last operation to be completed */
+ 467:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   status = FLASH_WaitForLastOperation((uint32_t)HAL_FLASH_TIMEOUT_VALUE);
+ 792              		.loc 1 467 0
+ 793 04d4 4CF25030 		movw	r0, #50000
+ 794 04d8 FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 795 04dc 0346     		mov	r3, r0
+ 796 04de FB73     		strb	r3, [r7, #15]
+ 468:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 469:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   if(status == HAL_OK)
+ 797              		.loc 1 469 0
+ 798 04e0 FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 799 04e2 002B     		cmp	r3, #0
+ 800 04e4 0ED1     		bne	.L36
+ 470:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   { 
+ 471:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     *(__IO uint16_t*)OPTCR_BYTE2_ADDRESS |= (uint16_t)WRPSector; 
+ 801              		.loc 1 471 0
+ 802 04e6 43F61643 		movw	r3, #15382
+ 803 04ea C4F20203 		movt	r3, 16386
+ 804 04ee 43F61642 		movw	r2, #15382
+ 805 04f2 C4F20202 		movt	r2, 16386
+ 806 04f6 1288     		ldrh	r2, [r2]	@ movhi
+ 807 04f8 91B2     		uxth	r1, r2
+ 808 04fa 7A68     		ldr	r2, [r7, #4]
+ 809 04fc 92B2     		uxth	r2, r2
+ 810 04fe 0A43     		orrs	r2, r2, r1
+ 811 0500 92B2     		uxth	r2, r2
+ 812 0502 1A80     		strh	r2, [r3]	@ movhi
+ 813              	.L36:
+ 472:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   }
+ 473:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   
+ 474:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   return status;
+ 814              		.loc 1 474 0
+ 815 0504 FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 475:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** }
+ 816              		.loc 1 475 0
+ 817 0506 1846     		mov	r0, r3
+ 818 0508 1037     		adds	r7, r7, #16
+ 819 050a BD46     		mov	sp, r7
+ 820              		@ sp needed
+ 821 050c 80BD     		pop	{r7, pc}
+ 822              		.cfi_endproc
+ 823              	.LFE62:
+ 825 050e 00BF     		.align	2
+ 826              		.thumb
+ 827              		.thumb_func
+ 829              	FLASH_OB_RDP_LevelConfig:
+ 830              	.LFB63:
+ 476:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 477:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** /**
+ 478:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @brief  Set the read protection level.
+ 479:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @param  Level: specifies the read protection level.
+ 480:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *          This parameter can be one of the following values:
+ 481:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *            @arg OB_RDP_LEVEL_0: No protection
+ 482:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *            @arg OB_RDP_LEVEL_1: Read protection of the memory
+ 483:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *            @arg OB_RDP_LEVEL_2: Full chip protection
+ 484:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *   
+ 485:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @note WARNING: When enabling OB_RDP level 2 it's no more possible to go back to level 1 or 0
+ 486:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *    
+ 487:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @retval HAL_StatusTypeDef HAL Status
+ 488:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   */
+ 489:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** static HAL_StatusTypeDef FLASH_OB_RDP_LevelConfig(uint8_t Level)
+ 490:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** {
+ 831              		.loc 1 490 0
+ 832              		.cfi_startproc
+ 833              		@ args = 0, pretend = 0, frame = 16
+ 834              		@ frame_needed = 1, uses_anonymous_args = 0
+ 835 0510 80B5     		push	{r7, lr}
+ 836              		.cfi_def_cfa_offset 8
+ 837              		.cfi_offset 7, -8
+ 838              		.cfi_offset 14, -4
+ 839 0512 84B0     		sub	sp, sp, #16
+ 840              		.cfi_def_cfa_offset 24
+ 841 0514 00AF     		add	r7, sp, #0
+ 842              		.cfi_def_cfa_register 7
+ 843 0516 0346     		mov	r3, r0
+ 844 0518 FB71     		strb	r3, [r7, #7]
+ 491:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   HAL_StatusTypeDef status = HAL_OK;
+ 845              		.loc 1 491 0
+ 846 051a 0023     		movs	r3, #0
+ 847 051c FB73     		strb	r3, [r7, #15]
+ 492:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   
+ 493:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /* Check the parameters */
+ 494:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   assert_param(IS_OB_RDP_LEVEL(Level));
+ 495:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     
+ 496:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /* Wait for last operation to be completed */
+ 497:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   status = FLASH_WaitForLastOperation((uint32_t)HAL_FLASH_TIMEOUT_VALUE);
+ 848              		.loc 1 497 0
+ 849 051e 4CF25030 		movw	r0, #50000
+ 850 0522 FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 851 0526 0346     		mov	r3, r0
+ 852 0528 FB73     		strb	r3, [r7, #15]
+ 498:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 499:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   if(status == HAL_OK)
+ 853              		.loc 1 499 0
+ 854 052a FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 855 052c 002B     		cmp	r3, #0
+ 856 052e 05D1     		bne	.L39
+ 500:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   { 
+ 501:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     *(__IO uint8_t*)OPTCR_BYTE1_ADDRESS = Level;
+ 857              		.loc 1 501 0
+ 858 0530 43F61543 		movw	r3, #15381
+ 859 0534 C4F20203 		movt	r3, 16386
+ 860 0538 FA79     		ldrb	r2, [r7, #7]
+ 861 053a 1A70     		strb	r2, [r3]
+ 862              	.L39:
+ 502:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   }
+ 503:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   
+ 504:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   return status;
+ 863              		.loc 1 504 0
+ 864 053c FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 505:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** }
+ 865              		.loc 1 505 0
+ 866 053e 1846     		mov	r0, r3
+ 867 0540 1037     		adds	r7, r7, #16
+ 868 0542 BD46     		mov	sp, r7
+ 869              		@ sp needed
+ 870 0544 80BD     		pop	{r7, pc}
+ 871              		.cfi_endproc
+ 872              	.LFE63:
+ 874 0546 00BF     		.align	2
+ 875              		.thumb
+ 876              		.thumb_func
+ 878              	FLASH_OB_UserConfig:
+ 879              	.LFB64:
+ 506:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 507:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** /**
+ 508:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @brief  Program the FLASH User Option Byte: IWDG_SW / RST_STOP / RST_STDBY.    
+ 509:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @param  Iwdg: Selects the IWDG mode
+ 510:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *          This parameter can be one of the following values:
+ 511:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *            @arg OB_IWDG_SW: Software IWDG selected
+ 512:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *            @arg OB_IWDG_HW: Hardware IWDG selected
+ 513:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @param  Stop: Reset event when entering STOP mode.
+ 514:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *          This parameter  can be one of the following values:
+ 515:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *            @arg OB_STOP_NO_RST: No reset generated when entering in STOP
+ 516:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *            @arg OB_STOP_RST: Reset generated when entering in STOP
+ 517:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @param  Stdby: Reset event when entering Standby mode.
+ 518:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *          This parameter  can be one of the following values:
+ 519:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *            @arg OB_STDBY_NO_RST: No reset generated when entering in STANDBY
+ 520:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *            @arg OB_STDBY_RST: Reset generated when entering in STANDBY
+ 521:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @retval HAL_StatusTypeDef HAL Status
+ 522:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   */
+ 523:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** static HAL_StatusTypeDef FLASH_OB_UserConfig(uint8_t Iwdg, uint8_t Stop, uint8_t Stdby)
+ 524:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** {
+ 880              		.loc 1 524 0
+ 881              		.cfi_startproc
+ 882              		@ args = 0, pretend = 0, frame = 16
+ 883              		@ frame_needed = 1, uses_anonymous_args = 0
+ 884 0548 80B5     		push	{r7, lr}
+ 885              		.cfi_def_cfa_offset 8
+ 886              		.cfi_offset 7, -8
+ 887              		.cfi_offset 14, -4
+ 888 054a 84B0     		sub	sp, sp, #16
+ 889              		.cfi_def_cfa_offset 24
+ 890 054c 00AF     		add	r7, sp, #0
+ 891              		.cfi_def_cfa_register 7
+ 892 054e 1346     		mov	r3, r2
+ 893 0550 0246     		mov	r2, r0
+ 894 0552 FA71     		strb	r2, [r7, #7]
+ 895 0554 0A46     		mov	r2, r1
+ 896 0556 BA71     		strb	r2, [r7, #6]
+ 897 0558 7B71     		strb	r3, [r7, #5]
+ 525:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   uint8_t optiontmp = 0xFF;
+ 898              		.loc 1 525 0
+ 899 055a FF23     		movs	r3, #255
+ 900 055c FB73     		strb	r3, [r7, #15]
+ 526:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   HAL_StatusTypeDef status = HAL_OK;
+ 901              		.loc 1 526 0
+ 902 055e 0023     		movs	r3, #0
+ 903 0560 BB73     		strb	r3, [r7, #14]
+ 527:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 528:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /* Check the parameters */
+ 529:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   assert_param(IS_OB_IWDG_SOURCE(Iwdg));
+ 530:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   assert_param(IS_OB_STOP_SOURCE(Stop));
+ 531:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   assert_param(IS_OB_STDBY_SOURCE(Stdby));
+ 532:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 533:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /* Wait for last operation to be completed */
+ 534:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   status = FLASH_WaitForLastOperation((uint32_t)HAL_FLASH_TIMEOUT_VALUE);
+ 904              		.loc 1 534 0
+ 905 0562 4CF25030 		movw	r0, #50000
+ 906 0566 FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 907 056a 0346     		mov	r3, r0
+ 908 056c BB73     		strb	r3, [r7, #14]
+ 535:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   
+ 536:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   if(status == HAL_OK)
+ 909              		.loc 1 536 0
+ 910 056e BB7B     		ldrb	r3, [r7, #14]	@ zero_extendqisi2
+ 911 0570 002B     		cmp	r3, #0
+ 912 0572 17D1     		bne	.L42
+ 537:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   {     
+ 538:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     /* Mask OPTLOCK, OPTSTRT, BOR_LEV and BFB2 bits */
+ 539:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     optiontmp =  (uint8_t)((*(__IO uint8_t *)OPTCR_BYTE0_ADDRESS) & (uint8_t)0x1F);
+ 913              		.loc 1 539 0
+ 914 0574 43F61443 		movw	r3, #15380
+ 915 0578 C4F20203 		movt	r3, 16386
+ 916 057c 1B78     		ldrb	r3, [r3]
+ 917 057e DBB2     		uxtb	r3, r3
+ 918 0580 03F01F03 		and	r3, r3, #31
+ 919 0584 FB73     		strb	r3, [r7, #15]
+ 540:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 541:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     /* Update User Option Byte */
+ 542:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     *(__IO uint8_t *)OPTCR_BYTE0_ADDRESS = Iwdg | (uint8_t)(Stdby | (uint8_t)(Stop | ((uint8_t)opti
+ 920              		.loc 1 542 0
+ 921 0586 43F61443 		movw	r3, #15380
+ 922 058a C4F20203 		movt	r3, 16386
+ 923 058e B979     		ldrb	r1, [r7, #6]
+ 924 0590 FA7B     		ldrb	r2, [r7, #15]
+ 925 0592 0A43     		orrs	r2, r2, r1
+ 926 0594 D1B2     		uxtb	r1, r2
+ 927 0596 7A79     		ldrb	r2, [r7, #5]
+ 928 0598 0A43     		orrs	r2, r2, r1
+ 929 059a D1B2     		uxtb	r1, r2
+ 930 059c FA79     		ldrb	r2, [r7, #7]
+ 931 059e 0A43     		orrs	r2, r2, r1
+ 932 05a0 D2B2     		uxtb	r2, r2
+ 933 05a2 1A70     		strb	r2, [r3]
+ 934              	.L42:
+ 543:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   }
+ 544:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   
+ 545:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   return status; 
+ 935              		.loc 1 545 0
+ 936 05a4 BB7B     		ldrb	r3, [r7, #14]	@ zero_extendqisi2
+ 546:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 547:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** }
+ 937              		.loc 1 547 0
+ 938 05a6 1846     		mov	r0, r3
+ 939 05a8 1037     		adds	r7, r7, #16
+ 940 05aa BD46     		mov	sp, r7
+ 941              		@ sp needed
+ 942 05ac 80BD     		pop	{r7, pc}
+ 943              		.cfi_endproc
+ 944              	.LFE64:
+ 946 05ae 00BF     		.align	2
+ 947              		.thumb
+ 948              		.thumb_func
+ 950              	FLASH_OB_BOR_LevelConfig:
+ 951              	.LFB65:
+ 548:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 549:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** /**
+ 550:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @brief  Set the BOR Level. 
+ 551:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @param  Level: specifies the Option Bytes BOR Reset Level.
+ 552:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *          This parameter can be one of the following values:
+ 553:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *            @arg OB_BOR_LEVEL3: Supply voltage ranges from 2.7 to 3.6 V
+ 554:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *            @arg OB_BOR_LEVEL2: Supply voltage ranges from 2.4 to 2.7 V
+ 555:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *            @arg OB_BOR_LEVEL1: Supply voltage ranges from 2.1 to 2.4 V
+ 556:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *            @arg OB_BOR_OFF: Supply voltage ranges from 1.62 to 2.1 V
+ 557:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @retval HAL_StatusTypeDef HAL Status
+ 558:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   */
+ 559:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** static HAL_StatusTypeDef FLASH_OB_BOR_LevelConfig(uint8_t Level)
+ 560:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** {
+ 952              		.loc 1 560 0
+ 953              		.cfi_startproc
+ 954              		@ args = 0, pretend = 0, frame = 8
+ 955              		@ frame_needed = 1, uses_anonymous_args = 0
+ 956              		@ link register save eliminated.
+ 957 05b0 80B4     		push	{r7}
+ 958              		.cfi_def_cfa_offset 4
+ 959              		.cfi_offset 7, -4
+ 960 05b2 83B0     		sub	sp, sp, #12
+ 961              		.cfi_def_cfa_offset 16
+ 962 05b4 00AF     		add	r7, sp, #0
+ 963              		.cfi_def_cfa_register 7
+ 964 05b6 0346     		mov	r3, r0
+ 965 05b8 FB71     		strb	r3, [r7, #7]
+ 561:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /* Check the parameters */
+ 562:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   assert_param(IS_OB_BOR_LEVEL(Level));
+ 563:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 564:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /* Set the BOR Level */
+ 565:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *(__IO uint8_t *)OPTCR_BYTE0_ADDRESS &= (~FLASH_OPTCR_BOR_LEV);
+ 966              		.loc 1 565 0
+ 967 05ba 43F61443 		movw	r3, #15380
+ 968 05be C4F20203 		movt	r3, 16386
+ 969 05c2 43F61442 		movw	r2, #15380
+ 970 05c6 C4F20202 		movt	r2, 16386
+ 971 05ca 1278     		ldrb	r2, [r2]
+ 972 05cc D2B2     		uxtb	r2, r2
+ 973 05ce 22F00C02 		bic	r2, r2, #12
+ 974 05d2 D2B2     		uxtb	r2, r2
+ 975 05d4 1A70     		strb	r2, [r3]
+ 566:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *(__IO uint8_t *)OPTCR_BYTE0_ADDRESS |= Level;
+ 976              		.loc 1 566 0
+ 977 05d6 43F61443 		movw	r3, #15380
+ 978 05da C4F20203 		movt	r3, 16386
+ 979 05de 43F61442 		movw	r2, #15380
+ 980 05e2 C4F20202 		movt	r2, 16386
+ 981 05e6 1278     		ldrb	r2, [r2]
+ 982 05e8 D1B2     		uxtb	r1, r2
+ 983 05ea FA79     		ldrb	r2, [r7, #7]
+ 984 05ec 0A43     		orrs	r2, r2, r1
+ 985 05ee D2B2     		uxtb	r2, r2
+ 986 05f0 1A70     		strb	r2, [r3]
+ 567:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   
+ 568:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   return HAL_OK;
+ 987              		.loc 1 568 0
+ 988 05f2 0023     		movs	r3, #0
+ 569:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   
+ 570:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** }
+ 989              		.loc 1 570 0
+ 990 05f4 1846     		mov	r0, r3
+ 991 05f6 0C37     		adds	r7, r7, #12
+ 992 05f8 BD46     		mov	sp, r7
+ 993              		@ sp needed
+ 994 05fa 5DF8047B 		ldr	r7, [sp], #4
+ 995 05fe 7047     		bx	lr
+ 996              		.cfi_endproc
+ 997              	.LFE65:
+ 999              		.align	2
+ 1000              		.thumb
+ 1001              		.thumb_func
+ 1003              	FLASH_OB_GetUser:
+ 1004              	.LFB66:
+ 571:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 572:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** /**
+ 573:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @brief  Return the FLASH User Option Byte value.
+ 574:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @param  None
+ 575:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @retval uint8_t FLASH User Option Bytes values: IWDG_SW(Bit0), RST_STOP(Bit1)
+ 576:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *         and RST_STDBY(Bit2).
+ 577:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   */
+ 578:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** static uint8_t FLASH_OB_GetUser(void)
+ 579:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** {
+ 1005              		.loc 1 579 0
+ 1006              		.cfi_startproc
+ 1007              		@ args = 0, pretend = 0, frame = 0
+ 1008              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1009              		@ link register save eliminated.
+ 1010 0600 80B4     		push	{r7}
+ 1011              		.cfi_def_cfa_offset 4
+ 1012              		.cfi_offset 7, -4
+ 1013 0602 00AF     		add	r7, sp, #0
+ 1014              		.cfi_def_cfa_register 7
+ 580:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /* Return the User Option Byte */
+ 581:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   return ((uint8_t)(FLASH->OPTCR & 0xE0));
+ 1015              		.loc 1 581 0
+ 1016 0604 4FF47053 		mov	r3, #15360
+ 1017 0608 C4F20203 		movt	r3, 16386
+ 1018 060c 5B69     		ldr	r3, [r3, #20]
+ 1019 060e DBB2     		uxtb	r3, r3
+ 1020 0610 23F01F03 		bic	r3, r3, #31
+ 1021 0614 DBB2     		uxtb	r3, r3
+ 582:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** }
+ 1022              		.loc 1 582 0
+ 1023 0616 1846     		mov	r0, r3
+ 1024 0618 BD46     		mov	sp, r7
+ 1025              		@ sp needed
+ 1026 061a 5DF8047B 		ldr	r7, [sp], #4
+ 1027 061e 7047     		bx	lr
+ 1028              		.cfi_endproc
+ 1029              	.LFE66:
+ 1031              		.align	2
+ 1032              		.thumb
+ 1033              		.thumb_func
+ 1035              	FLASH_OB_GetWRP:
+ 1036              	.LFB67:
+ 583:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 584:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** /**
+ 585:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @brief  Return the FLASH Write Protection Option Bytes value.
+ 586:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @param  None
+ 587:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @retval uint16_t FLASH Write Protection Option Bytes value
+ 588:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   */
+ 589:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** static uint16_t FLASH_OB_GetWRP(void)
+ 590:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** {
+ 1037              		.loc 1 590 0
+ 1038              		.cfi_startproc
+ 1039              		@ args = 0, pretend = 0, frame = 0
+ 1040              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1041              		@ link register save eliminated.
+ 1042 0620 80B4     		push	{r7}
+ 1043              		.cfi_def_cfa_offset 4
+ 1044              		.cfi_offset 7, -4
+ 1045 0622 00AF     		add	r7, sp, #0
+ 1046              		.cfi_def_cfa_register 7
+ 591:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /* Return the FLASH write protection Register value */
+ 592:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   return (*(__IO uint16_t *)(OPTCR_BYTE2_ADDRESS));
+ 1047              		.loc 1 592 0
+ 1048 0624 43F61643 		movw	r3, #15382
+ 1049 0628 C4F20203 		movt	r3, 16386
+ 1050 062c 1B88     		ldrh	r3, [r3]	@ movhi
+ 1051 062e 9BB2     		uxth	r3, r3
+ 593:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** }
+ 1052              		.loc 1 593 0
+ 1053 0630 1846     		mov	r0, r3
+ 1054 0632 BD46     		mov	sp, r7
+ 1055              		@ sp needed
+ 1056 0634 5DF8047B 		ldr	r7, [sp], #4
+ 1057 0638 7047     		bx	lr
+ 1058              		.cfi_endproc
+ 1059              	.LFE67:
+ 1061 063a 00BF     		.align	2
+ 1062              		.thumb
+ 1063              		.thumb_func
+ 1065              	FLASH_OB_GetRDP:
+ 1066              	.LFB68:
+ 594:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 595:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** /**
+ 596:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @brief  Returns the FLASH Read Protection level.
+ 597:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @param  None
+ 598:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @retval FlagStatus FLASH ReadOut Protection Status:
+ 599:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *           - SET, when OB_RDP_Level_1 or OB_RDP_Level_2 is set
+ 600:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *           - RESET, when OB_RDP_Level_0 is set
+ 601:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   */
+ 602:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** static FlagStatus FLASH_OB_GetRDP(void)
+ 603:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** {
+ 1067              		.loc 1 603 0
+ 1068              		.cfi_startproc
+ 1069              		@ args = 0, pretend = 0, frame = 8
+ 1070              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1071              		@ link register save eliminated.
+ 1072 063c 80B4     		push	{r7}
+ 1073              		.cfi_def_cfa_offset 4
+ 1074              		.cfi_offset 7, -4
+ 1075 063e 83B0     		sub	sp, sp, #12
+ 1076              		.cfi_def_cfa_offset 16
+ 1077 0640 00AF     		add	r7, sp, #0
+ 1078              		.cfi_def_cfa_register 7
+ 604:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   FlagStatus readstatus = RESET;
+ 1079              		.loc 1 604 0
+ 1080 0642 0023     		movs	r3, #0
+ 1081 0644 FB71     		strb	r3, [r7, #7]
+ 605:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 606:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   if ((*(__IO uint8_t*)(OPTCR_BYTE1_ADDRESS) != (uint8_t)OB_RDP_LEVEL_0))
+ 1082              		.loc 1 606 0
+ 1083 0646 43F61543 		movw	r3, #15381
+ 1084 064a C4F20203 		movt	r3, 16386
+ 1085 064e 1B78     		ldrb	r3, [r3]
+ 1086 0650 DBB2     		uxtb	r3, r3
+ 1087 0652 AA2B     		cmp	r3, #170
+ 1088 0654 01D0     		beq	.L51
+ 607:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   {
+ 608:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****     readstatus = SET;
+ 1089              		.loc 1 608 0
+ 1090 0656 0123     		movs	r3, #1
+ 1091 0658 FB71     		strb	r3, [r7, #7]
+ 1092              	.L51:
+ 609:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   }
+ 610:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   
+ 611:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   return readstatus;
+ 1093              		.loc 1 611 0
+ 1094 065a FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 612:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** }
+ 1095              		.loc 1 612 0
+ 1096 065c 1846     		mov	r0, r3
+ 1097 065e 0C37     		adds	r7, r7, #12
+ 1098 0660 BD46     		mov	sp, r7
+ 1099              		@ sp needed
+ 1100 0662 5DF8047B 		ldr	r7, [sp], #4
+ 1101 0666 7047     		bx	lr
+ 1102              		.cfi_endproc
+ 1103              	.LFE68:
+ 1105              		.align	2
+ 1106              		.thumb
+ 1107              		.thumb_func
+ 1109              	FLASH_OB_GetBOR:
+ 1110              	.LFB69:
+ 613:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** 
+ 614:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** /**
+ 615:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @brief  Returns the FLASH BOR level.
+ 616:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @param  None
+ 617:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   * @retval uint8_t The FLASH BOR level:
+ 618:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *           - OB_BOR_LEVEL3: Supply voltage ranges from 2.7 to 3.6 V
+ 619:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *           - OB_BOR_LEVEL2: Supply voltage ranges from 2.4 to 2.7 V
+ 620:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *           - OB_BOR_LEVEL1: Supply voltage ranges from 2.1 to 2.4 V
+ 621:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   *           - OB_BOR_OFF   : Supply voltage ranges from 1.62 to 2.1 V  
+ 622:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   */
+ 623:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** static uint8_t FLASH_OB_GetBOR(void)
+ 624:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** {
+ 1111              		.loc 1 624 0
+ 1112              		.cfi_startproc
+ 1113              		@ args = 0, pretend = 0, frame = 0
+ 1114              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1115              		@ link register save eliminated.
+ 1116 0668 80B4     		push	{r7}
+ 1117              		.cfi_def_cfa_offset 4
+ 1118              		.cfi_offset 7, -4
+ 1119 066a 00AF     		add	r7, sp, #0
+ 1120              		.cfi_def_cfa_register 7
+ 625:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   /* Return the FLASH BOR level */
+ 626:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c ****   return (uint8_t)(*(__IO uint8_t *)(OPTCR_BYTE0_ADDRESS) & (uint8_t)0x0C);
+ 1121              		.loc 1 626 0
+ 1122 066c 43F61443 		movw	r3, #15380
+ 1123 0670 C4F20203 		movt	r3, 16386
+ 1124 0674 1B78     		ldrb	r3, [r3]
+ 1125 0676 DBB2     		uxtb	r3, r3
+ 1126 0678 03F00C03 		and	r3, r3, #12
+ 1127 067c DBB2     		uxtb	r3, r3
+ 627:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_flash_ex.c **** }
+ 1128              		.loc 1 627 0
+ 1129 067e 1846     		mov	r0, r3
+ 1130 0680 BD46     		mov	sp, r7
+ 1131              		@ sp needed
+ 1132 0682 5DF8047B 		ldr	r7, [sp], #4
+ 1133 0686 7047     		bx	lr
+ 1134              		.cfi_endproc
+ 1135              	.LFE69:
+ 1137              	.Letext0:
+ 1138              		.file 3 "c:\\program files (x86)\\codesourcery\\arm-none-eabi\\include\\stdint.h"
+ 1139              		.file 4 "D:\\workspace\\console800480\\system/stm32f217xx.h"
+ 1140              		.file 5 "D:\\workspace\\console800480\\system/stm32f2xx.h"
+ 1141              		.file 6 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_hal_def.h"
+ 1142              		.file 7 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_hal_flash.h"
+ 1143              		.file 8 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_hal_flash_ex.h"
+ 1144              		.file 9 "D:\\workspace\\console800480\\system/core_cm3.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 stm32f2xx_hal_flash_ex.c
+C:\Users\sagok\AppData\Local\Temp\ccA0xoXv.s:18     .text:00000000 $t
+C:\Users\sagok\AppData\Local\Temp\ccA0xoXv.s:23     .text:00000000 HAL_FLASHEx_Erase
+C:\Users\sagok\AppData\Local\Temp\ccA0xoXv.s:503    .text:00000314 FLASH_MassErase
+C:\Users\sagok\AppData\Local\Temp\ccA0xoXv.s:569    .text:0000038c FLASH_Erase_Sector
+C:\Users\sagok\AppData\Local\Temp\ccA0xoXv.s:182    .text:00000110 HAL_FLASHEx_Erase_IT
+C:\Users\sagok\AppData\Local\Temp\ccA0xoXv.s:305    .text:000001ec HAL_FLASHEx_OBProgram
+C:\Users\sagok\AppData\Local\Temp\ccA0xoXv.s:717    .text:0000047c FLASH_OB_EnableWRP
+C:\Users\sagok\AppData\Local\Temp\ccA0xoXv.s:774    .text:000004c8 FLASH_OB_DisableWRP
+C:\Users\sagok\AppData\Local\Temp\ccA0xoXv.s:829    .text:00000510 FLASH_OB_RDP_LevelConfig
+C:\Users\sagok\AppData\Local\Temp\ccA0xoXv.s:878    .text:00000548 FLASH_OB_UserConfig
+C:\Users\sagok\AppData\Local\Temp\ccA0xoXv.s:950    .text:000005b0 FLASH_OB_BOR_LevelConfig
+C:\Users\sagok\AppData\Local\Temp\ccA0xoXv.s:448    .text:000002d0 HAL_FLASHEx_OBGetConfig
+C:\Users\sagok\AppData\Local\Temp\ccA0xoXv.s:1035   .text:00000620 FLASH_OB_GetWRP
+C:\Users\sagok\AppData\Local\Temp\ccA0xoXv.s:1065   .text:0000063c FLASH_OB_GetRDP
+C:\Users\sagok\AppData\Local\Temp\ccA0xoXv.s:1003   .text:00000600 FLASH_OB_GetUser
+C:\Users\sagok\AppData\Local\Temp\ccA0xoXv.s:1109   .text:00000668 FLASH_OB_GetBOR
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.1.7f551ac7fcad8b79b9df4bfdaa536673
+                           .group:00000000 wm4.stm32f2xx_hal_conf.h.40.007126baefb9f966c36646edbf8040d2
+                           .group:00000000 wm4.stm32f2xx.h.57.5ec1581efc43612c411d33a8686e9ec7
+                           .group:00000000 wm4.stm32f217xx.h.52.9c940d76d00294b78837dc334c172fdd
+                           .group:00000000 wm4.core_cm3.h.32.49180ccb4d36cabd2d7016d2a51d91ae
+                           .group:00000000 wm4.newlib.h.8.384a112feabb3bef7b573ae48cde2e3b
+                           .group:00000000 wm4.features.h.22.6a4ca7cd053637cc1d0db6c16f39b2d7
+                           .group:00000000 wm4.config.h.183.aa62afef667fb61d15fa64c48beb2f14
+                           .group:00000000 wm4._ansi.h.23.5644b60c990a4800b02a6e654e88f93a
+                           .group:00000000 wm4.stdint.h.20.54ad762faa59e3c05491630641c8d8bf
+                           .group:00000000 wm4.core_cmInstr.h.25.f50f886f2edf670cf199b35fd96f5c91
+                           .group:00000000 wm4.core_cm3.h.130.63ab2348a6eed0fdb318040d970b676c
+                           .group:00000000 wm4.stm32f217xx.h.978.a5c681952b2f704a0e7f2ba21d08adf5
+                           .group:00000000 wm4.stm32f2xx.h.142.bc2155a1f7498bab16371e38413a9e41
+                           .group:00000000 wm4.stm32f2xx_hal_def.h.74.8ad2dc8aa82c4fd02e5aeaae592641ba
+                           .group:00000000 wm4.stm32f2xx_hal_rcc.h.142.ec0f91cc6576a6acebd17e6dd85829ae
+                           .group:00000000 wm4.stm32f2xx_hal_rcc_ex.h.40.0829033e864455c6bdd0db01f8ba5a50
+                           .group:00000000 wm4.stm32f2xx_hal_gpio.h.40.ba64e0bb94d9a68835f80159f39a86f1
+                           .group:00000000 wm4.stm32f2xx_hal_gpio_ex.h.40.24e547fd402281923f446b510381083f
+                           .group:00000000 wm4.stm32f2xx_hal_dma.h.40.5d9732ace2a21a4526ce8f0c52428fff
+                           .group:00000000 wm4.stm32f2xx_hal_cortex.h.40.e10263d2ec5d4fa79b4180ce1a38aff1
+                           .group:00000000 wm4.stm32f2xx_hal_adc.h.40.89ac8b78113cac4cf63847587daabac9
+                           .group:00000000 wm4.stm32f2xx_hal_adc_ex.h.40.7de68ed256ef25526ee31cc017f2c291
+                           .group:00000000 wm4.stm32f2xx_hal_flash.h.40.c3171719ce015e9cff20c795e44e886d
+                           .group:00000000 wm4.stm32f2xx_hal_flash_ex.h.40.7389508bd24a0aeb077bde0c9fb651eb
+                           .group:00000000 wm4.stm32f2xx_ll_fsmc.h.40.c1c32f2e1862f4dd342bd9b80fb895bb
+                           .group:00000000 wm4.stm32f2xx_hal_pwr.h.40.812df32e5c31b609a128e9db0eb4cbd0
+                           .group:00000000 wm4.stm32f2xx_hal_rtc.h.40.850fda5fe2cce8797446913dee18382f
+                           .group:00000000 wm4.stm32f2xx_hal_rtc_ex.h.40.f3e0c408e3bf4e8a0352d7ec9a18a822
+                           .group:00000000 wm4.stm32f2xx_ll_sdmmc.h.40.3719ab487c4b77401c572f459adf6eb7
+                           .group:00000000 wm4.stm32f2xx_hal_sd.h.58.760215394dcc316161a6482c0af9b866
+                           .group:00000000 wm4.stm32f2xx_hal_spi.h.40.7984243dbaba8b21c6392998a47e6987
+                           .group:00000000 wm4.stm32f2xx_hal_tim.h.40.d79172f25d0e9a15dc346aba8515bdd6
+                           .group:00000000 wm4.stm32f2xx_hal_tim_ex.h.40.361f280a7a3f60b4b238bb99ca728d83
+                           .group:00000000 wm4.stm32f2xx_hal_uart.h.40.d74def561ae6f78f40f477c8426ecbef
+                           .group:00000000 wm4.stm32f2xx_ll_usb.h.40.9b0206a05bc6ce3bec1648b51f22cb81
+                           .group:00000000 wm4.stm32f2xx_hal_pcd.h.99.11faba414c39e357b2f23364912d0605
+                           .group:00000000 wm4.stm32f2xx_hal_hcd.h.40.44ee5e972983ae0139ddbacdc75c44ef
+                           .group:00000000 wm4.stm32f2xx_hal.h.64.ed79ee83e52b151b3c365392b398f866
+
+UNDEFINED SYMBOLS
+pFlash
+FLASH_WaitForLastOperation

@@ -1,0 +1,1519 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"event_groups.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.align	2
+  19              		.global	xEventGroupCreate
+  20              		.thumb
+  21              		.thumb_func
+  23              	xEventGroupCreate:
+  24              	.LFB0:
+  25              		.file 1 "../FreeRTOS/event_groups.c"
+   1:../FreeRTOS/event_groups.c **** /*
+   2:../FreeRTOS/event_groups.c ****     FreeRTOS V8.0.1 - Copyright (C) 2014 Real Time Engineers Ltd.
+   3:../FreeRTOS/event_groups.c ****     All rights reserved
+   4:../FreeRTOS/event_groups.c **** 
+   5:../FreeRTOS/event_groups.c ****     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
+   6:../FreeRTOS/event_groups.c **** 
+   7:../FreeRTOS/event_groups.c ****     ***************************************************************************
+   8:../FreeRTOS/event_groups.c ****      *                                                                       *
+   9:../FreeRTOS/event_groups.c ****      *    FreeRTOS provides completely free yet professionally developed,    *
+  10:../FreeRTOS/event_groups.c ****      *    robust, strictly quality controlled, supported, and cross          *
+  11:../FreeRTOS/event_groups.c ****      *    platform software that has become a de facto standard.             *
+  12:../FreeRTOS/event_groups.c ****      *                                                                       *
+  13:../FreeRTOS/event_groups.c ****      *    Help yourself get started quickly and support the FreeRTOS         *
+  14:../FreeRTOS/event_groups.c ****      *    project by purchasing a FreeRTOS tutorial book, reference          *
+  15:../FreeRTOS/event_groups.c ****      *    manual, or both from: http://www.FreeRTOS.org/Documentation        *
+  16:../FreeRTOS/event_groups.c ****      *                                                                       *
+  17:../FreeRTOS/event_groups.c ****      *    Thank you!                                                         *
+  18:../FreeRTOS/event_groups.c ****      *                                                                       *
+  19:../FreeRTOS/event_groups.c ****     ***************************************************************************
+  20:../FreeRTOS/event_groups.c **** 
+  21:../FreeRTOS/event_groups.c ****     This file is part of the FreeRTOS distribution.
+  22:../FreeRTOS/event_groups.c **** 
+  23:../FreeRTOS/event_groups.c ****     FreeRTOS is free software; you can redistribute it and/or modify it under
+  24:../FreeRTOS/event_groups.c ****     the terms of the GNU General Public License (version 2) as published by the
+  25:../FreeRTOS/event_groups.c ****     Free Software Foundation >>!AND MODIFIED BY!<< the FreeRTOS exception.
+  26:../FreeRTOS/event_groups.c **** 
+  27:../FreeRTOS/event_groups.c ****     >>!   NOTE: The modification to the GPL is included to allow you to     !<<
+  28:../FreeRTOS/event_groups.c ****     >>!   distribute a combined work that includes FreeRTOS without being   !<<
+  29:../FreeRTOS/event_groups.c ****     >>!   obliged to provide the source code for proprietary components     !<<
+  30:../FreeRTOS/event_groups.c ****     >>!   outside of the FreeRTOS kernel.                                   !<<
+  31:../FreeRTOS/event_groups.c **** 
+  32:../FreeRTOS/event_groups.c ****     FreeRTOS is distributed in the hope that it will be useful, but WITHOUT ANY
+  33:../FreeRTOS/event_groups.c ****     WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  34:../FreeRTOS/event_groups.c ****     FOR A PARTICULAR PURPOSE.  Full license text is available from the following
+  35:../FreeRTOS/event_groups.c ****     link: http://www.freertos.org/a00114.html
+  36:../FreeRTOS/event_groups.c **** 
+  37:../FreeRTOS/event_groups.c ****     1 tab == 4 spaces!
+  38:../FreeRTOS/event_groups.c **** 
+  39:../FreeRTOS/event_groups.c ****     ***************************************************************************
+  40:../FreeRTOS/event_groups.c ****      *                                                                       *
+  41:../FreeRTOS/event_groups.c ****      *    Having a problem?  Start by reading the FAQ "My application does   *
+  42:../FreeRTOS/event_groups.c ****      *    not run, what could be wrong?"                                     *
+  43:../FreeRTOS/event_groups.c ****      *                                                                       *
+  44:../FreeRTOS/event_groups.c ****      *    http://www.FreeRTOS.org/FAQHelp.html                               *
+  45:../FreeRTOS/event_groups.c ****      *                                                                       *
+  46:../FreeRTOS/event_groups.c ****     ***************************************************************************
+  47:../FreeRTOS/event_groups.c **** 
+  48:../FreeRTOS/event_groups.c ****     http://www.FreeRTOS.org - Documentation, books, training, latest versions,
+  49:../FreeRTOS/event_groups.c ****     license and Real Time Engineers Ltd. contact details.
+  50:../FreeRTOS/event_groups.c **** 
+  51:../FreeRTOS/event_groups.c ****     http://www.FreeRTOS.org/plus - A selection of FreeRTOS ecosystem products,
+  52:../FreeRTOS/event_groups.c ****     including FreeRTOS+Trace - an indispensable productivity tool, a DOS
+  53:../FreeRTOS/event_groups.c ****     compatible FAT file system, and our tiny thread aware UDP/IP stack.
+  54:../FreeRTOS/event_groups.c **** 
+  55:../FreeRTOS/event_groups.c ****     http://www.OpenRTOS.com - Real Time Engineers ltd license FreeRTOS to High
+  56:../FreeRTOS/event_groups.c ****     Integrity Systems to sell under the OpenRTOS brand.  Low cost OpenRTOS
+  57:../FreeRTOS/event_groups.c ****     licenses offer ticketed support, indemnification and middleware.
+  58:../FreeRTOS/event_groups.c **** 
+  59:../FreeRTOS/event_groups.c ****     http://www.SafeRTOS.com - High Integrity Systems also provide a safety
+  60:../FreeRTOS/event_groups.c ****     engineered and independently SIL3 certified version for use in safety and
+  61:../FreeRTOS/event_groups.c ****     mission critical applications that require provable dependability.
+  62:../FreeRTOS/event_groups.c **** 
+  63:../FreeRTOS/event_groups.c ****     1 tab == 4 spaces!
+  64:../FreeRTOS/event_groups.c **** */
+  65:../FreeRTOS/event_groups.c **** 
+  66:../FreeRTOS/event_groups.c **** /* Standard includes. */
+  67:../FreeRTOS/event_groups.c **** #include <stdlib.h>
+  68:../FreeRTOS/event_groups.c **** 
+  69:../FreeRTOS/event_groups.c **** /* Defining MPU_WRAPPERS_INCLUDED_FROM_API_FILE prevents task.h from redefining
+  70:../FreeRTOS/event_groups.c **** all the API functions to use the MPU wrappers.  That should only be done when
+  71:../FreeRTOS/event_groups.c **** task.h is included from an application file. */
+  72:../FreeRTOS/event_groups.c **** #define MPU_WRAPPERS_INCLUDED_FROM_API_FILE
+  73:../FreeRTOS/event_groups.c **** 
+  74:../FreeRTOS/event_groups.c **** /* FreeRTOS includes. */
+  75:../FreeRTOS/event_groups.c **** #include "FreeRTOS.h"
+  76:../FreeRTOS/event_groups.c **** #include "task.h"
+  77:../FreeRTOS/event_groups.c **** #include "timers.h"
+  78:../FreeRTOS/event_groups.c **** #include "event_groups.h"
+  79:../FreeRTOS/event_groups.c **** 
+  80:../FreeRTOS/event_groups.c **** /* Lint e961 and e750 are suppressed as a MISRA exception justified because the
+  81:../FreeRTOS/event_groups.c **** MPU ports require MPU_WRAPPERS_INCLUDED_FROM_API_FILE to be defined for the
+  82:../FreeRTOS/event_groups.c **** header files above, but not in this file, in order to generate the correct
+  83:../FreeRTOS/event_groups.c **** privileged Vs unprivileged linkage and placement. */
+  84:../FreeRTOS/event_groups.c **** #undef MPU_WRAPPERS_INCLUDED_FROM_API_FILE /*lint !e961 !e750. */
+  85:../FreeRTOS/event_groups.c **** 
+  86:../FreeRTOS/event_groups.c **** #if ( INCLUDE_xEventGroupSetBitFromISR == 1 ) && ( configUSE_TIMERS == 0 )
+  87:../FreeRTOS/event_groups.c **** 	#error configUSE_TIMERS must be set to 1 to make the xEventGroupSetBitFromISR() function available
+  88:../FreeRTOS/event_groups.c **** #endif
+  89:../FreeRTOS/event_groups.c **** 
+  90:../FreeRTOS/event_groups.c **** #if ( INCLUDE_xEventGroupSetBitFromISR == 1 ) && ( INCLUDE_xTimerPendFunctionCall == 0 )
+  91:../FreeRTOS/event_groups.c **** 	#error INCLUDE_xTimerPendFunctionCall must also be set to one to make the xEventGroupSetBitFromISR
+  92:../FreeRTOS/event_groups.c **** #endif
+  93:../FreeRTOS/event_groups.c **** 
+  94:../FreeRTOS/event_groups.c **** /* The following bit fields convey control information in a task's event list
+  95:../FreeRTOS/event_groups.c **** item value.  It is important they don't clash with the
+  96:../FreeRTOS/event_groups.c **** taskEVENT_LIST_ITEM_VALUE_IN_USE definition. */
+  97:../FreeRTOS/event_groups.c **** #if configUSE_16_BIT_TICKS == 1
+  98:../FreeRTOS/event_groups.c **** 	#define eventCLEAR_EVENTS_ON_EXIT_BIT	0x0100U
+  99:../FreeRTOS/event_groups.c **** 	#define eventUNBLOCKED_DUE_TO_BIT_SET	0x0200U
+ 100:../FreeRTOS/event_groups.c **** 	#define eventWAIT_FOR_ALL_BITS			0x0400U
+ 101:../FreeRTOS/event_groups.c **** 	#define eventEVENT_BITS_CONTROL_BYTES	0xff00U
+ 102:../FreeRTOS/event_groups.c **** #else
+ 103:../FreeRTOS/event_groups.c **** 	#define eventCLEAR_EVENTS_ON_EXIT_BIT	0x01000000UL
+ 104:../FreeRTOS/event_groups.c **** 	#define eventUNBLOCKED_DUE_TO_BIT_SET	0x02000000UL
+ 105:../FreeRTOS/event_groups.c **** 	#define eventWAIT_FOR_ALL_BITS			0x04000000UL
+ 106:../FreeRTOS/event_groups.c **** 	#define eventEVENT_BITS_CONTROL_BYTES	0xff000000UL
+ 107:../FreeRTOS/event_groups.c **** #endif
+ 108:../FreeRTOS/event_groups.c **** 
+ 109:../FreeRTOS/event_groups.c **** typedef struct xEventGroupDefinition
+ 110:../FreeRTOS/event_groups.c **** {
+ 111:../FreeRTOS/event_groups.c **** 	EventBits_t uxEventBits;
+ 112:../FreeRTOS/event_groups.c **** 	List_t xTasksWaitingForBits;		/*< List of tasks waiting for a bit to be set. */
+ 113:../FreeRTOS/event_groups.c **** 
+ 114:../FreeRTOS/event_groups.c **** 	#if( configUSE_TRACE_FACILITY == 1 )
+ 115:../FreeRTOS/event_groups.c **** 		UBaseType_t uxEventGroupNumber;
+ 116:../FreeRTOS/event_groups.c **** 	#endif
+ 117:../FreeRTOS/event_groups.c **** 
+ 118:../FreeRTOS/event_groups.c **** } EventGroup_t;
+ 119:../FreeRTOS/event_groups.c **** 
+ 120:../FreeRTOS/event_groups.c **** /*-----------------------------------------------------------*/
+ 121:../FreeRTOS/event_groups.c **** 
+ 122:../FreeRTOS/event_groups.c **** /*
+ 123:../FreeRTOS/event_groups.c ****  * Test the bits set in uxCurrentEventBits to see if the wait condition is met.
+ 124:../FreeRTOS/event_groups.c ****  * The wait condition is defined by xWaitForAllBits.  If xWaitForAllBits is
+ 125:../FreeRTOS/event_groups.c ****  * pdTRUE then the wait condition is met if all the bits set in uxBitsToWaitFor
+ 126:../FreeRTOS/event_groups.c ****  * are also set in uxCurrentEventBits.  If xWaitForAllBits is pdFALSE then the
+ 127:../FreeRTOS/event_groups.c ****  * wait condition is met if any of the bits set in uxBitsToWait for are also set
+ 128:../FreeRTOS/event_groups.c ****  * in uxCurrentEventBits.
+ 129:../FreeRTOS/event_groups.c ****  */
+ 130:../FreeRTOS/event_groups.c **** static BaseType_t prvTestWaitCondition( const EventBits_t uxCurrentEventBits, const EventBits_t uxB
+ 131:../FreeRTOS/event_groups.c **** 
+ 132:../FreeRTOS/event_groups.c **** /*-----------------------------------------------------------*/
+ 133:../FreeRTOS/event_groups.c **** 
+ 134:../FreeRTOS/event_groups.c **** EventGroupHandle_t xEventGroupCreate( void )
+ 135:../FreeRTOS/event_groups.c **** {
+  26              		.loc 1 135 0
+  27              		.cfi_startproc
+  28              		@ args = 0, pretend = 0, frame = 8
+  29              		@ frame_needed = 1, uses_anonymous_args = 0
+  30 0000 80B5     		push	{r7, lr}
+  31              		.cfi_def_cfa_offset 8
+  32              		.cfi_offset 7, -8
+  33              		.cfi_offset 14, -4
+  34 0002 82B0     		sub	sp, sp, #8
+  35              		.cfi_def_cfa_offset 16
+  36 0004 00AF     		add	r7, sp, #0
+  37              		.cfi_def_cfa_register 7
+ 136:../FreeRTOS/event_groups.c **** EventGroup_t *pxEventBits;
+ 137:../FreeRTOS/event_groups.c **** 
+ 138:../FreeRTOS/event_groups.c **** 	pxEventBits = pvPortMalloc( sizeof( EventGroup_t ) );
+  38              		.loc 1 138 0
+  39 0006 1820     		movs	r0, #24
+  40 0008 FFF7FEFF 		bl	pvPortMalloc
+  41 000c 7860     		str	r0, [r7, #4]
+ 139:../FreeRTOS/event_groups.c **** 	if( pxEventBits != NULL )
+  42              		.loc 1 139 0
+  43 000e 7B68     		ldr	r3, [r7, #4]
+  44 0010 002B     		cmp	r3, #0
+  45 0012 07D0     		beq	.L2
+ 140:../FreeRTOS/event_groups.c **** 	{
+ 141:../FreeRTOS/event_groups.c **** 		pxEventBits->uxEventBits = 0;
+  46              		.loc 1 141 0
+  47 0014 7B68     		ldr	r3, [r7, #4]
+  48 0016 0022     		movs	r2, #0
+  49 0018 1A60     		str	r2, [r3]
+ 142:../FreeRTOS/event_groups.c **** 		vListInitialise( &( pxEventBits->xTasksWaitingForBits ) );
+  50              		.loc 1 142 0
+  51 001a 7B68     		ldr	r3, [r7, #4]
+  52 001c 0433     		adds	r3, r3, #4
+  53 001e 1846     		mov	r0, r3
+  54 0020 FFF7FEFF 		bl	vListInitialise
+  55              	.L2:
+ 143:../FreeRTOS/event_groups.c **** 		traceEVENT_GROUP_CREATE( pxEventBits );
+ 144:../FreeRTOS/event_groups.c **** 	}
+ 145:../FreeRTOS/event_groups.c **** 	else
+ 146:../FreeRTOS/event_groups.c **** 	{
+ 147:../FreeRTOS/event_groups.c **** 		traceEVENT_GROUP_CREATE_FAILED();
+ 148:../FreeRTOS/event_groups.c **** 	}
+ 149:../FreeRTOS/event_groups.c **** 
+ 150:../FreeRTOS/event_groups.c **** 	return ( EventGroupHandle_t ) pxEventBits;
+  56              		.loc 1 150 0
+  57 0024 7B68     		ldr	r3, [r7, #4]
+ 151:../FreeRTOS/event_groups.c **** }
+  58              		.loc 1 151 0
+  59 0026 1846     		mov	r0, r3
+  60 0028 0837     		adds	r7, r7, #8
+  61 002a BD46     		mov	sp, r7
+  62              		@ sp needed
+  63 002c 80BD     		pop	{r7, pc}
+  64              		.cfi_endproc
+  65              	.LFE0:
+  67 002e 00BF     		.align	2
+  68              		.global	xEventGroupSync
+  69              		.thumb
+  70              		.thumb_func
+  72              	xEventGroupSync:
+  73              	.LFB1:
+ 152:../FreeRTOS/event_groups.c **** /*-----------------------------------------------------------*/
+ 153:../FreeRTOS/event_groups.c **** 
+ 154:../FreeRTOS/event_groups.c **** EventBits_t xEventGroupSync( EventGroupHandle_t xEventGroup, const EventBits_t uxBitsToSet, const E
+ 155:../FreeRTOS/event_groups.c **** {
+  74              		.loc 1 155 0
+  75              		.cfi_startproc
+  76              		@ args = 0, pretend = 0, frame = 40
+  77              		@ frame_needed = 1, uses_anonymous_args = 0
+  78 0030 80B5     		push	{r7, lr}
+  79              		.cfi_def_cfa_offset 8
+  80              		.cfi_offset 7, -8
+  81              		.cfi_offset 14, -4
+  82 0032 8AB0     		sub	sp, sp, #40
+  83              		.cfi_def_cfa_offset 48
+  84 0034 00AF     		add	r7, sp, #0
+  85              		.cfi_def_cfa_register 7
+  86 0036 F860     		str	r0, [r7, #12]
+  87 0038 B960     		str	r1, [r7, #8]
+  88 003a 7A60     		str	r2, [r7, #4]
+  89 003c 3B60     		str	r3, [r7]
+ 156:../FreeRTOS/event_groups.c **** EventBits_t uxOriginalBitValue, uxReturn;
+ 157:../FreeRTOS/event_groups.c **** EventGroup_t *pxEventBits = ( EventGroup_t * ) xEventGroup;
+  90              		.loc 1 157 0
+  91 003e FB68     		ldr	r3, [r7, #12]
+  92 0040 3B62     		str	r3, [r7, #32]
+ 158:../FreeRTOS/event_groups.c **** BaseType_t xAlreadyYielded;
+ 159:../FreeRTOS/event_groups.c **** BaseType_t xTimeoutOccurred = pdFALSE;
+  93              		.loc 1 159 0
+  94 0042 0023     		movs	r3, #0
+  95 0044 FB61     		str	r3, [r7, #28]
+ 160:../FreeRTOS/event_groups.c **** 
+ 161:../FreeRTOS/event_groups.c **** 	configASSERT( ( uxBitsToWaitFor & eventEVENT_BITS_CONTROL_BYTES ) == 0 );
+ 162:../FreeRTOS/event_groups.c **** 	configASSERT( uxBitsToWaitFor != 0 );
+ 163:../FreeRTOS/event_groups.c **** 	#if ( ( INCLUDE_xTaskGetSchedulerState == 1 ) || ( configUSE_TIMERS == 1 ) )
+ 164:../FreeRTOS/event_groups.c **** 	{
+ 165:../FreeRTOS/event_groups.c **** 		configASSERT( !( ( xTaskGetSchedulerState() == taskSCHEDULER_SUSPENDED ) && ( xTicksToWait != 0 )
+ 166:../FreeRTOS/event_groups.c **** 	}
+ 167:../FreeRTOS/event_groups.c **** 	#endif
+ 168:../FreeRTOS/event_groups.c **** 
+ 169:../FreeRTOS/event_groups.c **** 	vTaskSuspendAll();
+  96              		.loc 1 169 0
+  97 0046 FFF7FEFF 		bl	vTaskSuspendAll
+ 170:../FreeRTOS/event_groups.c **** 	{
+ 171:../FreeRTOS/event_groups.c **** 		uxOriginalBitValue = pxEventBits->uxEventBits;
+  98              		.loc 1 171 0
+  99 004a 3B6A     		ldr	r3, [r7, #32]
+ 100 004c 1B68     		ldr	r3, [r3]
+ 101 004e BB61     		str	r3, [r7, #24]
+ 172:../FreeRTOS/event_groups.c **** 
+ 173:../FreeRTOS/event_groups.c **** 		( void ) xEventGroupSetBits( xEventGroup, uxBitsToSet );
+ 102              		.loc 1 173 0
+ 103 0050 F868     		ldr	r0, [r7, #12]
+ 104 0052 B968     		ldr	r1, [r7, #8]
+ 105 0054 FFF7FEFF 		bl	xEventGroupSetBits
+ 174:../FreeRTOS/event_groups.c **** 
+ 175:../FreeRTOS/event_groups.c **** 		if( ( ( uxOriginalBitValue | uxBitsToSet ) & uxBitsToWaitFor ) == uxBitsToWaitFor )
+ 106              		.loc 1 175 0
+ 107 0058 BA69     		ldr	r2, [r7, #24]
+ 108 005a BB68     		ldr	r3, [r7, #8]
+ 109 005c 1A43     		orrs	r2, r2, r3
+ 110 005e 7B68     		ldr	r3, [r7, #4]
+ 111 0060 1A40     		ands	r2, r2, r3
+ 112 0062 7B68     		ldr	r3, [r7, #4]
+ 113 0064 9A42     		cmp	r2, r3
+ 114 0066 0DD1     		bne	.L5
+ 176:../FreeRTOS/event_groups.c **** 		{
+ 177:../FreeRTOS/event_groups.c **** 			/* All the rendezvous bits are now set - no need to block. */
+ 178:../FreeRTOS/event_groups.c **** 			uxReturn = ( uxOriginalBitValue | uxBitsToSet );
+ 115              		.loc 1 178 0
+ 116 0068 BA69     		ldr	r2, [r7, #24]
+ 117 006a BB68     		ldr	r3, [r7, #8]
+ 118 006c 1343     		orrs	r3, r3, r2
+ 119 006e 7B62     		str	r3, [r7, #36]
+ 179:../FreeRTOS/event_groups.c **** 
+ 180:../FreeRTOS/event_groups.c **** 			/* Rendezvous always clear the bits.  They will have been cleared
+ 181:../FreeRTOS/event_groups.c **** 			already unless this is the only task in the rendezvous. */
+ 182:../FreeRTOS/event_groups.c **** 			pxEventBits->uxEventBits &= ~uxBitsToWaitFor;
+ 120              		.loc 1 182 0
+ 121 0070 3B6A     		ldr	r3, [r7, #32]
+ 122 0072 1A68     		ldr	r2, [r3]
+ 123 0074 7B68     		ldr	r3, [r7, #4]
+ 124 0076 DB43     		mvns	r3, r3
+ 125 0078 1A40     		ands	r2, r2, r3
+ 126 007a 3B6A     		ldr	r3, [r7, #32]
+ 127 007c 1A60     		str	r2, [r3]
+ 183:../FreeRTOS/event_groups.c **** 
+ 184:../FreeRTOS/event_groups.c **** 			xTicksToWait = 0;
+ 128              		.loc 1 184 0
+ 129 007e 0023     		movs	r3, #0
+ 130 0080 3B60     		str	r3, [r7]
+ 131 0082 12E0     		b	.L6
+ 132              	.L5:
+ 185:../FreeRTOS/event_groups.c **** 		}
+ 186:../FreeRTOS/event_groups.c **** 		else
+ 187:../FreeRTOS/event_groups.c **** 		{
+ 188:../FreeRTOS/event_groups.c **** 			if( xTicksToWait != ( TickType_t ) 0 )
+ 133              		.loc 1 188 0
+ 134 0084 3B68     		ldr	r3, [r7]
+ 135 0086 002B     		cmp	r3, #0
+ 136 0088 0CD0     		beq	.L7
+ 189:../FreeRTOS/event_groups.c **** 			{
+ 190:../FreeRTOS/event_groups.c **** 				traceEVENT_GROUP_SYNC_BLOCK( xEventGroup, uxBitsToSet, uxBitsToWaitFor );
+ 191:../FreeRTOS/event_groups.c **** 
+ 192:../FreeRTOS/event_groups.c **** 				/* Store the bits that the calling task is waiting for in the
+ 193:../FreeRTOS/event_groups.c **** 				task's event list item so the kernel knows when a match is
+ 194:../FreeRTOS/event_groups.c **** 				found.  Then enter the blocked state. */
+ 195:../FreeRTOS/event_groups.c **** 				vTaskPlaceOnUnorderedEventList( &( pxEventBits->xTasksWaitingForBits ), ( uxBitsToWaitFor | eve
+ 137              		.loc 1 195 0
+ 138 008a 3B6A     		ldr	r3, [r7, #32]
+ 139 008c 1A1D     		adds	r2, r3, #4
+ 140 008e 7B68     		ldr	r3, [r7, #4]
+ 141 0090 43F0A063 		orr	r3, r3, #83886080
+ 142 0094 1046     		mov	r0, r2
+ 143 0096 1946     		mov	r1, r3
+ 144 0098 3A68     		ldr	r2, [r7]
+ 145 009a FFF7FEFF 		bl	vTaskPlaceOnUnorderedEventList
+ 196:../FreeRTOS/event_groups.c **** 
+ 197:../FreeRTOS/event_groups.c **** 				/* This assignment is obsolete as uxReturn will get set after
+ 198:../FreeRTOS/event_groups.c **** 				the task unblocks, but some compilers mistakenly generate a
+ 199:../FreeRTOS/event_groups.c **** 				warning about uxReturn being returned without being set if the
+ 200:../FreeRTOS/event_groups.c **** 				assignment is omitted. */
+ 201:../FreeRTOS/event_groups.c **** 				uxReturn = 0;
+ 146              		.loc 1 201 0
+ 147 009e 0023     		movs	r3, #0
+ 148 00a0 7B62     		str	r3, [r7, #36]
+ 149 00a2 02E0     		b	.L6
+ 150              	.L7:
+ 202:../FreeRTOS/event_groups.c **** 			}
+ 203:../FreeRTOS/event_groups.c **** 			else
+ 204:../FreeRTOS/event_groups.c **** 			{
+ 205:../FreeRTOS/event_groups.c **** 				/* The rendezvous bits were not set, but no block time was
+ 206:../FreeRTOS/event_groups.c **** 				specified - just return the current event bit value. */
+ 207:../FreeRTOS/event_groups.c **** 				uxReturn = pxEventBits->uxEventBits;
+ 151              		.loc 1 207 0
+ 152 00a4 3B6A     		ldr	r3, [r7, #32]
+ 153 00a6 1B68     		ldr	r3, [r3]
+ 154 00a8 7B62     		str	r3, [r7, #36]
+ 155              	.L6:
+ 208:../FreeRTOS/event_groups.c **** 			}
+ 209:../FreeRTOS/event_groups.c **** 		}
+ 210:../FreeRTOS/event_groups.c **** 	}
+ 211:../FreeRTOS/event_groups.c **** 	xAlreadyYielded = xTaskResumeAll();
+ 156              		.loc 1 211 0
+ 157 00aa FFF7FEFF 		bl	xTaskResumeAll
+ 158 00ae 7861     		str	r0, [r7, #20]
+ 212:../FreeRTOS/event_groups.c **** 
+ 213:../FreeRTOS/event_groups.c **** 	if( xTicksToWait != ( TickType_t ) 0 )
+ 159              		.loc 1 213 0
+ 160 00b0 3B68     		ldr	r3, [r7]
+ 161 00b2 002B     		cmp	r3, #0
+ 162 00b4 26D0     		beq	.L8
+ 214:../FreeRTOS/event_groups.c **** 	{
+ 215:../FreeRTOS/event_groups.c **** 		if( xAlreadyYielded == pdFALSE )
+ 163              		.loc 1 215 0
+ 164 00b6 7B69     		ldr	r3, [r7, #20]
+ 165 00b8 002B     		cmp	r3, #0
+ 166 00ba 01D1     		bne	.L9
+ 216:../FreeRTOS/event_groups.c **** 		{
+ 217:../FreeRTOS/event_groups.c **** 			portYIELD_WITHIN_API();
+ 167              		.loc 1 217 0
+ 168 00bc FFF7FEFF 		bl	vPortYield
+ 169              	.L9:
+ 218:../FreeRTOS/event_groups.c **** 		}
+ 219:../FreeRTOS/event_groups.c **** 		else
+ 220:../FreeRTOS/event_groups.c **** 		{
+ 221:../FreeRTOS/event_groups.c **** 			mtCOVERAGE_TEST_MARKER();
+ 222:../FreeRTOS/event_groups.c **** 		}
+ 223:../FreeRTOS/event_groups.c **** 
+ 224:../FreeRTOS/event_groups.c **** 		/* The task blocked to wait for its required bits to be set - at this
+ 225:../FreeRTOS/event_groups.c **** 		point either the required bits were set or the block time expired.  If
+ 226:../FreeRTOS/event_groups.c **** 		the required bits were set they will have been stored in the task's
+ 227:../FreeRTOS/event_groups.c **** 		event list item, and they should now be retrieved then cleared. */
+ 228:../FreeRTOS/event_groups.c **** 		uxReturn = uxTaskResetEventItemValue();
+ 170              		.loc 1 228 0
+ 171 00c0 FFF7FEFF 		bl	uxTaskResetEventItemValue
+ 172 00c4 7862     		str	r0, [r7, #36]
+ 229:../FreeRTOS/event_groups.c **** 
+ 230:../FreeRTOS/event_groups.c **** 		if( ( uxReturn & eventUNBLOCKED_DUE_TO_BIT_SET ) == ( EventBits_t ) 0 )
+ 173              		.loc 1 230 0
+ 174 00c6 7B6A     		ldr	r3, [r7, #36]
+ 175 00c8 03F00073 		and	r3, r3, #33554432
+ 176 00cc 002B     		cmp	r3, #0
+ 177 00ce 15D1     		bne	.L10
+ 231:../FreeRTOS/event_groups.c **** 		{
+ 232:../FreeRTOS/event_groups.c **** 			/* The task timed out, just return the current event bit value. */
+ 233:../FreeRTOS/event_groups.c **** 			taskENTER_CRITICAL();
+ 178              		.loc 1 233 0
+ 179 00d0 FFF7FEFF 		bl	vPortEnterCritical
+ 234:../FreeRTOS/event_groups.c **** 			{
+ 235:../FreeRTOS/event_groups.c **** 				uxReturn = pxEventBits->uxEventBits;
+ 180              		.loc 1 235 0
+ 181 00d4 3B6A     		ldr	r3, [r7, #32]
+ 182 00d6 1B68     		ldr	r3, [r3]
+ 183 00d8 7B62     		str	r3, [r7, #36]
+ 236:../FreeRTOS/event_groups.c **** 
+ 237:../FreeRTOS/event_groups.c **** 				/* Although the task got here because it timed out before the
+ 238:../FreeRTOS/event_groups.c **** 				bits it was waiting for were set, it is possible that since it
+ 239:../FreeRTOS/event_groups.c **** 				unblocked another task has set the bits.  If this is the case
+ 240:../FreeRTOS/event_groups.c **** 				then it needs to clear the bits before exiting. */
+ 241:../FreeRTOS/event_groups.c **** 				if( ( uxReturn & uxBitsToWaitFor ) == uxBitsToWaitFor )
+ 184              		.loc 1 241 0
+ 185 00da 7A6A     		ldr	r2, [r7, #36]
+ 186 00dc 7B68     		ldr	r3, [r7, #4]
+ 187 00de 1A40     		ands	r2, r2, r3
+ 188 00e0 7B68     		ldr	r3, [r7, #4]
+ 189 00e2 9A42     		cmp	r2, r3
+ 190 00e4 06D1     		bne	.L11
+ 242:../FreeRTOS/event_groups.c **** 				{
+ 243:../FreeRTOS/event_groups.c **** 					pxEventBits->uxEventBits &= ~uxBitsToWaitFor;
+ 191              		.loc 1 243 0
+ 192 00e6 3B6A     		ldr	r3, [r7, #32]
+ 193 00e8 1A68     		ldr	r2, [r3]
+ 194 00ea 7B68     		ldr	r3, [r7, #4]
+ 195 00ec DB43     		mvns	r3, r3
+ 196 00ee 1A40     		ands	r2, r2, r3
+ 197 00f0 3B6A     		ldr	r3, [r7, #32]
+ 198 00f2 1A60     		str	r2, [r3]
+ 199              	.L11:
+ 244:../FreeRTOS/event_groups.c **** 				}
+ 245:../FreeRTOS/event_groups.c **** 				else
+ 246:../FreeRTOS/event_groups.c **** 				{
+ 247:../FreeRTOS/event_groups.c **** 					mtCOVERAGE_TEST_MARKER();
+ 248:../FreeRTOS/event_groups.c **** 				}
+ 249:../FreeRTOS/event_groups.c **** 			}
+ 250:../FreeRTOS/event_groups.c **** 			taskEXIT_CRITICAL();
+ 200              		.loc 1 250 0 discriminator 1
+ 201 00f4 FFF7FEFF 		bl	vPortExitCritical
+ 251:../FreeRTOS/event_groups.c **** 
+ 252:../FreeRTOS/event_groups.c **** 			xTimeoutOccurred = pdTRUE;
+ 202              		.loc 1 252 0 discriminator 1
+ 203 00f8 0123     		movs	r3, #1
+ 204 00fa FB61     		str	r3, [r7, #28]
+ 205              	.L10:
+ 253:../FreeRTOS/event_groups.c **** 		}
+ 254:../FreeRTOS/event_groups.c **** 		else
+ 255:../FreeRTOS/event_groups.c **** 		{
+ 256:../FreeRTOS/event_groups.c **** 			/* The task unblocked because the bits were set. */
+ 257:../FreeRTOS/event_groups.c **** 		}
+ 258:../FreeRTOS/event_groups.c **** 
+ 259:../FreeRTOS/event_groups.c **** 		/* Control bits might be set as the task had blocked should not be
+ 260:../FreeRTOS/event_groups.c **** 		returned. */
+ 261:../FreeRTOS/event_groups.c **** 		uxReturn &= ~eventEVENT_BITS_CONTROL_BYTES;
+ 206              		.loc 1 261 0
+ 207 00fc 7B6A     		ldr	r3, [r7, #36]
+ 208 00fe 23F07F43 		bic	r3, r3, #-16777216
+ 209 0102 7B62     		str	r3, [r7, #36]
+ 210              	.L8:
+ 262:../FreeRTOS/event_groups.c **** 	}
+ 263:../FreeRTOS/event_groups.c **** 
+ 264:../FreeRTOS/event_groups.c **** 	traceEVENT_GROUP_SYNC_END( xEventGroup, uxBitsToSet, uxBitsToWaitFor, xTimeoutOccurred );
+ 265:../FreeRTOS/event_groups.c **** 
+ 266:../FreeRTOS/event_groups.c **** 	return uxReturn;
+ 211              		.loc 1 266 0
+ 212 0104 7B6A     		ldr	r3, [r7, #36]
+ 267:../FreeRTOS/event_groups.c **** }
+ 213              		.loc 1 267 0
+ 214 0106 1846     		mov	r0, r3
+ 215 0108 2837     		adds	r7, r7, #40
+ 216 010a BD46     		mov	sp, r7
+ 217              		@ sp needed
+ 218 010c 80BD     		pop	{r7, pc}
+ 219              		.cfi_endproc
+ 220              	.LFE1:
+ 222 010e 00BF     		.align	2
+ 223              		.global	xEventGroupWaitBits
+ 224              		.thumb
+ 225              		.thumb_func
+ 227              	xEventGroupWaitBits:
+ 228              	.LFB2:
+ 268:../FreeRTOS/event_groups.c **** /*-----------------------------------------------------------*/
+ 269:../FreeRTOS/event_groups.c **** 
+ 270:../FreeRTOS/event_groups.c **** EventBits_t xEventGroupWaitBits( EventGroupHandle_t xEventGroup, const EventBits_t uxBitsToWaitFor,
+ 271:../FreeRTOS/event_groups.c **** {
+ 229              		.loc 1 271 0
+ 230              		.cfi_startproc
+ 231              		@ args = 4, pretend = 0, frame = 48
+ 232              		@ frame_needed = 1, uses_anonymous_args = 0
+ 233 0110 80B5     		push	{r7, lr}
+ 234              		.cfi_def_cfa_offset 8
+ 235              		.cfi_offset 7, -8
+ 236              		.cfi_offset 14, -4
+ 237 0112 8CB0     		sub	sp, sp, #48
+ 238              		.cfi_def_cfa_offset 56
+ 239 0114 00AF     		add	r7, sp, #0
+ 240              		.cfi_def_cfa_register 7
+ 241 0116 F860     		str	r0, [r7, #12]
+ 242 0118 B960     		str	r1, [r7, #8]
+ 243 011a 7A60     		str	r2, [r7, #4]
+ 244 011c 3B60     		str	r3, [r7]
+ 272:../FreeRTOS/event_groups.c **** EventGroup_t *pxEventBits = ( EventGroup_t * ) xEventGroup;
+ 245              		.loc 1 272 0
+ 246 011e FB68     		ldr	r3, [r7, #12]
+ 247 0120 7B62     		str	r3, [r7, #36]
+ 273:../FreeRTOS/event_groups.c **** EventBits_t uxReturn, uxControlBits = 0;
+ 248              		.loc 1 273 0
+ 249 0122 0023     		movs	r3, #0
+ 250 0124 BB62     		str	r3, [r7, #40]
+ 274:../FreeRTOS/event_groups.c **** BaseType_t xWaitConditionMet, xAlreadyYielded;
+ 275:../FreeRTOS/event_groups.c **** BaseType_t xTimeoutOccurred = pdFALSE;
+ 251              		.loc 1 275 0
+ 252 0126 0023     		movs	r3, #0
+ 253 0128 3B62     		str	r3, [r7, #32]
+ 276:../FreeRTOS/event_groups.c **** 
+ 277:../FreeRTOS/event_groups.c **** 	/* Check the user is not attempting to wait on the bits used by the kernel
+ 278:../FreeRTOS/event_groups.c **** 	itself, and that at least one bit is being requested. */
+ 279:../FreeRTOS/event_groups.c **** 	configASSERT( ( uxBitsToWaitFor & eventEVENT_BITS_CONTROL_BYTES ) == 0 );
+ 280:../FreeRTOS/event_groups.c **** 	configASSERT( uxBitsToWaitFor != 0 );
+ 281:../FreeRTOS/event_groups.c **** 	#if ( ( INCLUDE_xTaskGetSchedulerState == 1 ) || ( configUSE_TIMERS == 1 ) )
+ 282:../FreeRTOS/event_groups.c **** 	{
+ 283:../FreeRTOS/event_groups.c **** 		configASSERT( !( ( xTaskGetSchedulerState() == taskSCHEDULER_SUSPENDED ) && ( xTicksToWait != 0 )
+ 284:../FreeRTOS/event_groups.c **** 	}
+ 285:../FreeRTOS/event_groups.c **** 	#endif
+ 286:../FreeRTOS/event_groups.c **** 
+ 287:../FreeRTOS/event_groups.c **** 	vTaskSuspendAll();
+ 254              		.loc 1 287 0
+ 255 012a FFF7FEFF 		bl	vTaskSuspendAll
+ 256              	.LBB2:
+ 288:../FreeRTOS/event_groups.c **** 	{
+ 289:../FreeRTOS/event_groups.c **** 		const EventBits_t uxCurrentEventBits = pxEventBits->uxEventBits;
+ 257              		.loc 1 289 0
+ 258 012e 7B6A     		ldr	r3, [r7, #36]
+ 259 0130 1B68     		ldr	r3, [r3]
+ 260 0132 FB61     		str	r3, [r7, #28]
+ 290:../FreeRTOS/event_groups.c **** 
+ 291:../FreeRTOS/event_groups.c **** 		/* Check to see if the wait condition is already met or not. */
+ 292:../FreeRTOS/event_groups.c **** 		xWaitConditionMet = prvTestWaitCondition( uxCurrentEventBits, uxBitsToWaitFor, xWaitForAllBits );
+ 261              		.loc 1 292 0
+ 262 0134 F869     		ldr	r0, [r7, #28]
+ 263 0136 B968     		ldr	r1, [r7, #8]
+ 264 0138 3A68     		ldr	r2, [r7]
+ 265 013a 00F03FF9 		bl	prvTestWaitCondition
+ 266 013e B861     		str	r0, [r7, #24]
+ 293:../FreeRTOS/event_groups.c **** 
+ 294:../FreeRTOS/event_groups.c **** 		if( xWaitConditionMet != pdFALSE )
+ 267              		.loc 1 294 0
+ 268 0140 BB69     		ldr	r3, [r7, #24]
+ 269 0142 002B     		cmp	r3, #0
+ 270 0144 0ED0     		beq	.L14
+ 295:../FreeRTOS/event_groups.c **** 		{
+ 296:../FreeRTOS/event_groups.c **** 			/* The wait condition has already been met so there is no need to
+ 297:../FreeRTOS/event_groups.c **** 			block. */
+ 298:../FreeRTOS/event_groups.c **** 			uxReturn = uxCurrentEventBits;
+ 271              		.loc 1 298 0
+ 272 0146 FB69     		ldr	r3, [r7, #28]
+ 273 0148 FB62     		str	r3, [r7, #44]
+ 299:../FreeRTOS/event_groups.c **** 			xTicksToWait = ( TickType_t ) 0;
+ 274              		.loc 1 299 0
+ 275 014a 0023     		movs	r3, #0
+ 276 014c BB63     		str	r3, [r7, #56]
+ 300:../FreeRTOS/event_groups.c **** 
+ 301:../FreeRTOS/event_groups.c **** 			/* Clear the wait bits if requested to do so. */
+ 302:../FreeRTOS/event_groups.c **** 			if( xClearOnExit != pdFALSE )
+ 277              		.loc 1 302 0
+ 278 014e 7B68     		ldr	r3, [r7, #4]
+ 279 0150 002B     		cmp	r3, #0
+ 280 0152 27D0     		beq	.L15
+ 303:../FreeRTOS/event_groups.c **** 			{
+ 304:../FreeRTOS/event_groups.c **** 				pxEventBits->uxEventBits &= ~uxBitsToWaitFor;
+ 281              		.loc 1 304 0
+ 282 0154 7B6A     		ldr	r3, [r7, #36]
+ 283 0156 1A68     		ldr	r2, [r3]
+ 284 0158 BB68     		ldr	r3, [r7, #8]
+ 285 015a DB43     		mvns	r3, r3
+ 286 015c 1A40     		ands	r2, r2, r3
+ 287 015e 7B6A     		ldr	r3, [r7, #36]
+ 288 0160 1A60     		str	r2, [r3]
+ 289 0162 1FE0     		b	.L15
+ 290              	.L14:
+ 305:../FreeRTOS/event_groups.c **** 			}
+ 306:../FreeRTOS/event_groups.c **** 			else
+ 307:../FreeRTOS/event_groups.c **** 			{
+ 308:../FreeRTOS/event_groups.c **** 				mtCOVERAGE_TEST_MARKER();
+ 309:../FreeRTOS/event_groups.c **** 			}
+ 310:../FreeRTOS/event_groups.c **** 		}
+ 311:../FreeRTOS/event_groups.c **** 		else if( xTicksToWait == ( TickType_t ) 0 )
+ 291              		.loc 1 311 0
+ 292 0164 BB6B     		ldr	r3, [r7, #56]
+ 293 0166 002B     		cmp	r3, #0
+ 294 0168 02D1     		bne	.L16
+ 312:../FreeRTOS/event_groups.c **** 		{
+ 313:../FreeRTOS/event_groups.c **** 			/* The wait condition has not been met, but no block time was
+ 314:../FreeRTOS/event_groups.c **** 			specified, so just return the current value. */
+ 315:../FreeRTOS/event_groups.c **** 			uxReturn = uxCurrentEventBits;
+ 295              		.loc 1 315 0
+ 296 016a FB69     		ldr	r3, [r7, #28]
+ 297 016c FB62     		str	r3, [r7, #44]
+ 298 016e 19E0     		b	.L15
+ 299              	.L16:
+ 316:../FreeRTOS/event_groups.c **** 		}
+ 317:../FreeRTOS/event_groups.c **** 		else
+ 318:../FreeRTOS/event_groups.c **** 		{
+ 319:../FreeRTOS/event_groups.c **** 			/* The task is going to block to wait for its required bits to be
+ 320:../FreeRTOS/event_groups.c **** 			set.  uxControlBits are used to remember the specified behaviour of
+ 321:../FreeRTOS/event_groups.c **** 			this call to xEventGroupWaitBits() - for use when the event bits
+ 322:../FreeRTOS/event_groups.c **** 			unblock the task. */
+ 323:../FreeRTOS/event_groups.c **** 			if( xClearOnExit != pdFALSE )
+ 300              		.loc 1 323 0
+ 301 0170 7B68     		ldr	r3, [r7, #4]
+ 302 0172 002B     		cmp	r3, #0
+ 303 0174 03D0     		beq	.L17
+ 324:../FreeRTOS/event_groups.c **** 			{
+ 325:../FreeRTOS/event_groups.c **** 				uxControlBits |= eventCLEAR_EVENTS_ON_EXIT_BIT;
+ 304              		.loc 1 325 0
+ 305 0176 BB6A     		ldr	r3, [r7, #40]
+ 306 0178 43F08073 		orr	r3, r3, #16777216
+ 307 017c BB62     		str	r3, [r7, #40]
+ 308              	.L17:
+ 326:../FreeRTOS/event_groups.c **** 			}
+ 327:../FreeRTOS/event_groups.c **** 			else
+ 328:../FreeRTOS/event_groups.c **** 			{
+ 329:../FreeRTOS/event_groups.c **** 				mtCOVERAGE_TEST_MARKER();
+ 330:../FreeRTOS/event_groups.c **** 			}
+ 331:../FreeRTOS/event_groups.c **** 
+ 332:../FreeRTOS/event_groups.c **** 			if( xWaitForAllBits != pdFALSE )
+ 309              		.loc 1 332 0
+ 310 017e 3B68     		ldr	r3, [r7]
+ 311 0180 002B     		cmp	r3, #0
+ 312 0182 03D0     		beq	.L18
+ 333:../FreeRTOS/event_groups.c **** 			{
+ 334:../FreeRTOS/event_groups.c **** 				uxControlBits |= eventWAIT_FOR_ALL_BITS;
+ 313              		.loc 1 334 0
+ 314 0184 BB6A     		ldr	r3, [r7, #40]
+ 315 0186 43F08063 		orr	r3, r3, #67108864
+ 316 018a BB62     		str	r3, [r7, #40]
+ 317              	.L18:
+ 335:../FreeRTOS/event_groups.c **** 			}
+ 336:../FreeRTOS/event_groups.c **** 			else
+ 337:../FreeRTOS/event_groups.c **** 			{
+ 338:../FreeRTOS/event_groups.c **** 				mtCOVERAGE_TEST_MARKER();
+ 339:../FreeRTOS/event_groups.c **** 			}
+ 340:../FreeRTOS/event_groups.c **** 
+ 341:../FreeRTOS/event_groups.c **** 			/* Store the bits that the calling task is waiting for in the
+ 342:../FreeRTOS/event_groups.c **** 			task's event list item so the kernel knows when a match is
+ 343:../FreeRTOS/event_groups.c **** 			found.  Then enter the blocked state. */
+ 344:../FreeRTOS/event_groups.c **** 			vTaskPlaceOnUnorderedEventList( &( pxEventBits->xTasksWaitingForBits ), ( uxBitsToWaitFor | uxCo
+ 318              		.loc 1 344 0
+ 319 018c 7B6A     		ldr	r3, [r7, #36]
+ 320 018e 1A1D     		adds	r2, r3, #4
+ 321 0190 B968     		ldr	r1, [r7, #8]
+ 322 0192 BB6A     		ldr	r3, [r7, #40]
+ 323 0194 0B43     		orrs	r3, r3, r1
+ 324 0196 1046     		mov	r0, r2
+ 325 0198 1946     		mov	r1, r3
+ 326 019a BA6B     		ldr	r2, [r7, #56]
+ 327 019c FFF7FEFF 		bl	vTaskPlaceOnUnorderedEventList
+ 345:../FreeRTOS/event_groups.c **** 
+ 346:../FreeRTOS/event_groups.c **** 			/* This is obsolete as it will get set after the task unblocks, but
+ 347:../FreeRTOS/event_groups.c **** 			some compilers mistakenly generate a warning about the variable
+ 348:../FreeRTOS/event_groups.c **** 			being returned without being set if it is not done. */
+ 349:../FreeRTOS/event_groups.c **** 			uxReturn = 0;
+ 328              		.loc 1 349 0
+ 329 01a0 0023     		movs	r3, #0
+ 330 01a2 FB62     		str	r3, [r7, #44]
+ 331              	.L15:
+ 332              	.LBE2:
+ 350:../FreeRTOS/event_groups.c **** 
+ 351:../FreeRTOS/event_groups.c **** 			traceEVENT_GROUP_WAIT_BITS_BLOCK( xEventGroup, uxBitsToWaitFor );
+ 352:../FreeRTOS/event_groups.c **** 		}
+ 353:../FreeRTOS/event_groups.c **** 	}
+ 354:../FreeRTOS/event_groups.c **** 	xAlreadyYielded = xTaskResumeAll();
+ 333              		.loc 1 354 0
+ 334 01a4 FFF7FEFF 		bl	xTaskResumeAll
+ 335 01a8 7861     		str	r0, [r7, #20]
+ 355:../FreeRTOS/event_groups.c **** 
+ 356:../FreeRTOS/event_groups.c **** 	if( xTicksToWait != ( TickType_t ) 0 )
+ 336              		.loc 1 356 0
+ 337 01aa BB6B     		ldr	r3, [r7, #56]
+ 338 01ac 002B     		cmp	r3, #0
+ 339 01ae 2BD0     		beq	.L19
+ 357:../FreeRTOS/event_groups.c **** 	{
+ 358:../FreeRTOS/event_groups.c **** 		if( xAlreadyYielded == pdFALSE )
+ 340              		.loc 1 358 0
+ 341 01b0 7B69     		ldr	r3, [r7, #20]
+ 342 01b2 002B     		cmp	r3, #0
+ 343 01b4 01D1     		bne	.L20
+ 359:../FreeRTOS/event_groups.c **** 		{
+ 360:../FreeRTOS/event_groups.c **** 			portYIELD_WITHIN_API();
+ 344              		.loc 1 360 0
+ 345 01b6 FFF7FEFF 		bl	vPortYield
+ 346              	.L20:
+ 361:../FreeRTOS/event_groups.c **** 		}
+ 362:../FreeRTOS/event_groups.c **** 		else
+ 363:../FreeRTOS/event_groups.c **** 		{
+ 364:../FreeRTOS/event_groups.c **** 			mtCOVERAGE_TEST_MARKER();
+ 365:../FreeRTOS/event_groups.c **** 		}
+ 366:../FreeRTOS/event_groups.c **** 
+ 367:../FreeRTOS/event_groups.c **** 		/* The task blocked to wait for its required bits to be set - at this
+ 368:../FreeRTOS/event_groups.c **** 		point either the required bits were set or the block time expired.  If
+ 369:../FreeRTOS/event_groups.c **** 		the required bits were set they will have been stored in the task's
+ 370:../FreeRTOS/event_groups.c **** 		event list item, and they should now be retrieved then cleared. */
+ 371:../FreeRTOS/event_groups.c **** 		uxReturn = uxTaskResetEventItemValue();
+ 347              		.loc 1 371 0
+ 348 01ba FFF7FEFF 		bl	uxTaskResetEventItemValue
+ 349 01be F862     		str	r0, [r7, #44]
+ 372:../FreeRTOS/event_groups.c **** 
+ 373:../FreeRTOS/event_groups.c **** 		if( ( uxReturn & eventUNBLOCKED_DUE_TO_BIT_SET ) == ( EventBits_t ) 0 )
+ 350              		.loc 1 373 0
+ 351 01c0 FB6A     		ldr	r3, [r7, #44]
+ 352 01c2 03F00073 		and	r3, r3, #33554432
+ 353 01c6 002B     		cmp	r3, #0
+ 354 01c8 1AD1     		bne	.L21
+ 374:../FreeRTOS/event_groups.c **** 		{
+ 375:../FreeRTOS/event_groups.c **** 			taskENTER_CRITICAL();
+ 355              		.loc 1 375 0
+ 356 01ca FFF7FEFF 		bl	vPortEnterCritical
+ 376:../FreeRTOS/event_groups.c **** 			{
+ 377:../FreeRTOS/event_groups.c **** 				/* The task timed out, just return the current event bit value. */
+ 378:../FreeRTOS/event_groups.c **** 				uxReturn = pxEventBits->uxEventBits;
+ 357              		.loc 1 378 0
+ 358 01ce 7B6A     		ldr	r3, [r7, #36]
+ 359 01d0 1B68     		ldr	r3, [r3]
+ 360 01d2 FB62     		str	r3, [r7, #44]
+ 379:../FreeRTOS/event_groups.c **** 
+ 380:../FreeRTOS/event_groups.c **** 				/* It is possible that the event bits were updated between this
+ 381:../FreeRTOS/event_groups.c **** 				task leaving the Blocked state and running again. */
+ 382:../FreeRTOS/event_groups.c **** 				if( prvTestWaitCondition( uxReturn, uxBitsToWaitFor, xWaitForAllBits ) != pdFALSE )
+ 361              		.loc 1 382 0
+ 362 01d4 F86A     		ldr	r0, [r7, #44]
+ 363 01d6 B968     		ldr	r1, [r7, #8]
+ 364 01d8 3A68     		ldr	r2, [r7]
+ 365 01da 00F0EFF8 		bl	prvTestWaitCondition
+ 366 01de 0346     		mov	r3, r0
+ 367 01e0 002B     		cmp	r3, #0
+ 368 01e2 09D0     		beq	.L22
+ 383:../FreeRTOS/event_groups.c **** 				{
+ 384:../FreeRTOS/event_groups.c **** 					if( xClearOnExit != pdFALSE )
+ 369              		.loc 1 384 0
+ 370 01e4 7B68     		ldr	r3, [r7, #4]
+ 371 01e6 002B     		cmp	r3, #0
+ 372 01e8 06D0     		beq	.L22
+ 385:../FreeRTOS/event_groups.c **** 					{
+ 386:../FreeRTOS/event_groups.c **** 						pxEventBits->uxEventBits &= ~uxBitsToWaitFor;
+ 373              		.loc 1 386 0
+ 374 01ea 7B6A     		ldr	r3, [r7, #36]
+ 375 01ec 1A68     		ldr	r2, [r3]
+ 376 01ee BB68     		ldr	r3, [r7, #8]
+ 377 01f0 DB43     		mvns	r3, r3
+ 378 01f2 1A40     		ands	r2, r2, r3
+ 379 01f4 7B6A     		ldr	r3, [r7, #36]
+ 380 01f6 1A60     		str	r2, [r3]
+ 381              	.L22:
+ 387:../FreeRTOS/event_groups.c **** 					}
+ 388:../FreeRTOS/event_groups.c **** 					else
+ 389:../FreeRTOS/event_groups.c **** 					{
+ 390:../FreeRTOS/event_groups.c **** 						mtCOVERAGE_TEST_MARKER();
+ 391:../FreeRTOS/event_groups.c **** 					}
+ 392:../FreeRTOS/event_groups.c **** 				}
+ 393:../FreeRTOS/event_groups.c **** 				else
+ 394:../FreeRTOS/event_groups.c **** 				{
+ 395:../FreeRTOS/event_groups.c **** 					mtCOVERAGE_TEST_MARKER();
+ 396:../FreeRTOS/event_groups.c **** 				}
+ 397:../FreeRTOS/event_groups.c **** 			}
+ 398:../FreeRTOS/event_groups.c **** 			taskEXIT_CRITICAL();
+ 382              		.loc 1 398 0 discriminator 2
+ 383 01f8 FFF7FEFF 		bl	vPortExitCritical
+ 399:../FreeRTOS/event_groups.c **** 
+ 400:../FreeRTOS/event_groups.c **** 			/* Prevent compiler warnings when trace macros are not used. */
+ 401:../FreeRTOS/event_groups.c **** 			xTimeoutOccurred = pdFALSE;
+ 384              		.loc 1 401 0 discriminator 2
+ 385 01fc 0023     		movs	r3, #0
+ 386 01fe 3B62     		str	r3, [r7, #32]
+ 387              	.L21:
+ 402:../FreeRTOS/event_groups.c **** 		}
+ 403:../FreeRTOS/event_groups.c **** 		else
+ 404:../FreeRTOS/event_groups.c **** 		{
+ 405:../FreeRTOS/event_groups.c **** 			/* The task unblocked because the bits were set. */
+ 406:../FreeRTOS/event_groups.c **** 		}
+ 407:../FreeRTOS/event_groups.c **** 
+ 408:../FreeRTOS/event_groups.c **** 		/* The task blocked so control bits may have been set. */
+ 409:../FreeRTOS/event_groups.c **** 		uxReturn &= ~eventEVENT_BITS_CONTROL_BYTES;
+ 388              		.loc 1 409 0
+ 389 0200 FB6A     		ldr	r3, [r7, #44]
+ 390 0202 23F07F43 		bic	r3, r3, #-16777216
+ 391 0206 FB62     		str	r3, [r7, #44]
+ 392              	.L19:
+ 410:../FreeRTOS/event_groups.c **** 	}
+ 411:../FreeRTOS/event_groups.c **** 	traceEVENT_GROUP_WAIT_BITS_END( xEventGroup, uxBitsToWaitFor, xTimeoutOccurred );
+ 412:../FreeRTOS/event_groups.c **** 
+ 413:../FreeRTOS/event_groups.c **** 	return uxReturn;
+ 393              		.loc 1 413 0
+ 394 0208 FB6A     		ldr	r3, [r7, #44]
+ 414:../FreeRTOS/event_groups.c **** }
+ 395              		.loc 1 414 0
+ 396 020a 1846     		mov	r0, r3
+ 397 020c 3037     		adds	r7, r7, #48
+ 398 020e BD46     		mov	sp, r7
+ 399              		@ sp needed
+ 400 0210 80BD     		pop	{r7, pc}
+ 401              		.cfi_endproc
+ 402              	.LFE2:
+ 404 0212 00BF     		.align	2
+ 405              		.global	xEventGroupClearBits
+ 406              		.thumb
+ 407              		.thumb_func
+ 409              	xEventGroupClearBits:
+ 410              	.LFB3:
+ 415:../FreeRTOS/event_groups.c **** /*-----------------------------------------------------------*/
+ 416:../FreeRTOS/event_groups.c **** 
+ 417:../FreeRTOS/event_groups.c **** EventBits_t xEventGroupClearBits( EventGroupHandle_t xEventGroup, const EventBits_t uxBitsToClear )
+ 418:../FreeRTOS/event_groups.c **** {
+ 411              		.loc 1 418 0
+ 412              		.cfi_startproc
+ 413              		@ args = 0, pretend = 0, frame = 16
+ 414              		@ frame_needed = 1, uses_anonymous_args = 0
+ 415 0214 80B5     		push	{r7, lr}
+ 416              		.cfi_def_cfa_offset 8
+ 417              		.cfi_offset 7, -8
+ 418              		.cfi_offset 14, -4
+ 419 0216 84B0     		sub	sp, sp, #16
+ 420              		.cfi_def_cfa_offset 24
+ 421 0218 00AF     		add	r7, sp, #0
+ 422              		.cfi_def_cfa_register 7
+ 423 021a 7860     		str	r0, [r7, #4]
+ 424 021c 3960     		str	r1, [r7]
+ 419:../FreeRTOS/event_groups.c **** EventGroup_t *pxEventBits = ( EventGroup_t * ) xEventGroup;
+ 425              		.loc 1 419 0
+ 426 021e 7B68     		ldr	r3, [r7, #4]
+ 427 0220 FB60     		str	r3, [r7, #12]
+ 420:../FreeRTOS/event_groups.c **** EventBits_t uxReturn;
+ 421:../FreeRTOS/event_groups.c **** 
+ 422:../FreeRTOS/event_groups.c **** 	/* Check the user is not attempting to clear the bits used by the kernel
+ 423:../FreeRTOS/event_groups.c **** 	itself. */
+ 424:../FreeRTOS/event_groups.c **** 	configASSERT( ( uxBitsToClear & eventEVENT_BITS_CONTROL_BYTES ) == 0 );
+ 425:../FreeRTOS/event_groups.c **** 
+ 426:../FreeRTOS/event_groups.c **** 	taskENTER_CRITICAL();
+ 428              		.loc 1 426 0
+ 429 0222 FFF7FEFF 		bl	vPortEnterCritical
+ 427:../FreeRTOS/event_groups.c **** 	{
+ 428:../FreeRTOS/event_groups.c **** 		traceEVENT_GROUP_CLEAR_BITS( xEventGroup, uxBitsToClear );
+ 429:../FreeRTOS/event_groups.c **** 
+ 430:../FreeRTOS/event_groups.c **** 		/* The value returned is the event group value prior to the bits being
+ 431:../FreeRTOS/event_groups.c **** 		cleared. */
+ 432:../FreeRTOS/event_groups.c **** 		uxReturn = pxEventBits->uxEventBits;
+ 430              		.loc 1 432 0
+ 431 0226 FB68     		ldr	r3, [r7, #12]
+ 432 0228 1B68     		ldr	r3, [r3]
+ 433 022a BB60     		str	r3, [r7, #8]
+ 433:../FreeRTOS/event_groups.c **** 
+ 434:../FreeRTOS/event_groups.c **** 		/* Clear the bits. */
+ 435:../FreeRTOS/event_groups.c **** 		pxEventBits->uxEventBits &= ~uxBitsToClear;
+ 434              		.loc 1 435 0
+ 435 022c FB68     		ldr	r3, [r7, #12]
+ 436 022e 1A68     		ldr	r2, [r3]
+ 437 0230 3B68     		ldr	r3, [r7]
+ 438 0232 DB43     		mvns	r3, r3
+ 439 0234 1A40     		ands	r2, r2, r3
+ 440 0236 FB68     		ldr	r3, [r7, #12]
+ 441 0238 1A60     		str	r2, [r3]
+ 436:../FreeRTOS/event_groups.c **** 	}
+ 437:../FreeRTOS/event_groups.c **** 	taskEXIT_CRITICAL();
+ 442              		.loc 1 437 0
+ 443 023a FFF7FEFF 		bl	vPortExitCritical
+ 438:../FreeRTOS/event_groups.c **** 
+ 439:../FreeRTOS/event_groups.c **** 	return uxReturn;
+ 444              		.loc 1 439 0
+ 445 023e BB68     		ldr	r3, [r7, #8]
+ 440:../FreeRTOS/event_groups.c **** }
+ 446              		.loc 1 440 0
+ 447 0240 1846     		mov	r0, r3
+ 448 0242 1037     		adds	r7, r7, #16
+ 449 0244 BD46     		mov	sp, r7
+ 450              		@ sp needed
+ 451 0246 80BD     		pop	{r7, pc}
+ 452              		.cfi_endproc
+ 453              	.LFE3:
+ 455              		.align	2
+ 456              		.global	xEventGroupGetBitsFromISR
+ 457              		.thumb
+ 458              		.thumb_func
+ 460              	xEventGroupGetBitsFromISR:
+ 461              	.LFB4:
+ 441:../FreeRTOS/event_groups.c **** /*-----------------------------------------------------------*/
+ 442:../FreeRTOS/event_groups.c **** 
+ 443:../FreeRTOS/event_groups.c **** #if ( ( configUSE_TRACE_FACILITY == 1 ) && ( INCLUDE_xTimerPendFunctionCall == 1 ) && ( configUSE_T
+ 444:../FreeRTOS/event_groups.c **** 
+ 445:../FreeRTOS/event_groups.c **** 	BaseType_t xEventGroupClearBitsFromISR( EventGroupHandle_t xEventGroup, const EventBits_t uxBitsTo
+ 446:../FreeRTOS/event_groups.c **** 	{
+ 447:../FreeRTOS/event_groups.c **** 		BaseType_t xReturn;
+ 448:../FreeRTOS/event_groups.c **** 
+ 449:../FreeRTOS/event_groups.c **** 		traceEVENT_GROUP_CLEAR_BITS_FROM_ISR( xEventGroup, uxBitsToClear );
+ 450:../FreeRTOS/event_groups.c **** 		xReturn = xTimerPendFunctionCallFromISR( vEventGroupClearBitsCallback, ( void * ) xEventGroup, ( 
+ 451:../FreeRTOS/event_groups.c **** 
+ 452:../FreeRTOS/event_groups.c **** 		return xReturn;
+ 453:../FreeRTOS/event_groups.c **** 	}
+ 454:../FreeRTOS/event_groups.c **** 
+ 455:../FreeRTOS/event_groups.c **** #endif
+ 456:../FreeRTOS/event_groups.c **** /*-----------------------------------------------------------*/
+ 457:../FreeRTOS/event_groups.c **** 
+ 458:../FreeRTOS/event_groups.c **** EventBits_t xEventGroupGetBitsFromISR( EventGroupHandle_t xEventGroup )
+ 459:../FreeRTOS/event_groups.c **** {
+ 462              		.loc 1 459 0
+ 463              		.cfi_startproc
+ 464              		@ args = 0, pretend = 0, frame = 24
+ 465              		@ frame_needed = 1, uses_anonymous_args = 0
+ 466 0248 80B5     		push	{r7, lr}
+ 467              		.cfi_def_cfa_offset 8
+ 468              		.cfi_offset 7, -8
+ 469              		.cfi_offset 14, -4
+ 470 024a 86B0     		sub	sp, sp, #24
+ 471              		.cfi_def_cfa_offset 32
+ 472 024c 00AF     		add	r7, sp, #0
+ 473              		.cfi_def_cfa_register 7
+ 474 024e 7860     		str	r0, [r7, #4]
+ 460:../FreeRTOS/event_groups.c **** UBaseType_t uxSavedInterruptStatus;
+ 461:../FreeRTOS/event_groups.c **** EventGroup_t *pxEventBits = ( EventGroup_t * ) xEventGroup;
+ 475              		.loc 1 461 0
+ 476 0250 7B68     		ldr	r3, [r7, #4]
+ 477 0252 7B61     		str	r3, [r7, #20]
+ 462:../FreeRTOS/event_groups.c **** EventBits_t uxReturn;
+ 463:../FreeRTOS/event_groups.c **** 
+ 464:../FreeRTOS/event_groups.c **** 	uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
+ 478              		.loc 1 464 0
+ 479 0254 FFF7FEFF 		bl	ulPortSetInterruptMask
+ 480 0258 3861     		str	r0, [r7, #16]
+ 465:../FreeRTOS/event_groups.c **** 	{
+ 466:../FreeRTOS/event_groups.c **** 		uxReturn = pxEventBits->uxEventBits;
+ 481              		.loc 1 466 0
+ 482 025a 7B69     		ldr	r3, [r7, #20]
+ 483 025c 1B68     		ldr	r3, [r3]
+ 484 025e FB60     		str	r3, [r7, #12]
+ 467:../FreeRTOS/event_groups.c **** 	}
+ 468:../FreeRTOS/event_groups.c **** 	portCLEAR_INTERRUPT_MASK_FROM_ISR( uxSavedInterruptStatus );
+ 485              		.loc 1 468 0
+ 486 0260 3869     		ldr	r0, [r7, #16]
+ 487 0262 FFF7FEFF 		bl	vPortClearInterruptMask
+ 469:../FreeRTOS/event_groups.c **** 
+ 470:../FreeRTOS/event_groups.c **** 	return uxReturn;
+ 488              		.loc 1 470 0
+ 489 0266 FB68     		ldr	r3, [r7, #12]
+ 471:../FreeRTOS/event_groups.c **** }
+ 490              		.loc 1 471 0
+ 491 0268 1846     		mov	r0, r3
+ 492 026a 1837     		adds	r7, r7, #24
+ 493 026c BD46     		mov	sp, r7
+ 494              		@ sp needed
+ 495 026e 80BD     		pop	{r7, pc}
+ 496              		.cfi_endproc
+ 497              	.LFE4:
+ 499              		.align	2
+ 500              		.global	xEventGroupSetBits
+ 501              		.thumb
+ 502              		.thumb_func
+ 504              	xEventGroupSetBits:
+ 505              	.LFB5:
+ 472:../FreeRTOS/event_groups.c **** /*-----------------------------------------------------------*/
+ 473:../FreeRTOS/event_groups.c **** 
+ 474:../FreeRTOS/event_groups.c **** EventBits_t xEventGroupSetBits( EventGroupHandle_t xEventGroup, const EventBits_t uxBitsToSet )
+ 475:../FreeRTOS/event_groups.c **** {
+ 506              		.loc 1 475 0
+ 507              		.cfi_startproc
+ 508              		@ args = 0, pretend = 0, frame = 48
+ 509              		@ frame_needed = 1, uses_anonymous_args = 0
+ 510 0270 80B5     		push	{r7, lr}
+ 511              		.cfi_def_cfa_offset 8
+ 512              		.cfi_offset 7, -8
+ 513              		.cfi_offset 14, -4
+ 514 0272 8CB0     		sub	sp, sp, #48
+ 515              		.cfi_def_cfa_offset 56
+ 516 0274 00AF     		add	r7, sp, #0
+ 517              		.cfi_def_cfa_register 7
+ 518 0276 7860     		str	r0, [r7, #4]
+ 519 0278 3960     		str	r1, [r7]
+ 476:../FreeRTOS/event_groups.c **** ListItem_t *pxListItem, *pxNext;
+ 477:../FreeRTOS/event_groups.c **** ListItem_t const *pxListEnd;
+ 478:../FreeRTOS/event_groups.c **** List_t *pxList;
+ 479:../FreeRTOS/event_groups.c **** EventBits_t uxBitsToClear = 0, uxBitsWaitedFor, uxControlBits;
+ 520              		.loc 1 479 0
+ 521 027a 0023     		movs	r3, #0
+ 522 027c BB62     		str	r3, [r7, #40]
+ 480:../FreeRTOS/event_groups.c **** EventGroup_t *pxEventBits = ( EventGroup_t * ) xEventGroup;
+ 523              		.loc 1 480 0
+ 524 027e 7B68     		ldr	r3, [r7, #4]
+ 525 0280 3B62     		str	r3, [r7, #32]
+ 481:../FreeRTOS/event_groups.c **** BaseType_t xMatchFound = pdFALSE;
+ 526              		.loc 1 481 0
+ 527 0282 0023     		movs	r3, #0
+ 528 0284 7B62     		str	r3, [r7, #36]
+ 482:../FreeRTOS/event_groups.c **** 
+ 483:../FreeRTOS/event_groups.c **** 	/* Check the user is not attempting to set the bits used by the kernel
+ 484:../FreeRTOS/event_groups.c **** 	itself. */
+ 485:../FreeRTOS/event_groups.c **** 	configASSERT( ( uxBitsToSet & eventEVENT_BITS_CONTROL_BYTES ) == 0 );
+ 486:../FreeRTOS/event_groups.c **** 
+ 487:../FreeRTOS/event_groups.c **** 	pxList = &( pxEventBits->xTasksWaitingForBits );
+ 529              		.loc 1 487 0
+ 530 0286 3B6A     		ldr	r3, [r7, #32]
+ 531 0288 0433     		adds	r3, r3, #4
+ 532 028a FB61     		str	r3, [r7, #28]
+ 488:../FreeRTOS/event_groups.c **** 	pxListEnd = listGET_END_MARKER( pxList ); /*lint !e826 !e740 The mini list structure is used as th
+ 533              		.loc 1 488 0
+ 534 028c FB69     		ldr	r3, [r7, #28]
+ 535 028e 0833     		adds	r3, r3, #8
+ 536 0290 BB61     		str	r3, [r7, #24]
+ 489:../FreeRTOS/event_groups.c **** 	vTaskSuspendAll();
+ 537              		.loc 1 489 0
+ 538 0292 FFF7FEFF 		bl	vTaskSuspendAll
+ 490:../FreeRTOS/event_groups.c **** 	{
+ 491:../FreeRTOS/event_groups.c **** 		traceEVENT_GROUP_SET_BITS( xEventGroup, uxBitsToSet );
+ 492:../FreeRTOS/event_groups.c **** 
+ 493:../FreeRTOS/event_groups.c **** 		pxListItem = listGET_HEAD_ENTRY( pxList );
+ 539              		.loc 1 493 0
+ 540 0296 FB69     		ldr	r3, [r7, #28]
+ 541 0298 DB68     		ldr	r3, [r3, #12]
+ 542 029a FB62     		str	r3, [r7, #44]
+ 494:../FreeRTOS/event_groups.c **** 
+ 495:../FreeRTOS/event_groups.c **** 		/* Set the bits. */
+ 496:../FreeRTOS/event_groups.c **** 		pxEventBits->uxEventBits |= uxBitsToSet;
+ 543              		.loc 1 496 0
+ 544 029c 3B6A     		ldr	r3, [r7, #32]
+ 545 029e 1A68     		ldr	r2, [r3]
+ 546 02a0 3B68     		ldr	r3, [r7]
+ 547 02a2 1A43     		orrs	r2, r2, r3
+ 548 02a4 3B6A     		ldr	r3, [r7, #32]
+ 549 02a6 1A60     		str	r2, [r3]
+ 497:../FreeRTOS/event_groups.c **** 
+ 498:../FreeRTOS/event_groups.c **** 		/* See if the new bit value should unblock any tasks. */
+ 499:../FreeRTOS/event_groups.c **** 		while( pxListItem != pxListEnd )
+ 550              		.loc 1 499 0
+ 551 02a8 3CE0     		b	.L29
+ 552              	.L34:
+ 500:../FreeRTOS/event_groups.c **** 		{
+ 501:../FreeRTOS/event_groups.c **** 			pxNext = listGET_NEXT( pxListItem );
+ 553              		.loc 1 501 0
+ 554 02aa FB6A     		ldr	r3, [r7, #44]
+ 555 02ac 5B68     		ldr	r3, [r3, #4]
+ 556 02ae 7B61     		str	r3, [r7, #20]
+ 502:../FreeRTOS/event_groups.c **** 			uxBitsWaitedFor = listGET_LIST_ITEM_VALUE( pxListItem );
+ 557              		.loc 1 502 0
+ 558 02b0 FB6A     		ldr	r3, [r7, #44]
+ 559 02b2 1B68     		ldr	r3, [r3]
+ 560 02b4 3B61     		str	r3, [r7, #16]
+ 503:../FreeRTOS/event_groups.c **** 			xMatchFound = pdFALSE;
+ 561              		.loc 1 503 0
+ 562 02b6 0023     		movs	r3, #0
+ 563 02b8 7B62     		str	r3, [r7, #36]
+ 504:../FreeRTOS/event_groups.c **** 
+ 505:../FreeRTOS/event_groups.c **** 			/* Split the bits waited for from the control bits. */
+ 506:../FreeRTOS/event_groups.c **** 			uxControlBits = uxBitsWaitedFor & eventEVENT_BITS_CONTROL_BYTES;
+ 564              		.loc 1 506 0
+ 565 02ba 3B69     		ldr	r3, [r7, #16]
+ 566 02bc 03F07F43 		and	r3, r3, #-16777216
+ 567 02c0 FB60     		str	r3, [r7, #12]
+ 507:../FreeRTOS/event_groups.c **** 			uxBitsWaitedFor &= ~eventEVENT_BITS_CONTROL_BYTES;
+ 568              		.loc 1 507 0
+ 569 02c2 3B69     		ldr	r3, [r7, #16]
+ 570 02c4 23F07F43 		bic	r3, r3, #-16777216
+ 571 02c8 3B61     		str	r3, [r7, #16]
+ 508:../FreeRTOS/event_groups.c **** 
+ 509:../FreeRTOS/event_groups.c **** 			if( ( uxControlBits & eventWAIT_FOR_ALL_BITS ) == ( EventBits_t ) 0 )
+ 572              		.loc 1 509 0
+ 573 02ca FB68     		ldr	r3, [r7, #12]
+ 574 02cc 03F08063 		and	r3, r3, #67108864
+ 575 02d0 002B     		cmp	r3, #0
+ 576 02d2 08D1     		bne	.L30
+ 510:../FreeRTOS/event_groups.c **** 			{
+ 511:../FreeRTOS/event_groups.c **** 				/* Just looking for single bit being set. */
+ 512:../FreeRTOS/event_groups.c **** 				if( ( uxBitsWaitedFor & pxEventBits->uxEventBits ) != ( EventBits_t ) 0 )
+ 577              		.loc 1 512 0
+ 578 02d4 3B6A     		ldr	r3, [r7, #32]
+ 579 02d6 1A68     		ldr	r2, [r3]
+ 580 02d8 3B69     		ldr	r3, [r7, #16]
+ 581 02da 1340     		ands	r3, r3, r2
+ 582 02dc 002B     		cmp	r3, #0
+ 583 02de 0BD0     		beq	.L31
+ 513:../FreeRTOS/event_groups.c **** 				{
+ 514:../FreeRTOS/event_groups.c **** 					xMatchFound = pdTRUE;
+ 584              		.loc 1 514 0
+ 585 02e0 0123     		movs	r3, #1
+ 586 02e2 7B62     		str	r3, [r7, #36]
+ 587 02e4 08E0     		b	.L31
+ 588              	.L30:
+ 515:../FreeRTOS/event_groups.c **** 				}
+ 516:../FreeRTOS/event_groups.c **** 				else
+ 517:../FreeRTOS/event_groups.c **** 				{
+ 518:../FreeRTOS/event_groups.c **** 					mtCOVERAGE_TEST_MARKER();
+ 519:../FreeRTOS/event_groups.c **** 				}
+ 520:../FreeRTOS/event_groups.c **** 			}
+ 521:../FreeRTOS/event_groups.c **** 			else if( ( uxBitsWaitedFor & pxEventBits->uxEventBits ) == uxBitsWaitedFor )
+ 589              		.loc 1 521 0
+ 590 02e6 3B6A     		ldr	r3, [r7, #32]
+ 591 02e8 1A68     		ldr	r2, [r3]
+ 592 02ea 3B69     		ldr	r3, [r7, #16]
+ 593 02ec 1A40     		ands	r2, r2, r3
+ 594 02ee 3B69     		ldr	r3, [r7, #16]
+ 595 02f0 9A42     		cmp	r2, r3
+ 596 02f2 01D1     		bne	.L31
+ 522:../FreeRTOS/event_groups.c **** 			{
+ 523:../FreeRTOS/event_groups.c **** 				/* All bits are set. */
+ 524:../FreeRTOS/event_groups.c **** 				xMatchFound = pdTRUE;
+ 597              		.loc 1 524 0
+ 598 02f4 0123     		movs	r3, #1
+ 599 02f6 7B62     		str	r3, [r7, #36]
+ 600              	.L31:
+ 525:../FreeRTOS/event_groups.c **** 			}
+ 526:../FreeRTOS/event_groups.c **** 			else
+ 527:../FreeRTOS/event_groups.c **** 			{
+ 528:../FreeRTOS/event_groups.c **** 				/* Need all bits to be set, but not all the bits were set. */
+ 529:../FreeRTOS/event_groups.c **** 			}
+ 530:../FreeRTOS/event_groups.c **** 
+ 531:../FreeRTOS/event_groups.c **** 			if( xMatchFound != pdFALSE )
+ 601              		.loc 1 531 0
+ 602 02f8 7B6A     		ldr	r3, [r7, #36]
+ 603 02fa 002B     		cmp	r3, #0
+ 604 02fc 10D0     		beq	.L32
+ 532:../FreeRTOS/event_groups.c **** 			{
+ 533:../FreeRTOS/event_groups.c **** 				/* The bits match.  Should the bits be cleared on exit? */
+ 534:../FreeRTOS/event_groups.c **** 				if( ( uxControlBits & eventCLEAR_EVENTS_ON_EXIT_BIT ) != ( EventBits_t ) 0 )
+ 605              		.loc 1 534 0
+ 606 02fe FB68     		ldr	r3, [r7, #12]
+ 607 0300 03F08073 		and	r3, r3, #16777216
+ 608 0304 002B     		cmp	r3, #0
+ 609 0306 03D0     		beq	.L33
+ 535:../FreeRTOS/event_groups.c **** 				{
+ 536:../FreeRTOS/event_groups.c **** 					uxBitsToClear |= uxBitsWaitedFor;
+ 610              		.loc 1 536 0
+ 611 0308 BA6A     		ldr	r2, [r7, #40]
+ 612 030a 3B69     		ldr	r3, [r7, #16]
+ 613 030c 1343     		orrs	r3, r3, r2
+ 614 030e BB62     		str	r3, [r7, #40]
+ 615              	.L33:
+ 537:../FreeRTOS/event_groups.c **** 				}
+ 538:../FreeRTOS/event_groups.c **** 				else
+ 539:../FreeRTOS/event_groups.c **** 				{
+ 540:../FreeRTOS/event_groups.c **** 					mtCOVERAGE_TEST_MARKER();
+ 541:../FreeRTOS/event_groups.c **** 				}
+ 542:../FreeRTOS/event_groups.c **** 
+ 543:../FreeRTOS/event_groups.c **** 				/* Store the actual event flag value in the task's event list
+ 544:../FreeRTOS/event_groups.c **** 				item before removing the task from the event list.  The
+ 545:../FreeRTOS/event_groups.c **** 				eventUNBLOCKED_DUE_TO_BIT_SET bit is set so the task knows
+ 546:../FreeRTOS/event_groups.c **** 				that is was unblocked due to its required bits matching, rather
+ 547:../FreeRTOS/event_groups.c **** 				than because it timed out. */
+ 548:../FreeRTOS/event_groups.c **** 				( void ) xTaskRemoveFromUnorderedEventList( pxListItem, pxEventBits->uxEventBits | eventUNBLOCK
+ 616              		.loc 1 548 0
+ 617 0310 3B6A     		ldr	r3, [r7, #32]
+ 618 0312 1B68     		ldr	r3, [r3]
+ 619 0314 43F00073 		orr	r3, r3, #33554432
+ 620 0318 F86A     		ldr	r0, [r7, #44]
+ 621 031a 1946     		mov	r1, r3
+ 622 031c FFF7FEFF 		bl	xTaskRemoveFromUnorderedEventList
+ 623              	.L32:
+ 549:../FreeRTOS/event_groups.c **** 			}
+ 550:../FreeRTOS/event_groups.c **** 
+ 551:../FreeRTOS/event_groups.c **** 			/* Move onto the next list item.  Note pxListItem->pxNext is not
+ 552:../FreeRTOS/event_groups.c **** 			used here as the list item may have been removed from the event list
+ 553:../FreeRTOS/event_groups.c **** 			and inserted into the ready/pending reading list. */
+ 554:../FreeRTOS/event_groups.c **** 			pxListItem = pxNext;
+ 624              		.loc 1 554 0
+ 625 0320 7B69     		ldr	r3, [r7, #20]
+ 626 0322 FB62     		str	r3, [r7, #44]
+ 627              	.L29:
+ 499:../FreeRTOS/event_groups.c **** 		{
+ 628              		.loc 1 499 0 discriminator 1
+ 629 0324 FA6A     		ldr	r2, [r7, #44]
+ 630 0326 BB69     		ldr	r3, [r7, #24]
+ 631 0328 9A42     		cmp	r2, r3
+ 632 032a BED1     		bne	.L34
+ 555:../FreeRTOS/event_groups.c **** 		}
+ 556:../FreeRTOS/event_groups.c **** 
+ 557:../FreeRTOS/event_groups.c **** 		/* Clear any bits that matched when the eventCLEAR_EVENTS_ON_EXIT_BIT
+ 558:../FreeRTOS/event_groups.c **** 		bit was set in the control word. */
+ 559:../FreeRTOS/event_groups.c **** 		pxEventBits->uxEventBits &= ~uxBitsToClear;
+ 633              		.loc 1 559 0
+ 634 032c 3B6A     		ldr	r3, [r7, #32]
+ 635 032e 1A68     		ldr	r2, [r3]
+ 636 0330 BB6A     		ldr	r3, [r7, #40]
+ 637 0332 DB43     		mvns	r3, r3
+ 638 0334 1A40     		ands	r2, r2, r3
+ 639 0336 3B6A     		ldr	r3, [r7, #32]
+ 640 0338 1A60     		str	r2, [r3]
+ 560:../FreeRTOS/event_groups.c **** 	}
+ 561:../FreeRTOS/event_groups.c **** 	( void ) xTaskResumeAll();
+ 641              		.loc 1 561 0
+ 642 033a FFF7FEFF 		bl	xTaskResumeAll
+ 562:../FreeRTOS/event_groups.c **** 
+ 563:../FreeRTOS/event_groups.c **** 	return pxEventBits->uxEventBits;
+ 643              		.loc 1 563 0
+ 644 033e 3B6A     		ldr	r3, [r7, #32]
+ 645 0340 1B68     		ldr	r3, [r3]
+ 564:../FreeRTOS/event_groups.c **** }
+ 646              		.loc 1 564 0
+ 647 0342 1846     		mov	r0, r3
+ 648 0344 3037     		adds	r7, r7, #48
+ 649 0346 BD46     		mov	sp, r7
+ 650              		@ sp needed
+ 651 0348 80BD     		pop	{r7, pc}
+ 652              		.cfi_endproc
+ 653              	.LFE5:
+ 655 034a 00BF     		.align	2
+ 656              		.global	vEventGroupDelete
+ 657              		.thumb
+ 658              		.thumb_func
+ 660              	vEventGroupDelete:
+ 661              	.LFB6:
+ 565:../FreeRTOS/event_groups.c **** /*-----------------------------------------------------------*/
+ 566:../FreeRTOS/event_groups.c **** 
+ 567:../FreeRTOS/event_groups.c **** void vEventGroupDelete( EventGroupHandle_t xEventGroup )
+ 568:../FreeRTOS/event_groups.c **** {
+ 662              		.loc 1 568 0
+ 663              		.cfi_startproc
+ 664              		@ args = 0, pretend = 0, frame = 16
+ 665              		@ frame_needed = 1, uses_anonymous_args = 0
+ 666 034c 80B5     		push	{r7, lr}
+ 667              		.cfi_def_cfa_offset 8
+ 668              		.cfi_offset 7, -8
+ 669              		.cfi_offset 14, -4
+ 670 034e 84B0     		sub	sp, sp, #16
+ 671              		.cfi_def_cfa_offset 24
+ 672 0350 00AF     		add	r7, sp, #0
+ 673              		.cfi_def_cfa_register 7
+ 674 0352 7860     		str	r0, [r7, #4]
+ 569:../FreeRTOS/event_groups.c **** EventGroup_t *pxEventBits = ( EventGroup_t * ) xEventGroup;
+ 675              		.loc 1 569 0
+ 676 0354 7B68     		ldr	r3, [r7, #4]
+ 677 0356 FB60     		str	r3, [r7, #12]
+ 570:../FreeRTOS/event_groups.c **** const List_t *pxTasksWaitingForBits = &( pxEventBits->xTasksWaitingForBits );
+ 678              		.loc 1 570 0
+ 679 0358 FB68     		ldr	r3, [r7, #12]
+ 680 035a 0433     		adds	r3, r3, #4
+ 681 035c BB60     		str	r3, [r7, #8]
+ 571:../FreeRTOS/event_groups.c **** 
+ 572:../FreeRTOS/event_groups.c **** 	vTaskSuspendAll();
+ 682              		.loc 1 572 0
+ 683 035e FFF7FEFF 		bl	vTaskSuspendAll
+ 573:../FreeRTOS/event_groups.c **** 	{
+ 574:../FreeRTOS/event_groups.c **** 		traceEVENT_GROUP_DELETE( xEventGroup );
+ 575:../FreeRTOS/event_groups.c **** 
+ 576:../FreeRTOS/event_groups.c **** 		while( listCURRENT_LIST_LENGTH( pxTasksWaitingForBits ) > ( UBaseType_t ) 0 )
+ 684              		.loc 1 576 0
+ 685 0362 06E0     		b	.L37
+ 686              	.L38:
+ 577:../FreeRTOS/event_groups.c **** 		{
+ 578:../FreeRTOS/event_groups.c **** 			/* Unblock the task, returning 0 as the event list is being deleted
+ 579:../FreeRTOS/event_groups.c **** 			and	cannot therefore have any bits set. */
+ 580:../FreeRTOS/event_groups.c **** 			configASSERT( pxTasksWaitingForBits->xListEnd.pxNext != ( ListItem_t * ) &( pxTasksWaitingForBit
+ 581:../FreeRTOS/event_groups.c **** 			( void ) xTaskRemoveFromUnorderedEventList( pxTasksWaitingForBits->xListEnd.pxNext, eventUNBLOCK
+ 687              		.loc 1 581 0
+ 688 0364 BB68     		ldr	r3, [r7, #8]
+ 689 0366 DB68     		ldr	r3, [r3, #12]
+ 690 0368 1846     		mov	r0, r3
+ 691 036a 4FF00071 		mov	r1, #33554432
+ 692 036e FFF7FEFF 		bl	xTaskRemoveFromUnorderedEventList
+ 693              	.L37:
+ 576:../FreeRTOS/event_groups.c **** 		{
+ 694              		.loc 1 576 0 discriminator 1
+ 695 0372 BB68     		ldr	r3, [r7, #8]
+ 696 0374 1B68     		ldr	r3, [r3]
+ 697 0376 002B     		cmp	r3, #0
+ 698 0378 F4D1     		bne	.L38
+ 582:../FreeRTOS/event_groups.c **** 		}
+ 583:../FreeRTOS/event_groups.c **** 
+ 584:../FreeRTOS/event_groups.c **** 		vPortFree( pxEventBits );
+ 699              		.loc 1 584 0
+ 700 037a F868     		ldr	r0, [r7, #12]
+ 701 037c FFF7FEFF 		bl	vPortFree
+ 585:../FreeRTOS/event_groups.c **** 	}
+ 586:../FreeRTOS/event_groups.c **** 	( void ) xTaskResumeAll();
+ 702              		.loc 1 586 0
+ 703 0380 FFF7FEFF 		bl	xTaskResumeAll
+ 587:../FreeRTOS/event_groups.c **** }
+ 704              		.loc 1 587 0
+ 705 0384 1037     		adds	r7, r7, #16
+ 706 0386 BD46     		mov	sp, r7
+ 707              		@ sp needed
+ 708 0388 80BD     		pop	{r7, pc}
+ 709              		.cfi_endproc
+ 710              	.LFE6:
+ 712 038a 00BF     		.align	2
+ 713              		.global	vEventGroupSetBitsCallback
+ 714              		.thumb
+ 715              		.thumb_func
+ 717              	vEventGroupSetBitsCallback:
+ 718              	.LFB7:
+ 588:../FreeRTOS/event_groups.c **** /*-----------------------------------------------------------*/
+ 589:../FreeRTOS/event_groups.c **** 
+ 590:../FreeRTOS/event_groups.c **** /* For internal use only - execute a 'set bits' command that was pended from
+ 591:../FreeRTOS/event_groups.c **** an interrupt. */
+ 592:../FreeRTOS/event_groups.c **** void vEventGroupSetBitsCallback( void *pvEventGroup, const uint32_t ulBitsToSet )
+ 593:../FreeRTOS/event_groups.c **** {
+ 719              		.loc 1 593 0
+ 720              		.cfi_startproc
+ 721              		@ args = 0, pretend = 0, frame = 8
+ 722              		@ frame_needed = 1, uses_anonymous_args = 0
+ 723 038c 80B5     		push	{r7, lr}
+ 724              		.cfi_def_cfa_offset 8
+ 725              		.cfi_offset 7, -8
+ 726              		.cfi_offset 14, -4
+ 727 038e 82B0     		sub	sp, sp, #8
+ 728              		.cfi_def_cfa_offset 16
+ 729 0390 00AF     		add	r7, sp, #0
+ 730              		.cfi_def_cfa_register 7
+ 731 0392 7860     		str	r0, [r7, #4]
+ 732 0394 3960     		str	r1, [r7]
+ 594:../FreeRTOS/event_groups.c **** 	( void ) xEventGroupSetBits( pvEventGroup, ( EventBits_t ) ulBitsToSet );
+ 733              		.loc 1 594 0
+ 734 0396 7868     		ldr	r0, [r7, #4]
+ 735 0398 3968     		ldr	r1, [r7]
+ 736 039a FFF7FEFF 		bl	xEventGroupSetBits
+ 595:../FreeRTOS/event_groups.c **** }
+ 737              		.loc 1 595 0
+ 738 039e 0837     		adds	r7, r7, #8
+ 739 03a0 BD46     		mov	sp, r7
+ 740              		@ sp needed
+ 741 03a2 80BD     		pop	{r7, pc}
+ 742              		.cfi_endproc
+ 743              	.LFE7:
+ 745              		.align	2
+ 746              		.global	vEventGroupClearBitsCallback
+ 747              		.thumb
+ 748              		.thumb_func
+ 750              	vEventGroupClearBitsCallback:
+ 751              	.LFB8:
+ 596:../FreeRTOS/event_groups.c **** /*-----------------------------------------------------------*/
+ 597:../FreeRTOS/event_groups.c **** 
+ 598:../FreeRTOS/event_groups.c **** /* For internal use only - execute a 'clear bits' command that was pended from
+ 599:../FreeRTOS/event_groups.c **** an interrupt. */
+ 600:../FreeRTOS/event_groups.c **** void vEventGroupClearBitsCallback( void *pvEventGroup, const uint32_t ulBitsToClear )
+ 601:../FreeRTOS/event_groups.c **** {
+ 752              		.loc 1 601 0
+ 753              		.cfi_startproc
+ 754              		@ args = 0, pretend = 0, frame = 8
+ 755              		@ frame_needed = 1, uses_anonymous_args = 0
+ 756 03a4 80B5     		push	{r7, lr}
+ 757              		.cfi_def_cfa_offset 8
+ 758              		.cfi_offset 7, -8
+ 759              		.cfi_offset 14, -4
+ 760 03a6 82B0     		sub	sp, sp, #8
+ 761              		.cfi_def_cfa_offset 16
+ 762 03a8 00AF     		add	r7, sp, #0
+ 763              		.cfi_def_cfa_register 7
+ 764 03aa 7860     		str	r0, [r7, #4]
+ 765 03ac 3960     		str	r1, [r7]
+ 602:../FreeRTOS/event_groups.c **** 	( void ) xEventGroupClearBits( pvEventGroup, ( EventBits_t ) ulBitsToClear );
+ 766              		.loc 1 602 0
+ 767 03ae 7868     		ldr	r0, [r7, #4]
+ 768 03b0 3968     		ldr	r1, [r7]
+ 769 03b2 FFF7FEFF 		bl	xEventGroupClearBits
+ 603:../FreeRTOS/event_groups.c **** }
+ 770              		.loc 1 603 0
+ 771 03b6 0837     		adds	r7, r7, #8
+ 772 03b8 BD46     		mov	sp, r7
+ 773              		@ sp needed
+ 774 03ba 80BD     		pop	{r7, pc}
+ 775              		.cfi_endproc
+ 776              	.LFE8:
+ 778              		.align	2
+ 779              		.thumb
+ 780              		.thumb_func
+ 782              	prvTestWaitCondition:
+ 783              	.LFB9:
+ 604:../FreeRTOS/event_groups.c **** /*-----------------------------------------------------------*/
+ 605:../FreeRTOS/event_groups.c **** 
+ 606:../FreeRTOS/event_groups.c **** static BaseType_t prvTestWaitCondition( const EventBits_t uxCurrentEventBits, const EventBits_t uxB
+ 607:../FreeRTOS/event_groups.c **** {
+ 784              		.loc 1 607 0
+ 785              		.cfi_startproc
+ 786              		@ args = 0, pretend = 0, frame = 24
+ 787              		@ frame_needed = 1, uses_anonymous_args = 0
+ 788              		@ link register save eliminated.
+ 789 03bc 80B4     		push	{r7}
+ 790              		.cfi_def_cfa_offset 4
+ 791              		.cfi_offset 7, -4
+ 792 03be 87B0     		sub	sp, sp, #28
+ 793              		.cfi_def_cfa_offset 32
+ 794 03c0 00AF     		add	r7, sp, #0
+ 795              		.cfi_def_cfa_register 7
+ 796 03c2 F860     		str	r0, [r7, #12]
+ 797 03c4 B960     		str	r1, [r7, #8]
+ 798 03c6 7A60     		str	r2, [r7, #4]
+ 608:../FreeRTOS/event_groups.c **** BaseType_t xWaitConditionMet = pdFALSE;
+ 799              		.loc 1 608 0
+ 800 03c8 0023     		movs	r3, #0
+ 801 03ca 7B61     		str	r3, [r7, #20]
+ 609:../FreeRTOS/event_groups.c **** 
+ 610:../FreeRTOS/event_groups.c **** 	if( xWaitForAllBits == pdFALSE )
+ 802              		.loc 1 610 0
+ 803 03cc 7B68     		ldr	r3, [r7, #4]
+ 804 03ce 002B     		cmp	r3, #0
+ 805 03d0 07D1     		bne	.L42
+ 611:../FreeRTOS/event_groups.c **** 	{
+ 612:../FreeRTOS/event_groups.c **** 		/* Task only has to wait for one bit within uxBitsToWaitFor to be
+ 613:../FreeRTOS/event_groups.c **** 		set.  Is one already set? */
+ 614:../FreeRTOS/event_groups.c **** 		if( ( uxCurrentEventBits & uxBitsToWaitFor ) != ( EventBits_t ) 0 )
+ 806              		.loc 1 614 0
+ 807 03d2 FA68     		ldr	r2, [r7, #12]
+ 808 03d4 BB68     		ldr	r3, [r7, #8]
+ 809 03d6 1340     		ands	r3, r3, r2
+ 810 03d8 002B     		cmp	r3, #0
+ 811 03da 0AD0     		beq	.L43
+ 615:../FreeRTOS/event_groups.c **** 		{
+ 616:../FreeRTOS/event_groups.c **** 			xWaitConditionMet = pdTRUE;
+ 812              		.loc 1 616 0
+ 813 03dc 0123     		movs	r3, #1
+ 814 03de 7B61     		str	r3, [r7, #20]
+ 815 03e0 07E0     		b	.L43
+ 816              	.L42:
+ 617:../FreeRTOS/event_groups.c **** 		}
+ 618:../FreeRTOS/event_groups.c **** 		else
+ 619:../FreeRTOS/event_groups.c **** 		{
+ 620:../FreeRTOS/event_groups.c **** 			mtCOVERAGE_TEST_MARKER();
+ 621:../FreeRTOS/event_groups.c **** 		}
+ 622:../FreeRTOS/event_groups.c **** 	}
+ 623:../FreeRTOS/event_groups.c **** 	else
+ 624:../FreeRTOS/event_groups.c **** 	{
+ 625:../FreeRTOS/event_groups.c **** 		/* Task has to wait for all the bits in uxBitsToWaitFor to be set.
+ 626:../FreeRTOS/event_groups.c **** 		Are they set already? */
+ 627:../FreeRTOS/event_groups.c **** 		if( ( uxCurrentEventBits & uxBitsToWaitFor ) == uxBitsToWaitFor )
+ 817              		.loc 1 627 0
+ 818 03e2 FA68     		ldr	r2, [r7, #12]
+ 819 03e4 BB68     		ldr	r3, [r7, #8]
+ 820 03e6 1A40     		ands	r2, r2, r3
+ 821 03e8 BB68     		ldr	r3, [r7, #8]
+ 822 03ea 9A42     		cmp	r2, r3
+ 823 03ec 01D1     		bne	.L43
+ 628:../FreeRTOS/event_groups.c **** 		{
+ 629:../FreeRTOS/event_groups.c **** 			xWaitConditionMet = pdTRUE;
+ 824              		.loc 1 629 0
+ 825 03ee 0123     		movs	r3, #1
+ 826 03f0 7B61     		str	r3, [r7, #20]
+ 827              	.L43:
+ 630:../FreeRTOS/event_groups.c **** 		}
+ 631:../FreeRTOS/event_groups.c **** 		else
+ 632:../FreeRTOS/event_groups.c **** 		{
+ 633:../FreeRTOS/event_groups.c **** 			mtCOVERAGE_TEST_MARKER();
+ 634:../FreeRTOS/event_groups.c **** 		}
+ 635:../FreeRTOS/event_groups.c **** 	}
+ 636:../FreeRTOS/event_groups.c **** 
+ 637:../FreeRTOS/event_groups.c **** 	return xWaitConditionMet;
+ 828              		.loc 1 637 0
+ 829 03f2 7B69     		ldr	r3, [r7, #20]
+ 638:../FreeRTOS/event_groups.c **** }
+ 830              		.loc 1 638 0
+ 831 03f4 1846     		mov	r0, r3
+ 832 03f6 1C37     		adds	r7, r7, #28
+ 833 03f8 BD46     		mov	sp, r7
+ 834              		@ sp needed
+ 835 03fa 5DF8047B 		ldr	r7, [sp], #4
+ 836 03fe 7047     		bx	lr
+ 837              		.cfi_endproc
+ 838              	.LFE9:
+ 840              	.Letext0:
+ 841              		.file 2 "c:\\program files (x86)\\codesourcery\\arm-none-eabi\\include\\stdint.h"
+ 842              		.file 3 "D:\\workspace\\console800480\\FreeRTOS\\portable\\GCC\\ARM_CM3/portmacro.h"
+ 843              		.file 4 "D:\\workspace\\console800480\\FreeRTOS\\include/list.h"
+ 844              		.file 5 "D:\\workspace\\console800480\\FreeRTOS\\include/event_groups.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 event_groups.c
+C:\Users\sagok\AppData\Local\Temp\ccQNriWM.s:18     .text:00000000 $t
+C:\Users\sagok\AppData\Local\Temp\ccQNriWM.s:23     .text:00000000 xEventGroupCreate
+C:\Users\sagok\AppData\Local\Temp\ccQNriWM.s:72     .text:00000030 xEventGroupSync
+C:\Users\sagok\AppData\Local\Temp\ccQNriWM.s:504    .text:00000270 xEventGroupSetBits
+C:\Users\sagok\AppData\Local\Temp\ccQNriWM.s:227    .text:00000110 xEventGroupWaitBits
+C:\Users\sagok\AppData\Local\Temp\ccQNriWM.s:782    .text:000003bc prvTestWaitCondition
+C:\Users\sagok\AppData\Local\Temp\ccQNriWM.s:409    .text:00000214 xEventGroupClearBits
+C:\Users\sagok\AppData\Local\Temp\ccQNriWM.s:460    .text:00000248 xEventGroupGetBitsFromISR
+C:\Users\sagok\AppData\Local\Temp\ccQNriWM.s:660    .text:0000034c vEventGroupDelete
+C:\Users\sagok\AppData\Local\Temp\ccQNriWM.s:717    .text:0000038c vEventGroupSetBitsCallback
+C:\Users\sagok\AppData\Local\Temp\ccQNriWM.s:750    .text:000003a4 vEventGroupClearBitsCallback
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.1.7f551ac7fcad8b79b9df4bfdaa536673
+                           .group:00000000 wm4.newlib.h.8.384a112feabb3bef7b573ae48cde2e3b
+                           .group:00000000 wm4.features.h.22.6a4ca7cd053637cc1d0db6c16f39b2d7
+                           .group:00000000 wm4.config.h.183.aa62afef667fb61d15fa64c48beb2f14
+                           .group:00000000 wm4._ansi.h.23.5644b60c990a4800b02a6e654e88f93a
+                           .group:00000000 wm4.stdlib.h.18.8bab2fb43ac4e90235390733c30a4530
+                           .group:00000000 wm4.stddef.h.184.aa65fb7281d578229bbad41b91862635
+                           .group:00000000 wm4._default_types.h.6.5e12cd604db8ce00b62bb2f02708eaf3
+                           .group:00000000 wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea
+                           .group:00000000 wm4._types.h.59.db8450f33c1f6150c0372fa1091a887a
+                           .group:00000000 wm4.stddef.h.348.9a99de77b6ba3b4278b57e9cc6d6e349
+                           .group:00000000 wm4.reent.h.16.567d760e6ae9ad7f917851a308bd7a57
+                           .group:00000000 wm4.alloca.h.8.dfc0c703c47ec3e69746825b17d9e66d
+                           .group:00000000 wm4.stdlib.h.55.7091a050e07f1c4abd225630fe3d62f1
+                           .group:00000000 wm4.stddef.h.39.d0197034aa5fd947cae140b9289e6734
+                           .group:00000000 wm4.stdint.h.10.90b695f550ca6cc3fb08fa83baf01e05
+                           .group:00000000 wm4.projdefs.h.67.1891ed3aab788f154f6e7a8ff42f2cfd
+                           .group:00000000 wm4.FreeRTOSConfig.h.51.b259e2e835793b5f31e6fb224a543b76
+                           .group:00000000 wm4.portmacro.h.68.b9ad41c1c2fd3fb36d97939d17ebacd9
+                           .group:00000000 wm4.portable.h.325.a31e8973a246cd28421ddb595e37fd13
+                           .group:00000000 wm4.mpu_wrappers.h.67.4bcfd12ce15e5313ce3efd77400f8168
+                           .group:00000000 wm4.FreeRTOS.h.177.d801ec107caaf24697618049ed7605b1
+                           .group:00000000 wm4.list.h.96.eaa3d29743bd681933f9f5e726c756a1
+                           .group:00000000 wm4.task.h.84.ff846741c7bdac87bd4a7636d5320d68
+                           .group:00000000 wm4.timers.h.92.7e7e1a9bf65701faf3dfc9cf90e720c0
+                           .group:00000000 wm4.event_groups.h.381.5e1a2300c52acd1cdd8f82fe474468fd
+
+UNDEFINED SYMBOLS
+pvPortMalloc
+vListInitialise
+vTaskSuspendAll
+vTaskPlaceOnUnorderedEventList
+xTaskResumeAll
+vPortYield
+uxTaskResetEventItemValue
+vPortEnterCritical
+vPortExitCritical
+ulPortSetInterruptMask
+vPortClearInterruptMask
+xTaskRemoveFromUnorderedEventList
+vPortFree

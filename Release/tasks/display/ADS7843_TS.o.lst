@@ -1,0 +1,1674 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"ADS7843_TS.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.comm	uSdHandle,96,4
+  19              		.comm	SD_CardInfo,88,8
+  20              		.comm	ax,2,2
+  21              		.comm	bx,2,2
+  22              		.comm	ay,2,2
+  23              		.comm	by,2,2
+  24              		.comm	AdcHandleX,68,4
+  25              		.comm	AdcHandleY,68,4
+  26              		.global	uhADCxConvertedValue
+  27              		.bss
+  28              		.align	2
+  31              	uhADCxConvertedValue:
+  32 0000 00000000 		.space	4
+  33              		.global	ADCTSConvertedValue
+  34              		.align	2
+  37              	ADCTSConvertedValue:
+  38 0004 00000000 		.space	4
+  39              		.global	ADS7843_ts_drv
+  40              		.data
+  41              		.align	2
+  44              	ADS7843_ts_drv:
+  45 0000 00000000 		.word	ADS7843_Init
+  46 0004 00000000 		.word	ADS7843_TS_Start
+  47 0008 00000000 		.word	ADS7843_TS_DetectTouch
+  48 000c 00000000 		.word	ADS7843_TS_GetXY
+  49              		.global	ADS7843_io_drv
+  50              		.align	2
+  53              	ADS7843_io_drv:
+  54 0010 00000000 		.word	ADS7843_Init
+  55 0014 00000000 		.word	ADS7843_IO_Start
+  56 0018 00000000 		.word	ADS7843_IO_Config
+  57              		.global	ADS7843TS
+  58              		.bss
+  59              		.align	2
+  62              	ADS7843TS:
+  63 0008 0000     		.space	2
+  64 000a 0000     		.section	.rodata
+  65              		.align	2
+  66              	.LC0:
+  67 0000 5B54535D 		.ascii	"[TS] I:DeviceAddr: %d , instance: %d \012\000"
+  67      20493A44 
+  67      65766963 
+  67      65416464 
+  67      723A2025 
+  68 0027 00       		.align	2
+  69              	.LC1:
+  70 0028 5B54535D 		.ascii	"[TS] I: TP_SPI_Config..\000"
+  70      20493A20 
+  70      54505F53 
+  70      50495F43 
+  70      6F6E6669 
+  71              		.text
+  72              		.align	2
+  73              		.global	ADS7843_Init
+  74              		.thumb
+  75              		.thumb_func
+  77              	ADS7843_Init:
+  78              	.LFB55:
+  79              		.file 1 "../tasks/display/ADS7843_TS.c"
+   1:../tasks/display/ADS7843_TS.c **** /**
+   2:../tasks/display/ADS7843_TS.c ****   ******************************************************************************
+   3:../tasks/display/ADS7843_TS.c ****   * @file    Internal.c
+   4:../tasks/display/ADS7843_TS.c ****   * @author  MCD Application Team
+   5:../tasks/display/ADS7843_TS.c ****   * @version V1.0.0
+   6:../tasks/display/ADS7843_TS.c ****   * @date    18-February-2014
+   7:../tasks/display/ADS7843_TS.c ****   * @brief   This file provides a set of functions needed to manage the Internal
+   8:../tasks/display/ADS7843_TS.c ****   *          IO Expander devices.
+   9:../tasks/display/ADS7843_TS.c ****   ******************************************************************************
+  10:../tasks/display/ADS7843_TS.c ****   * @attention
+  11:../tasks/display/ADS7843_TS.c ****   *
+  12:../tasks/display/ADS7843_TS.c ****   * <h2><center>&copy; COPYRIGHT(c) 2014 STMicroelectronics</center></h2>
+  13:../tasks/display/ADS7843_TS.c ****   *
+  14:../tasks/display/ADS7843_TS.c ****   * Redistribution and use in source and binary forms, with or without modification,
+  15:../tasks/display/ADS7843_TS.c ****   * are permitted provided that the following conditions are met:
+  16:../tasks/display/ADS7843_TS.c ****   *   1. Redistributions of source code must retain the above copyright notice,
+  17:../tasks/display/ADS7843_TS.c ****   *      this list of conditions and the following disclaimer.
+  18:../tasks/display/ADS7843_TS.c ****   *   2. Redistributions in binary form must reproduce the above copyright notice,
+  19:../tasks/display/ADS7843_TS.c ****   *      this list of conditions and the following disclaimer in the documentation
+  20:../tasks/display/ADS7843_TS.c ****   *      and/or other materials provided with the distribution.
+  21:../tasks/display/ADS7843_TS.c ****   *   3. Neither the name of STMicroelectronics nor the names of its contributors
+  22:../tasks/display/ADS7843_TS.c ****   *      may be used to endorse or promote products derived from this software
+  23:../tasks/display/ADS7843_TS.c ****   *      without specific prior written permission.
+  24:../tasks/display/ADS7843_TS.c ****   *
+  25:../tasks/display/ADS7843_TS.c ****   * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  26:../tasks/display/ADS7843_TS.c ****   * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  27:../tasks/display/ADS7843_TS.c ****   * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+  28:../tasks/display/ADS7843_TS.c ****   * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+  29:../tasks/display/ADS7843_TS.c ****   * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+  30:../tasks/display/ADS7843_TS.c ****   * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+  31:../tasks/display/ADS7843_TS.c ****   * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+  32:../tasks/display/ADS7843_TS.c ****   * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+  33:../tasks/display/ADS7843_TS.c ****   * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  34:../tasks/display/ADS7843_TS.c ****   * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  35:../tasks/display/ADS7843_TS.c ****   *
+  36:../tasks/display/ADS7843_TS.c ****   ******************************************************************************
+  37:../tasks/display/ADS7843_TS.c ****   */  
+  38:../tasks/display/ADS7843_TS.c **** 
+  39:../tasks/display/ADS7843_TS.c **** /* Includes ------------------------------------------------------------------*/
+  40:../tasks/display/ADS7843_TS.c **** #include "ADS7843_TS.h"
+  41:../tasks/display/ADS7843_TS.c **** #include "LEDs.h"
+  42:../tasks/display/ADS7843_TS.c **** #include "Display.h"
+  43:../tasks/display/ADS7843_TS.c **** 
+  44:../tasks/display/ADS7843_TS.c **** #include "stm32f2xx_hal.h"
+  45:../tasks/display/ADS7843_TS.c **** //#include "stm32f2xx_hal.h"
+  46:../tasks/display/ADS7843_TS.c **** /* Private typedef -----------------------------------------------------------*/
+  47:../tasks/display/ADS7843_TS.c **** 
+  48:../tasks/display/ADS7843_TS.c **** /* Private define ------------------------------------------------------------*/
+  49:../tasks/display/ADS7843_TS.c **** 
+  50:../tasks/display/ADS7843_TS.c **** #define ADS7843TS_MAX_INSTANCE         2
+  51:../tasks/display/ADS7843_TS.c **** 
+  52:../tasks/display/ADS7843_TS.c **** 
+  53:../tasks/display/ADS7843_TS.c **** /* Private variables ---------------------------------------------------------*/
+  54:../tasks/display/ADS7843_TS.c **** 
+  55:../tasks/display/ADS7843_TS.c **** int16_t ax, bx, ay, by;
+  56:../tasks/display/ADS7843_TS.c **** 
+  57:../tasks/display/ADS7843_TS.c **** /* ADC handler declaration */
+  58:../tasks/display/ADS7843_TS.c **** ADC_HandleTypeDef    AdcHandleX,AdcHandleY;
+  59:../tasks/display/ADS7843_TS.c **** 
+  60:../tasks/display/ADS7843_TS.c **** /* TIM handler declaration */
+  61:../tasks/display/ADS7843_TS.c **** //static TIM_HandleTypeDef  htim;
+  62:../tasks/display/ADS7843_TS.c **** 
+  63:../tasks/display/ADS7843_TS.c **** /* Variable used to get converted value */
+  64:../tasks/display/ADS7843_TS.c **** __IO uint32_t uhADCxConvertedValue = 0;
+  65:../tasks/display/ADS7843_TS.c **** 
+  66:../tasks/display/ADS7843_TS.c **** uint32_t ADCTSConvertedValue = 0;
+  67:../tasks/display/ADS7843_TS.c **** 
+  68:../tasks/display/ADS7843_TS.c **** /* Touch screen driver structure initialization */  
+  69:../tasks/display/ADS7843_TS.c **** TS_DrvTypeDef ADS7843_ts_drv =
+  70:../tasks/display/ADS7843_TS.c **** {
+  71:../tasks/display/ADS7843_TS.c **** 		ADS7843_Init,
+  72:../tasks/display/ADS7843_TS.c **** 		ADS7843_TS_Start,
+  73:../tasks/display/ADS7843_TS.c **** 		ADS7843_TS_DetectTouch,
+  74:../tasks/display/ADS7843_TS.c **** 		ADS7843_TS_GetXY
+  75:../tasks/display/ADS7843_TS.c **** };
+  76:../tasks/display/ADS7843_TS.c **** 
+  77:../tasks/display/ADS7843_TS.c **** /* IO driver structure initialization */ 
+  78:../tasks/display/ADS7843_TS.c **** IO_DrvTypeDef ADS7843_io_drv =
+  79:../tasks/display/ADS7843_TS.c **** {
+  80:../tasks/display/ADS7843_TS.c **** 		ADS7843_Init,
+  81:../tasks/display/ADS7843_TS.c **** 		ADS7843_IO_Start,
+  82:../tasks/display/ADS7843_TS.c **** 		ADS7843_IO_Config
+  83:../tasks/display/ADS7843_TS.c **** };
+  84:../tasks/display/ADS7843_TS.c **** 
+  85:../tasks/display/ADS7843_TS.c **** 
+  86:../tasks/display/ADS7843_TS.c **** /* Internal instances by address */
+  87:../tasks/display/ADS7843_TS.c **** uint8_t ADS7843TS[ADS7843TS_MAX_INSTANCE] = {0};
+  88:../tasks/display/ADS7843_TS.c **** /**
+  89:../tasks/display/ADS7843_TS.c ****   * @}
+  90:../tasks/display/ADS7843_TS.c ****   */ 
+  91:../tasks/display/ADS7843_TS.c ****     
+  92:../tasks/display/ADS7843_TS.c **** /* Private function prototypes -----------------------------------------------*/
+  93:../tasks/display/ADS7843_TS.c **** 
+  94:../tasks/display/ADS7843_TS.c **** /* Private functions ---------------------------------------------------------*/
+  95:../tasks/display/ADS7843_TS.c **** static uint8_t ADS7843_GetInstance(uint16_t DeviceAddr);
+  96:../tasks/display/ADS7843_TS.c **** static void Error_Handler(void);
+  97:../tasks/display/ADS7843_TS.c **** 
+  98:../tasks/display/ADS7843_TS.c **** void TP_SPI_Config(void);
+  99:../tasks/display/ADS7843_TS.c **** 
+ 100:../tasks/display/ADS7843_TS.c **** void touchGetSense(int16_t * x, int16_t * y);
+ 101:../tasks/display/ADS7843_TS.c **** int16_t touchGetX(void);
+ 102:../tasks/display/ADS7843_TS.c **** int16_t touchGetY(void);
+ 103:../tasks/display/ADS7843_TS.c **** void ADS7843_SendData(uint16_t	Data);
+ 104:../tasks/display/ADS7843_TS.c **** uint16_t ADS7843_ReceiveData(void);
+ 105:../tasks/display/ADS7843_TS.c **** uint16_t touchVerifyCoef(void);
+ 106:../tasks/display/ADS7843_TS.c **** 
+ 107:../tasks/display/ADS7843_TS.c **** /**
+ 108:../tasks/display/ADS7843_TS.c ****   * @brief  Initialize the Internal and configure the needed hardware resources
+ 109:../tasks/display/ADS7843_TS.c ****   * @param  DeviceAddr: Device address on communication Bus.
+ 110:../tasks/display/ADS7843_TS.c ****   * @retval None
+ 111:../tasks/display/ADS7843_TS.c ****   */
+ 112:../tasks/display/ADS7843_TS.c **** void ADS7843_Init(uint16_t DeviceAddr)
+ 113:../tasks/display/ADS7843_TS.c **** {
+  80              		.loc 1 113 0
+  81              		.cfi_startproc
+  82              		@ args = 0, pretend = 0, frame = 16
+  83              		@ frame_needed = 1, uses_anonymous_args = 0
+  84 0000 80B5     		push	{r7, lr}
+  85              		.cfi_def_cfa_offset 8
+  86              		.cfi_offset 7, -8
+  87              		.cfi_offset 14, -4
+  88 0002 84B0     		sub	sp, sp, #16
+  89              		.cfi_def_cfa_offset 24
+  90 0004 00AF     		add	r7, sp, #0
+  91              		.cfi_def_cfa_register 7
+  92 0006 0346     		mov	r3, r0
+  93 0008 FB80     		strh	r3, [r7, #6]	@ movhi
+ 114:../tasks/display/ADS7843_TS.c ****   uint8_t instance;
+ 115:../tasks/display/ADS7843_TS.c ****   uint8_t empty;
+ 116:../tasks/display/ADS7843_TS.c ****   
+ 117:../tasks/display/ADS7843_TS.c ****   /* Check if device instance already exists */
+ 118:../tasks/display/ADS7843_TS.c ****   instance = ADS7843_GetInstance(DeviceAddr);
+  94              		.loc 1 118 0
+  95 000a FB88     		ldrh	r3, [r7, #6]
+  96 000c 1846     		mov	r0, r3
+  97 000e 00F069F8 		bl	ADS7843_GetInstance
+  98 0012 0346     		mov	r3, r0
+  99 0014 FB73     		strb	r3, [r7, #15]
+ 119:../tasks/display/ADS7843_TS.c **** 
+ 120:../tasks/display/ADS7843_TS.c ****   printf("[TS] I:DeviceAddr: %d , instance: %d \n",DeviceAddr,instance);
+ 100              		.loc 1 120 0
+ 101 0016 FA88     		ldrh	r2, [r7, #6]
+ 102 0018 FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 103 001a 40F20000 		movw	r0, #:lower16:.LC0
+ 104 001e C0F20000 		movt	r0, #:upper16:.LC0
+ 105 0022 1146     		mov	r1, r2
+ 106 0024 1A46     		mov	r2, r3
+ 107 0026 FFF7FEFF 		bl	printf
+ 121:../tasks/display/ADS7843_TS.c **** 
+ 122:../tasks/display/ADS7843_TS.c ****   /* To prevent double initialization */
+ 123:../tasks/display/ADS7843_TS.c ****   if(instance == 0xFF)
+ 108              		.loc 1 123 0
+ 109 002a FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 110 002c FF2B     		cmp	r3, #255
+ 111 002e 17D1     		bne	.L1
+ 124:../tasks/display/ADS7843_TS.c ****   {
+ 125:../tasks/display/ADS7843_TS.c ****     /* Look for empty instance */
+ 126:../tasks/display/ADS7843_TS.c ****     empty = ADS7843_GetInstance(0);
+ 112              		.loc 1 126 0
+ 113 0030 0020     		movs	r0, #0
+ 114 0032 00F057F8 		bl	ADS7843_GetInstance
+ 115 0036 0346     		mov	r3, r0
+ 116 0038 BB73     		strb	r3, [r7, #14]
+ 127:../tasks/display/ADS7843_TS.c ****     
+ 128:../tasks/display/ADS7843_TS.c ****     if(empty < ADS7843TS_MAX_INSTANCE)
+ 117              		.loc 1 128 0
+ 118 003a BB7B     		ldrb	r3, [r7, #14]	@ zero_extendqisi2
+ 119 003c 012B     		cmp	r3, #1
+ 120 003e 0FD8     		bhi	.L1
+ 129:../tasks/display/ADS7843_TS.c ****     {
+ 130:../tasks/display/ADS7843_TS.c ****       /* Register the current device instance */
+ 131:../tasks/display/ADS7843_TS.c ****     	ADS7843TS[empty] = DeviceAddr;
+ 121              		.loc 1 131 0
+ 122 0040 BA7B     		ldrb	r2, [r7, #14]	@ zero_extendqisi2
+ 123 0042 FB88     		ldrh	r3, [r7, #6]	@ movhi
+ 124 0044 D9B2     		uxtb	r1, r3
+ 125 0046 40F20003 		movw	r3, #:lower16:ADS7843TS
+ 126 004a C0F20003 		movt	r3, #:upper16:ADS7843TS
+ 127 004e 9954     		strb	r1, [r3, r2]
+ 132:../tasks/display/ADS7843_TS.c ****       /* Initialize IO  */
+ 133:../tasks/display/ADS7843_TS.c ****     	TP_SPI_Config();
+ 128              		.loc 1 133 0
+ 129 0050 FFF7FEFF 		bl	TP_SPI_Config
+ 134:../tasks/display/ADS7843_TS.c ****        printf("[TS] I: TP_SPI_Config..\n");
+ 130              		.loc 1 134 0
+ 131 0054 40F20000 		movw	r0, #:lower16:.LC1
+ 132 0058 C0F20000 		movt	r0, #:upper16:.LC1
+ 133 005c FFF7FEFF 		bl	puts
+ 134              	.L1:
+ 135:../tasks/display/ADS7843_TS.c ****     }
+ 136:../tasks/display/ADS7843_TS.c ****   }
+ 137:../tasks/display/ADS7843_TS.c **** }
+ 135              		.loc 1 137 0
+ 136 0060 1037     		adds	r7, r7, #16
+ 137 0062 BD46     		mov	sp, r7
+ 138              		@ sp needed
+ 139 0064 80BD     		pop	{r7, pc}
+ 140              		.cfi_endproc
+ 141              	.LFE55:
+ 143 0066 00BF     		.align	2
+ 144              		.global	ADS7843_IO_Start
+ 145              		.thumb
+ 146              		.thumb_func
+ 148              	ADS7843_IO_Start:
+ 149              	.LFB56:
+ 138:../tasks/display/ADS7843_TS.c **** 
+ 139:../tasks/display/ADS7843_TS.c **** 
+ 140:../tasks/display/ADS7843_TS.c **** void ADS7843_IO_Start(uint16_t DeviceAddr, uint16_t IO_Pin)
+ 141:../tasks/display/ADS7843_TS.c **** {
+ 150              		.loc 1 141 0
+ 151              		.cfi_startproc
+ 152              		@ args = 0, pretend = 0, frame = 8
+ 153              		@ frame_needed = 1, uses_anonymous_args = 0
+ 154              		@ link register save eliminated.
+ 155 0068 80B4     		push	{r7}
+ 156              		.cfi_def_cfa_offset 4
+ 157              		.cfi_offset 7, -4
+ 158 006a 83B0     		sub	sp, sp, #12
+ 159              		.cfi_def_cfa_offset 16
+ 160 006c 00AF     		add	r7, sp, #0
+ 161              		.cfi_def_cfa_register 7
+ 162 006e 0246     		mov	r2, r0
+ 163 0070 0B46     		mov	r3, r1
+ 164 0072 FA80     		strh	r2, [r7, #6]	@ movhi
+ 165 0074 BB80     		strh	r3, [r7, #4]	@ movhi
+ 142:../tasks/display/ADS7843_TS.c **** 
+ 143:../tasks/display/ADS7843_TS.c **** }
+ 166              		.loc 1 143 0
+ 167 0076 0C37     		adds	r7, r7, #12
+ 168 0078 BD46     		mov	sp, r7
+ 169              		@ sp needed
+ 170 007a 5DF8047B 		ldr	r7, [sp], #4
+ 171 007e 7047     		bx	lr
+ 172              		.cfi_endproc
+ 173              	.LFE56:
+ 175              		.align	2
+ 176              		.global	ADS7843_IO_Config
+ 177              		.thumb
+ 178              		.thumb_func
+ 180              	ADS7843_IO_Config:
+ 181              	.LFB57:
+ 144:../tasks/display/ADS7843_TS.c **** 
+ 145:../tasks/display/ADS7843_TS.c **** /**
+ 146:../tasks/display/ADS7843_TS.c ****   */
+ 147:../tasks/display/ADS7843_TS.c **** void ADS7843_IO_Config(uint16_t DeviceAddr, uint16_t IO_Pin, IO_ModeTypedef IO_Mode)
+ 148:../tasks/display/ADS7843_TS.c **** {
+ 182              		.loc 1 148 0
+ 183              		.cfi_startproc
+ 184              		@ args = 0, pretend = 0, frame = 8
+ 185              		@ frame_needed = 1, uses_anonymous_args = 0
+ 186              		@ link register save eliminated.
+ 187 0080 80B4     		push	{r7}
+ 188              		.cfi_def_cfa_offset 4
+ 189              		.cfi_offset 7, -4
+ 190 0082 83B0     		sub	sp, sp, #12
+ 191              		.cfi_def_cfa_offset 16
+ 192 0084 00AF     		add	r7, sp, #0
+ 193              		.cfi_def_cfa_register 7
+ 194 0086 1346     		mov	r3, r2
+ 195 0088 0246     		mov	r2, r0	@ movhi
+ 196 008a FA80     		strh	r2, [r7, #6]	@ movhi
+ 197 008c 0A46     		mov	r2, r1	@ movhi
+ 198 008e BA80     		strh	r2, [r7, #4]	@ movhi
+ 199 0090 FB70     		strb	r3, [r7, #3]
+ 149:../tasks/display/ADS7843_TS.c **** 
+ 150:../tasks/display/ADS7843_TS.c **** 
+ 151:../tasks/display/ADS7843_TS.c **** }
+ 200              		.loc 1 151 0
+ 201 0092 0C37     		adds	r7, r7, #12
+ 202 0094 BD46     		mov	sp, r7
+ 203              		@ sp needed
+ 204 0096 5DF8047B 		ldr	r7, [sp], #4
+ 205 009a 7047     		bx	lr
+ 206              		.cfi_endproc
+ 207              	.LFE57:
+ 209              		.align	2
+ 210              		.global	ADS7843_TS_Start
+ 211              		.thumb
+ 212              		.thumb_func
+ 214              	ADS7843_TS_Start:
+ 215              	.LFB58:
+ 152:../tasks/display/ADS7843_TS.c **** 
+ 153:../tasks/display/ADS7843_TS.c **** /**
+ 154:../tasks/display/ADS7843_TS.c ****   */
+ 155:../tasks/display/ADS7843_TS.c **** void ADS7843_TS_Start(uint16_t DeviceAddr)
+ 156:../tasks/display/ADS7843_TS.c **** {
+ 216              		.loc 1 156 0
+ 217              		.cfi_startproc
+ 218              		@ args = 0, pretend = 0, frame = 8
+ 219              		@ frame_needed = 1, uses_anonymous_args = 0
+ 220              		@ link register save eliminated.
+ 221 009c 80B4     		push	{r7}
+ 222              		.cfi_def_cfa_offset 4
+ 223              		.cfi_offset 7, -4
+ 224 009e 83B0     		sub	sp, sp, #12
+ 225              		.cfi_def_cfa_offset 16
+ 226 00a0 00AF     		add	r7, sp, #0
+ 227              		.cfi_def_cfa_register 7
+ 228 00a2 0346     		mov	r3, r0
+ 229 00a4 FB80     		strh	r3, [r7, #6]	@ movhi
+ 157:../tasks/display/ADS7843_TS.c **** 
+ 158:../tasks/display/ADS7843_TS.c **** }
+ 230              		.loc 1 158 0
+ 231 00a6 0C37     		adds	r7, r7, #12
+ 232 00a8 BD46     		mov	sp, r7
+ 233              		@ sp needed
+ 234 00aa 5DF8047B 		ldr	r7, [sp], #4
+ 235 00ae 7047     		bx	lr
+ 236              		.cfi_endproc
+ 237              	.LFE58:
+ 239              		.align	2
+ 240              		.global	ADS7843_TS_DetectTouch
+ 241              		.thumb
+ 242              		.thumb_func
+ 244              	ADS7843_TS_DetectTouch:
+ 245              	.LFB59:
+ 159:../tasks/display/ADS7843_TS.c **** /************************************************************
+ 160:../tasks/display/ADS7843_TS.c ****  *
+ 161:../tasks/display/ADS7843_TS.c ****  */
+ 162:../tasks/display/ADS7843_TS.c **** uint8_t ADS7843_TS_DetectTouch(uint16_t DeviceAddr)
+ 163:../tasks/display/ADS7843_TS.c **** {
+ 246              		.loc 1 163 0
+ 247              		.cfi_startproc
+ 248              		@ args = 0, pretend = 0, frame = 16
+ 249              		@ frame_needed = 1, uses_anonymous_args = 0
+ 250              		@ link register save eliminated.
+ 251 00b0 80B4     		push	{r7}
+ 252              		.cfi_def_cfa_offset 4
+ 253              		.cfi_offset 7, -4
+ 254 00b2 85B0     		sub	sp, sp, #20
+ 255              		.cfi_def_cfa_offset 24
+ 256 00b4 00AF     		add	r7, sp, #0
+ 257              		.cfi_def_cfa_register 7
+ 258 00b6 0346     		mov	r3, r0
+ 259 00b8 FB80     		strh	r3, [r7, #6]	@ movhi
+ 164:../tasks/display/ADS7843_TS.c **** uint8_t ret = 0;
+ 260              		.loc 1 164 0
+ 261 00ba 0023     		movs	r3, #0
+ 262 00bc FB73     		strb	r3, [r7, #15]
+ 165:../tasks/display/ADS7843_TS.c **** 
+ 166:../tasks/display/ADS7843_TS.c **** return ret;
+ 263              		.loc 1 166 0
+ 264 00be FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 167:../tasks/display/ADS7843_TS.c **** }
+ 265              		.loc 1 167 0
+ 266 00c0 1846     		mov	r0, r3
+ 267 00c2 1437     		adds	r7, r7, #20
+ 268 00c4 BD46     		mov	sp, r7
+ 269              		@ sp needed
+ 270 00c6 5DF8047B 		ldr	r7, [sp], #4
+ 271 00ca 7047     		bx	lr
+ 272              		.cfi_endproc
+ 273              	.LFE59:
+ 275              		.align	2
+ 276              		.global	ADS7843_TS_GetXY
+ 277              		.thumb
+ 278              		.thumb_func
+ 280              	ADS7843_TS_GetXY:
+ 281              	.LFB60:
+ 168:../tasks/display/ADS7843_TS.c **** /**
+ 169:../tasks/display/ADS7843_TS.c ****   * @brief  Get the touch screen X and Y positions values
+ 170:../tasks/display/ADS7843_TS.c ****   * @param  DeviceAddr: Device address on communication Bus.
+ 171:../tasks/display/ADS7843_TS.c ****   * @param  X: Pointer to X position value
+ 172:../tasks/display/ADS7843_TS.c ****   * @param  Y: Pointer to Y position value   
+ 173:../tasks/display/ADS7843_TS.c ****   * @retval None.
+ 174:../tasks/display/ADS7843_TS.c ****   */
+ 175:../tasks/display/ADS7843_TS.c **** void ADS7843_TS_GetXY(uint16_t DeviceAddr, uint16_t *X, uint16_t *Y)
+ 176:../tasks/display/ADS7843_TS.c **** {
+ 282              		.loc 1 176 0
+ 283              		.cfi_startproc
+ 284              		@ args = 0, pretend = 0, frame = 16
+ 285              		@ frame_needed = 1, uses_anonymous_args = 0
+ 286              		@ link register save eliminated.
+ 287 00cc 80B4     		push	{r7}
+ 288              		.cfi_def_cfa_offset 4
+ 289              		.cfi_offset 7, -4
+ 290 00ce 85B0     		sub	sp, sp, #20
+ 291              		.cfi_def_cfa_offset 24
+ 292 00d0 00AF     		add	r7, sp, #0
+ 293              		.cfi_def_cfa_register 7
+ 294 00d2 0346     		mov	r3, r0
+ 295 00d4 B960     		str	r1, [r7, #8]
+ 296 00d6 7A60     		str	r2, [r7, #4]
+ 297 00d8 FB81     		strh	r3, [r7, #14]	@ movhi
+ 177:../tasks/display/ADS7843_TS.c **** 
+ 178:../tasks/display/ADS7843_TS.c **** }
+ 298              		.loc 1 178 0
+ 299 00da 1437     		adds	r7, r7, #20
+ 300 00dc BD46     		mov	sp, r7
+ 301              		@ sp needed
+ 302 00de 5DF8047B 		ldr	r7, [sp], #4
+ 303 00e2 7047     		bx	lr
+ 304              		.cfi_endproc
+ 305              	.LFE60:
+ 307              		.align	2
+ 308              		.thumb
+ 309              		.thumb_func
+ 311              	ADS7843_GetInstance:
+ 312              	.LFB61:
+ 179:../tasks/display/ADS7843_TS.c **** /**
+ 180:../tasks/display/ADS7843_TS.c ****   * @brief  Check if the device instance of the selected address is already registered
+ 181:../tasks/display/ADS7843_TS.c ****   *         and return its index
+ 182:../tasks/display/ADS7843_TS.c ****   * @param  DeviceAddr: Device address on communication Bus.
+ 183:../tasks/display/ADS7843_TS.c ****   * @retval Index of the device instance if registered, 0xFF if not.
+ 184:../tasks/display/ADS7843_TS.c ****   */
+ 185:../tasks/display/ADS7843_TS.c **** static uint8_t ADS7843_GetInstance(uint16_t DeviceAddr)
+ 186:../tasks/display/ADS7843_TS.c **** {
+ 313              		.loc 1 186 0
+ 314              		.cfi_startproc
+ 315              		@ args = 0, pretend = 0, frame = 16
+ 316              		@ frame_needed = 1, uses_anonymous_args = 0
+ 317              		@ link register save eliminated.
+ 318 00e4 80B4     		push	{r7}
+ 319              		.cfi_def_cfa_offset 4
+ 320              		.cfi_offset 7, -4
+ 321 00e6 85B0     		sub	sp, sp, #20
+ 322              		.cfi_def_cfa_offset 24
+ 323 00e8 00AF     		add	r7, sp, #0
+ 324              		.cfi_def_cfa_register 7
+ 325 00ea 0346     		mov	r3, r0
+ 326 00ec FB80     		strh	r3, [r7, #6]	@ movhi
+ 187:../tasks/display/ADS7843_TS.c ****   uint8_t idx = 0;
+ 327              		.loc 1 187 0
+ 328 00ee 0023     		movs	r3, #0
+ 329 00f0 FB73     		strb	r3, [r7, #15]
+ 188:../tasks/display/ADS7843_TS.c **** 
+ 189:../tasks/display/ADS7843_TS.c ****   /* Check all the registered instances */
+ 190:../tasks/display/ADS7843_TS.c ****   for(idx = 0; idx < ADS7843TS_MAX_INSTANCE ; idx ++)
+ 330              		.loc 1 190 0
+ 331 00f2 0023     		movs	r3, #0
+ 332 00f4 FB73     		strb	r3, [r7, #15]
+ 333 00f6 0DE0     		b	.L10
+ 334              	.L13:
+ 191:../tasks/display/ADS7843_TS.c ****   {
+ 192:../tasks/display/ADS7843_TS.c ****     if(ADS7843TS[idx] == DeviceAddr)
+ 335              		.loc 1 192 0
+ 336 00f8 FA7B     		ldrb	r2, [r7, #15]	@ zero_extendqisi2
+ 337 00fa 40F20003 		movw	r3, #:lower16:ADS7843TS
+ 338 00fe C0F20003 		movt	r3, #:upper16:ADS7843TS
+ 339 0102 9B5C     		ldrb	r3, [r3, r2]	@ zero_extendqisi2
+ 340 0104 FA88     		ldrh	r2, [r7, #6]
+ 341 0106 9A42     		cmp	r2, r3
+ 342 0108 01D1     		bne	.L11
+ 193:../tasks/display/ADS7843_TS.c ****     {
+ 194:../tasks/display/ADS7843_TS.c ****       return idx;
+ 343              		.loc 1 194 0
+ 344 010a FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 345 010c 06E0     		b	.L12
+ 346              	.L11:
+ 190:../tasks/display/ADS7843_TS.c ****   {
+ 347              		.loc 1 190 0
+ 348 010e FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 349 0110 0133     		adds	r3, r3, #1
+ 350 0112 FB73     		strb	r3, [r7, #15]
+ 351              	.L10:
+ 190:../tasks/display/ADS7843_TS.c ****   {
+ 352              		.loc 1 190 0 is_stmt 0 discriminator 1
+ 353 0114 FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 354 0116 012B     		cmp	r3, #1
+ 355 0118 EED9     		bls	.L13
+ 195:../tasks/display/ADS7843_TS.c ****     }
+ 196:../tasks/display/ADS7843_TS.c ****   }
+ 197:../tasks/display/ADS7843_TS.c **** 
+ 198:../tasks/display/ADS7843_TS.c ****   return 0xFF;
+ 356              		.loc 1 198 0 is_stmt 1
+ 357 011a FF23     		movs	r3, #255
+ 358              	.L12:
+ 199:../tasks/display/ADS7843_TS.c **** }
+ 359              		.loc 1 199 0
+ 360 011c 1846     		mov	r0, r3
+ 361 011e 1437     		adds	r7, r7, #20
+ 362 0120 BD46     		mov	sp, r7
+ 363              		@ sp needed
+ 364 0122 5DF8047B 		ldr	r7, [sp], #4
+ 365 0126 7047     		bx	lr
+ 366              		.cfi_endproc
+ 367              	.LFE61:
+ 369              		.section	.rodata
+ 370              		.align	2
+ 371              	.LC2:
+ 372 0040 4552524F 		.ascii	"ERROR: [ADS7843_TS] Error_Handler\000"
+ 372      523A205B 
+ 372      41445337 
+ 372      3834335F 
+ 372      54535D20 
+ 373 0062 0000     		.text
+ 374              		.align	2
+ 375              		.thumb
+ 376              		.thumb_func
+ 378              	Error_Handler:
+ 379              	.LFB62:
+ 200:../tasks/display/ADS7843_TS.c **** 
+ 201:../tasks/display/ADS7843_TS.c **** /*****************************************************************
+ 202:../tasks/display/ADS7843_TS.c **** * @brief  This function is executed in case of error occurrence.
+ 203:../tasks/display/ADS7843_TS.c **** ******************************************************************/
+ 204:../tasks/display/ADS7843_TS.c **** static void Error_Handler(void)
+ 205:../tasks/display/ADS7843_TS.c **** {
+ 380              		.loc 1 205 0
+ 381              		.cfi_startproc
+ 382              		@ args = 0, pretend = 0, frame = 0
+ 383              		@ frame_needed = 1, uses_anonymous_args = 0
+ 384 0128 80B5     		push	{r7, lr}
+ 385              		.cfi_def_cfa_offset 8
+ 386              		.cfi_offset 7, -8
+ 387              		.cfi_offset 14, -4
+ 388 012a 00AF     		add	r7, sp, #0
+ 389              		.cfi_def_cfa_register 7
+ 206:../tasks/display/ADS7843_TS.c ****   TST_High(TST4);
+ 390              		.loc 1 206 0
+ 391 012c 0220     		movs	r0, #2
+ 392 012e FFF7FEFF 		bl	TST_High
+ 207:../tasks/display/ADS7843_TS.c ****   printf("ERROR: [ADS7843_TS] Error_Handler\n");
+ 393              		.loc 1 207 0
+ 394 0132 40F20000 		movw	r0, #:lower16:.LC2
+ 395 0136 C0F20000 		movt	r0, #:upper16:.LC2
+ 396 013a FFF7FEFF 		bl	puts
+ 397              	.L15:
+ 208:../tasks/display/ADS7843_TS.c ****   while(1)  {  }
+ 398              		.loc 1 208 0 discriminator 1
+ 399 013e FEE7     		b	.L15
+ 400              		.cfi_endproc
+ 401              	.LFE62:
+ 403              		.align	2
+ 404              		.global	TP_SPI_Config
+ 405              		.thumb
+ 406              		.thumb_func
+ 408              	TP_SPI_Config:
+ 409              	.LFB63:
+ 209:../tasks/display/ADS7843_TS.c **** }
+ 210:../tasks/display/ADS7843_TS.c **** /******************************************************************
+ 211:../tasks/display/ADS7843_TS.c ****  *
+ 212:../tasks/display/ADS7843_TS.c **** ******************************************************************/
+ 213:../tasks/display/ADS7843_TS.c **** void TP_SPI_Config(void)
+ 214:../tasks/display/ADS7843_TS.c **** {
+ 410              		.loc 1 214 0
+ 411              		.cfi_startproc
+ 412              		@ args = 0, pretend = 0, frame = 24
+ 413              		@ frame_needed = 1, uses_anonymous_args = 0
+ 414 0140 80B5     		push	{r7, lr}
+ 415              		.cfi_def_cfa_offset 8
+ 416              		.cfi_offset 7, -8
+ 417              		.cfi_offset 14, -4
+ 418 0142 86B0     		sub	sp, sp, #24
+ 419              		.cfi_def_cfa_offset 32
+ 420 0144 00AF     		add	r7, sp, #0
+ 421              		.cfi_def_cfa_register 7
+ 215:../tasks/display/ADS7843_TS.c **** 	//NVIC_InitTypeDef nvic_InitStruct;
+ 216:../tasks/display/ADS7843_TS.c **** 	GPIO_InitTypeDef  GPIO_InitStructure;
+ 217:../tasks/display/ADS7843_TS.c **** 
+ 218:../tasks/display/ADS7843_TS.c **** 	__GPIOE_CLK_ENABLE();
+ 422              		.loc 1 218 0
+ 423 0146 4FF46053 		mov	r3, #14336
+ 424 014a C4F20203 		movt	r3, 16386
+ 425 014e 4FF46052 		mov	r2, #14336
+ 426 0152 C4F20202 		movt	r2, 16386
+ 427 0156 126B     		ldr	r2, [r2, #48]
+ 428 0158 42F01002 		orr	r2, r2, #16
+ 429 015c 1A63     		str	r2, [r3, #48]
+ 219:../tasks/display/ADS7843_TS.c **** 	__GPIOF_CLK_ENABLE();
+ 430              		.loc 1 219 0
+ 431 015e 4FF46053 		mov	r3, #14336
+ 432 0162 C4F20203 		movt	r3, 16386
+ 433 0166 4FF46052 		mov	r2, #14336
+ 434 016a C4F20202 		movt	r2, 16386
+ 435 016e 126B     		ldr	r2, [r2, #48]
+ 436 0170 42F02002 		orr	r2, r2, #32
+ 437 0174 1A63     		str	r2, [r3, #48]
+ 220:../tasks/display/ADS7843_TS.c **** 
+ 221:../tasks/display/ADS7843_TS.c **** 
+ 222:../tasks/display/ADS7843_TS.c **** 	TP_Deselect();
+ 438              		.loc 1 222 0
+ 439 0176 4FF48050 		mov	r0, #4096
+ 440 017a C4F20200 		movt	r0, 16386
+ 441 017e 0821     		movs	r1, #8
+ 442 0180 0122     		movs	r2, #1
+ 443 0182 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 223:../tasks/display/ADS7843_TS.c **** 
+ 224:../tasks/display/ADS7843_TS.c **** 	// spi out
+ 225:../tasks/display/ADS7843_TS.c **** 	GPIO_InitStructure.Pin 		= Pin_TP_SCK | Pin_TP_MOSI;
+ 444              		.loc 1 225 0
+ 445 0186 C023     		movs	r3, #192
+ 446 0188 7B60     		str	r3, [r7, #4]
+ 226:../tasks/display/ADS7843_TS.c **** 	GPIO_InitStructure.Mode 	= GPIO_MODE_OUTPUT_PP;
+ 447              		.loc 1 226 0
+ 448 018a 0123     		movs	r3, #1
+ 449 018c BB60     		str	r3, [r7, #8]
+ 227:../tasks/display/ADS7843_TS.c **** 	GPIO_InitStructure.Speed 	= GPIO_SPEED_FAST;
+ 450              		.loc 1 227 0
+ 451 018e 0223     		movs	r3, #2
+ 452 0190 3B61     		str	r3, [r7, #16]
+ 228:../tasks/display/ADS7843_TS.c **** 	GPIO_InitStructure.Pull 	= GPIO_PULLDOWN;
+ 453              		.loc 1 228 0
+ 454 0192 0223     		movs	r3, #2
+ 455 0194 FB60     		str	r3, [r7, #12]
+ 229:../tasks/display/ADS7843_TS.c **** 	HAL_GPIO_Init(PORT_TP_SPI, &GPIO_InitStructure);
+ 456              		.loc 1 229 0
+ 457 0196 3B1D     		adds	r3, r7, #4
+ 458 0198 4FF4A050 		mov	r0, #5120
+ 459 019c C4F20200 		movt	r0, 16386
+ 460 01a0 1946     		mov	r1, r3
+ 461 01a2 FFF7FEFF 		bl	HAL_GPIO_Init
+ 230:../tasks/display/ADS7843_TS.c **** 
+ 231:../tasks/display/ADS7843_TS.c **** 	// spi in
+ 232:../tasks/display/ADS7843_TS.c **** 	GPIO_InitStructure.Pin 		=  Pin_TP_MISO;
+ 462              		.loc 1 232 0
+ 463 01a6 4FF48073 		mov	r3, #256
+ 464 01aa 7B60     		str	r3, [r7, #4]
+ 233:../tasks/display/ADS7843_TS.c **** 	GPIO_InitStructure.Mode 	= GPIO_MODE_INPUT;
+ 465              		.loc 1 233 0
+ 466 01ac 0023     		movs	r3, #0
+ 467 01ae BB60     		str	r3, [r7, #8]
+ 234:../tasks/display/ADS7843_TS.c **** 	GPIO_InitStructure.Speed 	= GPIO_SPEED_FAST;
+ 468              		.loc 1 234 0
+ 469 01b0 0223     		movs	r3, #2
+ 470 01b2 3B61     		str	r3, [r7, #16]
+ 235:../tasks/display/ADS7843_TS.c **** 	GPIO_InitStructure.Pull 	= GPIO_PULLDOWN;
+ 471              		.loc 1 235 0
+ 472 01b4 0223     		movs	r3, #2
+ 473 01b6 FB60     		str	r3, [r7, #12]
+ 236:../tasks/display/ADS7843_TS.c **** 	HAL_GPIO_Init(PORT_TP_SPI, &GPIO_InitStructure);
+ 474              		.loc 1 236 0
+ 475 01b8 3B1D     		adds	r3, r7, #4
+ 476 01ba 4FF4A050 		mov	r0, #5120
+ 477 01be C4F20200 		movt	r0, 16386
+ 478 01c2 1946     		mov	r1, r3
+ 479 01c4 FFF7FEFF 		bl	HAL_GPIO_Init
+ 237:../tasks/display/ADS7843_TS.c **** 
+ 238:../tasks/display/ADS7843_TS.c **** 	// spi cs
+ 239:../tasks/display/ADS7843_TS.c **** 	GPIO_InitStructure.Pin 		= Pin_TP_CS;
+ 480              		.loc 1 239 0
+ 481 01c8 0823     		movs	r3, #8
+ 482 01ca 7B60     		str	r3, [r7, #4]
+ 240:../tasks/display/ADS7843_TS.c **** 	GPIO_InitStructure.Mode 	= GPIO_MODE_OUTPUT_PP;
+ 483              		.loc 1 240 0
+ 484 01cc 0123     		movs	r3, #1
+ 485 01ce BB60     		str	r3, [r7, #8]
+ 241:../tasks/display/ADS7843_TS.c **** 	GPIO_InitStructure.Speed 	= GPIO_SPEED_FAST;
+ 486              		.loc 1 241 0
+ 487 01d0 0223     		movs	r3, #2
+ 488 01d2 3B61     		str	r3, [r7, #16]
+ 242:../tasks/display/ADS7843_TS.c **** 	GPIO_InitStructure.Pull 	= GPIO_PULLUP;
+ 489              		.loc 1 242 0
+ 490 01d4 0123     		movs	r3, #1
+ 491 01d6 FB60     		str	r3, [r7, #12]
+ 243:../tasks/display/ADS7843_TS.c **** 	HAL_GPIO_Init(PORT_TP_SPI, &GPIO_InitStructure);
+ 492              		.loc 1 243 0
+ 493 01d8 3B1D     		adds	r3, r7, #4
+ 494 01da 4FF4A050 		mov	r0, #5120
+ 495 01de C4F20200 		movt	r0, 16386
+ 496 01e2 1946     		mov	r1, r3
+ 497 01e4 FFF7FEFF 		bl	HAL_GPIO_Init
+ 244:../tasks/display/ADS7843_TS.c **** 
+ 245:../tasks/display/ADS7843_TS.c **** 
+ 246:../tasks/display/ADS7843_TS.c **** 	// TP interrupt
+ 247:../tasks/display/ADS7843_TS.c **** 	GPIO_InitStructure.Pin 		= Pin_TP_IRQ;					//Pen Interrupt. Open anode output (requires 10kΩ to 
+ 498              		.loc 1 247 0
+ 499 01e8 2023     		movs	r3, #32
+ 500 01ea 7B60     		str	r3, [r7, #4]
+ 248:../tasks/display/ADS7843_TS.c **** 	GPIO_InitStructure.Mode 	= GPIO_MODE_INPUT;
+ 501              		.loc 1 248 0
+ 502 01ec 0023     		movs	r3, #0
+ 503 01ee BB60     		str	r3, [r7, #8]
+ 249:../tasks/display/ADS7843_TS.c **** 	GPIO_InitStructure.Speed 	= GPIO_SPEED_FAST;
+ 504              		.loc 1 249 0
+ 505 01f0 0223     		movs	r3, #2
+ 506 01f2 3B61     		str	r3, [r7, #16]
+ 250:../tasks/display/ADS7843_TS.c **** 	GPIO_InitStructure.Pull 	= GPIO_PULLUP;
+ 507              		.loc 1 250 0
+ 508 01f4 0123     		movs	r3, #1
+ 509 01f6 FB60     		str	r3, [r7, #12]
+ 251:../tasks/display/ADS7843_TS.c **** 	HAL_GPIO_Init(PORT_TP_IRQ, &GPIO_InitStructure);
+ 510              		.loc 1 251 0
+ 511 01f8 3B1D     		adds	r3, r7, #4
+ 512 01fa 4FF48050 		mov	r0, #4096
+ 513 01fe C4F20200 		movt	r0, 16386
+ 514 0202 1946     		mov	r1, r3
+ 515 0204 FFF7FEFF 		bl	HAL_GPIO_Init
+ 252:../tasks/display/ADS7843_TS.c **** 
+ 253:../tasks/display/ADS7843_TS.c **** 	// TP BUSY
+ 254:../tasks/display/ADS7843_TS.c **** 	GPIO_InitStructure.Pin 		= Pin_TP_BUSY;					// Busy Output. This output is high impedance when CS 
+ 516              		.loc 1 254 0
+ 517 0208 1023     		movs	r3, #16
+ 518 020a 7B60     		str	r3, [r7, #4]
+ 255:../tasks/display/ADS7843_TS.c **** 	GPIO_InitStructure.Mode 	= GPIO_MODE_INPUT;
+ 519              		.loc 1 255 0
+ 520 020c 0023     		movs	r3, #0
+ 521 020e BB60     		str	r3, [r7, #8]
+ 256:../tasks/display/ADS7843_TS.c **** 	GPIO_InitStructure.Speed 	= GPIO_SPEED_FAST;
+ 522              		.loc 1 256 0
+ 523 0210 0223     		movs	r3, #2
+ 524 0212 3B61     		str	r3, [r7, #16]
+ 257:../tasks/display/ADS7843_TS.c **** 	GPIO_InitStructure.Pull 	= GPIO_PULLUP;
+ 525              		.loc 1 257 0
+ 526 0214 0123     		movs	r3, #1
+ 527 0216 FB60     		str	r3, [r7, #12]
+ 258:../tasks/display/ADS7843_TS.c **** 	HAL_GPIO_Init(PORT_TP_BUSY, &GPIO_InitStructure);
+ 528              		.loc 1 258 0
+ 529 0218 3B1D     		adds	r3, r7, #4
+ 530 021a 4FF48050 		mov	r0, #4096
+ 531 021e C4F20200 		movt	r0, 16386
+ 532 0222 1946     		mov	r1, r3
+ 533 0224 FFF7FEFF 		bl	HAL_GPIO_Init
+ 259:../tasks/display/ADS7843_TS.c **** 
+ 260:../tasks/display/ADS7843_TS.c **** 	TP_Deselect();
+ 534              		.loc 1 260 0
+ 535 0228 4FF48050 		mov	r0, #4096
+ 536 022c C4F20200 		movt	r0, 16386
+ 537 0230 0821     		movs	r1, #8
+ 538 0232 0122     		movs	r2, #1
+ 539 0234 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 261:../tasks/display/ADS7843_TS.c **** 
+ 262:../tasks/display/ADS7843_TS.c **** 	HAL_GPIO_WritePin(PORT_TP_CS, Pin_TP_SCK,GPIO_PIN_RESET);
+ 540              		.loc 1 262 0
+ 541 0238 4FF48050 		mov	r0, #4096
+ 542 023c C4F20200 		movt	r0, 16386
+ 543 0240 4021     		movs	r1, #64
+ 544 0242 0022     		movs	r2, #0
+ 545 0244 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 263:../tasks/display/ADS7843_TS.c **** 	HAL_GPIO_WritePin(PORT_TP_MOSI, Pin_TP_MOSI,GPIO_PIN_RESET);
+ 546              		.loc 1 263 0
+ 547 0248 4FF4A050 		mov	r0, #5120
+ 548 024c C4F20200 		movt	r0, 16386
+ 549 0250 8021     		movs	r1, #128
+ 550 0252 0022     		movs	r2, #0
+ 551 0254 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 264:../tasks/display/ADS7843_TS.c **** 
+ 265:../tasks/display/ADS7843_TS.c **** }
+ 552              		.loc 1 265 0
+ 553 0258 1837     		adds	r7, r7, #24
+ 554 025a BD46     		mov	sp, r7
+ 555              		@ sp needed
+ 556 025c 80BD     		pop	{r7, pc}
+ 557              		.cfi_endproc
+ 558              	.LFE63:
+ 560 025e 00BF     		.align	2
+ 561              		.global	getTouchState
+ 562              		.thumb
+ 563              		.thumb_func
+ 565              	getTouchState:
+ 566              	.LFB64:
+ 266:../tasks/display/ADS7843_TS.c **** /******************************************************************
+ 267:../tasks/display/ADS7843_TS.c ****  *
+ 268:../tasks/display/ADS7843_TS.c **** ******************************************************************/
+ 269:../tasks/display/ADS7843_TS.c **** uint16_t getTouchState(void)
+ 270:../tasks/display/ADS7843_TS.c **** {
+ 567              		.loc 1 270 0
+ 568              		.cfi_startproc
+ 569              		@ args = 0, pretend = 0, frame = 8
+ 570              		@ frame_needed = 1, uses_anonymous_args = 0
+ 571 0260 80B5     		push	{r7, lr}
+ 572              		.cfi_def_cfa_offset 8
+ 573              		.cfi_offset 7, -8
+ 574              		.cfi_offset 14, -4
+ 575 0262 82B0     		sub	sp, sp, #8
+ 576              		.cfi_def_cfa_offset 16
+ 577 0264 00AF     		add	r7, sp, #0
+ 578              		.cfi_def_cfa_register 7
+ 271:../tasks/display/ADS7843_TS.c **** 	uint16_t ret = 0;
+ 579              		.loc 1 271 0
+ 580 0266 0023     		movs	r3, #0
+ 581 0268 FB80     		strh	r3, [r7, #6]	@ movhi
+ 272:../tasks/display/ADS7843_TS.c **** 
+ 273:../tasks/display/ADS7843_TS.c **** 	if (HAL_GPIO_ReadPin(PORT_TP_IRQ, Pin_TP_IRQ) == 0)
+ 582              		.loc 1 273 0
+ 583 026a 4FF48050 		mov	r0, #4096
+ 584 026e C4F20200 		movt	r0, 16386
+ 585 0272 2021     		movs	r1, #32
+ 586 0274 FFF7FEFF 		bl	HAL_GPIO_ReadPin
+ 587 0278 0346     		mov	r3, r0
+ 588 027a 002B     		cmp	r3, #0
+ 589 027c 01D1     		bne	.L18
+ 274:../tasks/display/ADS7843_TS.c **** 		ret = 1;
+ 590              		.loc 1 274 0
+ 591 027e 0123     		movs	r3, #1
+ 592 0280 FB80     		strh	r3, [r7, #6]	@ movhi
+ 593              	.L18:
+ 275:../tasks/display/ADS7843_TS.c **** 	return ret;
+ 594              		.loc 1 275 0
+ 595 0282 FB88     		ldrh	r3, [r7, #6]
+ 276:../tasks/display/ADS7843_TS.c **** }
+ 596              		.loc 1 276 0
+ 597 0284 1846     		mov	r0, r3
+ 598 0286 0837     		adds	r7, r7, #8
+ 599 0288 BD46     		mov	sp, r7
+ 600              		@ sp needed
+ 601 028a 80BD     		pop	{r7, pc}
+ 602              		.cfi_endproc
+ 603              	.LFE64:
+ 605              		.align	2
+ 606              		.global	touchGetSense
+ 607              		.thumb
+ 608              		.thumb_func
+ 610              	touchGetSense:
+ 611              	.LFB65:
+ 277:../tasks/display/ADS7843_TS.c **** /******************************************************************
+ 278:../tasks/display/ADS7843_TS.c ****  *
+ 279:../tasks/display/ADS7843_TS.c **** ******************************************************************/
+ 280:../tasks/display/ADS7843_TS.c **** void touchGetSense(int16_t * x, int16_t * y)
+ 281:../tasks/display/ADS7843_TS.c **** {
+ 612              		.loc 1 281 0
+ 613              		.cfi_startproc
+ 614              		@ args = 0, pretend = 0, frame = 8
+ 615              		@ frame_needed = 1, uses_anonymous_args = 0
+ 616 028c 80B5     		push	{r7, lr}
+ 617              		.cfi_def_cfa_offset 8
+ 618              		.cfi_offset 7, -8
+ 619              		.cfi_offset 14, -4
+ 620 028e 82B0     		sub	sp, sp, #8
+ 621              		.cfi_def_cfa_offset 16
+ 622 0290 00AF     		add	r7, sp, #0
+ 623              		.cfi_def_cfa_register 7
+ 624 0292 7860     		str	r0, [r7, #4]
+ 625 0294 3960     		str	r1, [r7]
+ 282:../tasks/display/ADS7843_TS.c **** 	*x = (touchGetX()/ax)+bx;
+ 626              		.loc 1 282 0
+ 627 0296 FFF7FEFF 		bl	touchGetX
+ 628 029a 0346     		mov	r3, r0
+ 629 029c 1A46     		mov	r2, r3
+ 630 029e 40F20003 		movw	r3, #:lower16:ax
+ 631 02a2 C0F20003 		movt	r3, #:upper16:ax
+ 632 02a6 1B88     		ldrh	r3, [r3]
+ 633 02a8 1BB2     		sxth	r3, r3
+ 634 02aa 92FBF3F3 		sdiv	r3, r2, r3
+ 635 02ae 9AB2     		uxth	r2, r3
+ 636 02b0 40F20003 		movw	r3, #:lower16:bx
+ 637 02b4 C0F20003 		movt	r3, #:upper16:bx
+ 638 02b8 1B88     		ldrh	r3, [r3]
+ 639 02ba 9BB2     		uxth	r3, r3
+ 640 02bc 1344     		add	r3, r3, r2
+ 641 02be 9BB2     		uxth	r3, r3
+ 642 02c0 9AB2     		uxth	r2, r3
+ 643 02c2 7B68     		ldr	r3, [r7, #4]
+ 644 02c4 1A80     		strh	r2, [r3]	@ movhi
+ 283:../tasks/display/ADS7843_TS.c **** 	*y = (touchGetY()/ay)+by;
+ 645              		.loc 1 283 0
+ 646 02c6 FFF7FEFF 		bl	touchGetY
+ 647 02ca 0346     		mov	r3, r0
+ 648 02cc 1A46     		mov	r2, r3
+ 649 02ce 40F20003 		movw	r3, #:lower16:ay
+ 650 02d2 C0F20003 		movt	r3, #:upper16:ay
+ 651 02d6 1B88     		ldrh	r3, [r3]
+ 652 02d8 1BB2     		sxth	r3, r3
+ 653 02da 92FBF3F3 		sdiv	r3, r2, r3
+ 654 02de 9AB2     		uxth	r2, r3
+ 655 02e0 40F20003 		movw	r3, #:lower16:by
+ 656 02e4 C0F20003 		movt	r3, #:upper16:by
+ 657 02e8 1B88     		ldrh	r3, [r3]
+ 658 02ea 9BB2     		uxth	r3, r3
+ 659 02ec 1344     		add	r3, r3, r2
+ 660 02ee 9BB2     		uxth	r3, r3
+ 661 02f0 9AB2     		uxth	r2, r3
+ 662 02f2 3B68     		ldr	r3, [r7]
+ 663 02f4 1A80     		strh	r2, [r3]	@ movhi
+ 284:../tasks/display/ADS7843_TS.c **** }
+ 664              		.loc 1 284 0
+ 665 02f6 0837     		adds	r7, r7, #8
+ 666 02f8 BD46     		mov	sp, r7
+ 667              		@ sp needed
+ 668 02fa 80BD     		pop	{r7, pc}
+ 669              		.cfi_endproc
+ 670              	.LFE65:
+ 672              		.align	2
+ 673              		.global	touchGetX
+ 674              		.thumb
+ 675              		.thumb_func
+ 677              	touchGetX:
+ 678              	.LFB66:
+ 285:../tasks/display/ADS7843_TS.c **** /******************************************************************
+ 286:../tasks/display/ADS7843_TS.c ****  *
+ 287:../tasks/display/ADS7843_TS.c **** ******************************************************************/
+ 288:../tasks/display/ADS7843_TS.c **** int16_t touchGetX(void)
+ 289:../tasks/display/ADS7843_TS.c **** {
+ 679              		.loc 1 289 0
+ 680              		.cfi_startproc
+ 681              		@ args = 0, pretend = 0, frame = 8
+ 682              		@ frame_needed = 1, uses_anonymous_args = 0
+ 683 02fc 80B5     		push	{r7, lr}
+ 684              		.cfi_def_cfa_offset 8
+ 685              		.cfi_offset 7, -8
+ 686              		.cfi_offset 14, -4
+ 687 02fe 82B0     		sub	sp, sp, #8
+ 688              		.cfi_def_cfa_offset 16
+ 689 0300 00AF     		add	r7, sp, #0
+ 690              		.cfi_def_cfa_register 7
+ 290:../tasks/display/ADS7843_TS.c **** 	uint16_t LSB, MSB;
+ 291:../tasks/display/ADS7843_TS.c **** 	int16_t ret = 4095;
+ 691              		.loc 1 291 0
+ 692 0302 40F6FF73 		movw	r3, #4095
+ 693 0306 FB80     		strh	r3, [r7, #6]	@ movhi
+ 292:../tasks/display/ADS7843_TS.c **** 
+ 293:../tasks/display/ADS7843_TS.c **** 	if (HAL_GPIO_ReadPin(PORT_TP_IRQ, Pin_TP_IRQ) == 0)
+ 694              		.loc 1 293 0
+ 695 0308 4FF48050 		mov	r0, #4096
+ 696 030c C4F20200 		movt	r0, 16386
+ 697 0310 2021     		movs	r1, #32
+ 698 0312 FFF7FEFF 		bl	HAL_GPIO_ReadPin
+ 699 0316 0346     		mov	r3, r0
+ 700 0318 002B     		cmp	r3, #0
+ 701 031a 29D1     		bne	.L22
+ 294:../tasks/display/ADS7843_TS.c **** 	{
+ 295:../tasks/display/ADS7843_TS.c **** 		TP_Select();
+ 702              		.loc 1 295 0
+ 703 031c 4FF48050 		mov	r0, #4096
+ 704 0320 C4F20200 		movt	r0, 16386
+ 705 0324 0821     		movs	r1, #8
+ 706 0326 0022     		movs	r2, #0
+ 707 0328 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 296:../tasks/display/ADS7843_TS.c **** //		ret = 0x2F;
+ 297:../tasks/display/ADS7843_TS.c **** //		while(--ret);
+ 298:../tasks/display/ADS7843_TS.c **** 
+ 299:../tasks/display/ADS7843_TS.c **** 		ADS7843_SendData(0x94);
+ 708              		.loc 1 299 0
+ 709 032c 9420     		movs	r0, #148
+ 710 032e FFF7FEFF 		bl	ADS7843_SendData
+ 300:../tasks/display/ADS7843_TS.c **** 		MSB=ADS7843_ReceiveData();
+ 711              		.loc 1 300 0
+ 712 0332 FFF7FEFF 		bl	ADS7843_ReceiveData
+ 713 0336 0346     		mov	r3, r0
+ 714 0338 BB80     		strh	r3, [r7, #4]	@ movhi
+ 301:../tasks/display/ADS7843_TS.c **** 		LSB=ADS7843_ReceiveData();
+ 715              		.loc 1 301 0
+ 716 033a FFF7FEFF 		bl	ADS7843_ReceiveData
+ 717 033e 0346     		mov	r3, r0
+ 718 0340 7B80     		strh	r3, [r7, #2]	@ movhi
+ 302:../tasks/display/ADS7843_TS.c **** 
+ 303:../tasks/display/ADS7843_TS.c **** 		TP_Deselect();
+ 719              		.loc 1 303 0
+ 720 0342 4FF48050 		mov	r0, #4096
+ 721 0346 C4F20200 		movt	r0, 16386
+ 722 034a 0821     		movs	r1, #8
+ 723 034c 0122     		movs	r2, #1
+ 724 034e FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 304:../tasks/display/ADS7843_TS.c **** 
+ 305:../tasks/display/ADS7843_TS.c **** 		ret =  ((MSB<<4) & 0x0FF0) | ((LSB>>4) & 0x000F);
+ 725              		.loc 1 305 0
+ 726 0352 BB88     		ldrh	r3, [r7, #4]
+ 727 0354 1B01     		lsls	r3, r3, #4
+ 728 0356 9BB2     		uxth	r3, r3
+ 729 0358 03F47F63 		and	r3, r3, #4080
+ 730 035c 9AB2     		uxth	r2, r3
+ 731 035e 7B88     		ldrh	r3, [r7, #2]
+ 732 0360 1B09     		lsrs	r3, r3, #4
+ 733 0362 9BB2     		uxth	r3, r3
+ 734 0364 9BB2     		uxth	r3, r3
+ 735 0366 03F00F03 		and	r3, r3, #15
+ 736 036a 9BB2     		uxth	r3, r3
+ 737 036c 1343     		orrs	r3, r3, r2
+ 738 036e FB80     		strh	r3, [r7, #6]	@ movhi
+ 739              	.L22:
+ 306:../tasks/display/ADS7843_TS.c **** 	}
+ 307:../tasks/display/ADS7843_TS.c **** 	return ret;
+ 740              		.loc 1 307 0
+ 741 0370 FB88     		ldrh	r3, [r7, #6]
+ 742 0372 1BB2     		sxth	r3, r3
+ 308:../tasks/display/ADS7843_TS.c **** }
+ 743              		.loc 1 308 0
+ 744 0374 1846     		mov	r0, r3
+ 745 0376 0837     		adds	r7, r7, #8
+ 746 0378 BD46     		mov	sp, r7
+ 747              		@ sp needed
+ 748 037a 80BD     		pop	{r7, pc}
+ 749              		.cfi_endproc
+ 750              	.LFE66:
+ 752              		.align	2
+ 753              		.global	touchGetY
+ 754              		.thumb
+ 755              		.thumb_func
+ 757              	touchGetY:
+ 758              	.LFB67:
+ 309:../tasks/display/ADS7843_TS.c **** /******************************************************************
+ 310:../tasks/display/ADS7843_TS.c ****  *
+ 311:../tasks/display/ADS7843_TS.c **** ******************************************************************/
+ 312:../tasks/display/ADS7843_TS.c **** int16_t touchGetY(void)
+ 313:../tasks/display/ADS7843_TS.c **** {
+ 759              		.loc 1 313 0
+ 760              		.cfi_startproc
+ 761              		@ args = 0, pretend = 0, frame = 8
+ 762              		@ frame_needed = 1, uses_anonymous_args = 0
+ 763 037c 80B5     		push	{r7, lr}
+ 764              		.cfi_def_cfa_offset 8
+ 765              		.cfi_offset 7, -8
+ 766              		.cfi_offset 14, -4
+ 767 037e 82B0     		sub	sp, sp, #8
+ 768              		.cfi_def_cfa_offset 16
+ 769 0380 00AF     		add	r7, sp, #0
+ 770              		.cfi_def_cfa_register 7
+ 314:../tasks/display/ADS7843_TS.c **** 	uint16_t LSB, MSB;
+ 315:../tasks/display/ADS7843_TS.c **** 	int16_t ret = 4095;
+ 771              		.loc 1 315 0
+ 772 0382 40F6FF73 		movw	r3, #4095
+ 773 0386 FB80     		strh	r3, [r7, #6]	@ movhi
+ 316:../tasks/display/ADS7843_TS.c **** 
+ 317:../tasks/display/ADS7843_TS.c **** 	if (HAL_GPIO_ReadPin(PORT_TP_IRQ, Pin_TP_IRQ) == 0)
+ 774              		.loc 1 317 0
+ 775 0388 4FF48050 		mov	r0, #4096
+ 776 038c C4F20200 		movt	r0, 16386
+ 777 0390 2021     		movs	r1, #32
+ 778 0392 FFF7FEFF 		bl	HAL_GPIO_ReadPin
+ 779 0396 0346     		mov	r3, r0
+ 780 0398 002B     		cmp	r3, #0
+ 781 039a 29D1     		bne	.L25
+ 318:../tasks/display/ADS7843_TS.c **** 	{
+ 319:../tasks/display/ADS7843_TS.c **** 		TP_Select();
+ 782              		.loc 1 319 0
+ 783 039c 4FF48050 		mov	r0, #4096
+ 784 03a0 C4F20200 		movt	r0, 16386
+ 785 03a4 0821     		movs	r1, #8
+ 786 03a6 0022     		movs	r2, #0
+ 787 03a8 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 320:../tasks/display/ADS7843_TS.c **** //		ret = 0x2F;
+ 321:../tasks/display/ADS7843_TS.c **** //		while(--ret);
+ 322:../tasks/display/ADS7843_TS.c **** 
+ 323:../tasks/display/ADS7843_TS.c **** 		ADS7843_SendData(0xD4);
+ 788              		.loc 1 323 0
+ 789 03ac D420     		movs	r0, #212
+ 790 03ae FFF7FEFF 		bl	ADS7843_SendData
+ 324:../tasks/display/ADS7843_TS.c **** 		MSB=ADS7843_ReceiveData();
+ 791              		.loc 1 324 0
+ 792 03b2 FFF7FEFF 		bl	ADS7843_ReceiveData
+ 793 03b6 0346     		mov	r3, r0
+ 794 03b8 BB80     		strh	r3, [r7, #4]	@ movhi
+ 325:../tasks/display/ADS7843_TS.c **** 		LSB=ADS7843_ReceiveData();
+ 795              		.loc 1 325 0
+ 796 03ba FFF7FEFF 		bl	ADS7843_ReceiveData
+ 797 03be 0346     		mov	r3, r0
+ 798 03c0 7B80     		strh	r3, [r7, #2]	@ movhi
+ 326:../tasks/display/ADS7843_TS.c **** 
+ 327:../tasks/display/ADS7843_TS.c **** 		TP_Deselect();
+ 799              		.loc 1 327 0
+ 800 03c2 4FF48050 		mov	r0, #4096
+ 801 03c6 C4F20200 		movt	r0, 16386
+ 802 03ca 0821     		movs	r1, #8
+ 803 03cc 0122     		movs	r2, #1
+ 804 03ce FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 328:../tasks/display/ADS7843_TS.c **** 
+ 329:../tasks/display/ADS7843_TS.c **** 		ret =  ((MSB<<4) & 0x0FF0) | ((LSB>>4) & 0x000F);
+ 805              		.loc 1 329 0
+ 806 03d2 BB88     		ldrh	r3, [r7, #4]
+ 807 03d4 1B01     		lsls	r3, r3, #4
+ 808 03d6 9BB2     		uxth	r3, r3
+ 809 03d8 03F47F63 		and	r3, r3, #4080
+ 810 03dc 9AB2     		uxth	r2, r3
+ 811 03de 7B88     		ldrh	r3, [r7, #2]
+ 812 03e0 1B09     		lsrs	r3, r3, #4
+ 813 03e2 9BB2     		uxth	r3, r3
+ 814 03e4 9BB2     		uxth	r3, r3
+ 815 03e6 03F00F03 		and	r3, r3, #15
+ 816 03ea 9BB2     		uxth	r3, r3
+ 817 03ec 1343     		orrs	r3, r3, r2
+ 818 03ee FB80     		strh	r3, [r7, #6]	@ movhi
+ 819              	.L25:
+ 330:../tasks/display/ADS7843_TS.c **** 	}
+ 331:../tasks/display/ADS7843_TS.c **** 	return ret;
+ 820              		.loc 1 331 0
+ 821 03f0 FB88     		ldrh	r3, [r7, #6]
+ 822 03f2 1BB2     		sxth	r3, r3
+ 332:../tasks/display/ADS7843_TS.c **** }
+ 823              		.loc 1 332 0
+ 824 03f4 1846     		mov	r0, r3
+ 825 03f6 0837     		adds	r7, r7, #8
+ 826 03f8 BD46     		mov	sp, r7
+ 827              		@ sp needed
+ 828 03fa 80BD     		pop	{r7, pc}
+ 829              		.cfi_endproc
+ 830              	.LFE67:
+ 832              		.align	2
+ 833              		.global	ADS7843_SendData
+ 834              		.thumb
+ 835              		.thumb_func
+ 837              	ADS7843_SendData:
+ 838              	.LFB68:
+ 333:../tasks/display/ADS7843_TS.c **** /****************************************************************
+ 334:../tasks/display/ADS7843_TS.c ****  * @param Data
+ 335:../tasks/display/ADS7843_TS.c **** ******************************************************************/
+ 336:../tasks/display/ADS7843_TS.c **** void ADS7843_SendData(uint16_t	Data){
+ 839              		.loc 1 336 0
+ 840              		.cfi_startproc
+ 841              		@ args = 0, pretend = 0, frame = 16
+ 842              		@ frame_needed = 1, uses_anonymous_args = 0
+ 843 03fc 80B5     		push	{r7, lr}
+ 844              		.cfi_def_cfa_offset 8
+ 845              		.cfi_offset 7, -8
+ 846              		.cfi_offset 14, -4
+ 847 03fe 84B0     		sub	sp, sp, #16
+ 848              		.cfi_def_cfa_offset 24
+ 849 0400 00AF     		add	r7, sp, #0
+ 850              		.cfi_def_cfa_register 7
+ 851 0402 0346     		mov	r3, r0
+ 852 0404 FB80     		strh	r3, [r7, #6]	@ movhi
+ 337:../tasks/display/ADS7843_TS.c **** uint8_t i;
+ 338:../tasks/display/ADS7843_TS.c **** 
+ 339:../tasks/display/ADS7843_TS.c **** 	for(i=0;i<8;i++){
+ 853              		.loc 1 339 0
+ 854 0406 0023     		movs	r3, #0
+ 855 0408 FB73     		strb	r3, [r7, #15]
+ 856 040a 2DE0     		b	.L28
+ 857              	.L31:
+ 340:../tasks/display/ADS7843_TS.c **** 		HAL_GPIO_WritePin(PORT_TP_CS, Pin_TP_SCK,GPIO_PIN_SET);
+ 858              		.loc 1 340 0
+ 859 040c 4FF48050 		mov	r0, #4096
+ 860 0410 C4F20200 		movt	r0, 16386
+ 861 0414 4021     		movs	r1, #64
+ 862 0416 0122     		movs	r2, #1
+ 863 0418 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 341:../tasks/display/ADS7843_TS.c **** 
+ 342:../tasks/display/ADS7843_TS.c **** 		if(Data & (1<<(7-i)))
+ 864              		.loc 1 342 0
+ 865 041c FA88     		ldrh	r2, [r7, #6]
+ 866 041e FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 867 0420 C3F10703 		rsb	r3, r3, #7
+ 868 0424 42FA03F3 		asr	r3, r2, r3
+ 869 0428 03F00103 		and	r3, r3, #1
+ 870 042c 002B     		cmp	r3, #0
+ 871 042e 08D0     		beq	.L29
+ 343:../tasks/display/ADS7843_TS.c **** 			HAL_GPIO_WritePin(PORT_TP_MOSI, Pin_TP_MOSI,GPIO_PIN_SET);
+ 872              		.loc 1 343 0
+ 873 0430 4FF4A050 		mov	r0, #5120
+ 874 0434 C4F20200 		movt	r0, 16386
+ 875 0438 8021     		movs	r1, #128
+ 876 043a 0122     		movs	r2, #1
+ 877 043c FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 878 0440 07E0     		b	.L30
+ 879              	.L29:
+ 344:../tasks/display/ADS7843_TS.c **** 		else
+ 345:../tasks/display/ADS7843_TS.c **** 			HAL_GPIO_WritePin(PORT_TP_MOSI, Pin_TP_MOSI,GPIO_PIN_RESET);
+ 880              		.loc 1 345 0
+ 881 0442 4FF4A050 		mov	r0, #5120
+ 882 0446 C4F20200 		movt	r0, 16386
+ 883 044a 8021     		movs	r1, #128
+ 884 044c 0022     		movs	r2, #0
+ 885 044e FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 886              	.L30:
+ 346:../tasks/display/ADS7843_TS.c **** 
+ 347:../tasks/display/ADS7843_TS.c **** 		HAL_GPIO_WritePin(PORT_TP_CS, Pin_TP_SCK,GPIO_PIN_RESET);
+ 887              		.loc 1 347 0
+ 888 0452 4FF48050 		mov	r0, #4096
+ 889 0456 C4F20200 		movt	r0, 16386
+ 890 045a 4021     		movs	r1, #64
+ 891 045c 0022     		movs	r2, #0
+ 892 045e FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 339:../tasks/display/ADS7843_TS.c **** 		HAL_GPIO_WritePin(PORT_TP_CS, Pin_TP_SCK,GPIO_PIN_SET);
+ 893              		.loc 1 339 0
+ 894 0462 FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 895 0464 0133     		adds	r3, r3, #1
+ 896 0466 FB73     		strb	r3, [r7, #15]
+ 897              	.L28:
+ 339:../tasks/display/ADS7843_TS.c **** 		HAL_GPIO_WritePin(PORT_TP_CS, Pin_TP_SCK,GPIO_PIN_SET);
+ 898              		.loc 1 339 0 is_stmt 0 discriminator 1
+ 899 0468 FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 900 046a 072B     		cmp	r3, #7
+ 901 046c CED9     		bls	.L31
+ 348:../tasks/display/ADS7843_TS.c **** 
+ 349:../tasks/display/ADS7843_TS.c **** 	}
+ 350:../tasks/display/ADS7843_TS.c **** 	HAL_GPIO_WritePin(PORT_TP_MOSI, Pin_TP_MOSI,GPIO_PIN_RESET);
+ 902              		.loc 1 350 0 is_stmt 1
+ 903 046e 4FF4A050 		mov	r0, #5120
+ 904 0472 C4F20200 		movt	r0, 16386
+ 905 0476 8021     		movs	r1, #128
+ 906 0478 0022     		movs	r2, #0
+ 907 047a FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 351:../tasks/display/ADS7843_TS.c **** }
+ 908              		.loc 1 351 0
+ 909 047e 1037     		adds	r7, r7, #16
+ 910 0480 BD46     		mov	sp, r7
+ 911              		@ sp needed
+ 912 0482 80BD     		pop	{r7, pc}
+ 913              		.cfi_endproc
+ 914              	.LFE68:
+ 916              		.align	2
+ 917              		.global	ADS7843_ReceiveData
+ 918              		.thumb
+ 919              		.thumb_func
+ 921              	ADS7843_ReceiveData:
+ 922              	.LFB69:
+ 352:../tasks/display/ADS7843_TS.c **** 
+ 353:../tasks/display/ADS7843_TS.c **** /****************************************************************
+ 354:../tasks/display/ADS7843_TS.c ****  *
+ 355:../tasks/display/ADS7843_TS.c **** ******************************************************************/
+ 356:../tasks/display/ADS7843_TS.c **** uint16_t ADS7843_ReceiveData(void){
+ 923              		.loc 1 356 0
+ 924              		.cfi_startproc
+ 925              		@ args = 0, pretend = 0, frame = 8
+ 926              		@ frame_needed = 1, uses_anonymous_args = 0
+ 927 0484 80B5     		push	{r7, lr}
+ 928              		.cfi_def_cfa_offset 8
+ 929              		.cfi_offset 7, -8
+ 930              		.cfi_offset 14, -4
+ 931 0486 82B0     		sub	sp, sp, #8
+ 932              		.cfi_def_cfa_offset 16
+ 933 0488 00AF     		add	r7, sp, #0
+ 934              		.cfi_def_cfa_register 7
+ 357:../tasks/display/ADS7843_TS.c **** 
+ 358:../tasks/display/ADS7843_TS.c **** uint16_t ret = 0;
+ 935              		.loc 1 358 0
+ 936 048a 0023     		movs	r3, #0
+ 937 048c FB80     		strh	r3, [r7, #6]	@ movhi
+ 359:../tasks/display/ADS7843_TS.c **** uint8_t i;
+ 360:../tasks/display/ADS7843_TS.c **** 
+ 361:../tasks/display/ADS7843_TS.c **** 	for(i=0;i<8;i++){
+ 938              		.loc 1 361 0
+ 939 048e 0023     		movs	r3, #0
+ 940 0490 7B71     		strb	r3, [r7, #5]
+ 941 0492 28E0     		b	.L33
+ 942              	.L36:
+ 362:../tasks/display/ADS7843_TS.c **** 		HAL_GPIO_WritePin(PORT_TP_CS, Pin_TP_SCK,GPIO_PIN_SET);
+ 943              		.loc 1 362 0
+ 944 0494 4FF48050 		mov	r0, #4096
+ 945 0498 C4F20200 		movt	r0, 16386
+ 946 049c 4021     		movs	r1, #64
+ 947 049e 0122     		movs	r2, #1
+ 948 04a0 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 363:../tasks/display/ADS7843_TS.c **** 
+ 364:../tasks/display/ADS7843_TS.c **** 		if (HAL_GPIO_ReadPin(PORT_TP_MISO, Pin_TP_MISO) == 1)
+ 949              		.loc 1 364 0
+ 950 04a4 4FF4A050 		mov	r0, #5120
+ 951 04a8 C4F20200 		movt	r0, 16386
+ 952 04ac 4FF48071 		mov	r1, #256
+ 953 04b0 FFF7FEFF 		bl	HAL_GPIO_ReadPin
+ 954 04b4 0346     		mov	r3, r0
+ 955 04b6 012B     		cmp	r3, #1
+ 956 04b8 07D1     		bne	.L34
+ 365:../tasks/display/ADS7843_TS.c **** 		{
+ 366:../tasks/display/ADS7843_TS.c **** 			ret=ret<<1; ret|=1;
+ 957              		.loc 1 366 0
+ 958 04ba FB88     		ldrh	r3, [r7, #6]	@ movhi
+ 959 04bc 5B00     		lsls	r3, r3, #1
+ 960 04be FB80     		strh	r3, [r7, #6]	@ movhi
+ 961 04c0 FB88     		ldrh	r3, [r7, #6]	@ movhi
+ 962 04c2 43F00103 		orr	r3, r3, #1
+ 963 04c6 FB80     		strh	r3, [r7, #6]	@ movhi
+ 964 04c8 02E0     		b	.L35
+ 965              	.L34:
+ 367:../tasks/display/ADS7843_TS.c **** 		}else{
+ 368:../tasks/display/ADS7843_TS.c **** 			ret=ret<<1;
+ 966              		.loc 1 368 0
+ 967 04ca FB88     		ldrh	r3, [r7, #6]	@ movhi
+ 968 04cc 5B00     		lsls	r3, r3, #1
+ 969 04ce FB80     		strh	r3, [r7, #6]	@ movhi
+ 970              	.L35:
+ 369:../tasks/display/ADS7843_TS.c **** 		}
+ 370:../tasks/display/ADS7843_TS.c **** 
+ 371:../tasks/display/ADS7843_TS.c **** 		HAL_GPIO_WritePin(PORT_TP_CS, Pin_TP_SCK,GPIO_PIN_RESET);
+ 971              		.loc 1 371 0
+ 972 04d0 4FF48050 		mov	r0, #4096
+ 973 04d4 C4F20200 		movt	r0, 16386
+ 974 04d8 4021     		movs	r1, #64
+ 975 04da 0022     		movs	r2, #0
+ 976 04dc FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 361:../tasks/display/ADS7843_TS.c **** 		HAL_GPIO_WritePin(PORT_TP_CS, Pin_TP_SCK,GPIO_PIN_SET);
+ 977              		.loc 1 361 0
+ 978 04e0 7B79     		ldrb	r3, [r7, #5]	@ zero_extendqisi2
+ 979 04e2 0133     		adds	r3, r3, #1
+ 980 04e4 7B71     		strb	r3, [r7, #5]
+ 981              	.L33:
+ 361:../tasks/display/ADS7843_TS.c **** 		HAL_GPIO_WritePin(PORT_TP_CS, Pin_TP_SCK,GPIO_PIN_SET);
+ 982              		.loc 1 361 0 is_stmt 0 discriminator 1
+ 983 04e6 7B79     		ldrb	r3, [r7, #5]	@ zero_extendqisi2
+ 984 04e8 072B     		cmp	r3, #7
+ 985 04ea D3D9     		bls	.L36
+ 372:../tasks/display/ADS7843_TS.c **** 	}
+ 373:../tasks/display/ADS7843_TS.c **** 	HAL_GPIO_WritePin(PORT_TP_MOSI, Pin_TP_MOSI,GPIO_PIN_RESET);
+ 986              		.loc 1 373 0 is_stmt 1
+ 987 04ec 4FF4A050 		mov	r0, #5120
+ 988 04f0 C4F20200 		movt	r0, 16386
+ 989 04f4 8021     		movs	r1, #128
+ 990 04f6 0022     		movs	r2, #0
+ 991 04f8 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 374:../tasks/display/ADS7843_TS.c **** 
+ 375:../tasks/display/ADS7843_TS.c **** 	return ret;
+ 992              		.loc 1 375 0
+ 993 04fc FB88     		ldrh	r3, [r7, #6]
+ 376:../tasks/display/ADS7843_TS.c **** }
+ 994              		.loc 1 376 0
+ 995 04fe 1846     		mov	r0, r3
+ 996 0500 0837     		adds	r7, r7, #8
+ 997 0502 BD46     		mov	sp, r7
+ 998              		@ sp needed
+ 999 0504 80BD     		pop	{r7, pc}
+ 1000              		.cfi_endproc
+ 1001              	.LFE69:
+ 1003 0506 00BF     		.align	2
+ 1004              		.global	touchSetCoef
+ 1005              		.thumb
+ 1006              		.thumb_func
+ 1008              	touchSetCoef:
+ 1009              	.LFB70:
+ 377:../tasks/display/ADS7843_TS.c **** /****************************************************************
+ 378:../tasks/display/ADS7843_TS.c ****  *
+ 379:../tasks/display/ADS7843_TS.c **** ******************************************************************/
+ 380:../tasks/display/ADS7843_TS.c **** void touchSetCoef(int16_t _ax, int16_t _bx, int16_t _ay, int16_t _by)
+ 381:../tasks/display/ADS7843_TS.c **** {
+ 1010              		.loc 1 381 0
+ 1011              		.cfi_startproc
+ 1012              		@ args = 0, pretend = 0, frame = 8
+ 1013              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1014              		@ link register save eliminated.
+ 1015 0508 80B4     		push	{r7}
+ 1016              		.cfi_def_cfa_offset 4
+ 1017              		.cfi_offset 7, -4
+ 1018 050a 83B0     		sub	sp, sp, #12
+ 1019              		.cfi_def_cfa_offset 16
+ 1020 050c 00AF     		add	r7, sp, #0
+ 1021              		.cfi_def_cfa_register 7
+ 1022 050e F880     		strh	r0, [r7, #6]	@ movhi
+ 1023 0510 B980     		strh	r1, [r7, #4]	@ movhi
+ 1024 0512 7A80     		strh	r2, [r7, #2]	@ movhi
+ 1025 0514 3B80     		strh	r3, [r7]	@ movhi
+ 382:../tasks/display/ADS7843_TS.c **** 	ax = _ax;
+ 1026              		.loc 1 382 0
+ 1027 0516 40F20003 		movw	r3, #:lower16:ax
+ 1028 051a C0F20003 		movt	r3, #:upper16:ax
+ 1029 051e FA88     		ldrh	r2, [r7, #6]	@ movhi
+ 1030 0520 1A80     		strh	r2, [r3]	@ movhi
+ 383:../tasks/display/ADS7843_TS.c **** 	bx = _bx;
+ 1031              		.loc 1 383 0
+ 1032 0522 40F20003 		movw	r3, #:lower16:bx
+ 1033 0526 C0F20003 		movt	r3, #:upper16:bx
+ 1034 052a BA88     		ldrh	r2, [r7, #4]	@ movhi
+ 1035 052c 1A80     		strh	r2, [r3]	@ movhi
+ 384:../tasks/display/ADS7843_TS.c **** 	ay = _ay;
+ 1036              		.loc 1 384 0
+ 1037 052e 40F20003 		movw	r3, #:lower16:ay
+ 1038 0532 C0F20003 		movt	r3, #:upper16:ay
+ 1039 0536 7A88     		ldrh	r2, [r7, #2]	@ movhi
+ 1040 0538 1A80     		strh	r2, [r3]	@ movhi
+ 385:../tasks/display/ADS7843_TS.c **** 	by = _by;
+ 1041              		.loc 1 385 0
+ 1042 053a 40F20003 		movw	r3, #:lower16:by
+ 1043 053e C0F20003 		movt	r3, #:upper16:by
+ 1044 0542 3A88     		ldrh	r2, [r7]	@ movhi
+ 1045 0544 1A80     		strh	r2, [r3]	@ movhi
+ 386:../tasks/display/ADS7843_TS.c **** }
+ 1046              		.loc 1 386 0
+ 1047 0546 0C37     		adds	r7, r7, #12
+ 1048 0548 BD46     		mov	sp, r7
+ 1049              		@ sp needed
+ 1050 054a 5DF8047B 		ldr	r7, [sp], #4
+ 1051 054e 7047     		bx	lr
+ 1052              		.cfi_endproc
+ 1053              	.LFE70:
+ 1055              		.align	2
+ 1056              		.global	touchGetCoef
+ 1057              		.thumb
+ 1058              		.thumb_func
+ 1060              	touchGetCoef:
+ 1061              	.LFB71:
+ 387:../tasks/display/ADS7843_TS.c **** /****************************************************************
+ 388:../tasks/display/ADS7843_TS.c ****  *
+ 389:../tasks/display/ADS7843_TS.c **** ******************************************************************/
+ 390:../tasks/display/ADS7843_TS.c **** void touchGetCoef(int16_t *_ax, int16_t *_bx, int16_t *_ay, int16_t *_by)
+ 391:../tasks/display/ADS7843_TS.c **** {
+ 1062              		.loc 1 391 0
+ 1063              		.cfi_startproc
+ 1064              		@ args = 0, pretend = 0, frame = 16
+ 1065              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1066              		@ link register save eliminated.
+ 1067 0550 80B4     		push	{r7}
+ 1068              		.cfi_def_cfa_offset 4
+ 1069              		.cfi_offset 7, -4
+ 1070 0552 85B0     		sub	sp, sp, #20
+ 1071              		.cfi_def_cfa_offset 24
+ 1072 0554 00AF     		add	r7, sp, #0
+ 1073              		.cfi_def_cfa_register 7
+ 1074 0556 F860     		str	r0, [r7, #12]
+ 1075 0558 B960     		str	r1, [r7, #8]
+ 1076 055a 7A60     		str	r2, [r7, #4]
+ 1077 055c 3B60     		str	r3, [r7]
+ 392:../tasks/display/ADS7843_TS.c **** 	*_ax = ax;
+ 1078              		.loc 1 392 0
+ 1079 055e 40F20003 		movw	r3, #:lower16:ax
+ 1080 0562 C0F20003 		movt	r3, #:upper16:ax
+ 1081 0566 1A88     		ldrh	r2, [r3]
+ 1082 0568 FB68     		ldr	r3, [r7, #12]
+ 1083 056a 1A80     		strh	r2, [r3]	@ movhi
+ 393:../tasks/display/ADS7843_TS.c **** 	*_bx = bx;
+ 1084              		.loc 1 393 0
+ 1085 056c 40F20003 		movw	r3, #:lower16:bx
+ 1086 0570 C0F20003 		movt	r3, #:upper16:bx
+ 1087 0574 1A88     		ldrh	r2, [r3]
+ 1088 0576 BB68     		ldr	r3, [r7, #8]
+ 1089 0578 1A80     		strh	r2, [r3]	@ movhi
+ 394:../tasks/display/ADS7843_TS.c **** 	*_ay = ay;
+ 1090              		.loc 1 394 0
+ 1091 057a 40F20003 		movw	r3, #:lower16:ay
+ 1092 057e C0F20003 		movt	r3, #:upper16:ay
+ 1093 0582 1A88     		ldrh	r2, [r3]
+ 1094 0584 7B68     		ldr	r3, [r7, #4]
+ 1095 0586 1A80     		strh	r2, [r3]	@ movhi
+ 395:../tasks/display/ADS7843_TS.c **** 	*_by = by;
+ 1096              		.loc 1 395 0
+ 1097 0588 40F20003 		movw	r3, #:lower16:by
+ 1098 058c C0F20003 		movt	r3, #:upper16:by
+ 1099 0590 1A88     		ldrh	r2, [r3]
+ 1100 0592 3B68     		ldr	r3, [r7]
+ 1101 0594 1A80     		strh	r2, [r3]	@ movhi
+ 396:../tasks/display/ADS7843_TS.c **** }
+ 1102              		.loc 1 396 0
+ 1103 0596 1437     		adds	r7, r7, #20
+ 1104 0598 BD46     		mov	sp, r7
+ 1105              		@ sp needed
+ 1106 059a 5DF8047B 		ldr	r7, [sp], #4
+ 1107 059e 7047     		bx	lr
+ 1108              		.cfi_endproc
+ 1109              	.LFE71:
+ 1111              		.align	2
+ 1112              		.global	touchVerifyCoef
+ 1113              		.thumb
+ 1114              		.thumb_func
+ 1116              	touchVerifyCoef:
+ 1117              	.LFB72:
+ 397:../tasks/display/ADS7843_TS.c **** /****************************************************************
+ 398:../tasks/display/ADS7843_TS.c ****  *
+ 399:../tasks/display/ADS7843_TS.c **** ******************************************************************/
+ 400:../tasks/display/ADS7843_TS.c **** uint16_t touchVerifyCoef(void)
+ 401:../tasks/display/ADS7843_TS.c **** {
+ 1118              		.loc 1 401 0
+ 1119              		.cfi_startproc
+ 1120              		@ args = 0, pretend = 0, frame = 8
+ 1121              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1122              		@ link register save eliminated.
+ 1123 05a0 80B4     		push	{r7}
+ 1124              		.cfi_def_cfa_offset 4
+ 1125              		.cfi_offset 7, -4
+ 1126 05a2 83B0     		sub	sp, sp, #12
+ 1127              		.cfi_def_cfa_offset 16
+ 1128 05a4 00AF     		add	r7, sp, #0
+ 1129              		.cfi_def_cfa_register 7
+ 402:../tasks/display/ADS7843_TS.c **** 	uint16_t ret = 0;
+ 1130              		.loc 1 402 0
+ 1131 05a6 0023     		movs	r3, #0
+ 1132 05a8 FB80     		strh	r3, [r7, #6]	@ movhi
+ 403:../tasks/display/ADS7843_TS.c **** 	if (ax == 0 || ax == 0xFFFF
+ 404:../tasks/display/ADS7843_TS.c **** 		|| bx == 0xFFFF
+ 1133              		.loc 1 404 0
+ 1134 05aa 40F20003 		movw	r3, #:lower16:ax
+ 1135 05ae C0F20003 		movt	r3, #:upper16:ax
+ 1136 05b2 1B88     		ldrh	r3, [r3]
+ 403:../tasks/display/ADS7843_TS.c **** 	if (ax == 0 || ax == 0xFFFF
+ 1137              		.loc 1 403 0
+ 1138 05b4 002B     		cmp	r3, #0
+ 1139 05b6 06D0     		beq	.L41
+ 405:../tasks/display/ADS7843_TS.c **** 		|| ay == 0 || ay == 0xFFFF
+ 1140              		.loc 1 405 0
+ 1141 05b8 40F20003 		movw	r3, #:lower16:ay
+ 1142 05bc C0F20003 		movt	r3, #:upper16:ay
+ 1143 05c0 1B88     		ldrh	r3, [r3]
+ 406:../tasks/display/ADS7843_TS.c **** 		|| by == 0xFFFF)
+ 1144              		.loc 1 406 0
+ 1145 05c2 002B     		cmp	r3, #0
+ 1146 05c4 01D1     		bne	.L42
+ 1147              	.L41:
+ 407:../tasks/display/ADS7843_TS.c **** 	ret = 1;
+ 1148              		.loc 1 407 0
+ 1149 05c6 0123     		movs	r3, #1
+ 1150 05c8 FB80     		strh	r3, [r7, #6]	@ movhi
+ 1151              	.L42:
+ 408:../tasks/display/ADS7843_TS.c **** 	return ret;
+ 1152              		.loc 1 408 0
+ 1153 05ca FB88     		ldrh	r3, [r7, #6]
+ 409:../tasks/display/ADS7843_TS.c **** }
+ 1154              		.loc 1 409 0
+ 1155 05cc 1846     		mov	r0, r3
+ 1156 05ce 0C37     		adds	r7, r7, #12
+ 1157 05d0 BD46     		mov	sp, r7
+ 1158              		@ sp needed
+ 1159 05d2 5DF8047B 		ldr	r7, [sp], #4
+ 1160 05d6 7047     		bx	lr
+ 1161              		.cfi_endproc
+ 1162              	.LFE72:
+ 1164              	.Letext0:
+ 1165              		.file 2 "c:\\program files (x86)\\codesourcery\\arm-none-eabi\\include\\stdint.h"
+ 1166              		.file 3 "../tasks/display/ts.h"
+ 1167              		.file 4 "../tasks/display/io.h"
+ 1168              		.file 5 "D:\\workspace\\console800480\\system/stm32f217xx.h"
+ 1169              		.file 6 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_hal_def.h"
+ 1170              		.file 7 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_hal_gpio.h"
+ 1171              		.file 8 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_hal_dma.h"
+ 1172              		.file 9 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_hal_adc.h"
+ 1173              		.file 10 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_ll_sdmmc.h"
+ 1174              		.file 11 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_hal_sd.h"
+ 1175              		.file 12 "D:\\workspace\\console800480\\src/LEDs.h"
+ 1176              		.file 13 "D:\\workspace\\console800480\\system/core_cm3.h"
+ 1177              		.file 14 "D:\\workspace\\console800480/main.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 ADS7843_TS.c
+                            *COM*:00000060 uSdHandle
+                            *COM*:00000058 SD_CardInfo
+                            *COM*:00000002 ax
+                            *COM*:00000002 bx
+                            *COM*:00000002 ay
+                            *COM*:00000002 by
+                            *COM*:00000044 AdcHandleX
+                            *COM*:00000044 AdcHandleY
+C:\Users\sagok\AppData\Local\Temp\ccdfucMi.s:31     .bss:00000000 uhADCxConvertedValue
+C:\Users\sagok\AppData\Local\Temp\ccdfucMi.s:28     .bss:00000000 $d
+C:\Users\sagok\AppData\Local\Temp\ccdfucMi.s:37     .bss:00000004 ADCTSConvertedValue
+C:\Users\sagok\AppData\Local\Temp\ccdfucMi.s:44     .data:00000000 ADS7843_ts_drv
+C:\Users\sagok\AppData\Local\Temp\ccdfucMi.s:41     .data:00000000 $d
+C:\Users\sagok\AppData\Local\Temp\ccdfucMi.s:77     .text:00000000 ADS7843_Init
+C:\Users\sagok\AppData\Local\Temp\ccdfucMi.s:214    .text:0000009c ADS7843_TS_Start
+C:\Users\sagok\AppData\Local\Temp\ccdfucMi.s:244    .text:000000b0 ADS7843_TS_DetectTouch
+C:\Users\sagok\AppData\Local\Temp\ccdfucMi.s:280    .text:000000cc ADS7843_TS_GetXY
+C:\Users\sagok\AppData\Local\Temp\ccdfucMi.s:53     .data:00000010 ADS7843_io_drv
+C:\Users\sagok\AppData\Local\Temp\ccdfucMi.s:148    .text:00000068 ADS7843_IO_Start
+C:\Users\sagok\AppData\Local\Temp\ccdfucMi.s:180    .text:00000080 ADS7843_IO_Config
+C:\Users\sagok\AppData\Local\Temp\ccdfucMi.s:62     .bss:00000008 ADS7843TS
+C:\Users\sagok\AppData\Local\Temp\ccdfucMi.s:65     .rodata:00000000 $d
+C:\Users\sagok\AppData\Local\Temp\ccdfucMi.s:66     .rodata:00000000 .LC0
+C:\Users\sagok\AppData\Local\Temp\ccdfucMi.s:69     .rodata:00000028 .LC1
+C:\Users\sagok\AppData\Local\Temp\ccdfucMi.s:72     .text:00000000 $t
+C:\Users\sagok\AppData\Local\Temp\ccdfucMi.s:311    .text:000000e4 ADS7843_GetInstance
+C:\Users\sagok\AppData\Local\Temp\ccdfucMi.s:408    .text:00000140 TP_SPI_Config
+C:\Users\sagok\AppData\Local\Temp\ccdfucMi.s:371    .rodata:00000040 .LC2
+C:\Users\sagok\AppData\Local\Temp\ccdfucMi.s:378    .text:00000128 Error_Handler
+C:\Users\sagok\AppData\Local\Temp\ccdfucMi.s:565    .text:00000260 getTouchState
+C:\Users\sagok\AppData\Local\Temp\ccdfucMi.s:610    .text:0000028c touchGetSense
+C:\Users\sagok\AppData\Local\Temp\ccdfucMi.s:677    .text:000002fc touchGetX
+C:\Users\sagok\AppData\Local\Temp\ccdfucMi.s:757    .text:0000037c touchGetY
+C:\Users\sagok\AppData\Local\Temp\ccdfucMi.s:837    .text:000003fc ADS7843_SendData
+C:\Users\sagok\AppData\Local\Temp\ccdfucMi.s:921    .text:00000484 ADS7843_ReceiveData
+C:\Users\sagok\AppData\Local\Temp\ccdfucMi.s:1008   .text:00000508 touchSetCoef
+C:\Users\sagok\AppData\Local\Temp\ccdfucMi.s:1060   .text:00000550 touchGetCoef
+C:\Users\sagok\AppData\Local\Temp\ccdfucMi.s:1116   .text:000005a0 touchVerifyCoef
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.1.7f551ac7fcad8b79b9df4bfdaa536673
+                           .group:00000000 wm4.newlib.h.8.384a112feabb3bef7b573ae48cde2e3b
+                           .group:00000000 wm4.features.h.22.6a4ca7cd053637cc1d0db6c16f39b2d7
+                           .group:00000000 wm4.config.h.183.aa62afef667fb61d15fa64c48beb2f14
+                           .group:00000000 wm4._ansi.h.23.5644b60c990a4800b02a6e654e88f93a
+                           .group:00000000 wm4.stdint.h.20.54ad762faa59e3c05491630641c8d8bf
+                           .group:00000000 wm4.stm32f2xx_hal_conf.h.40.007126baefb9f966c36646edbf8040d2
+                           .group:00000000 wm4.stm32f2xx.h.57.5ec1581efc43612c411d33a8686e9ec7
+                           .group:00000000 wm4.stm32f217xx.h.52.9c940d76d00294b78837dc334c172fdd
+                           .group:00000000 wm4.core_cm3.h.32.49180ccb4d36cabd2d7016d2a51d91ae
+                           .group:00000000 wm4.core_cmInstr.h.25.f50f886f2edf670cf199b35fd96f5c91
+                           .group:00000000 wm4.core_cm3.h.130.63ab2348a6eed0fdb318040d970b676c
+                           .group:00000000 wm4.stm32f217xx.h.978.a5c681952b2f704a0e7f2ba21d08adf5
+                           .group:00000000 wm4.stm32f2xx.h.142.bc2155a1f7498bab16371e38413a9e41
+                           .group:00000000 wm4.stm32f2xx_hal_def.h.74.8ad2dc8aa82c4fd02e5aeaae592641ba
+                           .group:00000000 wm4.stm32f2xx_hal_rcc.h.142.ec0f91cc6576a6acebd17e6dd85829ae
+                           .group:00000000 wm4.stm32f2xx_hal_rcc_ex.h.40.0829033e864455c6bdd0db01f8ba5a50
+                           .group:00000000 wm4.stm32f2xx_hal_gpio.h.40.ba64e0bb94d9a68835f80159f39a86f1
+                           .group:00000000 wm4.stm32f2xx_hal_gpio_ex.h.40.24e547fd402281923f446b510381083f
+                           .group:00000000 wm4.stm32f2xx_hal_dma.h.40.5d9732ace2a21a4526ce8f0c52428fff
+                           .group:00000000 wm4.stm32f2xx_hal_cortex.h.40.e10263d2ec5d4fa79b4180ce1a38aff1
+                           .group:00000000 wm4.stm32f2xx_hal_adc.h.40.89ac8b78113cac4cf63847587daabac9
+                           .group:00000000 wm4.stm32f2xx_hal_adc_ex.h.40.7de68ed256ef25526ee31cc017f2c291
+                           .group:00000000 wm4.stm32f2xx_hal_flash.h.40.c3171719ce015e9cff20c795e44e886d
+                           .group:00000000 wm4.stm32f2xx_hal_flash_ex.h.40.7389508bd24a0aeb077bde0c9fb651eb
+                           .group:00000000 wm4.stm32f2xx_ll_fsmc.h.40.c1c32f2e1862f4dd342bd9b80fb895bb
+                           .group:00000000 wm4.stm32f2xx_hal_pwr.h.40.812df32e5c31b609a128e9db0eb4cbd0
+                           .group:00000000 wm4.stm32f2xx_hal_rtc.h.40.850fda5fe2cce8797446913dee18382f
+                           .group:00000000 wm4.stm32f2xx_hal_rtc_ex.h.40.f3e0c408e3bf4e8a0352d7ec9a18a822
+                           .group:00000000 wm4.stm32f2xx_ll_sdmmc.h.40.3719ab487c4b77401c572f459adf6eb7
+                           .group:00000000 wm4.stm32f2xx_hal_sd.h.58.760215394dcc316161a6482c0af9b866
+                           .group:00000000 wm4.stm32f2xx_hal_spi.h.40.7984243dbaba8b21c6392998a47e6987
+                           .group:00000000 wm4.stm32f2xx_hal_tim.h.40.d79172f25d0e9a15dc346aba8515bdd6
+                           .group:00000000 wm4.stm32f2xx_hal_tim_ex.h.40.361f280a7a3f60b4b238bb99ca728d83
+                           .group:00000000 wm4.stm32f2xx_hal_uart.h.40.d74def561ae6f78f40f477c8426ecbef
+                           .group:00000000 wm4.stm32f2xx_ll_usb.h.40.9b0206a05bc6ce3bec1648b51f22cb81
+                           .group:00000000 wm4.stm32f2xx_hal_pcd.h.99.11faba414c39e357b2f23364912d0605
+                           .group:00000000 wm4.stm32f2xx_hal_hcd.h.40.44ee5e972983ae0139ddbacdc75c44ef
+                           .group:00000000 wm4.stm32f2xx_hal.h.64.ed79ee83e52b151b3c365392b398f866
+                           .group:00000000 wm4.stdio.h.31.7c0e28c411445f3f9c5b11accf882760
+                           .group:00000000 wm4.stddef.h.184.159df79b4ca79c76561572a55985524c
+                           .group:00000000 wm4.stdarg.h.34.3a23a216c0c293b3d2ea2e89281481e6
+                           .group:00000000 wm4._default_types.h.6.5e12cd604db8ce00b62bb2f02708eaf3
+                           .group:00000000 wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea
+                           .group:00000000 wm4._types.h.59.db8450f33c1f6150c0372fa1091a887a
+                           .group:00000000 wm4.stddef.h.348.9a99de77b6ba3b4278b57e9cc6d6e349
+                           .group:00000000 wm4.reent.h.16.567d760e6ae9ad7f917851a308bd7a57
+                           .group:00000000 wm4.types.h.23.0d949686bbcadd1621462d4fa1f884f9
+                           .group:00000000 wm4.stddef.h.39.7e3d906ac58942e0b374c527445f5de5
+                           .group:00000000 wm4.types.h.2.e9cec8c90ab35f77d9f499e06ae02400
+                           .group:00000000 wm4.types.h.80.5759fe41f87f5211a5952dfb1fc64f19
+                           .group:00000000 wm4.stdio.h.2.4aa87247282eca6c8f36f9de33d8df1a
+                           .group:00000000 wm4.stdio.h.64.f9f1bb6b0d3d7e12f6a27968d859709c
+                           .group:00000000 wm4.stdlib.h.18.8bab2fb43ac4e90235390733c30a4530
+                           .group:00000000 wm4.stddef.h.158.a7efb00f6cbc6f43213b50e183c9830c
+                           .group:00000000 wm4.alloca.h.8.dfc0c703c47ec3e69746825b17d9e66d
+                           .group:00000000 wm4.stdlib.h.55.7091a050e07f1c4abd225630fe3d62f1
+                           .group:00000000 wm4.cdefs.h.56.efab90f4d89fbc41d6b3a5c5fb0d3d0f
+                           .group:00000000 wm4.string.h.15.dab3980bf35408a4c507182805e2de3a
+                           .group:00000000 wm4.string.h.126.6ff3aa59129e7f66b2c273baf353e066
+                           .group:00000000 wm4.Display.h.39.49592f1e6d055d6383457fd20cdd98de
+                           .group:00000000 wm4.usbd_conf.h.42.6b5dabdfef26be13dabbf5c06e1837cb
+                           .group:00000000 wm4.usbd_def.h.54.f0a777e557f44b0cdc32a86cdf6d44e8
+                           .group:00000000 wm4.usbd_cdc.h.48.93470a15f0b6146c8b31621ae3de674b
+                           .group:00000000 wm4.ADS7843_TS.h.60.5447ee5bfeeab537372be7be33333aa0
+                           .group:00000000 wm4.LEDs.h.9.36ffa4b30bd168dc58d64fa6e53a9a30
+
+UNDEFINED SYMBOLS
+printf
+puts
+TST_High
+HAL_GPIO_WritePin
+HAL_GPIO_Init
+HAL_GPIO_ReadPin

@@ -1,0 +1,1383 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m4
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"ili9320.c"
+  15              		.global	ili9320_drv
+  16              		.data
+  17              		.align	2
+  20              	ili9320_drv:
+  21 0000 00000000 		.word	GFTM070_Init
+  22 0004 00000000 		.word	ili9320_ReadID
+  23 0008 00000000 		.word	GFTM070_DisplayOn
+  24 000c 00000000 		.word	ili9320_DisplayOff
+  25 0010 00000000 		.word	GFTM070_SetCursor
+  26 0014 00000000 		.word	GFTM070_WritePixel
+  27 0018 00000000 		.word	GFTM070_WriteNextWindowPixel
+  28 001c 00000000 		.word	ili9320_ReadPixel
+  29 0020 00000000 		.word	GFTM070_SetDisplayWindow
+  30 0024 00000000 		.word	GFTM070_DrawHLine
+  31 0028 00000000 		.word	GFTM070_DrawVLine
+  32 002c 00000000 		.word	ili9320_GetLcdPixelWidth
+  33 0030 00000000 		.word	ili9320_GetLcdPixelHeight
+  34 0034 00000000 		.word	GFTM070_DrawBitmap
+  35 0038 00000000 		.word	GFTM070_DrawRGBImage
+  36 003c 00000000 		.word	GFTM070_DrawHDataLine
+  37              		.global	GFTM070SoftMode_drv
+  38              		.align	2
+  41              	GFTM070SoftMode_drv:
+  42 0040 00000000 		.word	GFTM070_Init
+  43 0044 00000000 		.word	GFTM070_WriteCommand
+  44 0048 00000000 		.space	4
+  45              		.bss
+  46              	Is_ili9320_Initialized:
+  47 0000 00       		.space	1
+  48              	Is_GFTM070_Initialized:
+  49 0001 00       		.space	1
+  50              		.text
+  51              		.align	2
+  52              		.global	GFTM070_Init
+  53              		.thumb
+  54              		.thumb_func
+  56              	GFTM070_Init:
+  57              		@ args = 0, pretend = 0, frame = 8
+  58              		@ frame_needed = 1, uses_anonymous_args = 0
+  59 0000 80B5     		push	{r7, lr}
+  60 0002 82B0     		sub	sp, sp, #8
+  61 0004 00AF     		add	r7, sp, #0
+  62 0006 40F20003 		movw	r3, #:lower16:Is_GFTM070_Initialized
+  63 000a C0F20003 		movt	r3, #:upper16:Is_GFTM070_Initialized
+  64 000e 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+  65 0010 002B     		cmp	r3, #0
+  66 0012 40F00081 		bne	.L1
+  67 0016 40F20003 		movw	r3, #:lower16:Is_GFTM070_Initialized
+  68 001a C0F20003 		movt	r3, #:upper16:Is_GFTM070_Initialized
+  69 001e 0122     		movs	r2, #1
+  70 0020 1A70     		strb	r2, [r3]
+  71 0022 FFF7FEFF 		bl	GFTM070_IO_Init
+  72 0026 4FF4C050 		mov	r0, #6144
+  73 002a C4F20200 		movt	r0, 16386
+  74 002e 4FF40071 		mov	r1, #512
+  75 0032 0022     		movs	r2, #0
+  76 0034 FFF7FEFF 		bl	HAL_GPIO_WritePin
+  77 0038 0A20     		movs	r0, #10
+  78 003a FFF7FEFF 		bl	vTaskDelay
+  79 003e 4FF4C050 		mov	r0, #6144
+  80 0042 C4F20200 		movt	r0, 16386
+  81 0046 4FF40071 		mov	r1, #512
+  82 004a 0122     		movs	r2, #1
+  83 004c FFF7FEFF 		bl	HAL_GPIO_WritePin
+  84 0050 0A20     		movs	r0, #10
+  85 0052 FFF7FEFF 		bl	vTaskDelay
+  86 0056 0120     		movs	r0, #1
+  87 0058 FFF7FEFF 		bl	GFTM070_WriteCommand
+  88 005c E220     		movs	r0, #226
+  89 005e FFF7FEFF 		bl	GFTM070_WriteCommand
+  90 0062 7320     		movs	r0, #115
+  91 0064 FFF7FEFF 		bl	GFTM070_WriteData
+  92 0068 0420     		movs	r0, #4
+  93 006a FFF7FEFF 		bl	GFTM070_WriteData
+  94 006e 5420     		movs	r0, #84
+  95 0070 FFF7FEFF 		bl	GFTM070_WriteData
+  96 0074 E020     		movs	r0, #224
+  97 0076 FFF7FEFF 		bl	GFTM070_WriteCommand
+  98 007a 0120     		movs	r0, #1
+  99 007c FFF7FEFF 		bl	GFTM070_WriteData
+ 100 0080 0020     		movs	r0, #0
+ 101 0082 FFF7FEFF 		bl	GFTM070_WriteData
+ 102 0086 E020     		movs	r0, #224
+ 103 0088 FFF7FEFF 		bl	GFTM070_WriteCommand
+ 104 008c 0320     		movs	r0, #3
+ 105 008e FFF7FEFF 		bl	GFTM070_WriteData
+ 106 0092 0120     		movs	r0, #1
+ 107 0094 FFF7FEFF 		bl	GFTM070_WriteCommand
+ 108 0098 6420     		movs	r0, #100
+ 109 009a FFF7FEFF 		bl	vTaskDelay
+ 110 009e E620     		movs	r0, #230
+ 111 00a0 FFF7FEFF 		bl	GFTM070_WriteCommand
+ 112 00a4 0520     		movs	r0, #5
+ 113 00a6 FFF7FEFF 		bl	GFTM070_WriteData
+ 114 00aa BA20     		movs	r0, #186
+ 115 00ac FFF7FEFF 		bl	GFTM070_WriteData
+ 116 00b0 A720     		movs	r0, #167
+ 117 00b2 FFF7FEFF 		bl	GFTM070_WriteData
+ 118 00b6 B020     		movs	r0, #176
+ 119 00b8 FFF7FEFF 		bl	GFTM070_WriteCommand
+ 120 00bc 0B20     		movs	r0, #11
+ 121 00be FFF7FEFF 		bl	GFTM070_WriteData
+ 122 00c2 0020     		movs	r0, #0
+ 123 00c4 FFF7FEFF 		bl	GFTM070_WriteData
+ 124 00c8 0320     		movs	r0, #3
+ 125 00ca FFF7FEFF 		bl	GFTM070_WriteData
+ 126 00ce 1F20     		movs	r0, #31
+ 127 00d0 FFF7FEFF 		bl	GFTM070_WriteData
+ 128 00d4 0120     		movs	r0, #1
+ 129 00d6 FFF7FEFF 		bl	GFTM070_WriteData
+ 130 00da DF20     		movs	r0, #223
+ 131 00dc FFF7FEFF 		bl	GFTM070_WriteData
+ 132 00e0 B420     		movs	r0, #180
+ 133 00e2 FFF7FEFF 		bl	GFTM070_WriteCommand
+ 134 00e6 0320     		movs	r0, #3
+ 135 00e8 FFF7FEFF 		bl	GFTM070_WriteData
+ 136 00ec AB20     		movs	r0, #171
+ 137 00ee FFF7FEFF 		bl	GFTM070_WriteData
+ 138 00f2 0020     		movs	r0, #0
+ 139 00f4 FFF7FEFF 		bl	GFTM070_WriteData
+ 140 00f8 1420     		movs	r0, #20
+ 141 00fa FFF7FEFF 		bl	GFTM070_WriteData
+ 142 00fe 1320     		movs	r0, #19
+ 143 0100 FFF7FEFF 		bl	GFTM070_WriteData
+ 144 0104 0020     		movs	r0, #0
+ 145 0106 FFF7FEFF 		bl	GFTM070_WriteData
+ 146 010a 0020     		movs	r0, #0
+ 147 010c FFF7FEFF 		bl	GFTM070_WriteData
+ 148 0110 B620     		movs	r0, #182
+ 149 0112 FFF7FEFF 		bl	GFTM070_WriteCommand
+ 150 0116 0120     		movs	r0, #1
+ 151 0118 FFF7FEFF 		bl	GFTM070_WriteData
+ 152 011c F820     		movs	r0, #248
+ 153 011e FFF7FEFF 		bl	GFTM070_WriteData
+ 154 0122 0020     		movs	r0, #0
+ 155 0124 FFF7FEFF 		bl	GFTM070_WriteData
+ 156 0128 1420     		movs	r0, #20
+ 157 012a FFF7FEFF 		bl	GFTM070_WriteData
+ 158 012e 1320     		movs	r0, #19
+ 159 0130 FFF7FEFF 		bl	GFTM070_WriteData
+ 160 0134 0020     		movs	r0, #0
+ 161 0136 FFF7FEFF 		bl	GFTM070_WriteData
+ 162 013a 0020     		movs	r0, #0
+ 163 013c FFF7FEFF 		bl	GFTM070_WriteData
+ 164 0140 BA20     		movs	r0, #186
+ 165 0142 FFF7FEFF 		bl	GFTM070_WriteCommand
+ 166 0146 0F20     		movs	r0, #15
+ 167 0148 FFF7FEFF 		bl	GFTM070_WriteData
+ 168 014c B820     		movs	r0, #184
+ 169 014e FFF7FEFF 		bl	GFTM070_WriteCommand
+ 170 0152 0F20     		movs	r0, #15
+ 171 0154 FFF7FEFF 		bl	GFTM070_WriteData
+ 172 0158 0120     		movs	r0, #1
+ 173 015a FFF7FEFF 		bl	GFTM070_WriteData
+ 174 015e 0023     		movs	r3, #0
+ 175 0160 7B60     		str	r3, [r7, #4]
+ 176 0162 02E0     		b	.L3
+ 177              	.L4:
+ 178 0164 7B68     		ldr	r3, [r7, #4]
+ 179 0166 0133     		adds	r3, r3, #1
+ 180 0168 7B60     		str	r3, [r7, #4]
+ 181              	.L3:
+ 182 016a 7A68     		ldr	r2, [r7, #4]
+ 183 016c 40F63F53 		movw	r3, #3391
+ 184 0170 C0F20303 		movt	r3, 3
+ 185 0174 9A42     		cmp	r2, r3
+ 186 0176 F5D9     		bls	.L4
+ 187 0178 0A20     		movs	r0, #10
+ 188 017a FFF7FEFF 		bl	vTaskDelay
+ 189 017e 2920     		movs	r0, #41
+ 190 0180 FFF7FEFF 		bl	GFTM070_WriteCommand
+ 191 0184 0023     		movs	r3, #0
+ 192 0186 7B60     		str	r3, [r7, #4]
+ 193 0188 02E0     		b	.L5
+ 194              	.L6:
+ 195 018a 7B68     		ldr	r3, [r7, #4]
+ 196 018c 0133     		adds	r3, r3, #1
+ 197 018e 7B60     		str	r3, [r7, #4]
+ 198              	.L5:
+ 199 0190 7A68     		ldr	r2, [r7, #4]
+ 200 0192 40F63F53 		movw	r3, #3391
+ 201 0196 C0F20303 		movt	r3, 3
+ 202 019a 9A42     		cmp	r2, r3
+ 203 019c F5D9     		bls	.L6
+ 204 019e 0A20     		movs	r0, #10
+ 205 01a0 FFF7FEFF 		bl	vTaskDelay
+ 206 01a4 1120     		movs	r0, #17
+ 207 01a6 FFF7FEFF 		bl	GFTM070_WriteCommand
+ 208 01aa 2A20     		movs	r0, #42
+ 209 01ac FFF7FEFF 		bl	GFTM070_WriteCommand
+ 210 01b0 0020     		movs	r0, #0
+ 211 01b2 FFF7FEFF 		bl	GFTM070_WriteData
+ 212 01b6 0020     		movs	r0, #0
+ 213 01b8 FFF7FEFF 		bl	GFTM070_WriteData
+ 214 01bc 0320     		movs	r0, #3
+ 215 01be FFF7FEFF 		bl	GFTM070_WriteData
+ 216 01c2 1F20     		movs	r0, #31
+ 217 01c4 FFF7FEFF 		bl	GFTM070_WriteData
+ 218 01c8 2B20     		movs	r0, #43
+ 219 01ca FFF7FEFF 		bl	GFTM070_WriteCommand
+ 220 01ce 0020     		movs	r0, #0
+ 221 01d0 FFF7FEFF 		bl	GFTM070_WriteData
+ 222 01d4 0020     		movs	r0, #0
+ 223 01d6 FFF7FEFF 		bl	GFTM070_WriteData
+ 224 01da 0120     		movs	r0, #1
+ 225 01dc FFF7FEFF 		bl	GFTM070_WriteData
+ 226 01e0 DF20     		movs	r0, #223
+ 227 01e2 FFF7FEFF 		bl	GFTM070_WriteData
+ 228 01e6 3620     		movs	r0, #54
+ 229 01e8 FFF7FEFF 		bl	GFTM070_WriteCommand
+ 230 01ec 0220     		movs	r0, #2
+ 231 01ee FFF7FEFF 		bl	GFTM070_WriteData
+ 232 01f2 BE20     		movs	r0, #190
+ 233 01f4 FFF7FEFF 		bl	GFTM070_WriteCommand
+ 234 01f8 0820     		movs	r0, #8
+ 235 01fa FFF7FEFF 		bl	GFTM070_WriteData
+ 236 01fe FF20     		movs	r0, #255
+ 237 0200 FFF7FEFF 		bl	GFTM070_WriteData
+ 238 0204 0120     		movs	r0, #1
+ 239 0206 FFF7FEFF 		bl	GFTM070_WriteData
+ 240 020a F020     		movs	r0, #240
+ 241 020c FFF7FEFF 		bl	GFTM070_WriteCommand
+ 242 0210 0320     		movs	r0, #3
+ 243 0212 FFF7FEFF 		bl	GFTM070_WriteData
+ 244              	.L1:
+ 245 0216 0837     		adds	r7, r7, #8
+ 246 0218 BD46     		mov	sp, r7
+ 247              		@ sp needed
+ 248 021a 80BD     		pop	{r7, pc}
+ 250              		.align	2
+ 251              		.global	GFTM070_WriteCommand
+ 252              		.thumb
+ 253              		.thumb_func
+ 255              	GFTM070_WriteCommand:
+ 256              		@ args = 0, pretend = 0, frame = 8
+ 257              		@ frame_needed = 1, uses_anonymous_args = 0
+ 258 021c 80B5     		push	{r7, lr}
+ 259 021e 82B0     		sub	sp, sp, #8
+ 260 0220 00AF     		add	r7, sp, #0
+ 261 0222 0346     		mov	r3, r0
+ 262 0224 FB80     		strh	r3, [r7, #6]	@ movhi
+ 263 0226 FB88     		ldrh	r3, [r7, #6]
+ 264 0228 1846     		mov	r0, r3
+ 265 022a FFF7FEFF 		bl	LCD_IO_WriteReg
+ 266 022e 0837     		adds	r7, r7, #8
+ 267 0230 BD46     		mov	sp, r7
+ 268              		@ sp needed
+ 269 0232 80BD     		pop	{r7, pc}
+ 271              		.align	2
+ 272              		.global	GFTM070_ReadCommand
+ 273              		.thumb
+ 274              		.thumb_func
+ 276              	GFTM070_ReadCommand:
+ 277              		@ args = 0, pretend = 0, frame = 8
+ 278              		@ frame_needed = 1, uses_anonymous_args = 0
+ 279 0234 80B5     		push	{r7, lr}
+ 280 0236 82B0     		sub	sp, sp, #8
+ 281 0238 00AF     		add	r7, sp, #0
+ 282 023a 0346     		mov	r3, r0
+ 283 023c FB80     		strh	r3, [r7, #6]	@ movhi
+ 284 023e FB88     		ldrh	r3, [r7, #6]
+ 285 0240 1846     		mov	r0, r3
+ 286 0242 FFF7FEFF 		bl	LCD_IO_WriteReg
+ 287 0246 0837     		adds	r7, r7, #8
+ 288 0248 BD46     		mov	sp, r7
+ 289              		@ sp needed
+ 290 024a 80BD     		pop	{r7, pc}
+ 292              		.align	2
+ 293              		.global	GFTM070_WriteData
+ 294              		.thumb
+ 295              		.thumb_func
+ 297              	GFTM070_WriteData:
+ 298              		@ args = 0, pretend = 0, frame = 8
+ 299              		@ frame_needed = 1, uses_anonymous_args = 0
+ 300 024c 80B5     		push	{r7, lr}
+ 301 024e 82B0     		sub	sp, sp, #8
+ 302 0250 00AF     		add	r7, sp, #0
+ 303 0252 0346     		mov	r3, r0
+ 304 0254 FB80     		strh	r3, [r7, #6]	@ movhi
+ 305 0256 FB88     		ldrh	r3, [r7, #6]
+ 306 0258 1846     		mov	r0, r3
+ 307 025a FFF7FEFF 		bl	LCD_IO_WriteData
+ 308 025e 0837     		adds	r7, r7, #8
+ 309 0260 BD46     		mov	sp, r7
+ 310              		@ sp needed
+ 311 0262 80BD     		pop	{r7, pc}
+ 313              		.align	2
+ 314              		.global	GFTM070_ReadData
+ 315              		.thumb
+ 316              		.thumb_func
+ 318              	GFTM070_ReadData:
+ 319              		@ args = 0, pretend = 0, frame = 0
+ 320              		@ frame_needed = 1, uses_anonymous_args = 0
+ 321 0264 80B5     		push	{r7, lr}
+ 322 0266 00AF     		add	r7, sp, #0
+ 323 0268 FFF7FEFF 		bl	LCD_IO_ReadData
+ 324 026c 0346     		mov	r3, r0
+ 325 026e 1846     		mov	r0, r3
+ 326 0270 80BD     		pop	{r7, pc}
+ 328 0272 00BF     		.align	2
+ 329              		.global	ili9320_Init
+ 330              		.thumb
+ 331              		.thumb_func
+ 333              	ili9320_Init:
+ 334              		@ args = 0, pretend = 0, frame = 0
+ 335              		@ frame_needed = 1, uses_anonymous_args = 0
+ 336              		@ link register save eliminated.
+ 337 0274 80B4     		push	{r7}
+ 338 0276 00AF     		add	r7, sp, #0
+ 339 0278 BD46     		mov	sp, r7
+ 340              		@ sp needed
+ 341 027a 5DF8047B 		ldr	r7, [sp], #4
+ 342 027e 7047     		bx	lr
+ 344              		.align	2
+ 345              		.global	GFTM070_DisplayOn
+ 346              		.thumb
+ 347              		.thumb_func
+ 349              	GFTM070_DisplayOn:
+ 350              		@ args = 0, pretend = 0, frame = 8
+ 351              		@ frame_needed = 1, uses_anonymous_args = 0
+ 352 0280 80B5     		push	{r7, lr}
+ 353 0282 82B0     		sub	sp, sp, #8
+ 354 0284 00AF     		add	r7, sp, #0
+ 355 0286 2920     		movs	r0, #41
+ 356 0288 FFF7FEFF 		bl	GFTM070_WriteCommand
+ 357 028c 0023     		movs	r3, #0
+ 358 028e 7B60     		str	r3, [r7, #4]
+ 359 0290 02E0     		b	.L14
+ 360              	.L15:
+ 361 0292 7B68     		ldr	r3, [r7, #4]
+ 362 0294 0133     		adds	r3, r3, #1
+ 363 0296 7B60     		str	r3, [r7, #4]
+ 364              	.L14:
+ 365 0298 7A68     		ldr	r2, [r7, #4]
+ 366 029a 40F63F53 		movw	r3, #3391
+ 367 029e C0F20303 		movt	r3, 3
+ 368 02a2 9A42     		cmp	r2, r3
+ 369 02a4 F5D9     		bls	.L15
+ 370 02a6 1120     		movs	r0, #17
+ 371 02a8 FFF7FEFF 		bl	GFTM070_WriteCommand
+ 372 02ac 0837     		adds	r7, r7, #8
+ 373 02ae BD46     		mov	sp, r7
+ 374              		@ sp needed
+ 375 02b0 80BD     		pop	{r7, pc}
+ 377 02b2 00BF     		.align	2
+ 378              		.global	ili9320_DisplayOff
+ 379              		.thumb
+ 380              		.thumb_func
+ 382              	ili9320_DisplayOff:
+ 383              		@ args = 0, pretend = 0, frame = 0
+ 384              		@ frame_needed = 1, uses_anonymous_args = 0
+ 385              		@ link register save eliminated.
+ 386 02b4 80B4     		push	{r7}
+ 387 02b6 00AF     		add	r7, sp, #0
+ 388 02b8 BD46     		mov	sp, r7
+ 389              		@ sp needed
+ 390 02ba 5DF8047B 		ldr	r7, [sp], #4
+ 391 02be 7047     		bx	lr
+ 393              		.align	2
+ 394              		.global	ili9320_GetLcdPixelWidth
+ 395              		.thumb
+ 396              		.thumb_func
+ 398              	ili9320_GetLcdPixelWidth:
+ 399              		@ args = 0, pretend = 0, frame = 0
+ 400              		@ frame_needed = 1, uses_anonymous_args = 0
+ 401              		@ link register save eliminated.
+ 402 02c0 80B4     		push	{r7}
+ 403 02c2 00AF     		add	r7, sp, #0
+ 404 02c4 4FF44873 		mov	r3, #800
+ 405 02c8 1846     		mov	r0, r3
+ 406 02ca BD46     		mov	sp, r7
+ 407              		@ sp needed
+ 408 02cc 5DF8047B 		ldr	r7, [sp], #4
+ 409 02d0 7047     		bx	lr
+ 411 02d2 00BF     		.align	2
+ 412              		.global	ili9320_GetLcdPixelHeight
+ 413              		.thumb
+ 414              		.thumb_func
+ 416              	ili9320_GetLcdPixelHeight:
+ 417              		@ args = 0, pretend = 0, frame = 0
+ 418              		@ frame_needed = 1, uses_anonymous_args = 0
+ 419              		@ link register save eliminated.
+ 420 02d4 80B4     		push	{r7}
+ 421 02d6 00AF     		add	r7, sp, #0
+ 422 02d8 4FF4F073 		mov	r3, #480
+ 423 02dc 1846     		mov	r0, r3
+ 424 02de BD46     		mov	sp, r7
+ 425              		@ sp needed
+ 426 02e0 5DF8047B 		ldr	r7, [sp], #4
+ 427 02e4 7047     		bx	lr
+ 429 02e6 00BF     		.align	2
+ 430              		.global	ili9320_ReadID
+ 431              		.thumb
+ 432              		.thumb_func
+ 434              	ili9320_ReadID:
+ 435              		@ args = 0, pretend = 0, frame = 0
+ 436              		@ frame_needed = 1, uses_anonymous_args = 0
+ 437 02e8 80B5     		push	{r7, lr}
+ 438 02ea 00AF     		add	r7, sp, #0
+ 439 02ec 40F20003 		movw	r3, #:lower16:Is_ili9320_Initialized
+ 440 02f0 C0F20003 		movt	r3, #:upper16:Is_ili9320_Initialized
+ 441 02f4 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 442 02f6 002B     		cmp	r3, #0
+ 443 02f8 01D1     		bne	.L22
+ 444 02fa FFF7FEFF 		bl	ili9320_Init
+ 445              	.L22:
+ 446 02fe 0020     		movs	r0, #0
+ 447 0300 FFF7FEFF 		bl	ili9320_ReadReg
+ 448 0304 0346     		mov	r3, r0
+ 449 0306 1846     		mov	r0, r3
+ 450 0308 80BD     		pop	{r7, pc}
+ 452 030a 00BF     		.align	2
+ 453              		.global	ili9320_SetCursor
+ 454              		.thumb
+ 455              		.thumb_func
+ 457              	ili9320_SetCursor:
+ 458              		@ args = 0, pretend = 0, frame = 8
+ 459              		@ frame_needed = 1, uses_anonymous_args = 0
+ 460 030c 80B5     		push	{r7, lr}
+ 461 030e 82B0     		sub	sp, sp, #8
+ 462 0310 00AF     		add	r7, sp, #0
+ 463 0312 0246     		mov	r2, r0
+ 464 0314 0B46     		mov	r3, r1
+ 465 0316 FA80     		strh	r2, [r7, #6]	@ movhi
+ 466 0318 BB80     		strh	r3, [r7, #4]	@ movhi
+ 467 031a BB88     		ldrh	r3, [r7, #4]
+ 468 031c 2020     		movs	r0, #32
+ 469 031e 1946     		mov	r1, r3
+ 470 0320 FFF7FEFF 		bl	ili9320_WriteReg
+ 471 0324 FB88     		ldrh	r3, [r7, #6]	@ movhi
+ 472 0326 C3F54773 		rsb	r3, r3, #796
+ 473 032a 0333     		adds	r3, r3, #3
+ 474 032c 9BB2     		uxth	r3, r3
+ 475 032e 2120     		movs	r0, #33
+ 476 0330 1946     		mov	r1, r3
+ 477 0332 FFF7FEFF 		bl	ili9320_WriteReg
+ 478 0336 0837     		adds	r7, r7, #8
+ 479 0338 BD46     		mov	sp, r7
+ 480              		@ sp needed
+ 481 033a 80BD     		pop	{r7, pc}
+ 483              		.align	2
+ 484              		.global	GFTM070_SetCursor
+ 485              		.thumb
+ 486              		.thumb_func
+ 488              	GFTM070_SetCursor:
+ 489              		@ args = 0, pretend = 0, frame = 8
+ 490              		@ frame_needed = 1, uses_anonymous_args = 0
+ 491 033c 80B5     		push	{r7, lr}
+ 492 033e 82B0     		sub	sp, sp, #8
+ 493 0340 00AF     		add	r7, sp, #0
+ 494 0342 0246     		mov	r2, r0
+ 495 0344 0B46     		mov	r3, r1
+ 496 0346 FA80     		strh	r2, [r7, #6]	@ movhi
+ 497 0348 BB80     		strh	r3, [r7, #4]	@ movhi
+ 498 034a 2A20     		movs	r0, #42
+ 499 034c FFF7FEFF 		bl	GFTM070_WriteCommand
+ 500 0350 FB88     		ldrh	r3, [r7, #6]
+ 501 0352 1B0A     		lsrs	r3, r3, #8
+ 502 0354 9BB2     		uxth	r3, r3
+ 503 0356 1846     		mov	r0, r3
+ 504 0358 FFF7FEFF 		bl	GFTM070_WriteData
+ 505 035c FB88     		ldrh	r3, [r7, #6]	@ movhi
+ 506 035e DBB2     		uxtb	r3, r3
+ 507 0360 9BB2     		uxth	r3, r3
+ 508 0362 1846     		mov	r0, r3
+ 509 0364 FFF7FEFF 		bl	GFTM070_WriteData
+ 510 0368 FB88     		ldrh	r3, [r7, #6]
+ 511 036a 1B0A     		lsrs	r3, r3, #8
+ 512 036c 9BB2     		uxth	r3, r3
+ 513 036e 1846     		mov	r0, r3
+ 514 0370 FFF7FEFF 		bl	GFTM070_WriteData
+ 515 0374 FB88     		ldrh	r3, [r7, #6]	@ movhi
+ 516 0376 DBB2     		uxtb	r3, r3
+ 517 0378 9BB2     		uxth	r3, r3
+ 518 037a 1846     		mov	r0, r3
+ 519 037c FFF7FEFF 		bl	GFTM070_WriteData
+ 520 0380 2B20     		movs	r0, #43
+ 521 0382 FFF7FEFF 		bl	GFTM070_WriteCommand
+ 522 0386 BB88     		ldrh	r3, [r7, #4]
+ 523 0388 1B0A     		lsrs	r3, r3, #8
+ 524 038a 9BB2     		uxth	r3, r3
+ 525 038c 1846     		mov	r0, r3
+ 526 038e FFF7FEFF 		bl	GFTM070_WriteData
+ 527 0392 BB88     		ldrh	r3, [r7, #4]	@ movhi
+ 528 0394 DBB2     		uxtb	r3, r3
+ 529 0396 9BB2     		uxth	r3, r3
+ 530 0398 1846     		mov	r0, r3
+ 531 039a FFF7FEFF 		bl	GFTM070_WriteData
+ 532 039e BB88     		ldrh	r3, [r7, #4]
+ 533 03a0 1B0A     		lsrs	r3, r3, #8
+ 534 03a2 9BB2     		uxth	r3, r3
+ 535 03a4 1846     		mov	r0, r3
+ 536 03a6 FFF7FEFF 		bl	GFTM070_WriteData
+ 537 03aa BB88     		ldrh	r3, [r7, #4]	@ movhi
+ 538 03ac DBB2     		uxtb	r3, r3
+ 539 03ae 9BB2     		uxth	r3, r3
+ 540 03b0 1846     		mov	r0, r3
+ 541 03b2 FFF7FEFF 		bl	GFTM070_WriteData
+ 542 03b6 3620     		movs	r0, #54
+ 543 03b8 FFF7FEFF 		bl	GFTM070_WriteCommand
+ 544 03bc 0220     		movs	r0, #2
+ 545 03be FFF7FEFF 		bl	GFTM070_WriteData
+ 546 03c2 2C20     		movs	r0, #44
+ 547 03c4 FFF7FEFF 		bl	GFTM070_WriteCommand
+ 548 03c8 0837     		adds	r7, r7, #8
+ 549 03ca BD46     		mov	sp, r7
+ 550              		@ sp needed
+ 551 03cc 80BD     		pop	{r7, pc}
+ 553 03ce 00BF     		.align	2
+ 554              		.global	ili9320_WritePixel
+ 555              		.thumb
+ 556              		.thumb_func
+ 558              	ili9320_WritePixel:
+ 559              		@ args = 0, pretend = 0, frame = 8
+ 560              		@ frame_needed = 1, uses_anonymous_args = 0
+ 561 03d0 80B5     		push	{r7, lr}
+ 562 03d2 82B0     		sub	sp, sp, #8
+ 563 03d4 00AF     		add	r7, sp, #0
+ 564 03d6 1346     		mov	r3, r2
+ 565 03d8 0246     		mov	r2, r0	@ movhi
+ 566 03da FA80     		strh	r2, [r7, #6]	@ movhi
+ 567 03dc 0A46     		mov	r2, r1	@ movhi
+ 568 03de BA80     		strh	r2, [r7, #4]	@ movhi
+ 569 03e0 7B80     		strh	r3, [r7, #2]	@ movhi
+ 570 03e2 FA88     		ldrh	r2, [r7, #6]
+ 571 03e4 BB88     		ldrh	r3, [r7, #4]
+ 572 03e6 1046     		mov	r0, r2
+ 573 03e8 1946     		mov	r1, r3
+ 574 03ea FFF7FEFF 		bl	ili9320_SetCursor
+ 575 03ee 2220     		movs	r0, #34
+ 576 03f0 FFF7FEFF 		bl	LCD_IO_WriteReg
+ 577 03f4 7B88     		ldrh	r3, [r7, #2]
+ 578 03f6 1846     		mov	r0, r3
+ 579 03f8 FFF7FEFF 		bl	LCD_IO_WriteData
+ 580 03fc 0837     		adds	r7, r7, #8
+ 581 03fe BD46     		mov	sp, r7
+ 582              		@ sp needed
+ 583 0400 80BD     		pop	{r7, pc}
+ 585 0402 00BF     		.align	2
+ 586              		.global	GFTM070_WritePixel
+ 587              		.thumb
+ 588              		.thumb_func
+ 590              	GFTM070_WritePixel:
+ 591              		@ args = 0, pretend = 0, frame = 8
+ 592              		@ frame_needed = 1, uses_anonymous_args = 0
+ 593 0404 80B5     		push	{r7, lr}
+ 594 0406 82B0     		sub	sp, sp, #8
+ 595 0408 00AF     		add	r7, sp, #0
+ 596 040a 1346     		mov	r3, r2
+ 597 040c 0246     		mov	r2, r0	@ movhi
+ 598 040e FA80     		strh	r2, [r7, #6]	@ movhi
+ 599 0410 0A46     		mov	r2, r1	@ movhi
+ 600 0412 BA80     		strh	r2, [r7, #4]	@ movhi
+ 601 0414 7B80     		strh	r3, [r7, #2]	@ movhi
+ 602 0416 FA88     		ldrh	r2, [r7, #6]
+ 603 0418 BB88     		ldrh	r3, [r7, #4]
+ 604 041a 1046     		mov	r0, r2
+ 605 041c 1946     		mov	r1, r3
+ 606 041e FFF7FEFF 		bl	GFTM070_SetCursor
+ 607 0422 7B88     		ldrh	r3, [r7, #2]
+ 608 0424 1846     		mov	r0, r3
+ 609 0426 FFF7FEFF 		bl	GFTM070_WriteData
+ 610 042a 0837     		adds	r7, r7, #8
+ 611 042c BD46     		mov	sp, r7
+ 612              		@ sp needed
+ 613 042e 80BD     		pop	{r7, pc}
+ 615              		.align	2
+ 616              		.global	GFTM070_WriteNextWindowPixel
+ 617              		.thumb
+ 618              		.thumb_func
+ 620              	GFTM070_WriteNextWindowPixel:
+ 621              		@ args = 0, pretend = 0, frame = 8
+ 622              		@ frame_needed = 1, uses_anonymous_args = 0
+ 623 0430 80B5     		push	{r7, lr}
+ 624 0432 82B0     		sub	sp, sp, #8
+ 625 0434 00AF     		add	r7, sp, #0
+ 626 0436 0346     		mov	r3, r0
+ 627 0438 FB80     		strh	r3, [r7, #6]	@ movhi
+ 628 043a FB88     		ldrh	r3, [r7, #6]
+ 629 043c 1846     		mov	r0, r3
+ 630 043e FFF7FEFF 		bl	GFTM070_WriteData
+ 631 0442 0837     		adds	r7, r7, #8
+ 632 0444 BD46     		mov	sp, r7
+ 633              		@ sp needed
+ 634 0446 80BD     		pop	{r7, pc}
+ 636              		.align	2
+ 637              		.global	ili9320_ReadPixel
+ 638              		.thumb
+ 639              		.thumb_func
+ 641              	ili9320_ReadPixel:
+ 642              		@ args = 0, pretend = 0, frame = 8
+ 643              		@ frame_needed = 1, uses_anonymous_args = 0
+ 644 0448 80B5     		push	{r7, lr}
+ 645 044a 82B0     		sub	sp, sp, #8
+ 646 044c 00AF     		add	r7, sp, #0
+ 647 044e 0246     		mov	r2, r0
+ 648 0450 0B46     		mov	r3, r1
+ 649 0452 FA80     		strh	r2, [r7, #6]	@ movhi
+ 650 0454 BB80     		strh	r3, [r7, #4]	@ movhi
+ 651 0456 FA88     		ldrh	r2, [r7, #6]
+ 652 0458 BB88     		ldrh	r3, [r7, #4]
+ 653 045a 1046     		mov	r0, r2
+ 654 045c 1946     		mov	r1, r3
+ 655 045e FFF7FEFF 		bl	ili9320_SetCursor
+ 656 0462 2220     		movs	r0, #34
+ 657 0464 FFF7FEFF 		bl	LCD_IO_WriteReg
+ 658 0468 FFF7FEFF 		bl	LCD_IO_ReadData
+ 659 046c FFF7FEFF 		bl	LCD_IO_ReadData
+ 660 0470 0346     		mov	r3, r0
+ 661 0472 1846     		mov	r0, r3
+ 662 0474 0837     		adds	r7, r7, #8
+ 663 0476 BD46     		mov	sp, r7
+ 664              		@ sp needed
+ 665 0478 80BD     		pop	{r7, pc}
+ 667 047a 00BF     		.align	2
+ 668              		.global	ili9320_WriteReg
+ 669              		.thumb
+ 670              		.thumb_func
+ 672              	ili9320_WriteReg:
+ 673              		@ args = 0, pretend = 0, frame = 8
+ 674              		@ frame_needed = 1, uses_anonymous_args = 0
+ 675 047c 80B5     		push	{r7, lr}
+ 676 047e 82B0     		sub	sp, sp, #8
+ 677 0480 00AF     		add	r7, sp, #0
+ 678 0482 0246     		mov	r2, r0
+ 679 0484 0B46     		mov	r3, r1
+ 680 0486 FA71     		strb	r2, [r7, #7]
+ 681 0488 BB80     		strh	r3, [r7, #4]	@ movhi
+ 682 048a FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 683 048c 9BB2     		uxth	r3, r3
+ 684 048e 1846     		mov	r0, r3
+ 685 0490 FFF7FEFF 		bl	LCD_IO_WriteReg
+ 686 0494 BB88     		ldrh	r3, [r7, #4]
+ 687 0496 1846     		mov	r0, r3
+ 688 0498 FFF7FEFF 		bl	LCD_IO_WriteData
+ 689 049c 0837     		adds	r7, r7, #8
+ 690 049e BD46     		mov	sp, r7
+ 691              		@ sp needed
+ 692 04a0 80BD     		pop	{r7, pc}
+ 694 04a2 00BF     		.align	2
+ 695              		.global	ili9320_ReadReg
+ 696              		.thumb
+ 697              		.thumb_func
+ 699              	ili9320_ReadReg:
+ 700              		@ args = 0, pretend = 0, frame = 8
+ 701              		@ frame_needed = 1, uses_anonymous_args = 0
+ 702 04a4 80B5     		push	{r7, lr}
+ 703 04a6 82B0     		sub	sp, sp, #8
+ 704 04a8 00AF     		add	r7, sp, #0
+ 705 04aa 0346     		mov	r3, r0
+ 706 04ac FB71     		strb	r3, [r7, #7]
+ 707 04ae FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 708 04b0 9BB2     		uxth	r3, r3
+ 709 04b2 1846     		mov	r0, r3
+ 710 04b4 FFF7FEFF 		bl	LCD_IO_WriteReg
+ 711 04b8 FFF7FEFF 		bl	LCD_IO_ReadData
+ 712 04bc 0346     		mov	r3, r0
+ 713 04be 1846     		mov	r0, r3
+ 714 04c0 0837     		adds	r7, r7, #8
+ 715 04c2 BD46     		mov	sp, r7
+ 716              		@ sp needed
+ 717 04c4 80BD     		pop	{r7, pc}
+ 719 04c6 00BF     		.align	2
+ 720              		.global	ili9320_SetDisplayWindow
+ 721              		.thumb
+ 722              		.thumb_func
+ 724              	ili9320_SetDisplayWindow:
+ 725              		@ args = 0, pretend = 0, frame = 8
+ 726              		@ frame_needed = 1, uses_anonymous_args = 0
+ 727 04c8 80B5     		push	{r7, lr}
+ 728 04ca 82B0     		sub	sp, sp, #8
+ 729 04cc 00AF     		add	r7, sp, #0
+ 730 04ce F880     		strh	r0, [r7, #6]	@ movhi
+ 731 04d0 B980     		strh	r1, [r7, #4]	@ movhi
+ 732 04d2 7A80     		strh	r2, [r7, #2]	@ movhi
+ 733 04d4 3B80     		strh	r3, [r7]	@ movhi
+ 734 04d6 BB88     		ldrh	r3, [r7, #4]
+ 735 04d8 5020     		movs	r0, #80
+ 736 04da 1946     		mov	r1, r3
+ 737 04dc FFF7FEFF 		bl	ili9320_WriteReg
+ 738 04e0 BA88     		ldrh	r2, [r7, #4]	@ movhi
+ 739 04e2 3B88     		ldrh	r3, [r7]	@ movhi
+ 740 04e4 1344     		add	r3, r3, r2
+ 741 04e6 9BB2     		uxth	r3, r3
+ 742 04e8 013B     		subs	r3, r3, #1
+ 743 04ea 9BB2     		uxth	r3, r3
+ 744 04ec 5120     		movs	r0, #81
+ 745 04ee 1946     		mov	r1, r3
+ 746 04f0 FFF7FEFF 		bl	ili9320_WriteReg
+ 747 04f4 FB88     		ldrh	r3, [r7, #6]	@ movhi
+ 748 04f6 5B42     		negs	r3, r3
+ 749 04f8 9AB2     		uxth	r2, r3
+ 750 04fa 7B88     		ldrh	r3, [r7, #2]	@ movhi
+ 751 04fc D31A     		subs	r3, r2, r3
+ 752 04fe 9BB2     		uxth	r3, r3
+ 753 0500 03F54873 		add	r3, r3, #800
+ 754 0504 9BB2     		uxth	r3, r3
+ 755 0506 5220     		movs	r0, #82
+ 756 0508 1946     		mov	r1, r3
+ 757 050a FFF7FEFF 		bl	ili9320_WriteReg
+ 758 050e FB88     		ldrh	r3, [r7, #6]	@ movhi
+ 759 0510 C3F54773 		rsb	r3, r3, #796
+ 760 0514 0333     		adds	r3, r3, #3
+ 761 0516 9BB2     		uxth	r3, r3
+ 762 0518 5320     		movs	r0, #83
+ 763 051a 1946     		mov	r1, r3
+ 764 051c FFF7FEFF 		bl	ili9320_WriteReg
+ 765 0520 0837     		adds	r7, r7, #8
+ 766 0522 BD46     		mov	sp, r7
+ 767              		@ sp needed
+ 768 0524 80BD     		pop	{r7, pc}
+ 770 0526 00BF     		.align	2
+ 771              		.global	GFTM070_SetDisplayWindow
+ 772              		.thumb
+ 773              		.thumb_func
+ 775              	GFTM070_SetDisplayWindow:
+ 776              		@ args = 0, pretend = 0, frame = 8
+ 777              		@ frame_needed = 1, uses_anonymous_args = 0
+ 778 0528 80B5     		push	{r7, lr}
+ 779 052a 82B0     		sub	sp, sp, #8
+ 780 052c 00AF     		add	r7, sp, #0
+ 781 052e F880     		strh	r0, [r7, #6]	@ movhi
+ 782 0530 B980     		strh	r1, [r7, #4]	@ movhi
+ 783 0532 7A80     		strh	r2, [r7, #2]	@ movhi
+ 784 0534 3B80     		strh	r3, [r7]	@ movhi
+ 785 0536 2A20     		movs	r0, #42
+ 786 0538 FFF7FEFF 		bl	GFTM070_WriteCommand
+ 787 053c FB88     		ldrh	r3, [r7, #6]
+ 788 053e 1B0A     		lsrs	r3, r3, #8
+ 789 0540 9BB2     		uxth	r3, r3
+ 790 0542 1846     		mov	r0, r3
+ 791 0544 FFF7FEFF 		bl	GFTM070_WriteData
+ 792 0548 FB88     		ldrh	r3, [r7, #6]	@ movhi
+ 793 054a DBB2     		uxtb	r3, r3
+ 794 054c 9BB2     		uxth	r3, r3
+ 795 054e 1846     		mov	r0, r3
+ 796 0550 FFF7FEFF 		bl	GFTM070_WriteData
+ 797 0554 FA88     		ldrh	r2, [r7, #6]
+ 798 0556 7B88     		ldrh	r3, [r7, #2]
+ 799 0558 1344     		add	r3, r3, r2
+ 800 055a 013B     		subs	r3, r3, #1
+ 801 055c 03F47F43 		and	r3, r3, #65280
+ 802 0560 1B12     		asrs	r3, r3, #8
+ 803 0562 9BB2     		uxth	r3, r3
+ 804 0564 1846     		mov	r0, r3
+ 805 0566 FFF7FEFF 		bl	GFTM070_WriteData
+ 806 056a FA88     		ldrh	r2, [r7, #6]	@ movhi
+ 807 056c 7B88     		ldrh	r3, [r7, #2]	@ movhi
+ 808 056e 1344     		add	r3, r3, r2
+ 809 0570 9BB2     		uxth	r3, r3
+ 810 0572 013B     		subs	r3, r3, #1
+ 811 0574 9BB2     		uxth	r3, r3
+ 812 0576 DBB2     		uxtb	r3, r3
+ 813 0578 9BB2     		uxth	r3, r3
+ 814 057a 1846     		mov	r0, r3
+ 815 057c FFF7FEFF 		bl	GFTM070_WriteData
+ 816 0580 2B20     		movs	r0, #43
+ 817 0582 FFF7FEFF 		bl	GFTM070_WriteCommand
+ 818 0586 BB88     		ldrh	r3, [r7, #4]
+ 819 0588 1B0A     		lsrs	r3, r3, #8
+ 820 058a 9BB2     		uxth	r3, r3
+ 821 058c 1846     		mov	r0, r3
+ 822 058e FFF7FEFF 		bl	GFTM070_WriteData
+ 823 0592 BB88     		ldrh	r3, [r7, #4]	@ movhi
+ 824 0594 DBB2     		uxtb	r3, r3
+ 825 0596 9BB2     		uxth	r3, r3
+ 826 0598 1846     		mov	r0, r3
+ 827 059a FFF7FEFF 		bl	GFTM070_WriteData
+ 828 059e BA88     		ldrh	r2, [r7, #4]
+ 829 05a0 3B88     		ldrh	r3, [r7]
+ 830 05a2 1344     		add	r3, r3, r2
+ 831 05a4 013B     		subs	r3, r3, #1
+ 832 05a6 03F47F43 		and	r3, r3, #65280
+ 833 05aa 1B12     		asrs	r3, r3, #8
+ 834 05ac 9BB2     		uxth	r3, r3
+ 835 05ae 1846     		mov	r0, r3
+ 836 05b0 FFF7FEFF 		bl	GFTM070_WriteData
+ 837 05b4 BA88     		ldrh	r2, [r7, #4]	@ movhi
+ 838 05b6 3B88     		ldrh	r3, [r7]	@ movhi
+ 839 05b8 1344     		add	r3, r3, r2
+ 840 05ba 9BB2     		uxth	r3, r3
+ 841 05bc 013B     		subs	r3, r3, #1
+ 842 05be 9BB2     		uxth	r3, r3
+ 843 05c0 DBB2     		uxtb	r3, r3
+ 844 05c2 9BB2     		uxth	r3, r3
+ 845 05c4 1846     		mov	r0, r3
+ 846 05c6 FFF7FEFF 		bl	GFTM070_WriteData
+ 847 05ca 3620     		movs	r0, #54
+ 848 05cc FFF7FEFF 		bl	GFTM070_WriteCommand
+ 849 05d0 0320     		movs	r0, #3
+ 850 05d2 FFF7FEFF 		bl	GFTM070_WriteData
+ 851 05d6 2C20     		movs	r0, #44
+ 852 05d8 FFF7FEFF 		bl	GFTM070_WriteCommand
+ 853 05dc 0837     		adds	r7, r7, #8
+ 854 05de BD46     		mov	sp, r7
+ 855              		@ sp needed
+ 856 05e0 80BD     		pop	{r7, pc}
+ 858 05e2 00BF     		.align	2
+ 859              		.global	ili9320_DrawHLine
+ 860              		.thumb
+ 861              		.thumb_func
+ 863              	ili9320_DrawHLine:
+ 864              		@ args = 0, pretend = 0, frame = 16
+ 865              		@ frame_needed = 1, uses_anonymous_args = 0
+ 866 05e4 80B5     		push	{r7, lr}
+ 867 05e6 84B0     		sub	sp, sp, #16
+ 868 05e8 00AF     		add	r7, sp, #0
+ 869 05ea F880     		strh	r0, [r7, #6]	@ movhi
+ 870 05ec B980     		strh	r1, [r7, #4]	@ movhi
+ 871 05ee 7A80     		strh	r2, [r7, #2]	@ movhi
+ 872 05f0 3B80     		strh	r3, [r7]	@ movhi
+ 873 05f2 0023     		movs	r3, #0
+ 874 05f4 FB81     		strh	r3, [r7, #14]	@ movhi
+ 875 05f6 BA88     		ldrh	r2, [r7, #4]
+ 876 05f8 7B88     		ldrh	r3, [r7, #2]
+ 877 05fa 1046     		mov	r0, r2
+ 878 05fc 1946     		mov	r1, r3
+ 879 05fe FFF7FEFF 		bl	ili9320_SetCursor
+ 880 0602 2220     		movs	r0, #34
+ 881 0604 FFF7FEFF 		bl	LCD_IO_WriteReg
+ 882 0608 0023     		movs	r3, #0
+ 883 060a FB81     		strh	r3, [r7, #14]	@ movhi
+ 884 060c 06E0     		b	.L37
+ 885              	.L38:
+ 886 060e FB88     		ldrh	r3, [r7, #6]
+ 887 0610 1846     		mov	r0, r3
+ 888 0612 FFF7FEFF 		bl	LCD_IO_WriteData
+ 889 0616 FB89     		ldrh	r3, [r7, #14]
+ 890 0618 0133     		adds	r3, r3, #1
+ 891 061a FB81     		strh	r3, [r7, #14]	@ movhi
+ 892              	.L37:
+ 893 061c FA89     		ldrh	r2, [r7, #14]
+ 894 061e 3B88     		ldrh	r3, [r7]
+ 895 0620 9A42     		cmp	r2, r3
+ 896 0622 F4D3     		bcc	.L38
+ 897 0624 1037     		adds	r7, r7, #16
+ 898 0626 BD46     		mov	sp, r7
+ 899              		@ sp needed
+ 900 0628 80BD     		pop	{r7, pc}
+ 902 062a 00BF     		.align	2
+ 903              		.global	GFTM070_DrawHLine
+ 904              		.thumb
+ 905              		.thumb_func
+ 907              	GFTM070_DrawHLine:
+ 908              		@ args = 0, pretend = 0, frame = 16
+ 909              		@ frame_needed = 1, uses_anonymous_args = 0
+ 910 062c 80B5     		push	{r7, lr}
+ 911 062e 84B0     		sub	sp, sp, #16
+ 912 0630 00AF     		add	r7, sp, #0
+ 913 0632 F880     		strh	r0, [r7, #6]	@ movhi
+ 914 0634 B980     		strh	r1, [r7, #4]	@ movhi
+ 915 0636 7A80     		strh	r2, [r7, #2]	@ movhi
+ 916 0638 3B80     		strh	r3, [r7]	@ movhi
+ 917 063a 0023     		movs	r3, #0
+ 918 063c FB81     		strh	r3, [r7, #14]	@ movhi
+ 919 063e BA88     		ldrh	r2, [r7, #4]	@ movhi
+ 920 0640 3B88     		ldrh	r3, [r7]	@ movhi
+ 921 0642 1344     		add	r3, r3, r2
+ 922 0644 9AB2     		uxth	r2, r3
+ 923 0646 B888     		ldrh	r0, [r7, #4]
+ 924 0648 7988     		ldrh	r1, [r7, #2]
+ 925 064a 7B88     		ldrh	r3, [r7, #2]
+ 926 064c FFF7FEFF 		bl	GFTM070_SetDisplayWindow
+ 927 0650 0023     		movs	r3, #0
+ 928 0652 FB81     		strh	r3, [r7, #14]	@ movhi
+ 929 0654 06E0     		b	.L40
+ 930              	.L41:
+ 931 0656 FB88     		ldrh	r3, [r7, #6]
+ 932 0658 1846     		mov	r0, r3
+ 933 065a FFF7FEFF 		bl	LCD_IO_WriteData
+ 934 065e FB89     		ldrh	r3, [r7, #14]
+ 935 0660 0133     		adds	r3, r3, #1
+ 936 0662 FB81     		strh	r3, [r7, #14]	@ movhi
+ 937              	.L40:
+ 938 0664 FA89     		ldrh	r2, [r7, #14]
+ 939 0666 3B88     		ldrh	r3, [r7]
+ 940 0668 9A42     		cmp	r2, r3
+ 941 066a F4D3     		bcc	.L41
+ 942 066c 1037     		adds	r7, r7, #16
+ 943 066e BD46     		mov	sp, r7
+ 944              		@ sp needed
+ 945 0670 80BD     		pop	{r7, pc}
+ 947 0672 00BF     		.align	2
+ 948              		.global	GFTM070_DrawHDataLine
+ 949              		.thumb
+ 950              		.thumb_func
+ 952              	GFTM070_DrawHDataLine:
+ 953              		@ args = 8, pretend = 0, frame = 16
+ 954              		@ frame_needed = 1, uses_anonymous_args = 0
+ 955 0674 80B5     		push	{r7, lr}
+ 956 0676 84B0     		sub	sp, sp, #16
+ 957 0678 00AF     		add	r7, sp, #0
+ 958 067a F880     		strh	r0, [r7, #6]	@ movhi
+ 959 067c B980     		strh	r1, [r7, #4]	@ movhi
+ 960 067e 7A80     		strh	r2, [r7, #2]	@ movhi
+ 961 0680 3B80     		strh	r3, [r7]	@ movhi
+ 962 0682 0023     		movs	r3, #0
+ 963 0684 FB81     		strh	r3, [r7, #14]	@ movhi
+ 964 0686 0023     		movs	r3, #0
+ 965 0688 7B73     		strb	r3, [r7, #13]
+ 966 068a BB8B     		ldrh	r3, [r7, #28]
+ 967 068c 1B0A     		lsrs	r3, r3, #8
+ 968 068e 9BB2     		uxth	r3, r3
+ 969 0690 FB72     		strb	r3, [r7, #11]
+ 970 0692 BB69     		ldr	r3, [r7, #24]
+ 971 0694 1B78     		ldrb	r3, [r3]
+ 972 0696 3B73     		strb	r3, [r7, #12]
+ 973 0698 7A88     		ldrh	r2, [r7, #2]	@ movhi
+ 974 069a BB8B     		ldrh	r3, [r7, #28]	@ movhi
+ 975 069c 1344     		add	r3, r3, r2
+ 976 069e 9AB2     		uxth	r2, r3
+ 977 06a0 7888     		ldrh	r0, [r7, #2]
+ 978 06a2 3988     		ldrh	r1, [r7]
+ 979 06a4 3B88     		ldrh	r3, [r7]
+ 980 06a6 FFF7FEFF 		bl	GFTM070_SetDisplayWindow
+ 981 06aa 0023     		movs	r3, #0
+ 982 06ac FB81     		strh	r3, [r7, #14]	@ movhi
+ 983 06ae 23E0     		b	.L43
+ 984              	.L47:
+ 985 06b0 7B7B     		ldrb	r3, [r7, #13]	@ zero_extendqisi2
+ 986 06b2 0133     		adds	r3, r3, #1
+ 987 06b4 7B73     		strb	r3, [r7, #13]
+ 988 06b6 7B7B     		ldrb	r3, [r7, #13]	@ zero_extendqisi2
+ 989 06b8 072B     		cmp	r3, #7
+ 990 06ba 07D9     		bls	.L44
+ 991 06bc 0023     		movs	r3, #0
+ 992 06be 7B73     		strb	r3, [r7, #13]
+ 993 06c0 BB69     		ldr	r3, [r7, #24]
+ 994 06c2 0133     		adds	r3, r3, #1
+ 995 06c4 BB61     		str	r3, [r7, #24]
+ 996 06c6 BB69     		ldr	r3, [r7, #24]
+ 997 06c8 1B78     		ldrb	r3, [r3]
+ 998 06ca 3B73     		strb	r3, [r7, #12]
+ 999              	.L44:
+ 1000 06cc 3A7B     		ldrb	r2, [r7, #12]	@ zero_extendqisi2
+ 1001 06ce 7B7B     		ldrb	r3, [r7, #13]	@ zero_extendqisi2
+ 1002 06d0 C3F10703 		rsb	r3, r3, #7
+ 1003 06d4 42FA03F3 		asr	r3, r2, r3
+ 1004 06d8 03F00103 		and	r3, r3, #1
+ 1005 06dc 002B     		cmp	r3, #0
+ 1006 06de 04D0     		beq	.L45
+ 1007 06e0 FB88     		ldrh	r3, [r7, #6]
+ 1008 06e2 1846     		mov	r0, r3
+ 1009 06e4 FFF7FEFF 		bl	LCD_IO_WriteData
+ 1010 06e8 03E0     		b	.L46
+ 1011              	.L45:
+ 1012 06ea BB88     		ldrh	r3, [r7, #4]
+ 1013 06ec 1846     		mov	r0, r3
+ 1014 06ee FFF7FEFF 		bl	LCD_IO_WriteData
+ 1015              	.L46:
+ 1016 06f2 FB89     		ldrh	r3, [r7, #14]
+ 1017 06f4 0133     		adds	r3, r3, #1
+ 1018 06f6 FB81     		strh	r3, [r7, #14]	@ movhi
+ 1019              	.L43:
+ 1020 06f8 FA89     		ldrh	r2, [r7, #14]
+ 1021 06fa BB8B     		ldrh	r3, [r7, #28]
+ 1022 06fc 9A42     		cmp	r2, r3
+ 1023 06fe D7D3     		bcc	.L47
+ 1024 0700 1037     		adds	r7, r7, #16
+ 1025 0702 BD46     		mov	sp, r7
+ 1026              		@ sp needed
+ 1027 0704 80BD     		pop	{r7, pc}
+ 1029 0706 00BF     		.align	2
+ 1030              		.global	ili9320_DrawVLine
+ 1031              		.thumb
+ 1032              		.thumb_func
+ 1034              	ili9320_DrawVLine:
+ 1035              		@ args = 0, pretend = 0, frame = 16
+ 1036              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1037 0708 80B5     		push	{r7, lr}
+ 1038 070a 84B0     		sub	sp, sp, #16
+ 1039 070c 00AF     		add	r7, sp, #0
+ 1040 070e F880     		strh	r0, [r7, #6]	@ movhi
+ 1041 0710 B980     		strh	r1, [r7, #4]	@ movhi
+ 1042 0712 7A80     		strh	r2, [r7, #2]	@ movhi
+ 1043 0714 3B80     		strh	r3, [r7]	@ movhi
+ 1044 0716 0023     		movs	r3, #0
+ 1045 0718 FB81     		strh	r3, [r7, #14]	@ movhi
+ 1046 071a 0320     		movs	r0, #3
+ 1047 071c 41F21001 		movw	r1, #4112
+ 1048 0720 FFF7FEFF 		bl	ili9320_WriteReg
+ 1049 0724 BA88     		ldrh	r2, [r7, #4]
+ 1050 0726 7B88     		ldrh	r3, [r7, #2]
+ 1051 0728 1046     		mov	r0, r2
+ 1052 072a 1946     		mov	r1, r3
+ 1053 072c FFF7FEFF 		bl	ili9320_SetCursor
+ 1054 0730 2220     		movs	r0, #34
+ 1055 0732 FFF7FEFF 		bl	LCD_IO_WriteReg
+ 1056 0736 0023     		movs	r3, #0
+ 1057 0738 FB81     		strh	r3, [r7, #14]	@ movhi
+ 1058 073a 06E0     		b	.L49
+ 1059              	.L50:
+ 1060 073c FB88     		ldrh	r3, [r7, #6]
+ 1061 073e 1846     		mov	r0, r3
+ 1062 0740 FFF7FEFF 		bl	LCD_IO_WriteData
+ 1063 0744 FB89     		ldrh	r3, [r7, #14]
+ 1064 0746 0133     		adds	r3, r3, #1
+ 1065 0748 FB81     		strh	r3, [r7, #14]	@ movhi
+ 1066              	.L49:
+ 1067 074a FA89     		ldrh	r2, [r7, #14]
+ 1068 074c 3B88     		ldrh	r3, [r7]
+ 1069 074e 9A42     		cmp	r2, r3
+ 1070 0750 F4D3     		bcc	.L50
+ 1071 0752 0320     		movs	r0, #3
+ 1072 0754 41F21801 		movw	r1, #4120
+ 1073 0758 FFF7FEFF 		bl	ili9320_WriteReg
+ 1074 075c 1037     		adds	r7, r7, #16
+ 1075 075e BD46     		mov	sp, r7
+ 1076              		@ sp needed
+ 1077 0760 80BD     		pop	{r7, pc}
+ 1079 0762 00BF     		.align	2
+ 1080              		.global	GFTM070_DrawVLine
+ 1081              		.thumb
+ 1082              		.thumb_func
+ 1084              	GFTM070_DrawVLine:
+ 1085              		@ args = 0, pretend = 0, frame = 16
+ 1086              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1087 0764 80B5     		push	{r7, lr}
+ 1088 0766 84B0     		sub	sp, sp, #16
+ 1089 0768 00AF     		add	r7, sp, #0
+ 1090 076a F880     		strh	r0, [r7, #6]	@ movhi
+ 1091 076c B980     		strh	r1, [r7, #4]	@ movhi
+ 1092 076e 7A80     		strh	r2, [r7, #2]	@ movhi
+ 1093 0770 3B80     		strh	r3, [r7]	@ movhi
+ 1094 0772 0023     		movs	r3, #0
+ 1095 0774 FB81     		strh	r3, [r7, #14]	@ movhi
+ 1096 0776 7B88     		ldrh	r3, [r7, #2]	@ movhi
+ 1097 0778 FB81     		strh	r3, [r7, #14]	@ movhi
+ 1098 077a 0AE0     		b	.L52
+ 1099              	.L53:
+ 1100 077c B988     		ldrh	r1, [r7, #4]
+ 1101 077e FA89     		ldrh	r2, [r7, #14]
+ 1102 0780 FB88     		ldrh	r3, [r7, #6]
+ 1103 0782 0846     		mov	r0, r1
+ 1104 0784 1146     		mov	r1, r2
+ 1105 0786 1A46     		mov	r2, r3
+ 1106 0788 FFF7FEFF 		bl	GFTM070_WritePixel
+ 1107 078c FB89     		ldrh	r3, [r7, #14]
+ 1108 078e 0133     		adds	r3, r3, #1
+ 1109 0790 FB81     		strh	r3, [r7, #14]	@ movhi
+ 1110              	.L52:
+ 1111 0792 FA89     		ldrh	r2, [r7, #14]
+ 1112 0794 7988     		ldrh	r1, [r7, #2]
+ 1113 0796 3B88     		ldrh	r3, [r7]
+ 1114 0798 0B44     		add	r3, r3, r1
+ 1115 079a 9A42     		cmp	r2, r3
+ 1116 079c EEDB     		blt	.L53
+ 1117 079e 1037     		adds	r7, r7, #16
+ 1118 07a0 BD46     		mov	sp, r7
+ 1119              		@ sp needed
+ 1120 07a2 80BD     		pop	{r7, pc}
+ 1122              		.align	2
+ 1123              		.global	ili9320_DrawBitmap
+ 1124              		.thumb
+ 1125              		.thumb_func
+ 1127              	ili9320_DrawBitmap:
+ 1128              		@ args = 0, pretend = 0, frame = 16
+ 1129              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1130 07a4 80B5     		push	{r7, lr}
+ 1131 07a6 84B0     		sub	sp, sp, #16
+ 1132 07a8 00AF     		add	r7, sp, #0
+ 1133 07aa 0B46     		mov	r3, r1
+ 1134 07ac 3A60     		str	r2, [r7]
+ 1135 07ae 0246     		mov	r2, r0	@ movhi
+ 1136 07b0 FA80     		strh	r2, [r7, #6]	@ movhi
+ 1137 07b2 BB80     		strh	r3, [r7, #4]	@ movhi
+ 1138 07b4 0023     		movs	r3, #0
+ 1139 07b6 FB60     		str	r3, [r7, #12]
+ 1140 07b8 0023     		movs	r3, #0
+ 1141 07ba BB60     		str	r3, [r7, #8]
+ 1142 07bc 3B68     		ldr	r3, [r7]
+ 1143 07be 0233     		adds	r3, r3, #2
+ 1144 07c0 1B88     		ldrh	r3, [r3]	@ movhi
+ 1145 07c2 9BB2     		uxth	r3, r3
+ 1146 07c4 BB60     		str	r3, [r7, #8]
+ 1147 07c6 3B68     		ldr	r3, [r7]
+ 1148 07c8 0433     		adds	r3, r3, #4
+ 1149 07ca 1B88     		ldrh	r3, [r3]	@ movhi
+ 1150 07cc 9BB2     		uxth	r3, r3
+ 1151 07ce 1B04     		lsls	r3, r3, #16
+ 1152 07d0 BA68     		ldr	r2, [r7, #8]
+ 1153 07d2 1343     		orrs	r3, r3, r2
+ 1154 07d4 BB60     		str	r3, [r7, #8]
+ 1155 07d6 3B68     		ldr	r3, [r7]
+ 1156 07d8 0A33     		adds	r3, r3, #10
+ 1157 07da 1B88     		ldrh	r3, [r3]	@ movhi
+ 1158 07dc 9BB2     		uxth	r3, r3
+ 1159 07de FB60     		str	r3, [r7, #12]
+ 1160 07e0 3B68     		ldr	r3, [r7]
+ 1161 07e2 0C33     		adds	r3, r3, #12
+ 1162 07e4 1B88     		ldrh	r3, [r3]	@ movhi
+ 1163 07e6 9BB2     		uxth	r3, r3
+ 1164 07e8 1B04     		lsls	r3, r3, #16
+ 1165 07ea FA68     		ldr	r2, [r7, #12]
+ 1166 07ec 1343     		orrs	r3, r3, r2
+ 1167 07ee FB60     		str	r3, [r7, #12]
+ 1168 07f0 BA68     		ldr	r2, [r7, #8]
+ 1169 07f2 FB68     		ldr	r3, [r7, #12]
+ 1170 07f4 D31A     		subs	r3, r2, r3
+ 1171 07f6 5B08     		lsrs	r3, r3, #1
+ 1172 07f8 BB60     		str	r3, [r7, #8]
+ 1173 07fa 3A68     		ldr	r2, [r7]
+ 1174 07fc FB68     		ldr	r3, [r7, #12]
+ 1175 07fe 1344     		add	r3, r3, r2
+ 1176 0800 3B60     		str	r3, [r7]
+ 1177 0802 0320     		movs	r0, #3
+ 1178 0804 41F20801 		movw	r1, #4104
+ 1179 0808 FFF7FEFF 		bl	ili9320_WriteReg
+ 1180 080c FA88     		ldrh	r2, [r7, #6]
+ 1181 080e BB88     		ldrh	r3, [r7, #4]
+ 1182 0810 1046     		mov	r0, r2
+ 1183 0812 1946     		mov	r1, r3
+ 1184 0814 FFF7FEFF 		bl	ili9320_SetCursor
+ 1185 0818 2220     		movs	r0, #34
+ 1186 081a FFF7FEFF 		bl	LCD_IO_WriteReg
+ 1187 081e 0023     		movs	r3, #0
+ 1188 0820 FB60     		str	r3, [r7, #12]
+ 1189 0822 0BE0     		b	.L55
+ 1190              	.L56:
+ 1191 0824 3B68     		ldr	r3, [r7]
+ 1192 0826 1B88     		ldrh	r3, [r3]	@ movhi
+ 1193 0828 9BB2     		uxth	r3, r3
+ 1194 082a 1846     		mov	r0, r3
+ 1195 082c FFF7FEFF 		bl	LCD_IO_WriteData
+ 1196 0830 3B68     		ldr	r3, [r7]
+ 1197 0832 0233     		adds	r3, r3, #2
+ 1198 0834 3B60     		str	r3, [r7]
+ 1199 0836 FB68     		ldr	r3, [r7, #12]
+ 1200 0838 0133     		adds	r3, r3, #1
+ 1201 083a FB60     		str	r3, [r7, #12]
+ 1202              	.L55:
+ 1203 083c FA68     		ldr	r2, [r7, #12]
+ 1204 083e BB68     		ldr	r3, [r7, #8]
+ 1205 0840 9A42     		cmp	r2, r3
+ 1206 0842 EFD3     		bcc	.L56
+ 1207 0844 1037     		adds	r7, r7, #16
+ 1208 0846 BD46     		mov	sp, r7
+ 1209              		@ sp needed
+ 1210 0848 80BD     		pop	{r7, pc}
+ 1212 084a 00BF     		.align	2
+ 1213              		.global	GFTM070_DrawBitmap
+ 1214              		.thumb
+ 1215              		.thumb_func
+ 1217              	GFTM070_DrawBitmap:
+ 1218              		@ args = 0, pretend = 0, frame = 16
+ 1219              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1220 084c 80B5     		push	{r7, lr}
+ 1221 084e 84B0     		sub	sp, sp, #16
+ 1222 0850 00AF     		add	r7, sp, #0
+ 1223 0852 0B46     		mov	r3, r1
+ 1224 0854 3A60     		str	r2, [r7]
+ 1225 0856 0246     		mov	r2, r0	@ movhi
+ 1226 0858 FA80     		strh	r2, [r7, #6]	@ movhi
+ 1227 085a BB80     		strh	r3, [r7, #4]	@ movhi
+ 1228 085c 0023     		movs	r3, #0
+ 1229 085e FB60     		str	r3, [r7, #12]
+ 1230 0860 0023     		movs	r3, #0
+ 1231 0862 BB60     		str	r3, [r7, #8]
+ 1232 0864 3B68     		ldr	r3, [r7]
+ 1233 0866 0233     		adds	r3, r3, #2
+ 1234 0868 1B88     		ldrh	r3, [r3]	@ movhi
+ 1235 086a 9BB2     		uxth	r3, r3
+ 1236 086c BB60     		str	r3, [r7, #8]
+ 1237 086e 3B68     		ldr	r3, [r7]
+ 1238 0870 0433     		adds	r3, r3, #4
+ 1239 0872 1B88     		ldrh	r3, [r3]	@ movhi
+ 1240 0874 9BB2     		uxth	r3, r3
+ 1241 0876 1B04     		lsls	r3, r3, #16
+ 1242 0878 BA68     		ldr	r2, [r7, #8]
+ 1243 087a 1343     		orrs	r3, r3, r2
+ 1244 087c BB60     		str	r3, [r7, #8]
+ 1245 087e 3B68     		ldr	r3, [r7]
+ 1246 0880 0A33     		adds	r3, r3, #10
+ 1247 0882 1B88     		ldrh	r3, [r3]	@ movhi
+ 1248 0884 9BB2     		uxth	r3, r3
+ 1249 0886 FB60     		str	r3, [r7, #12]
+ 1250 0888 3B68     		ldr	r3, [r7]
+ 1251 088a 0C33     		adds	r3, r3, #12
+ 1252 088c 1B88     		ldrh	r3, [r3]	@ movhi
+ 1253 088e 9BB2     		uxth	r3, r3
+ 1254 0890 1B04     		lsls	r3, r3, #16
+ 1255 0892 FA68     		ldr	r2, [r7, #12]
+ 1256 0894 1343     		orrs	r3, r3, r2
+ 1257 0896 FB60     		str	r3, [r7, #12]
+ 1258 0898 BA68     		ldr	r2, [r7, #8]
+ 1259 089a FB68     		ldr	r3, [r7, #12]
+ 1260 089c D31A     		subs	r3, r2, r3
+ 1261 089e 5B08     		lsrs	r3, r3, #1
+ 1262 08a0 BB60     		str	r3, [r7, #8]
+ 1263 08a2 3A68     		ldr	r2, [r7]
+ 1264 08a4 FB68     		ldr	r3, [r7, #12]
+ 1265 08a6 1344     		add	r3, r3, r2
+ 1266 08a8 3B60     		str	r3, [r7]
+ 1267 08aa 0023     		movs	r3, #0
+ 1268 08ac FB60     		str	r3, [r7, #12]
+ 1269 08ae 0BE0     		b	.L58
+ 1270              	.L59:
+ 1271 08b0 3B68     		ldr	r3, [r7]
+ 1272 08b2 1B88     		ldrh	r3, [r3]	@ movhi
+ 1273 08b4 9BB2     		uxth	r3, r3
+ 1274 08b6 1846     		mov	r0, r3
+ 1275 08b8 FFF7FEFF 		bl	LCD_IO_WriteData
+ 1276 08bc 3B68     		ldr	r3, [r7]
+ 1277 08be 0233     		adds	r3, r3, #2
+ 1278 08c0 3B60     		str	r3, [r7]
+ 1279 08c2 FB68     		ldr	r3, [r7, #12]
+ 1280 08c4 0133     		adds	r3, r3, #1
+ 1281 08c6 FB60     		str	r3, [r7, #12]
+ 1282              	.L58:
+ 1283 08c8 FA68     		ldr	r2, [r7, #12]
+ 1284 08ca BB68     		ldr	r3, [r7, #8]
+ 1285 08cc 9A42     		cmp	r2, r3
+ 1286 08ce EFD3     		bcc	.L59
+ 1287 08d0 1037     		adds	r7, r7, #16
+ 1288 08d2 BD46     		mov	sp, r7
+ 1289              		@ sp needed
+ 1290 08d4 80BD     		pop	{r7, pc}
+ 1292 08d6 00BF     		.align	2
+ 1293              		.global	ili9320_DrawRGBImage
+ 1294              		.thumb
+ 1295              		.thumb_func
+ 1297              	ili9320_DrawRGBImage:
+ 1298              		@ args = 4, pretend = 0, frame = 16
+ 1299              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1300 08d8 80B5     		push	{r7, lr}
+ 1301 08da 84B0     		sub	sp, sp, #16
+ 1302 08dc 00AF     		add	r7, sp, #0
+ 1303 08de F880     		strh	r0, [r7, #6]	@ movhi
+ 1304 08e0 B980     		strh	r1, [r7, #4]	@ movhi
+ 1305 08e2 7A80     		strh	r2, [r7, #2]	@ movhi
+ 1306 08e4 3B80     		strh	r3, [r7]	@ movhi
+ 1307 08e6 0023     		movs	r3, #0
+ 1308 08e8 FB60     		str	r3, [r7, #12]
+ 1309 08ea 0023     		movs	r3, #0
+ 1310 08ec BB60     		str	r3, [r7, #8]
+ 1311 08ee 7B88     		ldrh	r3, [r7, #2]
+ 1312 08f0 3A88     		ldrh	r2, [r7]
+ 1313 08f2 02FB03F3 		mul	r3, r2, r3
+ 1314 08f6 BB60     		str	r3, [r7, #8]
+ 1315 08f8 FA88     		ldrh	r2, [r7, #6]
+ 1316 08fa BB88     		ldrh	r3, [r7, #4]
+ 1317 08fc 1046     		mov	r0, r2
+ 1318 08fe 1946     		mov	r1, r3
+ 1319 0900 FFF7FEFF 		bl	ili9320_SetCursor
+ 1320 0904 2220     		movs	r0, #34
+ 1321 0906 FFF7FEFF 		bl	LCD_IO_WriteReg
+ 1322 090a 0023     		movs	r3, #0
+ 1323 090c FB60     		str	r3, [r7, #12]
+ 1324 090e 0BE0     		b	.L61
+ 1325              	.L62:
+ 1326 0910 BB69     		ldr	r3, [r7, #24]
+ 1327 0912 1B88     		ldrh	r3, [r3]	@ movhi
+ 1328 0914 9BB2     		uxth	r3, r3
+ 1329 0916 1846     		mov	r0, r3
+ 1330 0918 FFF7FEFF 		bl	LCD_IO_WriteData
+ 1331 091c BB69     		ldr	r3, [r7, #24]
+ 1332 091e 0233     		adds	r3, r3, #2
+ 1333 0920 BB61     		str	r3, [r7, #24]
+ 1334 0922 FB68     		ldr	r3, [r7, #12]
+ 1335 0924 0133     		adds	r3, r3, #1
+ 1336 0926 FB60     		str	r3, [r7, #12]
+ 1337              	.L61:
+ 1338 0928 FA68     		ldr	r2, [r7, #12]
+ 1339 092a BB68     		ldr	r3, [r7, #8]
+ 1340 092c 9A42     		cmp	r2, r3
+ 1341 092e EFD3     		bcc	.L62
+ 1342 0930 1037     		adds	r7, r7, #16
+ 1343 0932 BD46     		mov	sp, r7
+ 1344              		@ sp needed
+ 1345 0934 80BD     		pop	{r7, pc}
+ 1347 0936 00BF     		.align	2
+ 1348              		.global	GFTM070_DrawRGBImage
+ 1349              		.thumb
+ 1350              		.thumb_func
+ 1352              	GFTM070_DrawRGBImage:
+ 1353              		@ args = 4, pretend = 0, frame = 16
+ 1354              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1355 0938 80B5     		push	{r7, lr}
+ 1356 093a 84B0     		sub	sp, sp, #16
+ 1357 093c 00AF     		add	r7, sp, #0
+ 1358 093e F880     		strh	r0, [r7, #6]	@ movhi
+ 1359 0940 B980     		strh	r1, [r7, #4]	@ movhi
+ 1360 0942 7A80     		strh	r2, [r7, #2]	@ movhi
+ 1361 0944 3B80     		strh	r3, [r7]	@ movhi
+ 1362 0946 0023     		movs	r3, #0
+ 1363 0948 FB60     		str	r3, [r7, #12]
+ 1364 094a 0023     		movs	r3, #0
+ 1365 094c BB60     		str	r3, [r7, #8]
+ 1366 094e 7B88     		ldrh	r3, [r7, #2]
+ 1367 0950 3A88     		ldrh	r2, [r7]
+ 1368 0952 02FB03F3 		mul	r3, r2, r3
+ 1369 0956 BB60     		str	r3, [r7, #8]
+ 1370 0958 F888     		ldrh	r0, [r7, #6]
+ 1371 095a B988     		ldrh	r1, [r7, #4]
+ 1372 095c 7A88     		ldrh	r2, [r7, #2]
+ 1373 095e 3B88     		ldrh	r3, [r7]
+ 1374 0960 FFF7FEFF 		bl	GFTM070_SetDisplayWindow
+ 1375 0964 0023     		movs	r3, #0
+ 1376 0966 FB60     		str	r3, [r7, #12]
+ 1377 0968 0BE0     		b	.L64
+ 1378              	.L65:
+ 1379 096a BB69     		ldr	r3, [r7, #24]
+ 1380 096c 1B88     		ldrh	r3, [r3]	@ movhi
+ 1381 096e 9BB2     		uxth	r3, r3
+ 1382 0970 1846     		mov	r0, r3
+ 1383 0972 FFF7FEFF 		bl	LCD_IO_WriteData
+ 1384 0976 BB69     		ldr	r3, [r7, #24]
+ 1385 0978 0233     		adds	r3, r3, #2
+ 1386 097a BB61     		str	r3, [r7, #24]
+ 1387 097c FB68     		ldr	r3, [r7, #12]
+ 1388 097e 0133     		adds	r3, r3, #1
+ 1389 0980 FB60     		str	r3, [r7, #12]
+ 1390              	.L64:
+ 1391 0982 FA68     		ldr	r2, [r7, #12]
+ 1392 0984 BB68     		ldr	r3, [r7, #8]
+ 1393 0986 9A42     		cmp	r2, r3
+ 1394 0988 EFD3     		bcc	.L65
+ 1395 098a 1037     		adds	r7, r7, #16
+ 1396 098c BD46     		mov	sp, r7
+ 1397              		@ sp needed
+ 1398 098e 80BD     		pop	{r7, pc}
+ 1400              		.ident	"GCC: (Sourcery CodeBench Lite 2014.05-28) 4.8.3 20140320 (prerelease)"
+DEFINED SYMBOLS
+                            *ABS*:00000000 ili9320.c
+C:\Users\sagok\AppData\Local\Temp\ccxAPONJ.s:20     .data:00000000 ili9320_drv
+C:\Users\sagok\AppData\Local\Temp\ccxAPONJ.s:17     .data:00000000 $d
+C:\Users\sagok\AppData\Local\Temp\ccxAPONJ.s:56     .text:00000000 GFTM070_Init
+C:\Users\sagok\AppData\Local\Temp\ccxAPONJ.s:434    .text:000002e8 ili9320_ReadID
+C:\Users\sagok\AppData\Local\Temp\ccxAPONJ.s:349    .text:00000280 GFTM070_DisplayOn
+C:\Users\sagok\AppData\Local\Temp\ccxAPONJ.s:382    .text:000002b4 ili9320_DisplayOff
+C:\Users\sagok\AppData\Local\Temp\ccxAPONJ.s:488    .text:0000033c GFTM070_SetCursor
+C:\Users\sagok\AppData\Local\Temp\ccxAPONJ.s:590    .text:00000404 GFTM070_WritePixel
+C:\Users\sagok\AppData\Local\Temp\ccxAPONJ.s:620    .text:00000430 GFTM070_WriteNextWindowPixel
+C:\Users\sagok\AppData\Local\Temp\ccxAPONJ.s:641    .text:00000448 ili9320_ReadPixel
+C:\Users\sagok\AppData\Local\Temp\ccxAPONJ.s:775    .text:00000528 GFTM070_SetDisplayWindow
+C:\Users\sagok\AppData\Local\Temp\ccxAPONJ.s:907    .text:0000062c GFTM070_DrawHLine
+C:\Users\sagok\AppData\Local\Temp\ccxAPONJ.s:1084   .text:00000764 GFTM070_DrawVLine
+C:\Users\sagok\AppData\Local\Temp\ccxAPONJ.s:398    .text:000002c0 ili9320_GetLcdPixelWidth
+C:\Users\sagok\AppData\Local\Temp\ccxAPONJ.s:416    .text:000002d4 ili9320_GetLcdPixelHeight
+C:\Users\sagok\AppData\Local\Temp\ccxAPONJ.s:1217   .text:0000084c GFTM070_DrawBitmap
+C:\Users\sagok\AppData\Local\Temp\ccxAPONJ.s:1352   .text:00000938 GFTM070_DrawRGBImage
+C:\Users\sagok\AppData\Local\Temp\ccxAPONJ.s:952    .text:00000674 GFTM070_DrawHDataLine
+C:\Users\sagok\AppData\Local\Temp\ccxAPONJ.s:41     .data:00000040 GFTM070SoftMode_drv
+C:\Users\sagok\AppData\Local\Temp\ccxAPONJ.s:255    .text:0000021c GFTM070_WriteCommand
+C:\Users\sagok\AppData\Local\Temp\ccxAPONJ.s:46     .bss:00000000 Is_ili9320_Initialized
+C:\Users\sagok\AppData\Local\Temp\ccxAPONJ.s:47     .bss:00000000 $d
+C:\Users\sagok\AppData\Local\Temp\ccxAPONJ.s:48     .bss:00000001 Is_GFTM070_Initialized
+C:\Users\sagok\AppData\Local\Temp\ccxAPONJ.s:51     .text:00000000 $t
+C:\Users\sagok\AppData\Local\Temp\ccxAPONJ.s:297    .text:0000024c GFTM070_WriteData
+C:\Users\sagok\AppData\Local\Temp\ccxAPONJ.s:276    .text:00000234 GFTM070_ReadCommand
+C:\Users\sagok\AppData\Local\Temp\ccxAPONJ.s:318    .text:00000264 GFTM070_ReadData
+C:\Users\sagok\AppData\Local\Temp\ccxAPONJ.s:333    .text:00000274 ili9320_Init
+C:\Users\sagok\AppData\Local\Temp\ccxAPONJ.s:699    .text:000004a4 ili9320_ReadReg
+C:\Users\sagok\AppData\Local\Temp\ccxAPONJ.s:457    .text:0000030c ili9320_SetCursor
+C:\Users\sagok\AppData\Local\Temp\ccxAPONJ.s:672    .text:0000047c ili9320_WriteReg
+C:\Users\sagok\AppData\Local\Temp\ccxAPONJ.s:558    .text:000003d0 ili9320_WritePixel
+C:\Users\sagok\AppData\Local\Temp\ccxAPONJ.s:724    .text:000004c8 ili9320_SetDisplayWindow
+C:\Users\sagok\AppData\Local\Temp\ccxAPONJ.s:863    .text:000005e4 ili9320_DrawHLine
+C:\Users\sagok\AppData\Local\Temp\ccxAPONJ.s:1034   .text:00000708 ili9320_DrawVLine
+C:\Users\sagok\AppData\Local\Temp\ccxAPONJ.s:1127   .text:000007a4 ili9320_DrawBitmap
+C:\Users\sagok\AppData\Local\Temp\ccxAPONJ.s:1297   .text:000008d8 ili9320_DrawRGBImage
+
+UNDEFINED SYMBOLS
+GFTM070_IO_Init
+HAL_GPIO_WritePin
+vTaskDelay
+LCD_IO_WriteReg
+LCD_IO_WriteData
+LCD_IO_ReadData

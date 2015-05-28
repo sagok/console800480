@@ -1,0 +1,1173 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"stm32f2xx_ll_sdmmc.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.align	2
+  19              		.global	SDIO_Init
+  20              		.thumb
+  21              		.thumb_func
+  23              	SDIO_Init:
+  24              	.LFB55:
+  25              		.file 1 "../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c"
+   1:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** /**
+   2:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   ******************************************************************************
+   3:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @file    stm32f2xx_ll_sdmmc.c
+   4:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @author  MCD Application Team
+   5:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @version V1.0.1
+   6:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @date    25-March-2014
+   7:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @brief   SDMMC Low Layer HAL module driver.
+   8:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *    
+   9:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *          This file provides firmware functions to manage the following 
+  10:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *          functionalities of the SDMMC peripheral:
+  11:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *           + Initialization/de-initialization functions
+  12:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *           + I/O operation functions
+  13:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *           + Peripheral Control functions 
+  14:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *           + Peripheral State functions
+  15:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *         
+  16:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   @verbatim
+  17:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   ==============================================================================
+  18:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****                        ##### SDMMC peripheral features #####
+  19:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   ==============================================================================        
+  20:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****     [..] The SD/SDIO MMC card host interface (SDIO) provides an interface between the APB2
+  21:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****          peripheral bus and MultiMedia cards (MMCs), SD memory cards, SDIO cards and CE-ATA
+  22:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****          devices.
+  23:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+  24:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****     [..] The MultiMedia Card system specifications are available through the MultiMedia Card
+  25:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****          Association website at www.mmca.org, published by the MMCA technical committee.
+  26:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****          SD memory card and SD I/O card system specifications are available through the SD card
+  27:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****          Association website at www.sdcard.org.
+  28:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****          CE-ATA system specifications are available through the CE-ATA work group web site at
+  29:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****          www.ce-ata.org.
+  30:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****     
+  31:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****     [..] The SDIO features include the following:
+  32:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****          (+) Full compliance with MultiMedia Card System Specification Version 4.2. Card support
+  33:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****              for three different databus modes: 1-bit (default), 4-bit and 8-bit
+  34:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****          (+) Full compatibility with previous versions of MultiMedia Cards (forward compatibility)
+  35:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****          (+) Full compliance with SD Memory Card Specifications Version 2.0
+  36:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****          (+) Full compliance with SD I/O Card Specification Version 2.0: card support for two
+  37:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****              different data bus modes: 1-bit (default) and 4-bit
+  38:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****          (+) Full support of the CE-ATA features (full compliance with CE-ATA digital protocol
+  39:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****              Rev1.1)
+  40:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****          (+) Data transfer up to 48 MHz for the 8 bit mode
+  41:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****          (+) Data and command output enable signals to control external bidirectional drivers.
+  42:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****                  
+  43:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****    
+  44:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****                            ##### How to use this driver #####
+  45:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   ==============================================================================
+  46:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****     [..]
+  47:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****       This driver is a considered as a driver of service for external devices drivers 
+  48:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****       that interfaces with the SDIO peripheral.
+  49:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****       According to the device used (SD card/ MMC card / SDIO card ...), a set of APIs 
+  50:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****       is used in the device's driver to perform SDIO operations and functionalities.
+  51:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****    
+  52:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****       This driver is almost transparent for the final user, it is only used to implement other
+  53:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****       functionalities of the external device.
+  54:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****    
+  55:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****     [..]
+  56:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****       (+) The SDIO clock (SDIOCLK = 48 MHz) is coming from a specific output of PLL 
+  57:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****           (PLL48CLK). Before start working with SDIO peripheral make sure that the
+  58:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****           PLL is well configured.
+  59:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****           The SDIO peripheral uses two clock signals:
+  60:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****           (++) SDIO adapter clock (SDIOCLK = 48 MHz)
+  61:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****           (++) APB2 bus clock (PCLK2)
+  62:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****        
+  63:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****           -@@- PCLK2 and SDIO_CK clock frequencies must respect the following condition:
+  64:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****                Frequency(PCLK2) >= (3 / 8 x Frequency(SDIO_CK))
+  65:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   
+  66:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****       (+) Enable/Disable peripheral clock using RCC peripheral macros related to SDIO
+  67:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****           peripheral.
+  68:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+  69:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****       (+) Enable the Power ON State using the HAL_SDIO_PowerState_ON(hsdio) 
+  70:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****           function and disable it using the function HAL_SDIO_PowerState_OFF(hsdio).
+  71:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****                 
+  72:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****       (+) Enable/Disable the clock using the __SDIO_ENABLE()/__SDIO_DISABLE() macros.
+  73:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   
+  74:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****       (+) Enable/Disable the peripheral interrupts using the macros __SDIO_ENABLE_IT(hsdio, IT) 
+  75:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****           and __SDIO_DISABLE_IT(hsdio, IT) if you need to use interrupt mode. 
+  76:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   
+  77:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****       (+) When using the DMA mode 
+  78:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****           (++) Configure the DMA in the MSP layer of the external device
+  79:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****           (++) Active the needed channel Request 
+  80:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****           (++) Enable the DMA using __SDIO_DMA_ENABLE() macro or Disable it using the macro
+  81:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****                __SDIO_DMA_DISABLE().
+  82:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   
+  83:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****       (+) To control the CPSM (Command Path State Machine) and send 
+  84:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****           commands to the card use the HAL_SDIO_SendCommand(), 
+  85:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****           HAL_SDIO_GetCommandResponse() and HAL_SDIO_GetResponse() functions. First, user has
+  86:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****           to fill the command structure (pointer to SDIO_CmdInitTypeDef) according 
+  87:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****           to the selected command to be sent.
+  88:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****           The parameters that should be filled are:
+  89:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****            (++) Command Argument
+  90:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****            (++) Command Index
+  91:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****            (++) Command Response type
+  92:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****            (++) Command Wait
+  93:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****            (++) CPSM Status (Enable or Disable).
+  94:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   
+  95:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****           -@@- To check if the command is well received, read the SDIO_CMDRESP
+  96:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****               register using the HAL_SDIO_GetCommandResponse().
+  97:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****               The SDIO responses registers (SDIO_RESP1 to SDIO_RESP2), use the
+  98:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****               HAL_SDIO_GetResponse() function.
+  99:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   
+ 100:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****       (+) To control the DPSM (Data Path State Machine) and send/receive 
+ 101:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****            data to/from the card use the HAL_SDIO_DataConfig(), HAL_SDIO_GetDataCounter(), 
+ 102:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****           HAL_SDIO_ReadFIFO(), HAL_SDIO_WriteFIFO() and HAL_SDIO_GetFIFOCount() functions.
+ 103:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   
+ 104:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****     *** Read Operations ***
+ 105:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****     =======================
+ 106:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****     [..]
+ 107:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****       (#) First, user has to fill the data structure (pointer to
+ 108:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****           SDIO_DataInitTypeDef) according to the selected data type to be received.
+ 109:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****           The parameters that should be filled are:
+ 110:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****            (++) Data TimeOut
+ 111:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****            (++) Data Length
+ 112:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****            (++) Data Block size
+ 113:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****            (++) Data Transfer direction: should be from card (To SDIO)
+ 114:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****            (++) Data Transfer mode
+ 115:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****            (++) DPSM Status (Enable or Disable)
+ 116:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****                                      
+ 117:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****       (#) Configure the SDIO resources to receive the data from the card
+ 118:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****           according to selected transfer mode (Refer to Step 8, 9 and 10).
+ 119:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   
+ 120:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****       (#) Send the selected Read command (refer to step 11).
+ 121:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****                     
+ 122:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****       (#) Use the SDIO flags/interrupts to check the transfer status.
+ 123:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   
+ 124:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****     *** Write Operations ***
+ 125:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****     ========================
+ 126:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****     [..]
+ 127:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****      (#) First, user has to fill the data structure (pointer to
+ 128:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****          SDIO_DataInitTypeDef) according to the selected data type to be received.
+ 129:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****          The parameters that should be filled are:
+ 130:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****           (++) Data TimeOut
+ 131:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****           (++) Data Length
+ 132:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****           (++) Data Block size
+ 133:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****           (++) Data Transfer direction:  should be to card (To CARD)
+ 134:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****           (++) Data Transfer mode
+ 135:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****           (++) DPSM Status (Enable or Disable)
+ 136:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   
+ 137:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****      (#) Configure the SDIO resources to send the data to the card according to 
+ 138:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****          selected transfer mode (Refer to Step 8, 9 and 10).
+ 139:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****                      
+ 140:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****      (#) Send the selected Write command (refer to step 11).
+ 141:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****                     
+ 142:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****      (#) Use the SDIO flags/interrupts to check the transfer status.
+ 143:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   
+ 144:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   @endverbatim
+ 145:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   ******************************************************************************
+ 146:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @attention
+ 147:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *
+ 148:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * <h2><center>&copy; COPYRIGHT(c) 2014 STMicroelectronics</center></h2>
+ 149:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *
+ 150:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * Redistribution and use in source and binary forms, with or without modification,
+ 151:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * are permitted provided that the following conditions are met:
+ 152:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *   1. Redistributions of source code must retain the above copyright notice,
+ 153:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *      this list of conditions and the following disclaimer.
+ 154:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *   2. Redistributions in binary form must reproduce the above copyright notice,
+ 155:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *      this list of conditions and the following disclaimer in the documentation
+ 156:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *      and/or other materials provided with the distribution.
+ 157:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *   3. Neither the name of STMicroelectronics nor the names of its contributors
+ 158:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *      may be used to endorse or promote products derived from this software
+ 159:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *      without specific prior written permission.
+ 160:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *
+ 161:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ 162:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ 163:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ 164:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ 165:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ 166:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ 167:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ 168:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ 169:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ 170:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ 171:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *
+ 172:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   ******************************************************************************
+ 173:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   */ 
+ 174:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 175:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** /* Includes ------------------------------------------------------------------*/
+ 176:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** #include "stm32f2xx_hal.h"
+ 177:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 178:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** /** @addtogroup STM32F2xx_HAL_Driver
+ 179:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @{
+ 180:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   */
+ 181:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 182:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** /** @defgroup SDMMC 
+ 183:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @brief SDMMC HAL module driver
+ 184:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @{
+ 185:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   */
+ 186:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 187:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** #if defined (HAL_SD_MODULE_ENABLED) || defined(HAL_MMC_MODULE_ENABLED)
+ 188:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 189:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** /* Private typedef -----------------------------------------------------------*/
+ 190:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** /* Private define ------------------------------------------------------------*/
+ 191:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** /* Private macro -------------------------------------------------------------*/
+ 192:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** /* Private variables ---------------------------------------------------------*/
+ 193:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** /* Private function prototypes -----------------------------------------------*/
+ 194:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** /* Private functions ---------------------------------------------------------*/
+ 195:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 196:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** /** @defgroup SDIO_Private_Functions
+ 197:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @{
+ 198:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   */
+ 199:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 200:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** /** @defgroup HAL_SDIO_Group1 Initialization/de-initialization functions 
+ 201:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****  *  @brief    Initialization and Configuration functions 
+ 202:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****  *
+ 203:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** @verbatim    
+ 204:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****  ===============================================================================
+ 205:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****               ##### Initialization/de-initialization functions #####
+ 206:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****  ===============================================================================
+ 207:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****     [..]  This section provides functions allowing to:
+ 208:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****  
+ 209:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** @endverbatim
+ 210:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @{
+ 211:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   */
+ 212:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 213:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** /**
+ 214:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @brief  Initializes the SDIO according to the specified
+ 215:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *         parameters in the SDIO_InitTypeDef and create the associated handle.
+ 216:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @param  SDIOx: Pointer to SDIO register base
+ 217:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @param  Init: SDIO initialization structure   
+ 218:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @retval HAL status
+ 219:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   */
+ 220:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** HAL_StatusTypeDef SDIO_Init(SDIO_TypeDef *SDIOx, SDIO_InitTypeDef Init)
+ 221:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** {
+  26              		.loc 1 221 0
+  27              		.cfi_startproc
+  28              		@ args = 28, pretend = 16, frame = 16
+  29              		@ frame_needed = 1, uses_anonymous_args = 0
+  30              		@ link register save eliminated.
+  31 0000 84B0     		sub	sp, sp, #16
+  32              		.cfi_def_cfa_offset 16
+  33 0002 80B4     		push	{r7}
+  34              		.cfi_def_cfa_offset 20
+  35              		.cfi_offset 7, -20
+  36 0004 85B0     		sub	sp, sp, #20
+  37              		.cfi_def_cfa_offset 40
+  38 0006 00AF     		add	r7, sp, #0
+  39              		.cfi_def_cfa_register 7
+  40 0008 7860     		str	r0, [r7, #4]
+  41 000a 07F11C00 		add	r0, r7, #28
+  42 000e 80E80E00 		stmia	r0, {r1, r2, r3}
+ 222:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   __IO uint32_t tmpreg = 0; 
+  43              		.loc 1 222 0
+  44 0012 0023     		movs	r3, #0
+  45 0014 FB60     		str	r3, [r7, #12]
+ 223:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 224:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   /* Check the parameters */
+ 225:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   assert_param(IS_SDIO_ALL_INSTANCE(SDIOx));
+ 226:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   assert_param(IS_SDIO_CLOCK_EDGE(Init.ClockEdge)); 
+ 227:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   assert_param(IS_SDIO_CLOCK_BYPASS(Init.ClockBypass));
+ 228:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   assert_param(IS_SDIO_CLOCK_POWER_SAVE(Init.ClockPowerSave));
+ 229:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   assert_param(IS_SDIO_BUS_WIDE(Init.BusWide));
+ 230:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   assert_param(IS_SDIO_HARDWARE_FLOW_CONTROL(Init.HardwareFlowControl));
+ 231:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   assert_param(IS_SDIO_CLKDIV(Init.ClockDiv));
+ 232:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   
+ 233:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   /* Get the SDIO CLKCR value */
+ 234:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   tmpreg = SDIOx->CLKCR;
+  46              		.loc 1 234 0
+  47 0016 7B68     		ldr	r3, [r7, #4]
+  48 0018 5B68     		ldr	r3, [r3, #4]
+  49 001a FB60     		str	r3, [r7, #12]
+ 235:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   
+ 236:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   /* Clear CLKDIV, PWRSAV, BYPASS, WIDBUS, NEGEDGE, HWFC_EN bits */
+ 237:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   tmpreg &= CLKCR_CLEAR_MASK;
+  50              		.loc 1 237 0
+  51 001c FB68     		ldr	r3, [r7, #12]
+  52 001e 23F4FD43 		bic	r3, r3, #32384
+  53 0022 23F07F03 		bic	r3, r3, #127
+  54 0026 FB60     		str	r3, [r7, #12]
+ 238:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   
+ 239:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   /* Set SDIO configuration parameters */
+ 240:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   tmpreg |= (Init.ClockEdge           |\
+  55              		.loc 1 240 0
+  56 0028 FA69     		ldr	r2, [r7, #28]
+ 241:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****              Init.ClockBypass         |\
+  57              		.loc 1 241 0
+  58 002a 3B6A     		ldr	r3, [r7, #32]
+ 240:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****              Init.ClockBypass         |\
+  59              		.loc 1 240 0
+  60 002c 1A43     		orrs	r2, r2, r3
+ 242:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****              Init.ClockPowerSave      |\
+  61              		.loc 1 242 0
+  62 002e 7B6A     		ldr	r3, [r7, #36]
+ 241:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****              Init.ClockBypass         |\
+  63              		.loc 1 241 0
+  64 0030 1A43     		orrs	r2, r2, r3
+ 243:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****              Init.BusWide             |\
+  65              		.loc 1 243 0
+  66 0032 BB6A     		ldr	r3, [r7, #40]
+ 242:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****              Init.ClockPowerSave      |\
+  67              		.loc 1 242 0
+  68 0034 1A43     		orrs	r2, r2, r3
+ 244:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****              Init.HardwareFlowControl |\
+  69              		.loc 1 244 0
+  70 0036 FB6A     		ldr	r3, [r7, #44]
+ 243:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****              Init.BusWide             |\
+  71              		.loc 1 243 0
+  72 0038 1A43     		orrs	r2, r2, r3
+ 245:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****              Init.ClockDiv
+  73              		.loc 1 245 0
+  74 003a 3B6B     		ldr	r3, [r7, #48]
+ 244:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****              Init.HardwareFlowControl |\
+  75              		.loc 1 244 0
+  76 003c 1A43     		orrs	r2, r2, r3
+ 240:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****              Init.ClockBypass         |\
+  77              		.loc 1 240 0
+  78 003e FB68     		ldr	r3, [r7, #12]
+  79 0040 1343     		orrs	r3, r3, r2
+  80 0042 FB60     		str	r3, [r7, #12]
+ 246:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****              ); 
+ 247:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   
+ 248:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   /* Write to SDIO CLKCR */
+ 249:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   SDIOx->CLKCR = tmpreg;  
+  81              		.loc 1 249 0
+  82 0044 FA68     		ldr	r2, [r7, #12]
+  83 0046 7B68     		ldr	r3, [r7, #4]
+  84 0048 5A60     		str	r2, [r3, #4]
+ 250:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 251:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   return HAL_OK;
+  85              		.loc 1 251 0
+  86 004a 0023     		movs	r3, #0
+ 252:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** }
+  87              		.loc 1 252 0
+  88 004c 1846     		mov	r0, r3
+  89 004e 1437     		adds	r7, r7, #20
+  90 0050 BD46     		mov	sp, r7
+  91              		@ sp needed
+  92 0052 5DF8047B 		ldr	r7, [sp], #4
+  93 0056 04B0     		add	sp, sp, #16
+  94 0058 7047     		bx	lr
+  95              		.cfi_endproc
+  96              	.LFE55:
+  98 005a 00BF     		.align	2
+  99              		.global	SDIO_ReadFIFO
+ 100              		.thumb
+ 101              		.thumb_func
+ 103              	SDIO_ReadFIFO:
+ 104              	.LFB56:
+ 253:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 254:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 255:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 256:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** /**
+ 257:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @}
+ 258:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   */
+ 259:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 260:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** /** @defgroup HAL_SDIO_Group2 I/O operation functions 
+ 261:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****  *  @brief   Data transfers functions 
+ 262:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****  *
+ 263:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** @verbatim   
+ 264:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****  ===============================================================================
+ 265:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****                       ##### I/O operation functions #####
+ 266:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****  ===============================================================================  
+ 267:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****     [..]
+ 268:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****     This subsection provides a set of functions allowing to manage the SDIO data 
+ 269:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****     transfers.
+ 270:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 271:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** @endverbatim
+ 272:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @{
+ 273:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   */
+ 274:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 275:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** /**
+ 276:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @brief  Read data (word) from Rx FIFO in blocking mode (polling) 
+ 277:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @param  SDIOx: Pointer to SDIO register base
+ 278:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @param  ReadData: Data to read
+ 279:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @retval HAL status
+ 280:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   */
+ 281:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** uint32_t SDIO_ReadFIFO(SDIO_TypeDef *SDIOx)
+ 282:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** {
+ 105              		.loc 1 282 0
+ 106              		.cfi_startproc
+ 107              		@ args = 0, pretend = 0, frame = 8
+ 108              		@ frame_needed = 1, uses_anonymous_args = 0
+ 109              		@ link register save eliminated.
+ 110 005c 80B4     		push	{r7}
+ 111              		.cfi_def_cfa_offset 4
+ 112              		.cfi_offset 7, -4
+ 113 005e 83B0     		sub	sp, sp, #12
+ 114              		.cfi_def_cfa_offset 16
+ 115 0060 00AF     		add	r7, sp, #0
+ 116              		.cfi_def_cfa_register 7
+ 117 0062 7860     		str	r0, [r7, #4]
+ 283:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   /* Read data from Rx FIFO */ 
+ 284:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   return (SDIOx->FIFO);
+ 118              		.loc 1 284 0
+ 119 0064 7B68     		ldr	r3, [r7, #4]
+ 120 0066 D3F88030 		ldr	r3, [r3, #128]
+ 285:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** }
+ 121              		.loc 1 285 0
+ 122 006a 1846     		mov	r0, r3
+ 123 006c 0C37     		adds	r7, r7, #12
+ 124 006e BD46     		mov	sp, r7
+ 125              		@ sp needed
+ 126 0070 5DF8047B 		ldr	r7, [sp], #4
+ 127 0074 7047     		bx	lr
+ 128              		.cfi_endproc
+ 129              	.LFE56:
+ 131 0076 00BF     		.align	2
+ 132              		.global	SDIO_WriteFIFO
+ 133              		.thumb
+ 134              		.thumb_func
+ 136              	SDIO_WriteFIFO:
+ 137              	.LFB57:
+ 286:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 287:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** /**
+ 288:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @brief  Write data (word) to Tx FIFO in blocking mode (polling) 
+ 289:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @param  SDIOx: Pointer to SDIO register base
+ 290:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @param  pWriteData: pointer to data to write
+ 291:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @retval HAL status
+ 292:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   */
+ 293:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** HAL_StatusTypeDef SDIO_WriteFIFO(SDIO_TypeDef *SDIOx, uint32_t *pWriteData)
+ 294:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** { 
+ 138              		.loc 1 294 0
+ 139              		.cfi_startproc
+ 140              		@ args = 0, pretend = 0, frame = 8
+ 141              		@ frame_needed = 1, uses_anonymous_args = 0
+ 142              		@ link register save eliminated.
+ 143 0078 80B4     		push	{r7}
+ 144              		.cfi_def_cfa_offset 4
+ 145              		.cfi_offset 7, -4
+ 146 007a 83B0     		sub	sp, sp, #12
+ 147              		.cfi_def_cfa_offset 16
+ 148 007c 00AF     		add	r7, sp, #0
+ 149              		.cfi_def_cfa_register 7
+ 150 007e 7860     		str	r0, [r7, #4]
+ 151 0080 3960     		str	r1, [r7]
+ 295:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   /* Write data to FIFO */ 
+ 296:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   SDIOx->FIFO = *pWriteData;
+ 152              		.loc 1 296 0
+ 153 0082 3B68     		ldr	r3, [r7]
+ 154 0084 1A68     		ldr	r2, [r3]
+ 155 0086 7B68     		ldr	r3, [r7, #4]
+ 156 0088 C3F88020 		str	r2, [r3, #128]
+ 297:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 298:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   return HAL_OK;
+ 157              		.loc 1 298 0
+ 158 008c 0023     		movs	r3, #0
+ 299:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** }
+ 159              		.loc 1 299 0
+ 160 008e 1846     		mov	r0, r3
+ 161 0090 0C37     		adds	r7, r7, #12
+ 162 0092 BD46     		mov	sp, r7
+ 163              		@ sp needed
+ 164 0094 5DF8047B 		ldr	r7, [sp], #4
+ 165 0098 7047     		bx	lr
+ 166              		.cfi_endproc
+ 167              	.LFE57:
+ 169 009a 00BF     		.align	2
+ 170              		.global	SDIO_PowerState_ON
+ 171              		.thumb
+ 172              		.thumb_func
+ 174              	SDIO_PowerState_ON:
+ 175              	.LFB58:
+ 300:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 301:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** /**
+ 302:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @}
+ 303:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   */
+ 304:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 305:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** /** @defgroup HAL_SDIO_Group3 Peripheral Control functions 
+ 306:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****  *  @brief   management functions 
+ 307:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****  *
+ 308:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** @verbatim   
+ 309:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****  ===============================================================================
+ 310:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****                       ##### Peripheral Control functions #####
+ 311:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****  ===============================================================================  
+ 312:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****     [..]
+ 313:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****     This subsection provides a set of functions allowing to control the SDIO data 
+ 314:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****     transfers.
+ 315:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 316:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** @endverbatim
+ 317:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @{
+ 318:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   */
+ 319:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 320:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** /**
+ 321:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @brief  Set SDIO Power state to ON. 
+ 322:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @param  SDIOx: Pointer to SDIO register base
+ 323:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @retval HAL status
+ 324:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   */
+ 325:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** HAL_StatusTypeDef SDIO_PowerState_ON(SDIO_TypeDef *SDIOx)
+ 326:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** {  
+ 176              		.loc 1 326 0
+ 177              		.cfi_startproc
+ 178              		@ args = 0, pretend = 0, frame = 8
+ 179              		@ frame_needed = 1, uses_anonymous_args = 0
+ 180              		@ link register save eliminated.
+ 181 009c 80B4     		push	{r7}
+ 182              		.cfi_def_cfa_offset 4
+ 183              		.cfi_offset 7, -4
+ 184 009e 83B0     		sub	sp, sp, #12
+ 185              		.cfi_def_cfa_offset 16
+ 186 00a0 00AF     		add	r7, sp, #0
+ 187              		.cfi_def_cfa_register 7
+ 188 00a2 7860     		str	r0, [r7, #4]
+ 327:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   /* Set power state to ON */ 
+ 328:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   SDIOx->POWER = (uint32_t)0x00000003;
+ 189              		.loc 1 328 0
+ 190 00a4 7B68     		ldr	r3, [r7, #4]
+ 191 00a6 0322     		movs	r2, #3
+ 192 00a8 1A60     		str	r2, [r3]
+ 329:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   
+ 330:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   return HAL_OK; 
+ 193              		.loc 1 330 0
+ 194 00aa 0023     		movs	r3, #0
+ 331:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** }
+ 195              		.loc 1 331 0
+ 196 00ac 1846     		mov	r0, r3
+ 197 00ae 0C37     		adds	r7, r7, #12
+ 198 00b0 BD46     		mov	sp, r7
+ 199              		@ sp needed
+ 200 00b2 5DF8047B 		ldr	r7, [sp], #4
+ 201 00b6 7047     		bx	lr
+ 202              		.cfi_endproc
+ 203              	.LFE58:
+ 205              		.align	2
+ 206              		.global	SDIO_PowerState_OFF
+ 207              		.thumb
+ 208              		.thumb_func
+ 210              	SDIO_PowerState_OFF:
+ 211              	.LFB59:
+ 332:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 333:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** /**
+ 334:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @brief  Set SDIO Power state to OFF. 
+ 335:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @param  SDIOx: Pointer to SDIO register base
+ 336:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @retval HAL status
+ 337:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   */
+ 338:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** HAL_StatusTypeDef SDIO_PowerState_OFF(SDIO_TypeDef *SDIOx)
+ 339:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** {
+ 212              		.loc 1 339 0
+ 213              		.cfi_startproc
+ 214              		@ args = 0, pretend = 0, frame = 8
+ 215              		@ frame_needed = 1, uses_anonymous_args = 0
+ 216              		@ link register save eliminated.
+ 217 00b8 80B4     		push	{r7}
+ 218              		.cfi_def_cfa_offset 4
+ 219              		.cfi_offset 7, -4
+ 220 00ba 83B0     		sub	sp, sp, #12
+ 221              		.cfi_def_cfa_offset 16
+ 222 00bc 00AF     		add	r7, sp, #0
+ 223              		.cfi_def_cfa_register 7
+ 224 00be 7860     		str	r0, [r7, #4]
+ 340:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   /* Set power state to OFF */
+ 341:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   SDIOx->POWER = (uint32_t)0x00000000;
+ 225              		.loc 1 341 0
+ 226 00c0 7B68     		ldr	r3, [r7, #4]
+ 227 00c2 0022     		movs	r2, #0
+ 228 00c4 1A60     		str	r2, [r3]
+ 342:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   
+ 343:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   return HAL_OK;
+ 229              		.loc 1 343 0
+ 230 00c6 0023     		movs	r3, #0
+ 344:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** }
+ 231              		.loc 1 344 0
+ 232 00c8 1846     		mov	r0, r3
+ 233 00ca 0C37     		adds	r7, r7, #12
+ 234 00cc BD46     		mov	sp, r7
+ 235              		@ sp needed
+ 236 00ce 5DF8047B 		ldr	r7, [sp], #4
+ 237 00d2 7047     		bx	lr
+ 238              		.cfi_endproc
+ 239              	.LFE59:
+ 241              		.align	2
+ 242              		.global	SDIO_GetPowerState
+ 243              		.thumb
+ 244              		.thumb_func
+ 246              	SDIO_GetPowerState:
+ 247              	.LFB60:
+ 345:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 346:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** /**
+ 347:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @brief  Get SDIO Power state. 
+ 348:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @param  SDIOx: Pointer to SDIO register base
+ 349:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @retval Power status of the controller. The returned value can be one of the 
+ 350:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *         following values:
+ 351:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *            - 0x00: Power OFF
+ 352:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *            - 0x02: Power UP
+ 353:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *            - 0x03: Power ON 
+ 354:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   */
+ 355:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** uint32_t SDIO_GetPowerState(SDIO_TypeDef *SDIOx)  
+ 356:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** {
+ 248              		.loc 1 356 0
+ 249              		.cfi_startproc
+ 250              		@ args = 0, pretend = 0, frame = 8
+ 251              		@ frame_needed = 1, uses_anonymous_args = 0
+ 252              		@ link register save eliminated.
+ 253 00d4 80B4     		push	{r7}
+ 254              		.cfi_def_cfa_offset 4
+ 255              		.cfi_offset 7, -4
+ 256 00d6 83B0     		sub	sp, sp, #12
+ 257              		.cfi_def_cfa_offset 16
+ 258 00d8 00AF     		add	r7, sp, #0
+ 259              		.cfi_def_cfa_register 7
+ 260 00da 7860     		str	r0, [r7, #4]
+ 357:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   return (SDIOx->POWER & (~PWR_PWRCTRL_MASK));
+ 261              		.loc 1 357 0
+ 262 00dc 7B68     		ldr	r3, [r7, #4]
+ 263 00de 1B68     		ldr	r3, [r3]
+ 264 00e0 03F00303 		and	r3, r3, #3
+ 358:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** }
+ 265              		.loc 1 358 0
+ 266 00e4 1846     		mov	r0, r3
+ 267 00e6 0C37     		adds	r7, r7, #12
+ 268 00e8 BD46     		mov	sp, r7
+ 269              		@ sp needed
+ 270 00ea 5DF8047B 		ldr	r7, [sp], #4
+ 271 00ee 7047     		bx	lr
+ 272              		.cfi_endproc
+ 273              	.LFE60:
+ 275              		.align	2
+ 276              		.global	SDIO_SendCommand
+ 277              		.thumb
+ 278              		.thumb_func
+ 280              	SDIO_SendCommand:
+ 281              	.LFB61:
+ 359:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 360:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** /**
+ 361:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @brief  Configure the SDIO command path according to the specified parameters in
+ 362:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *         SDIO_CmdInitTypeDef structure and send the command 
+ 363:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @param  SDIOx: Pointer to SDIO register base
+ 364:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @param  SDIO_CmdInitStruct: pointer to a SDIO_CmdInitTypeDef structure that contains 
+ 365:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *         the configuration information for the SDIO command
+ 366:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @retval HAL status
+ 367:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   */
+ 368:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** HAL_StatusTypeDef SDIO_SendCommand(SDIO_TypeDef *SDIOx, SDIO_CmdInitTypeDef *SDIO_CmdInitStruct)
+ 369:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** {
+ 282              		.loc 1 369 0
+ 283              		.cfi_startproc
+ 284              		@ args = 0, pretend = 0, frame = 16
+ 285              		@ frame_needed = 1, uses_anonymous_args = 0
+ 286              		@ link register save eliminated.
+ 287 00f0 80B4     		push	{r7}
+ 288              		.cfi_def_cfa_offset 4
+ 289              		.cfi_offset 7, -4
+ 290 00f2 85B0     		sub	sp, sp, #20
+ 291              		.cfi_def_cfa_offset 24
+ 292 00f4 00AF     		add	r7, sp, #0
+ 293              		.cfi_def_cfa_register 7
+ 294 00f6 7860     		str	r0, [r7, #4]
+ 295 00f8 3960     		str	r1, [r7]
+ 370:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   uint32_t tmpreg = 0;
+ 296              		.loc 1 370 0
+ 297 00fa 0023     		movs	r3, #0
+ 298 00fc FB60     		str	r3, [r7, #12]
+ 371:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   
+ 372:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   /* Check the parameters */
+ 373:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   assert_param(IS_SDIO_CMD_INDEX(SDIO_CmdInitStruct->CmdIndex));
+ 374:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   assert_param(IS_SDIO_RESPONSE(SDIO_CmdInitStruct->Response));
+ 375:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   assert_param(IS_SDIO_WAIT(SDIO_CmdInitStruct->WaitForInterrupt));
+ 376:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   assert_param(IS_SDIO_CPSM(SDIO_CmdInitStruct->CPSM));
+ 377:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 378:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   /* Set the SDIO Argument value */
+ 379:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   SDIOx->ARG = SDIO_CmdInitStruct->Argument;
+ 299              		.loc 1 379 0
+ 300 00fe 3B68     		ldr	r3, [r7]
+ 301 0100 1A68     		ldr	r2, [r3]
+ 302 0102 7B68     		ldr	r3, [r7, #4]
+ 303 0104 9A60     		str	r2, [r3, #8]
+ 380:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   
+ 381:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   /* SDIO CMD Configuration */  
+ 382:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   /* Get the SDIO CMD value */
+ 383:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   tmpreg = SDIOx->CMD;
+ 304              		.loc 1 383 0
+ 305 0106 7B68     		ldr	r3, [r7, #4]
+ 306 0108 DB68     		ldr	r3, [r3, #12]
+ 307 010a FB60     		str	r3, [r7, #12]
+ 384:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   
+ 385:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   /* Clear CMDINDEX, WAITRESP, WAITINT, WAITPEND, CPSMEN bits */
+ 386:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   tmpreg &= CMD_CLEAR_MASK;
+ 308              		.loc 1 386 0
+ 309 010c FB68     		ldr	r3, [r7, #12]
+ 310 010e 23F4FF63 		bic	r3, r3, #2040
+ 311 0112 23F00703 		bic	r3, r3, #7
+ 312 0116 FB60     		str	r3, [r7, #12]
+ 387:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   
+ 388:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   /* Set SDIO command parameters */
+ 389:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   tmpreg |= (uint32_t)(SDIO_CmdInitStruct->CmdIndex         |\
+ 313              		.loc 1 389 0
+ 314 0118 3B68     		ldr	r3, [r7]
+ 315 011a 5A68     		ldr	r2, [r3, #4]
+ 390:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****                        SDIO_CmdInitStruct->Response         |\
+ 316              		.loc 1 390 0
+ 317 011c 3B68     		ldr	r3, [r7]
+ 318 011e 9B68     		ldr	r3, [r3, #8]
+ 389:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****                        SDIO_CmdInitStruct->Response         |\
+ 319              		.loc 1 389 0
+ 320 0120 1A43     		orrs	r2, r2, r3
+ 391:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****                        SDIO_CmdInitStruct->WaitForInterrupt |\
+ 321              		.loc 1 391 0
+ 322 0122 3B68     		ldr	r3, [r7]
+ 323 0124 DB68     		ldr	r3, [r3, #12]
+ 390:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****                        SDIO_CmdInitStruct->Response         |\
+ 324              		.loc 1 390 0
+ 325 0126 1A43     		orrs	r2, r2, r3
+ 392:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****                        SDIO_CmdInitStruct->CPSM);
+ 326              		.loc 1 392 0
+ 327 0128 3B68     		ldr	r3, [r7]
+ 328 012a 1B69     		ldr	r3, [r3, #16]
+ 389:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****                        SDIO_CmdInitStruct->Response         |\
+ 329              		.loc 1 389 0
+ 330 012c 1343     		orrs	r3, r3, r2
+ 331 012e FA68     		ldr	r2, [r7, #12]
+ 332 0130 1343     		orrs	r3, r3, r2
+ 333 0132 FB60     		str	r3, [r7, #12]
+ 393:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   
+ 394:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   /* Write to SDIO CMD register */
+ 395:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   SDIOx->CMD = tmpreg;
+ 334              		.loc 1 395 0
+ 335 0134 7B68     		ldr	r3, [r7, #4]
+ 336 0136 FA68     		ldr	r2, [r7, #12]
+ 337 0138 DA60     		str	r2, [r3, #12]
+ 396:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   
+ 397:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   return HAL_OK;  
+ 338              		.loc 1 397 0
+ 339 013a 0023     		movs	r3, #0
+ 398:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** }
+ 340              		.loc 1 398 0
+ 341 013c 1846     		mov	r0, r3
+ 342 013e 1437     		adds	r7, r7, #20
+ 343 0140 BD46     		mov	sp, r7
+ 344              		@ sp needed
+ 345 0142 5DF8047B 		ldr	r7, [sp], #4
+ 346 0146 7047     		bx	lr
+ 347              		.cfi_endproc
+ 348              	.LFE61:
+ 350              		.align	2
+ 351              		.global	SDIO_GetCommandResponse
+ 352              		.thumb
+ 353              		.thumb_func
+ 355              	SDIO_GetCommandResponse:
+ 356              	.LFB62:
+ 399:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 400:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** /**
+ 401:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @brief  Return the command index of last command for which response received
+ 402:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @param  SDIOx: Pointer to SDIO register base
+ 403:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @retval Command index of the last command response received
+ 404:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   */
+ 405:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** uint8_t SDIO_GetCommandResponse(SDIO_TypeDef *SDIOx)
+ 406:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** {
+ 357              		.loc 1 406 0
+ 358              		.cfi_startproc
+ 359              		@ args = 0, pretend = 0, frame = 8
+ 360              		@ frame_needed = 1, uses_anonymous_args = 0
+ 361              		@ link register save eliminated.
+ 362 0148 80B4     		push	{r7}
+ 363              		.cfi_def_cfa_offset 4
+ 364              		.cfi_offset 7, -4
+ 365 014a 83B0     		sub	sp, sp, #12
+ 366              		.cfi_def_cfa_offset 16
+ 367 014c 00AF     		add	r7, sp, #0
+ 368              		.cfi_def_cfa_register 7
+ 369 014e 7860     		str	r0, [r7, #4]
+ 407:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   return (uint8_t)(SDIOx->RESPCMD);
+ 370              		.loc 1 407 0
+ 371 0150 7B68     		ldr	r3, [r7, #4]
+ 372 0152 1B69     		ldr	r3, [r3, #16]
+ 373 0154 DBB2     		uxtb	r3, r3
+ 408:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** }
+ 374              		.loc 1 408 0
+ 375 0156 1846     		mov	r0, r3
+ 376 0158 0C37     		adds	r7, r7, #12
+ 377 015a BD46     		mov	sp, r7
+ 378              		@ sp needed
+ 379 015c 5DF8047B 		ldr	r7, [sp], #4
+ 380 0160 7047     		bx	lr
+ 381              		.cfi_endproc
+ 382              	.LFE62:
+ 384 0162 00BF     		.align	2
+ 385              		.global	SDIO_GetResponse
+ 386              		.thumb
+ 387              		.thumb_func
+ 389              	SDIO_GetResponse:
+ 390              	.LFB63:
+ 409:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 410:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 411:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** /**
+ 412:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @brief  Return the response received from the card for the last command
+ 413:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @param  SDIO_RESP: Specifies the SDIO response register. 
+ 414:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *          This parameter can be one of the following values:
+ 415:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *            @arg SDIO_RESP1: Response Register 1
+ 416:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *            @arg SDIO_RESP2: Response Register 2
+ 417:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *            @arg SDIO_RESP3: Response Register 3
+ 418:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *            @arg SDIO_RESP4: Response Register 4  
+ 419:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @retval The Corresponding response register value
+ 420:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   */
+ 421:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** uint32_t SDIO_GetResponse(uint32_t SDIO_RESP)
+ 422:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** {
+ 391              		.loc 1 422 0
+ 392              		.cfi_startproc
+ 393              		@ args = 0, pretend = 0, frame = 16
+ 394              		@ frame_needed = 1, uses_anonymous_args = 0
+ 395              		@ link register save eliminated.
+ 396 0164 80B4     		push	{r7}
+ 397              		.cfi_def_cfa_offset 4
+ 398              		.cfi_offset 7, -4
+ 399 0166 85B0     		sub	sp, sp, #20
+ 400              		.cfi_def_cfa_offset 24
+ 401 0168 00AF     		add	r7, sp, #0
+ 402              		.cfi_def_cfa_register 7
+ 403 016a 7860     		str	r0, [r7, #4]
+ 423:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   __IO uint32_t tmp = 0;
+ 404              		.loc 1 423 0
+ 405 016c 0023     		movs	r3, #0
+ 406 016e FB60     		str	r3, [r7, #12]
+ 424:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 425:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   /* Check the parameters */
+ 426:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   assert_param(IS_SDIO_RESP(SDIO_RESP));
+ 427:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 428:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   /* Get the response */
+ 429:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   tmp = SDIO_RESP_ADDR + SDIO_RESP;
+ 407              		.loc 1 429 0
+ 408 0170 7A68     		ldr	r2, [r7, #4]
+ 409 0172 42F61443 		movw	r3, #11284
+ 410 0176 C4F20103 		movt	r3, 16385
+ 411 017a 1344     		add	r3, r3, r2
+ 412 017c FB60     		str	r3, [r7, #12]
+ 430:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   
+ 431:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   return (*(__IO uint32_t *) tmp);
+ 413              		.loc 1 431 0
+ 414 017e FB68     		ldr	r3, [r7, #12]
+ 415 0180 1B68     		ldr	r3, [r3]
+ 432:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** }  
+ 416              		.loc 1 432 0
+ 417 0182 1846     		mov	r0, r3
+ 418 0184 1437     		adds	r7, r7, #20
+ 419 0186 BD46     		mov	sp, r7
+ 420              		@ sp needed
+ 421 0188 5DF8047B 		ldr	r7, [sp], #4
+ 422 018c 7047     		bx	lr
+ 423              		.cfi_endproc
+ 424              	.LFE63:
+ 426 018e 00BF     		.align	2
+ 427              		.global	SDIO_DataConfig
+ 428              		.thumb
+ 429              		.thumb_func
+ 431              	SDIO_DataConfig:
+ 432              	.LFB64:
+ 433:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 434:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** /**
+ 435:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @brief  Configure the SDIO data path according to the specified 
+ 436:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *         parameters in the SDIO_DataInitTypeDef.
+ 437:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @param  SDIOx: Pointer to SDIO register base  
+ 438:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @param  SDIO_DataInitStruct : pointer to a SDIO_DataInitTypeDef structure 
+ 439:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *         that contains the configuration information for the SDIO command.
+ 440:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @retval HAL status
+ 441:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   */
+ 442:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** HAL_StatusTypeDef SDIO_DataConfig(SDIO_TypeDef *SDIOx, SDIO_DataInitTypeDef* SDIO_DataInitStruct)
+ 443:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** {
+ 433              		.loc 1 443 0
+ 434              		.cfi_startproc
+ 435              		@ args = 0, pretend = 0, frame = 16
+ 436              		@ frame_needed = 1, uses_anonymous_args = 0
+ 437              		@ link register save eliminated.
+ 438 0190 80B4     		push	{r7}
+ 439              		.cfi_def_cfa_offset 4
+ 440              		.cfi_offset 7, -4
+ 441 0192 85B0     		sub	sp, sp, #20
+ 442              		.cfi_def_cfa_offset 24
+ 443 0194 00AF     		add	r7, sp, #0
+ 444              		.cfi_def_cfa_register 7
+ 445 0196 7860     		str	r0, [r7, #4]
+ 446 0198 3960     		str	r1, [r7]
+ 444:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   uint32_t tmpreg = 0;
+ 447              		.loc 1 444 0
+ 448 019a 0023     		movs	r3, #0
+ 449 019c FB60     		str	r3, [r7, #12]
+ 445:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   
+ 446:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   /* Check the parameters */
+ 447:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   assert_param(IS_SDIO_DATA_LENGTH(SDIO_DataInitStruct->DataLength));
+ 448:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   assert_param(IS_SDIO_BLOCK_SIZE(SDIO_DataInitStruct->DataBlockSize));
+ 449:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   assert_param(IS_SDIO_TRANSFER_DIR(SDIO_DataInitStruct->TransferDir));
+ 450:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   assert_param(IS_SDIO_TRANSFER_MODE(SDIO_DataInitStruct->TransferMode));
+ 451:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   assert_param(IS_SDIO_DPSM(SDIO_DataInitStruct->DPSM));
+ 452:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 453:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   /* Set the SDIO Data TimeOut value */
+ 454:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   SDIOx->DTIMER = SDIO_DataInitStruct->DataTimeOut;
+ 450              		.loc 1 454 0
+ 451 019e 3B68     		ldr	r3, [r7]
+ 452 01a0 1A68     		ldr	r2, [r3]
+ 453 01a2 7B68     		ldr	r3, [r7, #4]
+ 454 01a4 5A62     		str	r2, [r3, #36]
+ 455:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 456:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   /* Set the SDIO DataLength value */
+ 457:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   SDIOx->DLEN = SDIO_DataInitStruct->DataLength;
+ 455              		.loc 1 457 0
+ 456 01a6 3B68     		ldr	r3, [r7]
+ 457 01a8 5A68     		ldr	r2, [r3, #4]
+ 458 01aa 7B68     		ldr	r3, [r7, #4]
+ 459 01ac 9A62     		str	r2, [r3, #40]
+ 458:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 459:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** /* SDIO DCTRL Configuration */  
+ 460:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   /* Get the SDIO DCTRL value */
+ 461:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   tmpreg = SDIOx->DCTRL;
+ 460              		.loc 1 461 0
+ 461 01ae 7B68     		ldr	r3, [r7, #4]
+ 462 01b0 DB6A     		ldr	r3, [r3, #44]
+ 463 01b2 FB60     		str	r3, [r7, #12]
+ 462:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   
+ 463:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   /* Clear DEN, DTMODE, DTDIR and DBCKSIZE bits */
+ 464:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   tmpreg &= DCTRL_CLEAR_MASK;
+ 464              		.loc 1 464 0
+ 465 01b4 FB68     		ldr	r3, [r7, #12]
+ 466 01b6 23F0F703 		bic	r3, r3, #247
+ 467 01ba FB60     		str	r3, [r7, #12]
+ 465:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   
+ 466:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   /* Set the SDIO data configuration parameters */
+ 467:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   tmpreg |= (uint32_t)(SDIO_DataInitStruct->DataBlockSize |\
+ 468              		.loc 1 467 0
+ 469 01bc 3B68     		ldr	r3, [r7]
+ 470 01be 9A68     		ldr	r2, [r3, #8]
+ 468:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****                        SDIO_DataInitStruct->TransferDir   |\
+ 471              		.loc 1 468 0
+ 472 01c0 3B68     		ldr	r3, [r7]
+ 473 01c2 DB68     		ldr	r3, [r3, #12]
+ 467:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****                        SDIO_DataInitStruct->TransferDir   |\
+ 474              		.loc 1 467 0
+ 475 01c4 1A43     		orrs	r2, r2, r3
+ 469:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****                        SDIO_DataInitStruct->TransferMode  |\
+ 476              		.loc 1 469 0
+ 477 01c6 3B68     		ldr	r3, [r7]
+ 478 01c8 1B69     		ldr	r3, [r3, #16]
+ 468:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****                        SDIO_DataInitStruct->TransferDir   |\
+ 479              		.loc 1 468 0
+ 480 01ca 1A43     		orrs	r2, r2, r3
+ 470:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****                        SDIO_DataInitStruct->DPSM);
+ 481              		.loc 1 470 0
+ 482 01cc 3B68     		ldr	r3, [r7]
+ 483 01ce 5B69     		ldr	r3, [r3, #20]
+ 467:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****                        SDIO_DataInitStruct->TransferDir   |\
+ 484              		.loc 1 467 0
+ 485 01d0 1343     		orrs	r3, r3, r2
+ 486 01d2 FA68     		ldr	r2, [r7, #12]
+ 487 01d4 1343     		orrs	r3, r3, r2
+ 488 01d6 FB60     		str	r3, [r7, #12]
+ 471:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 472:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   /* Write to SDIO DCTRL */
+ 473:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   SDIOx->DCTRL = tmpreg;
+ 489              		.loc 1 473 0
+ 490 01d8 7B68     		ldr	r3, [r7, #4]
+ 491 01da FA68     		ldr	r2, [r7, #12]
+ 492 01dc DA62     		str	r2, [r3, #44]
+ 474:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 475:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   return HAL_OK;
+ 493              		.loc 1 475 0
+ 494 01de 0023     		movs	r3, #0
+ 476:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 477:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** }
+ 495              		.loc 1 477 0
+ 496 01e0 1846     		mov	r0, r3
+ 497 01e2 1437     		adds	r7, r7, #20
+ 498 01e4 BD46     		mov	sp, r7
+ 499              		@ sp needed
+ 500 01e6 5DF8047B 		ldr	r7, [sp], #4
+ 501 01ea 7047     		bx	lr
+ 502              		.cfi_endproc
+ 503              	.LFE64:
+ 505              		.align	2
+ 506              		.global	SDIO_GetDataCounter
+ 507              		.thumb
+ 508              		.thumb_func
+ 510              	SDIO_GetDataCounter:
+ 511              	.LFB65:
+ 478:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 479:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** /**
+ 480:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @brief  Returns number of remaining data bytes to be transferred.
+ 481:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @param  SDIOx: Pointer to SDIO register base
+ 482:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @retval Number of remaining data bytes to be transferred
+ 483:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   */
+ 484:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** uint32_t SDIO_GetDataCounter(SDIO_TypeDef *SDIOx)
+ 485:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** {
+ 512              		.loc 1 485 0
+ 513              		.cfi_startproc
+ 514              		@ args = 0, pretend = 0, frame = 8
+ 515              		@ frame_needed = 1, uses_anonymous_args = 0
+ 516              		@ link register save eliminated.
+ 517 01ec 80B4     		push	{r7}
+ 518              		.cfi_def_cfa_offset 4
+ 519              		.cfi_offset 7, -4
+ 520 01ee 83B0     		sub	sp, sp, #12
+ 521              		.cfi_def_cfa_offset 16
+ 522 01f0 00AF     		add	r7, sp, #0
+ 523              		.cfi_def_cfa_register 7
+ 524 01f2 7860     		str	r0, [r7, #4]
+ 486:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   return (SDIOx->DCOUNT);
+ 525              		.loc 1 486 0
+ 526 01f4 7B68     		ldr	r3, [r7, #4]
+ 527 01f6 1B6B     		ldr	r3, [r3, #48]
+ 487:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** }
+ 528              		.loc 1 487 0
+ 529 01f8 1846     		mov	r0, r3
+ 530 01fa 0C37     		adds	r7, r7, #12
+ 531 01fc BD46     		mov	sp, r7
+ 532              		@ sp needed
+ 533 01fe 5DF8047B 		ldr	r7, [sp], #4
+ 534 0202 7047     		bx	lr
+ 535              		.cfi_endproc
+ 536              	.LFE65:
+ 538              		.align	2
+ 539              		.global	SDIO_GetFIFOCount
+ 540              		.thumb
+ 541              		.thumb_func
+ 543              	SDIO_GetFIFOCount:
+ 544              	.LFB66:
+ 488:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 489:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** /**
+ 490:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @brief  Get the FIFO data
+ 491:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @param  hsdio: SDIO handle
+ 492:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @retval Data received
+ 493:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   */
+ 494:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** uint32_t SDIO_GetFIFOCount(SDIO_TypeDef *SDIOx)
+ 495:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** {
+ 545              		.loc 1 495 0
+ 546              		.cfi_startproc
+ 547              		@ args = 0, pretend = 0, frame = 8
+ 548              		@ frame_needed = 1, uses_anonymous_args = 0
+ 549              		@ link register save eliminated.
+ 550 0204 80B4     		push	{r7}
+ 551              		.cfi_def_cfa_offset 4
+ 552              		.cfi_offset 7, -4
+ 553 0206 83B0     		sub	sp, sp, #12
+ 554              		.cfi_def_cfa_offset 16
+ 555 0208 00AF     		add	r7, sp, #0
+ 556              		.cfi_def_cfa_register 7
+ 557 020a 7860     		str	r0, [r7, #4]
+ 496:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   return (SDIOx->FIFO);
+ 558              		.loc 1 496 0
+ 559 020c 7B68     		ldr	r3, [r7, #4]
+ 560 020e D3F88030 		ldr	r3, [r3, #128]
+ 497:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** }
+ 561              		.loc 1 497 0
+ 562 0212 1846     		mov	r0, r3
+ 563 0214 0C37     		adds	r7, r7, #12
+ 564 0216 BD46     		mov	sp, r7
+ 565              		@ sp needed
+ 566 0218 5DF8047B 		ldr	r7, [sp], #4
+ 567 021c 7047     		bx	lr
+ 568              		.cfi_endproc
+ 569              	.LFE66:
+ 571 021e 00BF     		.align	2
+ 572              		.global	SDIO_SetSDIOReadWaitMode
+ 573              		.thumb
+ 574              		.thumb_func
+ 576              	SDIO_SetSDIOReadWaitMode:
+ 577              	.LFB67:
+ 498:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 499:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** 
+ 500:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** /**
+ 501:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @brief  Sets one of the two options of inserting read wait interval.
+ 502:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @param  SDIO_ReadWaitMode: SD I/O Read Wait operation mode.
+ 503:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *          This parameter can be:
+ 504:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *            @arg SDIO_READ_WAIT_MODE_CLK: Read Wait control by stopping SDIOCLK
+ 505:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *            @arg SDIO_READ_WAIT_MODE_DATA2: Read Wait control using SDIO_DATA2
+ 506:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   * @retval None
+ 507:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   */
+ 508:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** HAL_StatusTypeDef SDIO_SetSDIOReadWaitMode(uint32_t SDIO_ReadWaitMode)
+ 509:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** {
+ 578              		.loc 1 509 0
+ 579              		.cfi_startproc
+ 580              		@ args = 0, pretend = 0, frame = 8
+ 581              		@ frame_needed = 1, uses_anonymous_args = 0
+ 582              		@ link register save eliminated.
+ 583 0220 80B4     		push	{r7}
+ 584              		.cfi_def_cfa_offset 4
+ 585              		.cfi_offset 7, -4
+ 586 0222 83B0     		sub	sp, sp, #12
+ 587              		.cfi_def_cfa_offset 16
+ 588 0224 00AF     		add	r7, sp, #0
+ 589              		.cfi_def_cfa_register 7
+ 590 0226 7860     		str	r0, [r7, #4]
+ 510:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   /* Check the parameters */
+ 511:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   assert_param(IS_SDIO_READWAIT_MODE(SDIO_ReadWaitMode));
+ 512:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   
+ 513:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   *(__IO uint32_t *)DCTRL_RWMOD_BB = SDIO_ReadWaitMode;
+ 591              		.loc 1 513 0
+ 592 0228 48F2A853 		movw	r3, #34216
+ 593 022c C4F22523 		movt	r3, 16933
+ 594 0230 7A68     		ldr	r2, [r7, #4]
+ 595 0232 1A60     		str	r2, [r3]
+ 514:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   
+ 515:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c ****   return HAL_OK;  
+ 596              		.loc 1 515 0
+ 597 0234 0023     		movs	r3, #0
+ 516:../STM32F2xx_HAL_Driver/Src/stm32f2xx_ll_sdmmc.c **** }
+ 598              		.loc 1 516 0
+ 599 0236 1846     		mov	r0, r3
+ 600 0238 0C37     		adds	r7, r7, #12
+ 601 023a BD46     		mov	sp, r7
+ 602              		@ sp needed
+ 603 023c 5DF8047B 		ldr	r7, [sp], #4
+ 604 0240 7047     		bx	lr
+ 605              		.cfi_endproc
+ 606              	.LFE67:
+ 608              	.Letext0:
+ 609              		.file 2 "c:\\program files (x86)\\codesourcery\\arm-none-eabi\\include\\stdint.h"
+ 610              		.file 3 "D:\\workspace\\console800480\\system/stm32f217xx.h"
+ 611              		.file 4 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_hal_def.h"
+ 612              		.file 5 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_ll_sdmmc.h"
+ 613              		.file 6 "D:\\workspace\\console800480\\system/core_cm3.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 stm32f2xx_ll_sdmmc.c
+C:\Users\sagok\AppData\Local\Temp\cckpWVQg.s:18     .text:00000000 $t
+C:\Users\sagok\AppData\Local\Temp\cckpWVQg.s:23     .text:00000000 SDIO_Init
+C:\Users\sagok\AppData\Local\Temp\cckpWVQg.s:103    .text:0000005c SDIO_ReadFIFO
+C:\Users\sagok\AppData\Local\Temp\cckpWVQg.s:136    .text:00000078 SDIO_WriteFIFO
+C:\Users\sagok\AppData\Local\Temp\cckpWVQg.s:174    .text:0000009c SDIO_PowerState_ON
+C:\Users\sagok\AppData\Local\Temp\cckpWVQg.s:210    .text:000000b8 SDIO_PowerState_OFF
+C:\Users\sagok\AppData\Local\Temp\cckpWVQg.s:246    .text:000000d4 SDIO_GetPowerState
+C:\Users\sagok\AppData\Local\Temp\cckpWVQg.s:280    .text:000000f0 SDIO_SendCommand
+C:\Users\sagok\AppData\Local\Temp\cckpWVQg.s:355    .text:00000148 SDIO_GetCommandResponse
+C:\Users\sagok\AppData\Local\Temp\cckpWVQg.s:389    .text:00000164 SDIO_GetResponse
+C:\Users\sagok\AppData\Local\Temp\cckpWVQg.s:431    .text:00000190 SDIO_DataConfig
+C:\Users\sagok\AppData\Local\Temp\cckpWVQg.s:510    .text:000001ec SDIO_GetDataCounter
+C:\Users\sagok\AppData\Local\Temp\cckpWVQg.s:543    .text:00000204 SDIO_GetFIFOCount
+C:\Users\sagok\AppData\Local\Temp\cckpWVQg.s:576    .text:00000220 SDIO_SetSDIOReadWaitMode
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.1.7f551ac7fcad8b79b9df4bfdaa536673
+                           .group:00000000 wm4.stm32f2xx_hal_conf.h.40.007126baefb9f966c36646edbf8040d2
+                           .group:00000000 wm4.stm32f2xx.h.57.5ec1581efc43612c411d33a8686e9ec7
+                           .group:00000000 wm4.stm32f217xx.h.52.9c940d76d00294b78837dc334c172fdd
+                           .group:00000000 wm4.core_cm3.h.32.49180ccb4d36cabd2d7016d2a51d91ae
+                           .group:00000000 wm4.newlib.h.8.384a112feabb3bef7b573ae48cde2e3b
+                           .group:00000000 wm4.features.h.22.6a4ca7cd053637cc1d0db6c16f39b2d7
+                           .group:00000000 wm4.config.h.183.aa62afef667fb61d15fa64c48beb2f14
+                           .group:00000000 wm4._ansi.h.23.5644b60c990a4800b02a6e654e88f93a
+                           .group:00000000 wm4.stdint.h.20.54ad762faa59e3c05491630641c8d8bf
+                           .group:00000000 wm4.core_cmInstr.h.25.f50f886f2edf670cf199b35fd96f5c91
+                           .group:00000000 wm4.core_cm3.h.130.63ab2348a6eed0fdb318040d970b676c
+                           .group:00000000 wm4.stm32f217xx.h.978.a5c681952b2f704a0e7f2ba21d08adf5
+                           .group:00000000 wm4.stm32f2xx.h.142.bc2155a1f7498bab16371e38413a9e41
+                           .group:00000000 wm4.stm32f2xx_hal_def.h.74.8ad2dc8aa82c4fd02e5aeaae592641ba
+                           .group:00000000 wm4.stm32f2xx_hal_rcc.h.142.ec0f91cc6576a6acebd17e6dd85829ae
+                           .group:00000000 wm4.stm32f2xx_hal_rcc_ex.h.40.0829033e864455c6bdd0db01f8ba5a50
+                           .group:00000000 wm4.stm32f2xx_hal_gpio.h.40.ba64e0bb94d9a68835f80159f39a86f1
+                           .group:00000000 wm4.stm32f2xx_hal_gpio_ex.h.40.24e547fd402281923f446b510381083f
+                           .group:00000000 wm4.stm32f2xx_hal_dma.h.40.5d9732ace2a21a4526ce8f0c52428fff
+                           .group:00000000 wm4.stm32f2xx_hal_cortex.h.40.e10263d2ec5d4fa79b4180ce1a38aff1
+                           .group:00000000 wm4.stm32f2xx_hal_adc.h.40.89ac8b78113cac4cf63847587daabac9
+                           .group:00000000 wm4.stm32f2xx_hal_adc_ex.h.40.7de68ed256ef25526ee31cc017f2c291
+                           .group:00000000 wm4.stm32f2xx_hal_flash.h.40.c3171719ce015e9cff20c795e44e886d
+                           .group:00000000 wm4.stm32f2xx_hal_flash_ex.h.40.7389508bd24a0aeb077bde0c9fb651eb
+                           .group:00000000 wm4.stm32f2xx_ll_fsmc.h.40.c1c32f2e1862f4dd342bd9b80fb895bb
+                           .group:00000000 wm4.stm32f2xx_hal_pwr.h.40.812df32e5c31b609a128e9db0eb4cbd0
+                           .group:00000000 wm4.stm32f2xx_hal_rtc.h.40.850fda5fe2cce8797446913dee18382f
+                           .group:00000000 wm4.stm32f2xx_hal_rtc_ex.h.40.f3e0c408e3bf4e8a0352d7ec9a18a822
+                           .group:00000000 wm4.stm32f2xx_ll_sdmmc.h.40.3719ab487c4b77401c572f459adf6eb7
+                           .group:00000000 wm4.stm32f2xx_hal_sd.h.58.760215394dcc316161a6482c0af9b866
+                           .group:00000000 wm4.stm32f2xx_hal_spi.h.40.7984243dbaba8b21c6392998a47e6987
+                           .group:00000000 wm4.stm32f2xx_hal_tim.h.40.d79172f25d0e9a15dc346aba8515bdd6
+                           .group:00000000 wm4.stm32f2xx_hal_tim_ex.h.40.361f280a7a3f60b4b238bb99ca728d83
+                           .group:00000000 wm4.stm32f2xx_hal_uart.h.40.d74def561ae6f78f40f477c8426ecbef
+                           .group:00000000 wm4.stm32f2xx_ll_usb.h.40.9b0206a05bc6ce3bec1648b51f22cb81
+                           .group:00000000 wm4.stm32f2xx_hal_pcd.h.99.11faba414c39e357b2f23364912d0605
+                           .group:00000000 wm4.stm32f2xx_hal_hcd.h.40.44ee5e972983ae0139ddbacdc75c44ef
+                           .group:00000000 wm4.stm32f2xx_hal.h.64.ed79ee83e52b151b3c365392b398f866
+
+NO UNDEFINED SYMBOLS

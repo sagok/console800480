@@ -1,0 +1,436 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"stm32f2xx_hal_pwr_ex.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.align	2
+  19              		.global	HAL_PWREx_EnableBkUpReg
+  20              		.thumb
+  21              		.thumb_func
+  23              	HAL_PWREx_EnableBkUpReg:
+  24              	.LFB55:
+  25              		.file 1 "../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c"
+   1:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** /**
+   2:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   ******************************************************************************
+   3:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   * @file    stm32f2xx_hal_pwr_ex.c
+   4:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   * @author  MCD Application Team
+   5:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   * @version V1.0.1
+   6:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   * @date    25-March-2014
+   7:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   * @brief   Extended PWR HAL module driver.
+   8:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   *          This file provides firmware functions to manage the following 
+   9:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   *          functionalities of PWR extension peripheral:           
+  10:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   *           + Peripheral Extended features functions
+  11:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   *         
+  12:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   ******************************************************************************
+  13:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   * @attention
+  14:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   *
+  15:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   * <h2><center>&copy; COPYRIGHT(c) 2014 STMicroelectronics</center></h2>
+  16:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   *
+  17:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   * Redistribution and use in source and binary forms, with or without modification,
+  18:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   * are permitted provided that the following conditions are met:
+  19:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   *   1. Redistributions of source code must retain the above copyright notice,
+  20:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   *      this list of conditions and the following disclaimer.
+  21:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   *   2. Redistributions in binary form must reproduce the above copyright notice,
+  22:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   *      this list of conditions and the following disclaimer in the documentation
+  23:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   *      and/or other materials provided with the distribution.
+  24:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   *   3. Neither the name of STMicroelectronics nor the names of its contributors
+  25:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   *      may be used to endorse or promote products derived from this software
+  26:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   *      without specific prior written permission.
+  27:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   *
+  28:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  29:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  30:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+  31:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+  32:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+  33:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+  34:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+  35:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+  36:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  37:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  38:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   *
+  39:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   ******************************************************************************
+  40:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   */ 
+  41:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** 
+  42:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** /* Includes ------------------------------------------------------------------*/
+  43:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** #include "stm32f2xx_hal.h"
+  44:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** 
+  45:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** /** @addtogroup STM32F2xx_HAL_Driver
+  46:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   * @{
+  47:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   */
+  48:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** 
+  49:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** /** @defgroup PWREx 
+  50:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   * @brief PWR HAL module driver
+  51:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   * @{
+  52:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   */
+  53:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** 
+  54:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** #ifdef HAL_PWR_MODULE_ENABLED
+  55:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** 
+  56:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** /* Private typedef -----------------------------------------------------------*/
+  57:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** /* Private define ------------------------------------------------------------*/
+  58:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** #define PWR_BKPREG_TIMEOUT_VALUE     1000
+  59:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** /* Private macro -------------------------------------------------------------*/
+  60:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** /* Private variables ---------------------------------------------------------*/
+  61:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** /* Private function prototypes -----------------------------------------------*/
+  62:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** /* Private functions ---------------------------------------------------------*/
+  63:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** 
+  64:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** /** @defgroup PWREx_Private_Functions
+  65:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   * @{
+  66:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   */
+  67:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** 
+  68:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** /** @defgroup PWREx_Group1 Peripheral Extended features functions 
+  69:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   *  @brief Peripheral Extended features functions 
+  70:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   *
+  71:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** @verbatim   
+  72:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** 
+  73:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****  ===============================================================================
+  74:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****                  ##### Peripheral extended features functions #####
+  75:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****  ===============================================================================
+  76:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** 
+  77:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****     *** Main and Backup Regulators configuration ***
+  78:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****     ================================================
+  79:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****     [..] 
+  80:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****       (+) The backup domain includes 4 Kbytes of backup SRAM accessible only from 
+  81:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****           the CPU, and address in 32-bit, 16-bit or 8-bit mode. Its content is 
+  82:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****           retained even in Standby or VBAT mode when the low power backup regulator
+  83:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****           is enabled. It can be considered as an internal EEPROM when VBAT is 
+  84:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****           always present. You can use the HAL_PWR_EnableBkUpReg() function to 
+  85:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****           enable the low power backup regulator. 
+  86:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** 
+  87:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****       (+) When the backup domain is supplied by VDD (analog switch connected to VDD) 
+  88:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****           the backup SRAM is powered from VDD which replaces the VBAT power supply to 
+  89:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****           save battery life.
+  90:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** 
+  91:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****       (+) The backup SRAM is not mass erased by a tamper event. It is read 
+  92:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****           protected to prevent confidential data, such as cryptographic private 
+  93:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****           key, from being accessed. The backup SRAM can be erased only through 
+  94:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****           the Flash interface when a protection level change from level 1 to 
+  95:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****           level 0 is requested. 
+  96:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****       -@- Refer to the description of Read protection (RDP) in the Flash 
+  97:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****           programming manual.
+  98:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** 
+  99:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****         Refer to the product datasheets for more details.
+ 100:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** 
+ 101:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****     *** FLASH Power Down configuration ****
+ 102:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****     =======================================
+ 103:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****     [..] 
+ 104:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****       (+) By setting the FPDS bit in the PWR_CR register by using the 
+ 105:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****           HAL_PWR_EnableFlashPowerDown() function, the Flash memory also enters power 
+ 106:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****           down mode when the device enters Stop mode. When the Flash memory 
+ 107:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****           is in power down mode, an additional startup delay is incurred when 
+ 108:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****           waking up from Stop mode.
+ 109:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****           
+ 110:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** @endverbatim
+ 111:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   * @{
+ 112:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   */
+ 113:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** 
+ 114:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** /**
+ 115:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   * @brief Enables the Backup Regulator.
+ 116:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   * @param None
+ 117:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   * @retval HAL status
+ 118:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   */
+ 119:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** HAL_StatusTypeDef HAL_PWREx_EnableBkUpReg(void)
+ 120:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** {
+  26              		.loc 1 120 0
+  27              		.cfi_startproc
+  28              		@ args = 0, pretend = 0, frame = 8
+  29              		@ frame_needed = 1, uses_anonymous_args = 0
+  30 0000 80B5     		push	{r7, lr}
+  31              		.cfi_def_cfa_offset 8
+  32              		.cfi_offset 7, -8
+  33              		.cfi_offset 14, -4
+  34 0002 82B0     		sub	sp, sp, #8
+  35              		.cfi_def_cfa_offset 16
+  36 0004 00AF     		add	r7, sp, #0
+  37              		.cfi_def_cfa_register 7
+ 121:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   uint32_t timeout = 0;   
+  38              		.loc 1 121 0
+  39 0006 0023     		movs	r3, #0
+  40 0008 7B60     		str	r3, [r7, #4]
+ 122:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** 
+ 123:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   *(__IO uint32_t *) CSR_BRE_BB = (uint32_t)ENABLE;
+  41              		.loc 1 123 0
+  42 000a A423     		movs	r3, #164
+  43 000c C4F20E23 		movt	r3, 16910
+  44 0010 0122     		movs	r2, #1
+  45 0012 1A60     		str	r2, [r3]
+ 124:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** 
+ 125:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   /* Get timeout */
+ 126:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   timeout = HAL_GetTick() + PWR_BKPREG_TIMEOUT_VALUE;
+  46              		.loc 1 126 0
+  47 0014 FFF7FEFF 		bl	HAL_GetTick
+  48 0018 0346     		mov	r3, r0
+  49 001a 03F57A73 		add	r3, r3, #1000
+  50 001e 7B60     		str	r3, [r7, #4]
+ 127:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   /* Wait till Backup regulator ready flag is set */  
+ 128:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   while(__HAL_PWR_GET_FLAG(PWR_FLAG_BRR) == RESET)
+  51              		.loc 1 128 0
+  52 0020 07E0     		b	.L2
+  53              	.L4:
+ 129:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   {
+ 130:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****     if(HAL_GetTick() >= timeout)
+  54              		.loc 1 130 0
+  55 0022 FFF7FEFF 		bl	HAL_GetTick
+  56 0026 0246     		mov	r2, r0
+  57 0028 7B68     		ldr	r3, [r7, #4]
+  58 002a 9A42     		cmp	r2, r3
+  59 002c 01D3     		bcc	.L2
+ 131:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****     {
+ 132:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****       return HAL_TIMEOUT;
+  60              		.loc 1 132 0
+  61 002e 0323     		movs	r3, #3
+  62 0030 09E0     		b	.L3
+  63              	.L2:
+ 128:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   {
+  64              		.loc 1 128 0 discriminator 1
+  65 0032 4FF4E043 		mov	r3, #28672
+  66 0036 C4F20003 		movt	r3, 16384
+  67 003a 5B68     		ldr	r3, [r3, #4]
+  68 003c 03F00803 		and	r3, r3, #8
+  69 0040 002B     		cmp	r3, #0
+  70 0042 EED0     		beq	.L4
+ 133:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****     } 
+ 134:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   }
+ 135:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   return HAL_OK;
+  71              		.loc 1 135 0
+  72 0044 0023     		movs	r3, #0
+  73              	.L3:
+ 136:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** }
+  74              		.loc 1 136 0
+  75 0046 1846     		mov	r0, r3
+  76 0048 0837     		adds	r7, r7, #8
+  77 004a BD46     		mov	sp, r7
+  78              		@ sp needed
+  79 004c 80BD     		pop	{r7, pc}
+  80              		.cfi_endproc
+  81              	.LFE55:
+  83 004e 00BF     		.align	2
+  84              		.global	HAL_PWREx_DisableBkUpReg
+  85              		.thumb
+  86              		.thumb_func
+  88              	HAL_PWREx_DisableBkUpReg:
+  89              	.LFB56:
+ 137:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** 
+ 138:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** /**
+ 139:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   * @brief Disables the Backup Regulator.
+ 140:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   * @param None
+ 141:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   * @retval None
+ 142:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   */
+ 143:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** HAL_StatusTypeDef HAL_PWREx_DisableBkUpReg(void)
+ 144:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** {
+  90              		.loc 1 144 0
+  91              		.cfi_startproc
+  92              		@ args = 0, pretend = 0, frame = 8
+  93              		@ frame_needed = 1, uses_anonymous_args = 0
+  94 0050 80B5     		push	{r7, lr}
+  95              		.cfi_def_cfa_offset 8
+  96              		.cfi_offset 7, -8
+  97              		.cfi_offset 14, -4
+  98 0052 82B0     		sub	sp, sp, #8
+  99              		.cfi_def_cfa_offset 16
+ 100 0054 00AF     		add	r7, sp, #0
+ 101              		.cfi_def_cfa_register 7
+ 145:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   uint32_t timeout = 0; 
+ 102              		.loc 1 145 0
+ 103 0056 0023     		movs	r3, #0
+ 104 0058 7B60     		str	r3, [r7, #4]
+ 146:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** 
+ 147:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   *(__IO uint32_t *) CSR_BRE_BB = (uint32_t)DISABLE;
+ 105              		.loc 1 147 0
+ 106 005a A423     		movs	r3, #164
+ 107 005c C4F20E23 		movt	r3, 16910
+ 108 0060 0022     		movs	r2, #0
+ 109 0062 1A60     		str	r2, [r3]
+ 148:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** 
+ 149:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   /* Get timeout */
+ 150:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   timeout = HAL_GetTick() + PWR_BKPREG_TIMEOUT_VALUE;
+ 110              		.loc 1 150 0
+ 111 0064 FFF7FEFF 		bl	HAL_GetTick
+ 112 0068 0346     		mov	r3, r0
+ 113 006a 03F57A73 		add	r3, r3, #1000
+ 114 006e 7B60     		str	r3, [r7, #4]
+ 151:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   /* Wait till Backup regulator ready flag is set */  
+ 152:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   while(__HAL_PWR_GET_FLAG(PWR_FLAG_BRR) != RESET)
+ 115              		.loc 1 152 0
+ 116 0070 07E0     		b	.L6
+ 117              	.L8:
+ 153:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   {
+ 154:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****     if(HAL_GetTick() >= timeout)
+ 118              		.loc 1 154 0
+ 119 0072 FFF7FEFF 		bl	HAL_GetTick
+ 120 0076 0246     		mov	r2, r0
+ 121 0078 7B68     		ldr	r3, [r7, #4]
+ 122 007a 9A42     		cmp	r2, r3
+ 123 007c 01D3     		bcc	.L6
+ 155:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****     {
+ 156:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****       return HAL_TIMEOUT;
+ 124              		.loc 1 156 0
+ 125 007e 0323     		movs	r3, #3
+ 126 0080 09E0     		b	.L7
+ 127              	.L6:
+ 152:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   {
+ 128              		.loc 1 152 0 discriminator 1
+ 129 0082 4FF4E043 		mov	r3, #28672
+ 130 0086 C4F20003 		movt	r3, 16384
+ 131 008a 5B68     		ldr	r3, [r3, #4]
+ 132 008c 03F00803 		and	r3, r3, #8
+ 133 0090 002B     		cmp	r3, #0
+ 134 0092 EED1     		bne	.L8
+ 157:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****     } 
+ 158:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   }
+ 159:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   return HAL_OK;
+ 135              		.loc 1 159 0
+ 136 0094 0023     		movs	r3, #0
+ 137              	.L7:
+ 160:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** }
+ 138              		.loc 1 160 0
+ 139 0096 1846     		mov	r0, r3
+ 140 0098 0837     		adds	r7, r7, #8
+ 141 009a BD46     		mov	sp, r7
+ 142              		@ sp needed
+ 143 009c 80BD     		pop	{r7, pc}
+ 144              		.cfi_endproc
+ 145              	.LFE56:
+ 147 009e 00BF     		.align	2
+ 148              		.global	HAL_PWREx_EnableFlashPowerDown
+ 149              		.thumb
+ 150              		.thumb_func
+ 152              	HAL_PWREx_EnableFlashPowerDown:
+ 153              	.LFB57:
+ 161:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** 
+ 162:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** /**
+ 163:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   * @brief Enables the Flash Power Down in Stop mode.
+ 164:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   * @param None
+ 165:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   * @retval None
+ 166:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   */
+ 167:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** void HAL_PWREx_EnableFlashPowerDown(void)
+ 168:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** {
+ 154              		.loc 1 168 0
+ 155              		.cfi_startproc
+ 156              		@ args = 0, pretend = 0, frame = 0
+ 157              		@ frame_needed = 1, uses_anonymous_args = 0
+ 158              		@ link register save eliminated.
+ 159 00a0 80B4     		push	{r7}
+ 160              		.cfi_def_cfa_offset 4
+ 161              		.cfi_offset 7, -4
+ 162 00a2 00AF     		add	r7, sp, #0
+ 163              		.cfi_def_cfa_register 7
+ 169:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   *(__IO uint32_t *) CR_FPDS_BB = (uint32_t)ENABLE;
+ 164              		.loc 1 169 0
+ 165 00a4 2423     		movs	r3, #36
+ 166 00a6 C4F20E23 		movt	r3, 16910
+ 167 00aa 0122     		movs	r2, #1
+ 168 00ac 1A60     		str	r2, [r3]
+ 170:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** }
+ 169              		.loc 1 170 0
+ 170 00ae BD46     		mov	sp, r7
+ 171              		@ sp needed
+ 172 00b0 5DF8047B 		ldr	r7, [sp], #4
+ 173 00b4 7047     		bx	lr
+ 174              		.cfi_endproc
+ 175              	.LFE57:
+ 177 00b6 00BF     		.align	2
+ 178              		.global	HAL_PWREx_DisableFlashPowerDown
+ 179              		.thumb
+ 180              		.thumb_func
+ 182              	HAL_PWREx_DisableFlashPowerDown:
+ 183              	.LFB58:
+ 171:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** 
+ 172:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** /**
+ 173:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   * @brief Disables the Flash Power Down in Stop mode.
+ 174:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   * @param None
+ 175:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   * @retval None
+ 176:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   */
+ 177:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** void HAL_PWREx_DisableFlashPowerDown(void)
+ 178:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** {
+ 184              		.loc 1 178 0
+ 185              		.cfi_startproc
+ 186              		@ args = 0, pretend = 0, frame = 0
+ 187              		@ frame_needed = 1, uses_anonymous_args = 0
+ 188              		@ link register save eliminated.
+ 189 00b8 80B4     		push	{r7}
+ 190              		.cfi_def_cfa_offset 4
+ 191              		.cfi_offset 7, -4
+ 192 00ba 00AF     		add	r7, sp, #0
+ 193              		.cfi_def_cfa_register 7
+ 179:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c ****   *(__IO uint32_t *) CR_FPDS_BB = (uint32_t)DISABLE;
+ 194              		.loc 1 179 0
+ 195 00bc 2423     		movs	r3, #36
+ 196 00be C4F20E23 		movt	r3, 16910
+ 197 00c2 0022     		movs	r2, #0
+ 198 00c4 1A60     		str	r2, [r3]
+ 180:../STM32F2xx_HAL_Driver/Src/stm32f2xx_hal_pwr_ex.c **** }
+ 199              		.loc 1 180 0
+ 200 00c6 BD46     		mov	sp, r7
+ 201              		@ sp needed
+ 202 00c8 5DF8047B 		ldr	r7, [sp], #4
+ 203 00cc 7047     		bx	lr
+ 204              		.cfi_endproc
+ 205              	.LFE58:
+ 207              	.Letext0:
+ 208              		.file 2 "c:\\program files (x86)\\codesourcery\\arm-none-eabi\\include\\stdint.h"
+ 209              		.file 3 "D:\\workspace\\console800480\\system/stm32f217xx.h"
+ 210              		.file 4 "D:\\workspace\\console800480\\system/stm32f2xx.h"
+ 211              		.file 5 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_hal_def.h"
+ 212              		.file 6 "D:\\workspace\\console800480\\system/core_cm3.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 stm32f2xx_hal_pwr_ex.c
+C:\Users\sagok\AppData\Local\Temp\ccp4MRXg.s:18     .text:00000000 $t
+C:\Users\sagok\AppData\Local\Temp\ccp4MRXg.s:23     .text:00000000 HAL_PWREx_EnableBkUpReg
+C:\Users\sagok\AppData\Local\Temp\ccp4MRXg.s:88     .text:00000050 HAL_PWREx_DisableBkUpReg
+C:\Users\sagok\AppData\Local\Temp\ccp4MRXg.s:152    .text:000000a0 HAL_PWREx_EnableFlashPowerDown
+C:\Users\sagok\AppData\Local\Temp\ccp4MRXg.s:182    .text:000000b8 HAL_PWREx_DisableFlashPowerDown
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.1.7f551ac7fcad8b79b9df4bfdaa536673
+                           .group:00000000 wm4.stm32f2xx_hal_conf.h.40.007126baefb9f966c36646edbf8040d2
+                           .group:00000000 wm4.stm32f2xx.h.57.5ec1581efc43612c411d33a8686e9ec7
+                           .group:00000000 wm4.stm32f217xx.h.52.9c940d76d00294b78837dc334c172fdd
+                           .group:00000000 wm4.core_cm3.h.32.49180ccb4d36cabd2d7016d2a51d91ae
+                           .group:00000000 wm4.newlib.h.8.384a112feabb3bef7b573ae48cde2e3b
+                           .group:00000000 wm4.features.h.22.6a4ca7cd053637cc1d0db6c16f39b2d7
+                           .group:00000000 wm4.config.h.183.aa62afef667fb61d15fa64c48beb2f14
+                           .group:00000000 wm4._ansi.h.23.5644b60c990a4800b02a6e654e88f93a
+                           .group:00000000 wm4.stdint.h.20.54ad762faa59e3c05491630641c8d8bf
+                           .group:00000000 wm4.core_cmInstr.h.25.f50f886f2edf670cf199b35fd96f5c91
+                           .group:00000000 wm4.core_cm3.h.130.63ab2348a6eed0fdb318040d970b676c
+                           .group:00000000 wm4.stm32f217xx.h.978.a5c681952b2f704a0e7f2ba21d08adf5
+                           .group:00000000 wm4.stm32f2xx.h.142.bc2155a1f7498bab16371e38413a9e41
+                           .group:00000000 wm4.stm32f2xx_hal_def.h.74.8ad2dc8aa82c4fd02e5aeaae592641ba
+                           .group:00000000 wm4.stm32f2xx_hal_rcc.h.142.ec0f91cc6576a6acebd17e6dd85829ae
+                           .group:00000000 wm4.stm32f2xx_hal_rcc_ex.h.40.0829033e864455c6bdd0db01f8ba5a50
+                           .group:00000000 wm4.stm32f2xx_hal_gpio.h.40.ba64e0bb94d9a68835f80159f39a86f1
+                           .group:00000000 wm4.stm32f2xx_hal_gpio_ex.h.40.24e547fd402281923f446b510381083f
+                           .group:00000000 wm4.stm32f2xx_hal_dma.h.40.5d9732ace2a21a4526ce8f0c52428fff
+                           .group:00000000 wm4.stm32f2xx_hal_cortex.h.40.e10263d2ec5d4fa79b4180ce1a38aff1
+                           .group:00000000 wm4.stm32f2xx_hal_adc.h.40.89ac8b78113cac4cf63847587daabac9
+                           .group:00000000 wm4.stm32f2xx_hal_adc_ex.h.40.7de68ed256ef25526ee31cc017f2c291
+                           .group:00000000 wm4.stm32f2xx_hal_flash.h.40.c3171719ce015e9cff20c795e44e886d
+                           .group:00000000 wm4.stm32f2xx_hal_flash_ex.h.40.7389508bd24a0aeb077bde0c9fb651eb
+                           .group:00000000 wm4.stm32f2xx_ll_fsmc.h.40.c1c32f2e1862f4dd342bd9b80fb895bb
+                           .group:00000000 wm4.stm32f2xx_hal_pwr.h.40.812df32e5c31b609a128e9db0eb4cbd0
+                           .group:00000000 wm4.stm32f2xx_hal_rtc.h.40.850fda5fe2cce8797446913dee18382f
+                           .group:00000000 wm4.stm32f2xx_hal_rtc_ex.h.40.f3e0c408e3bf4e8a0352d7ec9a18a822
+                           .group:00000000 wm4.stm32f2xx_ll_sdmmc.h.40.3719ab487c4b77401c572f459adf6eb7
+                           .group:00000000 wm4.stm32f2xx_hal_sd.h.58.760215394dcc316161a6482c0af9b866
+                           .group:00000000 wm4.stm32f2xx_hal_spi.h.40.7984243dbaba8b21c6392998a47e6987
+                           .group:00000000 wm4.stm32f2xx_hal_tim.h.40.d79172f25d0e9a15dc346aba8515bdd6
+                           .group:00000000 wm4.stm32f2xx_hal_tim_ex.h.40.361f280a7a3f60b4b238bb99ca728d83
+                           .group:00000000 wm4.stm32f2xx_hal_uart.h.40.d74def561ae6f78f40f477c8426ecbef
+                           .group:00000000 wm4.stm32f2xx_ll_usb.h.40.9b0206a05bc6ce3bec1648b51f22cb81
+                           .group:00000000 wm4.stm32f2xx_hal_pcd.h.99.11faba414c39e357b2f23364912d0605
+                           .group:00000000 wm4.stm32f2xx_hal_hcd.h.40.44ee5e972983ae0139ddbacdc75c44ef
+                           .group:00000000 wm4.stm32f2xx_hal.h.64.ed79ee83e52b151b3c365392b398f866
+
+UNDEFINED SYMBOLS
+HAL_GetTick

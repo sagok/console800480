@@ -1,0 +1,1555 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"usbh_conf.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.comm	hhcd,656,4
+  19              		.align	2
+  20              		.global	HAL_HCD_MspInit
+  21              		.thumb
+  22              		.thumb_func
+  24              	HAL_HCD_MspInit:
+  25              	.LFB55:
+  26              		.file 1 "../tasks/usb/usbh_conf.c"
+   1:../tasks/usb/usbh_conf.c **** /**
+   2:../tasks/usb/usbh_conf.c ****   ******************************************************************************
+   3:../tasks/usb/usbh_conf.c ****   * @file    FatFs/FatFs_USBDisk/Src/usbh_conf.c
+   4:../tasks/usb/usbh_conf.c ****   * @author  MCD Application Team
+   5:../tasks/usb/usbh_conf.c ****   * @version V1.1.0
+   6:../tasks/usb/usbh_conf.c ****   * @date    13-March-2014
+   7:../tasks/usb/usbh_conf.c ****   * @brief   USB Host configuration file.
+   8:../tasks/usb/usbh_conf.c ****   ******************************************************************************
+   9:../tasks/usb/usbh_conf.c ****   * @attention
+  10:../tasks/usb/usbh_conf.c ****   *
+  11:../tasks/usb/usbh_conf.c ****   * <h2><center>&copy; COPYRIGHT(c) 2014 STMicroelectronics</center></h2>
+  12:../tasks/usb/usbh_conf.c ****   *
+  13:../tasks/usb/usbh_conf.c ****   * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+  14:../tasks/usb/usbh_conf.c ****   * You may not use this file except in compliance with the License.
+  15:../tasks/usb/usbh_conf.c ****   * You may obtain a copy of the License at:
+  16:../tasks/usb/usbh_conf.c ****   *
+  17:../tasks/usb/usbh_conf.c ****   *        http://www.st.com/software_license_agreement_liberty_v2
+  18:../tasks/usb/usbh_conf.c ****   *
+  19:../tasks/usb/usbh_conf.c ****   * Unless required by applicable law or agreed to in writing, software 
+  20:../tasks/usb/usbh_conf.c ****   * distributed under the License is distributed on an "AS IS" BASIS, 
+  21:../tasks/usb/usbh_conf.c ****   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  22:../tasks/usb/usbh_conf.c ****   * See the License for the specific language governing permissions and
+  23:../tasks/usb/usbh_conf.c ****   * limitations under the License.
+  24:../tasks/usb/usbh_conf.c ****   *
+  25:../tasks/usb/usbh_conf.c ****   ******************************************************************************
+  26:../tasks/usb/usbh_conf.c ****   */ 
+  27:../tasks/usb/usbh_conf.c **** 
+  28:../tasks/usb/usbh_conf.c **** /* Includes ------------------------------------------------------------------*/
+  29:../tasks/usb/usbh_conf.c **** #include "stm32f2xx_hal.h"
+  30:../tasks/usb/usbh_conf.c **** #include "usbh_core.h"
+  31:../tasks/usb/usbh_conf.c **** 
+  32:../tasks/usb/usbh_conf.c **** HCD_HandleTypeDef hhcd;
+  33:../tasks/usb/usbh_conf.c **** 
+  34:../tasks/usb/usbh_conf.c **** /*******************************************************************************
+  35:../tasks/usb/usbh_conf.c ****                        HCD BSP Routines
+  36:../tasks/usb/usbh_conf.c **** *******************************************************************************/
+  37:../tasks/usb/usbh_conf.c **** /**
+  38:../tasks/usb/usbh_conf.c ****   * @brief  Initializes the HCD MSP.
+  39:../tasks/usb/usbh_conf.c ****   * @param  hhcd: HCD handle
+  40:../tasks/usb/usbh_conf.c ****   * @retval None
+  41:../tasks/usb/usbh_conf.c ****   */
+  42:../tasks/usb/usbh_conf.c **** void HAL_HCD_MspInit(HCD_HandleTypeDef *hhcd)
+  43:../tasks/usb/usbh_conf.c **** {
+  27              		.loc 1 43 0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 32
+  30              		@ frame_needed = 1, uses_anonymous_args = 0
+  31 0000 80B5     		push	{r7, lr}
+  32              		.cfi_def_cfa_offset 8
+  33              		.cfi_offset 7, -8
+  34              		.cfi_offset 14, -4
+  35 0002 88B0     		sub	sp, sp, #32
+  36              		.cfi_def_cfa_offset 40
+  37 0004 00AF     		add	r7, sp, #0
+  38              		.cfi_def_cfa_register 7
+  39 0006 7860     		str	r0, [r7, #4]
+  44:../tasks/usb/usbh_conf.c ****   GPIO_InitTypeDef  GPIO_InitStruct;
+  45:../tasks/usb/usbh_conf.c **** 
+  46:../tasks/usb/usbh_conf.c ****     /* Configure USB HS GPIOs */
+  47:../tasks/usb/usbh_conf.c ****     __GPIOB_CLK_ENABLE();
+  40              		.loc 1 47 0
+  41 0008 4FF46053 		mov	r3, #14336
+  42 000c C4F20203 		movt	r3, 16386
+  43 0010 4FF46052 		mov	r2, #14336
+  44 0014 C4F20202 		movt	r2, 16386
+  45 0018 126B     		ldr	r2, [r2, #48]
+  46 001a 42F00202 		orr	r2, r2, #2
+  47 001e 1A63     		str	r2, [r3, #48]
+  48:../tasks/usb/usbh_conf.c **** //    __GPIOH_CLK_ENABLE();
+  49:../tasks/usb/usbh_conf.c ****     
+  50:../tasks/usb/usbh_conf.c ****     GPIO_InitStruct.Pin = (GPIO_PIN_14 | GPIO_PIN_15);
+  48              		.loc 1 50 0
+  49 0020 4FF44043 		mov	r3, #49152
+  50 0024 FB60     		str	r3, [r7, #12]
+  51:../tasks/usb/usbh_conf.c ****     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  51              		.loc 1 51 0
+  52 0026 0223     		movs	r3, #2
+  53 0028 3B61     		str	r3, [r7, #16]
+  52:../tasks/usb/usbh_conf.c ****     GPIO_InitStruct.Pull = GPIO_NOPULL;
+  54              		.loc 1 52 0
+  55 002a 0023     		movs	r3, #0
+  56 002c 7B61     		str	r3, [r7, #20]
+  53:../tasks/usb/usbh_conf.c ****     GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;//GPIO_SPEED_HIGH;
+  57              		.loc 1 53 0
+  58 002e 0323     		movs	r3, #3
+  59 0030 BB61     		str	r3, [r7, #24]
+  54:../tasks/usb/usbh_conf.c ****     GPIO_InitStruct.Alternate = GPIO_AF12_OTG_HS_FS;//GPIO_AF10_OTG_HS;
+  60              		.loc 1 54 0
+  61 0032 0C23     		movs	r3, #12
+  62 0034 FB61     		str	r3, [r7, #28]
+  55:../tasks/usb/usbh_conf.c ****     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  63              		.loc 1 55 0
+  64 0036 07F10C03 		add	r3, r7, #12
+  65 003a 4FF48060 		mov	r0, #1024
+  66 003e C4F20200 		movt	r0, 16386
+  67 0042 1946     		mov	r1, r3
+  68 0044 FFF7FEFF 		bl	HAL_GPIO_Init
+  56:../tasks/usb/usbh_conf.c ****     
+  57:../tasks/usb/usbh_conf.c ****     /* Enable USB HS Clocks */
+  58:../tasks/usb/usbh_conf.c ****     __USB_OTG_HS_CLK_ENABLE();
+  69              		.loc 1 58 0
+  70 0048 4FF46053 		mov	r3, #14336
+  71 004c C4F20203 		movt	r3, 16386
+  72 0050 4FF46052 		mov	r2, #14336
+  73 0054 C4F20202 		movt	r2, 16386
+  74 0058 126B     		ldr	r2, [r2, #48]
+  75 005a 42F00052 		orr	r2, r2, #536870912
+  76 005e 1A63     		str	r2, [r3, #48]
+  59:../tasks/usb/usbh_conf.c ****     
+  60:../tasks/usb/usbh_conf.c ****     /* Set USBHS Interrupt to the lowest priority */
+  61:../tasks/usb/usbh_conf.c ****     HAL_NVIC_SetPriority(OTG_HS_IRQn, 5, 0);
+  77              		.loc 1 61 0
+  78 0060 4D20     		movs	r0, #77
+  79 0062 0521     		movs	r1, #5
+  80 0064 0022     		movs	r2, #0
+  81 0066 FFF7FEFF 		bl	HAL_NVIC_SetPriority
+  62:../tasks/usb/usbh_conf.c ****     
+  63:../tasks/usb/usbh_conf.c ****     /* Enable USBHS Interrupt */
+  64:../tasks/usb/usbh_conf.c ****     HAL_NVIC_EnableIRQ(OTG_HS_IRQn);
+  82              		.loc 1 64 0
+  83 006a 4D20     		movs	r0, #77
+  84 006c FFF7FEFF 		bl	HAL_NVIC_EnableIRQ
+  65:../tasks/usb/usbh_conf.c **** 
+  66:../tasks/usb/usbh_conf.c **** }
+  85              		.loc 1 66 0
+  86 0070 2037     		adds	r7, r7, #32
+  87 0072 BD46     		mov	sp, r7
+  88              		@ sp needed
+  89 0074 80BD     		pop	{r7, pc}
+  90              		.cfi_endproc
+  91              	.LFE55:
+  93 0076 00BF     		.align	2
+  94              		.global	HAL_HCD_MspDeInit
+  95              		.thumb
+  96              		.thumb_func
+  98              	HAL_HCD_MspDeInit:
+  99              	.LFB56:
+  67:../tasks/usb/usbh_conf.c **** 
+  68:../tasks/usb/usbh_conf.c **** /**
+  69:../tasks/usb/usbh_conf.c ****   * @brief  DeInitializes the HCD MSP.
+  70:../tasks/usb/usbh_conf.c ****   * @param  hhcd: HCD handle
+  71:../tasks/usb/usbh_conf.c ****   * @retval None
+  72:../tasks/usb/usbh_conf.c ****   */
+  73:../tasks/usb/usbh_conf.c **** void HAL_HCD_MspDeInit(HCD_HandleTypeDef *hhcd)
+  74:../tasks/usb/usbh_conf.c **** {
+ 100              		.loc 1 74 0
+ 101              		.cfi_startproc
+ 102              		@ args = 0, pretend = 0, frame = 8
+ 103              		@ frame_needed = 1, uses_anonymous_args = 0
+ 104              		@ link register save eliminated.
+ 105 0078 80B4     		push	{r7}
+ 106              		.cfi_def_cfa_offset 4
+ 107              		.cfi_offset 7, -4
+ 108 007a 83B0     		sub	sp, sp, #12
+ 109              		.cfi_def_cfa_offset 16
+ 110 007c 00AF     		add	r7, sp, #0
+ 111              		.cfi_def_cfa_register 7
+ 112 007e 7860     		str	r0, [r7, #4]
+  75:../tasks/usb/usbh_conf.c **** 
+  76:../tasks/usb/usbh_conf.c ****     /* Disable USB HS Clocks */
+  77:../tasks/usb/usbh_conf.c ****     __USB_OTG_HS_CLK_DISABLE();
+ 113              		.loc 1 77 0
+ 114 0080 4FF46053 		mov	r3, #14336
+ 115 0084 C4F20203 		movt	r3, 16386
+ 116 0088 4FF46052 		mov	r2, #14336
+ 117 008c C4F20202 		movt	r2, 16386
+ 118 0090 126B     		ldr	r2, [r2, #48]
+ 119 0092 22F00052 		bic	r2, r2, #536870912
+ 120 0096 1A63     		str	r2, [r3, #48]
+  78:../tasks/usb/usbh_conf.c **** 
+  79:../tasks/usb/usbh_conf.c **** }
+ 121              		.loc 1 79 0
+ 122 0098 0C37     		adds	r7, r7, #12
+ 123 009a BD46     		mov	sp, r7
+ 124              		@ sp needed
+ 125 009c 5DF8047B 		ldr	r7, [sp], #4
+ 126 00a0 7047     		bx	lr
+ 127              		.cfi_endproc
+ 128              	.LFE56:
+ 130 00a2 00BF     		.align	2
+ 131              		.global	HAL_HCD_SOF_Callback
+ 132              		.thumb
+ 133              		.thumb_func
+ 135              	HAL_HCD_SOF_Callback:
+ 136              	.LFB57:
+  80:../tasks/usb/usbh_conf.c **** 
+  81:../tasks/usb/usbh_conf.c **** /*******************************************************************************
+  82:../tasks/usb/usbh_conf.c ****                        LL Driver Callbacks (HCD -> USB Host Library)
+  83:../tasks/usb/usbh_conf.c **** *******************************************************************************/
+  84:../tasks/usb/usbh_conf.c **** 
+  85:../tasks/usb/usbh_conf.c **** /**
+  86:../tasks/usb/usbh_conf.c ****   * @brief  SOF callback.
+  87:../tasks/usb/usbh_conf.c ****   * @param  hhcd: HCD handle
+  88:../tasks/usb/usbh_conf.c ****   * @retval None
+  89:../tasks/usb/usbh_conf.c ****   */
+  90:../tasks/usb/usbh_conf.c **** void HAL_HCD_SOF_Callback(HCD_HandleTypeDef *hhcd)
+  91:../tasks/usb/usbh_conf.c **** {
+ 137              		.loc 1 91 0
+ 138              		.cfi_startproc
+ 139              		@ args = 0, pretend = 0, frame = 8
+ 140              		@ frame_needed = 1, uses_anonymous_args = 0
+ 141 00a4 80B5     		push	{r7, lr}
+ 142              		.cfi_def_cfa_offset 8
+ 143              		.cfi_offset 7, -8
+ 144              		.cfi_offset 14, -4
+ 145 00a6 82B0     		sub	sp, sp, #8
+ 146              		.cfi_def_cfa_offset 16
+ 147 00a8 00AF     		add	r7, sp, #0
+ 148              		.cfi_def_cfa_register 7
+ 149 00aa 7860     		str	r0, [r7, #4]
+  92:../tasks/usb/usbh_conf.c ****   USBH_LL_IncTimer (hhcd->pData);
+ 150              		.loc 1 92 0
+ 151 00ac 7B68     		ldr	r3, [r7, #4]
+ 152 00ae D3F88C32 		ldr	r3, [r3, #652]
+ 153 00b2 1846     		mov	r0, r3
+ 154 00b4 FFF7FEFF 		bl	USBH_LL_IncTimer
+  93:../tasks/usb/usbh_conf.c **** }
+ 155              		.loc 1 93 0
+ 156 00b8 0837     		adds	r7, r7, #8
+ 157 00ba BD46     		mov	sp, r7
+ 158              		@ sp needed
+ 159 00bc 80BD     		pop	{r7, pc}
+ 160              		.cfi_endproc
+ 161              	.LFE57:
+ 163 00be 00BF     		.align	2
+ 164              		.global	HAL_HCD_Connect_Callback
+ 165              		.thumb
+ 166              		.thumb_func
+ 168              	HAL_HCD_Connect_Callback:
+ 169              	.LFB58:
+  94:../tasks/usb/usbh_conf.c **** 
+  95:../tasks/usb/usbh_conf.c **** /**
+  96:../tasks/usb/usbh_conf.c ****   * @brief  Connect callback.
+  97:../tasks/usb/usbh_conf.c ****   * @param  hhcd: HCD handle
+  98:../tasks/usb/usbh_conf.c ****   * @retval None
+  99:../tasks/usb/usbh_conf.c ****   */
+ 100:../tasks/usb/usbh_conf.c **** void HAL_HCD_Connect_Callback(HCD_HandleTypeDef *hhcd)
+ 101:../tasks/usb/usbh_conf.c **** {
+ 170              		.loc 1 101 0
+ 171              		.cfi_startproc
+ 172              		@ args = 0, pretend = 0, frame = 8
+ 173              		@ frame_needed = 1, uses_anonymous_args = 0
+ 174 00c0 80B5     		push	{r7, lr}
+ 175              		.cfi_def_cfa_offset 8
+ 176              		.cfi_offset 7, -8
+ 177              		.cfi_offset 14, -4
+ 178 00c2 82B0     		sub	sp, sp, #8
+ 179              		.cfi_def_cfa_offset 16
+ 180 00c4 00AF     		add	r7, sp, #0
+ 181              		.cfi_def_cfa_register 7
+ 182 00c6 7860     		str	r0, [r7, #4]
+ 102:../tasks/usb/usbh_conf.c ****   USBH_LL_Connect(hhcd->pData);
+ 183              		.loc 1 102 0
+ 184 00c8 7B68     		ldr	r3, [r7, #4]
+ 185 00ca D3F88C32 		ldr	r3, [r3, #652]
+ 186 00ce 1846     		mov	r0, r3
+ 187 00d0 FFF7FEFF 		bl	USBH_LL_Connect
+ 103:../tasks/usb/usbh_conf.c **** }
+ 188              		.loc 1 103 0
+ 189 00d4 0837     		adds	r7, r7, #8
+ 190 00d6 BD46     		mov	sp, r7
+ 191              		@ sp needed
+ 192 00d8 80BD     		pop	{r7, pc}
+ 193              		.cfi_endproc
+ 194              	.LFE58:
+ 196 00da 00BF     		.align	2
+ 197              		.global	HAL_HCD_Disconnect_Callback
+ 198              		.thumb
+ 199              		.thumb_func
+ 201              	HAL_HCD_Disconnect_Callback:
+ 202              	.LFB59:
+ 104:../tasks/usb/usbh_conf.c **** 
+ 105:../tasks/usb/usbh_conf.c **** /**
+ 106:../tasks/usb/usbh_conf.c ****   * @brief  Disconnect callback.
+ 107:../tasks/usb/usbh_conf.c ****   * @param  hhcd: HCD handle
+ 108:../tasks/usb/usbh_conf.c ****   * @retval None
+ 109:../tasks/usb/usbh_conf.c ****   */
+ 110:../tasks/usb/usbh_conf.c **** void HAL_HCD_Disconnect_Callback(HCD_HandleTypeDef *hhcd)
+ 111:../tasks/usb/usbh_conf.c **** {
+ 203              		.loc 1 111 0
+ 204              		.cfi_startproc
+ 205              		@ args = 0, pretend = 0, frame = 8
+ 206              		@ frame_needed = 1, uses_anonymous_args = 0
+ 207 00dc 80B5     		push	{r7, lr}
+ 208              		.cfi_def_cfa_offset 8
+ 209              		.cfi_offset 7, -8
+ 210              		.cfi_offset 14, -4
+ 211 00de 82B0     		sub	sp, sp, #8
+ 212              		.cfi_def_cfa_offset 16
+ 213 00e0 00AF     		add	r7, sp, #0
+ 214              		.cfi_def_cfa_register 7
+ 215 00e2 7860     		str	r0, [r7, #4]
+ 112:../tasks/usb/usbh_conf.c ****   USBH_LL_Disconnect(hhcd->pData);
+ 216              		.loc 1 112 0
+ 217 00e4 7B68     		ldr	r3, [r7, #4]
+ 218 00e6 D3F88C32 		ldr	r3, [r3, #652]
+ 219 00ea 1846     		mov	r0, r3
+ 220 00ec FFF7FEFF 		bl	USBH_LL_Disconnect
+ 113:../tasks/usb/usbh_conf.c **** } 
+ 221              		.loc 1 113 0
+ 222 00f0 0837     		adds	r7, r7, #8
+ 223 00f2 BD46     		mov	sp, r7
+ 224              		@ sp needed
+ 225 00f4 80BD     		pop	{r7, pc}
+ 226              		.cfi_endproc
+ 227              	.LFE59:
+ 229 00f6 00BF     		.align	2
+ 230              		.global	HAL_HCD_HC_NotifyURBChange_Callback
+ 231              		.thumb
+ 232              		.thumb_func
+ 234              	HAL_HCD_HC_NotifyURBChange_Callback:
+ 235              	.LFB60:
+ 114:../tasks/usb/usbh_conf.c **** 
+ 115:../tasks/usb/usbh_conf.c **** /**
+ 116:../tasks/usb/usbh_conf.c ****   * @brief  Notify URB state change callback.
+ 117:../tasks/usb/usbh_conf.c ****   * @param  hhcd: HCD handle
+ 118:../tasks/usb/usbh_conf.c ****   * @param  chnum:
+ 119:../tasks/usb/usbh_conf.c ****   * @param  urb_state:
+ 120:../tasks/usb/usbh_conf.c ****   * @retval None
+ 121:../tasks/usb/usbh_conf.c ****   */
+ 122:../tasks/usb/usbh_conf.c **** void HAL_HCD_HC_NotifyURBChange_Callback(HCD_HandleTypeDef *hhcd, uint8_t chnum, HCD_URBStateTypeDe
+ 123:../tasks/usb/usbh_conf.c **** {
+ 236              		.loc 1 123 0
+ 237              		.cfi_startproc
+ 238              		@ args = 0, pretend = 0, frame = 8
+ 239              		@ frame_needed = 1, uses_anonymous_args = 0
+ 240              		@ link register save eliminated.
+ 241 00f8 80B4     		push	{r7}
+ 242              		.cfi_def_cfa_offset 4
+ 243              		.cfi_offset 7, -4
+ 244 00fa 83B0     		sub	sp, sp, #12
+ 245              		.cfi_def_cfa_offset 16
+ 246 00fc 00AF     		add	r7, sp, #0
+ 247              		.cfi_def_cfa_register 7
+ 248 00fe 7860     		str	r0, [r7, #4]
+ 249 0100 1346     		mov	r3, r2
+ 250 0102 0A46     		mov	r2, r1
+ 251 0104 FA70     		strb	r2, [r7, #3]
+ 252 0106 BB70     		strb	r3, [r7, #2]
+ 124:../tasks/usb/usbh_conf.c ****   /* To be used with OS to sync URB state with the global state machine */
+ 125:../tasks/usb/usbh_conf.c **** }
+ 253              		.loc 1 125 0
+ 254 0108 0C37     		adds	r7, r7, #12
+ 255 010a BD46     		mov	sp, r7
+ 256              		@ sp needed
+ 257 010c 5DF8047B 		ldr	r7, [sp], #4
+ 258 0110 7047     		bx	lr
+ 259              		.cfi_endproc
+ 260              	.LFE60:
+ 262 0112 00BF     		.align	2
+ 263              		.global	USBH_LL_Init
+ 264              		.thumb
+ 265              		.thumb_func
+ 267              	USBH_LL_Init:
+ 268              	.LFB61:
+ 126:../tasks/usb/usbh_conf.c **** 
+ 127:../tasks/usb/usbh_conf.c **** /*******************************************************************************
+ 128:../tasks/usb/usbh_conf.c ****                        LL Driver Interface (USB Host Library --> HCD)
+ 129:../tasks/usb/usbh_conf.c **** *******************************************************************************/
+ 130:../tasks/usb/usbh_conf.c **** 
+ 131:../tasks/usb/usbh_conf.c **** /**
+ 132:../tasks/usb/usbh_conf.c ****   * @brief  Initializes the Low Level portion of the Host driver.
+ 133:../tasks/usb/usbh_conf.c ****   * @param  phost: Host handle
+ 134:../tasks/usb/usbh_conf.c ****   * @retval USBH Status
+ 135:../tasks/usb/usbh_conf.c ****   */
+ 136:../tasks/usb/usbh_conf.c **** USBH_StatusTypeDef USBH_LL_Init(USBH_HandleTypeDef *phost)
+ 137:../tasks/usb/usbh_conf.c **** {  
+ 269              		.loc 1 137 0
+ 270              		.cfi_startproc
+ 271              		@ args = 0, pretend = 0, frame = 8
+ 272              		@ frame_needed = 1, uses_anonymous_args = 0
+ 273 0114 80B5     		push	{r7, lr}
+ 274              		.cfi_def_cfa_offset 8
+ 275              		.cfi_offset 7, -8
+ 276              		.cfi_offset 14, -4
+ 277 0116 82B0     		sub	sp, sp, #8
+ 278              		.cfi_def_cfa_offset 16
+ 279 0118 00AF     		add	r7, sp, #0
+ 280              		.cfi_def_cfa_register 7
+ 281 011a 7860     		str	r0, [r7, #4]
+ 138:../tasks/usb/usbh_conf.c **** #ifdef USEH_USB_FS
+ 139:../tasks/usb/usbh_conf.c ****   /* Set the LL driver parameters */
+ 140:../tasks/usb/usbh_conf.c ****   hhcd.Instance = USB_OTG_FS;
+ 141:../tasks/usb/usbh_conf.c ****   hhcd.Init.Host_channels = 11; 
+ 142:../tasks/usb/usbh_conf.c ****   hhcd.Init.dma_enable = 0;
+ 143:../tasks/usb/usbh_conf.c ****   hhcd.Init.low_power_enable = 0;
+ 144:../tasks/usb/usbh_conf.c ****   hhcd.Init.phy_itface = HCD_PHY_EMBEDDED; 
+ 145:../tasks/usb/usbh_conf.c ****   hhcd.Init.Sof_enable = 0;
+ 146:../tasks/usb/usbh_conf.c ****   hhcd.Init.speed = HCD_SPEED_FULL;
+ 147:../tasks/usb/usbh_conf.c ****   hhcd.Init.vbus_sensing_enable = 0;
+ 148:../tasks/usb/usbh_conf.c ****   /* Link the driver to the stack */
+ 149:../tasks/usb/usbh_conf.c ****   hhcd.pData = phost;
+ 150:../tasks/usb/usbh_conf.c ****   phost->pData = &hhcd;
+ 151:../tasks/usb/usbh_conf.c ****   /* Initialize the LL Driver */
+ 152:../tasks/usb/usbh_conf.c ****   HAL_HCD_Init(&hhcd);
+ 153:../tasks/usb/usbh_conf.c **** #endif 
+ 154:../tasks/usb/usbh_conf.c **** #ifdef USEH_USB_HS
+ 155:../tasks/usb/usbh_conf.c ****   /* Set the LL driver parameters */
+ 156:../tasks/usb/usbh_conf.c ****   hhcd.Instance = USB_OTG_HS;
+ 282              		.loc 1 156 0
+ 283 011c 40F20003 		movw	r3, #:lower16:hhcd
+ 284 0120 C0F20003 		movt	r3, #:upper16:hhcd
+ 285 0124 0022     		movs	r2, #0
+ 286 0126 C4F20402 		movt	r2, 16388
+ 287 012a 1A60     		str	r2, [r3]
+ 157:../tasks/usb/usbh_conf.c ****   hhcd.Init.Host_channels = 11; 
+ 288              		.loc 1 157 0
+ 289 012c 40F20003 		movw	r3, #:lower16:hhcd
+ 290 0130 C0F20003 		movt	r3, #:upper16:hhcd
+ 291 0134 0B22     		movs	r2, #11
+ 292 0136 9A60     		str	r2, [r3, #8]
+ 158:../tasks/usb/usbh_conf.c ****   hhcd.Init.dma_enable = 1;
+ 293              		.loc 1 158 0
+ 294 0138 40F20003 		movw	r3, #:lower16:hhcd
+ 295 013c C0F20003 		movt	r3, #:upper16:hhcd
+ 296 0140 0122     		movs	r2, #1
+ 297 0142 1A61     		str	r2, [r3, #16]
+ 159:../tasks/usb/usbh_conf.c ****   hhcd.Init.low_power_enable = 0;
+ 298              		.loc 1 159 0
+ 299 0144 40F20003 		movw	r3, #:lower16:hhcd
+ 300 0148 C0F20003 		movt	r3, #:upper16:hhcd
+ 301 014c 0022     		movs	r2, #0
+ 302 014e 1A62     		str	r2, [r3, #32]
+ 160:../tasks/usb/usbh_conf.c ****   hhcd.Init.phy_itface = HCD_PHY_EMBEDDED; //HCD_PHY_ULPI
+ 303              		.loc 1 160 0
+ 304 0150 40F20003 		movw	r3, #:lower16:hhcd
+ 305 0154 C0F20003 		movt	r3, #:upper16:hhcd
+ 306 0158 0222     		movs	r2, #2
+ 307 015a 9A61     		str	r2, [r3, #24]
+ 161:../tasks/usb/usbh_conf.c ****   hhcd.Init.Sof_enable = 0;
+ 308              		.loc 1 161 0
+ 309 015c 40F20003 		movw	r3, #:lower16:hhcd
+ 310 0160 C0F20003 		movt	r3, #:upper16:hhcd
+ 311 0164 0022     		movs	r2, #0
+ 312 0166 DA61     		str	r2, [r3, #28]
+ 162:../tasks/usb/usbh_conf.c ****   hhcd.Init.speed = HCD_SPEED_FULL;//HCD_SPEED_HIGH;
+ 313              		.loc 1 162 0
+ 314 0168 40F20003 		movw	r3, #:lower16:hhcd
+ 315 016c C0F20003 		movt	r3, #:upper16:hhcd
+ 316 0170 0322     		movs	r2, #3
+ 317 0172 DA60     		str	r2, [r3, #12]
+ 163:../tasks/usb/usbh_conf.c ****   hhcd.Init.vbus_sensing_enable = 0;
+ 318              		.loc 1 163 0
+ 319 0174 40F20003 		movw	r3, #:lower16:hhcd
+ 320 0178 C0F20003 		movt	r3, #:upper16:hhcd
+ 321 017c 0022     		movs	r2, #0
+ 322 017e 5A62     		str	r2, [r3, #36]
+ 164:../tasks/usb/usbh_conf.c ****   hhcd.Init.use_external_vbus = 0; 	//1
+ 323              		.loc 1 164 0
+ 324 0180 40F20003 		movw	r3, #:lower16:hhcd
+ 325 0184 C0F20003 		movt	r3, #:upper16:hhcd
+ 326 0188 0022     		movs	r2, #0
+ 327 018a DA62     		str	r2, [r3, #44]
+ 165:../tasks/usb/usbh_conf.c ****   /* Link the driver to the stack */
+ 166:../tasks/usb/usbh_conf.c ****   hhcd.pData = phost;
+ 328              		.loc 1 166 0
+ 329 018c 40F20003 		movw	r3, #:lower16:hhcd
+ 330 0190 C0F20003 		movt	r3, #:upper16:hhcd
+ 331 0194 7A68     		ldr	r2, [r7, #4]
+ 332 0196 C3F88C22 		str	r2, [r3, #652]
+ 167:../tasks/usb/usbh_conf.c ****   phost->pData = &hhcd;
+ 333              		.loc 1 167 0
+ 334 019a 7A68     		ldr	r2, [r7, #4]
+ 335 019c 40F20003 		movw	r3, #:lower16:hhcd
+ 336 01a0 C0F20003 		movt	r3, #:upper16:hhcd
+ 337 01a4 C2F8C032 		str	r3, [r2, #704]
+ 168:../tasks/usb/usbh_conf.c ****   /* Initialize the LL driver */
+ 169:../tasks/usb/usbh_conf.c ****   HAL_HCD_Init(&hhcd);
+ 338              		.loc 1 169 0
+ 339 01a8 40F20000 		movw	r0, #:lower16:hhcd
+ 340 01ac C0F20000 		movt	r0, #:upper16:hhcd
+ 341 01b0 FFF7FEFF 		bl	HAL_HCD_Init
+ 170:../tasks/usb/usbh_conf.c **** #endif 
+ 171:../tasks/usb/usbh_conf.c ****  
+ 172:../tasks/usb/usbh_conf.c ****   USBH_LL_SetTimer(phost, HAL_HCD_GetCurrentFrame(&hhcd));
+ 342              		.loc 1 172 0
+ 343 01b4 40F20000 		movw	r0, #:lower16:hhcd
+ 344 01b8 C0F20000 		movt	r0, #:upper16:hhcd
+ 345 01bc FFF7FEFF 		bl	HAL_HCD_GetCurrentFrame
+ 346 01c0 0346     		mov	r3, r0
+ 347 01c2 7868     		ldr	r0, [r7, #4]
+ 348 01c4 1946     		mov	r1, r3
+ 349 01c6 FFF7FEFF 		bl	USBH_LL_SetTimer
+ 173:../tasks/usb/usbh_conf.c ****   
+ 174:../tasks/usb/usbh_conf.c ****   return USBH_OK;
+ 350              		.loc 1 174 0
+ 351 01ca 0023     		movs	r3, #0
+ 175:../tasks/usb/usbh_conf.c **** }
+ 352              		.loc 1 175 0
+ 353 01cc 1846     		mov	r0, r3
+ 354 01ce 0837     		adds	r7, r7, #8
+ 355 01d0 BD46     		mov	sp, r7
+ 356              		@ sp needed
+ 357 01d2 80BD     		pop	{r7, pc}
+ 358              		.cfi_endproc
+ 359              	.LFE61:
+ 361              		.align	2
+ 362              		.global	USBH_LL_DeInit
+ 363              		.thumb
+ 364              		.thumb_func
+ 366              	USBH_LL_DeInit:
+ 367              	.LFB62:
+ 176:../tasks/usb/usbh_conf.c **** 
+ 177:../tasks/usb/usbh_conf.c **** /**
+ 178:../tasks/usb/usbh_conf.c ****   * @brief  De-Initializes the Low Level portion of the Host driver.
+ 179:../tasks/usb/usbh_conf.c ****   * @param  phost: Host handle
+ 180:../tasks/usb/usbh_conf.c ****   * @retval USBH Status
+ 181:../tasks/usb/usbh_conf.c ****   */
+ 182:../tasks/usb/usbh_conf.c **** USBH_StatusTypeDef USBH_LL_DeInit(USBH_HandleTypeDef *phost)
+ 183:../tasks/usb/usbh_conf.c **** {
+ 368              		.loc 1 183 0
+ 369              		.cfi_startproc
+ 370              		@ args = 0, pretend = 0, frame = 8
+ 371              		@ frame_needed = 1, uses_anonymous_args = 0
+ 372 01d4 80B5     		push	{r7, lr}
+ 373              		.cfi_def_cfa_offset 8
+ 374              		.cfi_offset 7, -8
+ 375              		.cfi_offset 14, -4
+ 376 01d6 82B0     		sub	sp, sp, #8
+ 377              		.cfi_def_cfa_offset 16
+ 378 01d8 00AF     		add	r7, sp, #0
+ 379              		.cfi_def_cfa_register 7
+ 380 01da 7860     		str	r0, [r7, #4]
+ 184:../tasks/usb/usbh_conf.c ****   HAL_HCD_DeInit(phost->pData);
+ 381              		.loc 1 184 0
+ 382 01dc 7B68     		ldr	r3, [r7, #4]
+ 383 01de D3F8C032 		ldr	r3, [r3, #704]
+ 384 01e2 1846     		mov	r0, r3
+ 385 01e4 FFF7FEFF 		bl	HAL_HCD_DeInit
+ 185:../tasks/usb/usbh_conf.c ****   return USBH_OK; 
+ 386              		.loc 1 185 0
+ 387 01e8 0023     		movs	r3, #0
+ 186:../tasks/usb/usbh_conf.c **** }
+ 388              		.loc 1 186 0
+ 389 01ea 1846     		mov	r0, r3
+ 390 01ec 0837     		adds	r7, r7, #8
+ 391 01ee BD46     		mov	sp, r7
+ 392              		@ sp needed
+ 393 01f0 80BD     		pop	{r7, pc}
+ 394              		.cfi_endproc
+ 395              	.LFE62:
+ 397 01f2 00BF     		.align	2
+ 398              		.global	USBH_LL_Start
+ 399              		.thumb
+ 400              		.thumb_func
+ 402              	USBH_LL_Start:
+ 403              	.LFB63:
+ 187:../tasks/usb/usbh_conf.c **** 
+ 188:../tasks/usb/usbh_conf.c **** /**
+ 189:../tasks/usb/usbh_conf.c ****   * @brief  Starts the Low Level portion of the Host driver.   
+ 190:../tasks/usb/usbh_conf.c ****   * @param  phost: Host handle
+ 191:../tasks/usb/usbh_conf.c ****   * @retval USBH Status
+ 192:../tasks/usb/usbh_conf.c ****   */
+ 193:../tasks/usb/usbh_conf.c **** USBH_StatusTypeDef USBH_LL_Start(USBH_HandleTypeDef *phost)
+ 194:../tasks/usb/usbh_conf.c **** {
+ 404              		.loc 1 194 0
+ 405              		.cfi_startproc
+ 406              		@ args = 0, pretend = 0, frame = 8
+ 407              		@ frame_needed = 1, uses_anonymous_args = 0
+ 408 01f4 80B5     		push	{r7, lr}
+ 409              		.cfi_def_cfa_offset 8
+ 410              		.cfi_offset 7, -8
+ 411              		.cfi_offset 14, -4
+ 412 01f6 82B0     		sub	sp, sp, #8
+ 413              		.cfi_def_cfa_offset 16
+ 414 01f8 00AF     		add	r7, sp, #0
+ 415              		.cfi_def_cfa_register 7
+ 416 01fa 7860     		str	r0, [r7, #4]
+ 195:../tasks/usb/usbh_conf.c ****   HAL_HCD_Start(phost->pData);
+ 417              		.loc 1 195 0
+ 418 01fc 7B68     		ldr	r3, [r7, #4]
+ 419 01fe D3F8C032 		ldr	r3, [r3, #704]
+ 420 0202 1846     		mov	r0, r3
+ 421 0204 FFF7FEFF 		bl	HAL_HCD_Start
+ 196:../tasks/usb/usbh_conf.c ****   return USBH_OK; 
+ 422              		.loc 1 196 0
+ 423 0208 0023     		movs	r3, #0
+ 197:../tasks/usb/usbh_conf.c **** }
+ 424              		.loc 1 197 0
+ 425 020a 1846     		mov	r0, r3
+ 426 020c 0837     		adds	r7, r7, #8
+ 427 020e BD46     		mov	sp, r7
+ 428              		@ sp needed
+ 429 0210 80BD     		pop	{r7, pc}
+ 430              		.cfi_endproc
+ 431              	.LFE63:
+ 433 0212 00BF     		.align	2
+ 434              		.global	USBH_LL_Stop
+ 435              		.thumb
+ 436              		.thumb_func
+ 438              	USBH_LL_Stop:
+ 439              	.LFB64:
+ 198:../tasks/usb/usbh_conf.c **** 
+ 199:../tasks/usb/usbh_conf.c **** /**
+ 200:../tasks/usb/usbh_conf.c ****   * @brief  Stops the Low Level portion of the Host driver.
+ 201:../tasks/usb/usbh_conf.c ****   * @param  phost: Host handle
+ 202:../tasks/usb/usbh_conf.c ****   * @retval USBH Status
+ 203:../tasks/usb/usbh_conf.c ****   */
+ 204:../tasks/usb/usbh_conf.c **** USBH_StatusTypeDef USBH_LL_Stop(USBH_HandleTypeDef *phost)
+ 205:../tasks/usb/usbh_conf.c **** {
+ 440              		.loc 1 205 0
+ 441              		.cfi_startproc
+ 442              		@ args = 0, pretend = 0, frame = 8
+ 443              		@ frame_needed = 1, uses_anonymous_args = 0
+ 444 0214 80B5     		push	{r7, lr}
+ 445              		.cfi_def_cfa_offset 8
+ 446              		.cfi_offset 7, -8
+ 447              		.cfi_offset 14, -4
+ 448 0216 82B0     		sub	sp, sp, #8
+ 449              		.cfi_def_cfa_offset 16
+ 450 0218 00AF     		add	r7, sp, #0
+ 451              		.cfi_def_cfa_register 7
+ 452 021a 7860     		str	r0, [r7, #4]
+ 206:../tasks/usb/usbh_conf.c ****   HAL_HCD_Stop(phost->pData);
+ 453              		.loc 1 206 0
+ 454 021c 7B68     		ldr	r3, [r7, #4]
+ 455 021e D3F8C032 		ldr	r3, [r3, #704]
+ 456 0222 1846     		mov	r0, r3
+ 457 0224 FFF7FEFF 		bl	HAL_HCD_Stop
+ 207:../tasks/usb/usbh_conf.c ****   return USBH_OK; 
+ 458              		.loc 1 207 0
+ 459 0228 0023     		movs	r3, #0
+ 208:../tasks/usb/usbh_conf.c **** }
+ 460              		.loc 1 208 0
+ 461 022a 1846     		mov	r0, r3
+ 462 022c 0837     		adds	r7, r7, #8
+ 463 022e BD46     		mov	sp, r7
+ 464              		@ sp needed
+ 465 0230 80BD     		pop	{r7, pc}
+ 466              		.cfi_endproc
+ 467              	.LFE64:
+ 469 0232 00BF     		.align	2
+ 470              		.global	USBH_LL_GetSpeed
+ 471              		.thumb
+ 472              		.thumb_func
+ 474              	USBH_LL_GetSpeed:
+ 475              	.LFB65:
+ 209:../tasks/usb/usbh_conf.c **** 
+ 210:../tasks/usb/usbh_conf.c **** /**
+ 211:../tasks/usb/usbh_conf.c ****   * @brief  Returns the USB Host Speed from the Low Level Driver.
+ 212:../tasks/usb/usbh_conf.c ****   * @param  phost: Host handle
+ 213:../tasks/usb/usbh_conf.c ****   * @retval USBH Speeds
+ 214:../tasks/usb/usbh_conf.c ****   */
+ 215:../tasks/usb/usbh_conf.c **** USBH_SpeedTypeDef USBH_LL_GetSpeed(USBH_HandleTypeDef *phost)
+ 216:../tasks/usb/usbh_conf.c **** {
+ 476              		.loc 1 216 0
+ 477              		.cfi_startproc
+ 478              		@ args = 0, pretend = 0, frame = 16
+ 479              		@ frame_needed = 1, uses_anonymous_args = 0
+ 480 0234 80B5     		push	{r7, lr}
+ 481              		.cfi_def_cfa_offset 8
+ 482              		.cfi_offset 7, -8
+ 483              		.cfi_offset 14, -4
+ 484 0236 84B0     		sub	sp, sp, #16
+ 485              		.cfi_def_cfa_offset 24
+ 486 0238 00AF     		add	r7, sp, #0
+ 487              		.cfi_def_cfa_register 7
+ 488 023a 7860     		str	r0, [r7, #4]
+ 217:../tasks/usb/usbh_conf.c ****   USBH_SpeedTypeDef speed = USBH_SPEED_FULL;
+ 489              		.loc 1 217 0
+ 490 023c 0123     		movs	r3, #1
+ 491 023e FB73     		strb	r3, [r7, #15]
+ 218:../tasks/usb/usbh_conf.c ****     
+ 219:../tasks/usb/usbh_conf.c ****   switch (HAL_HCD_GetCurrentSpeed(phost->pData))
+ 492              		.loc 1 219 0
+ 493 0240 7B68     		ldr	r3, [r7, #4]
+ 494 0242 D3F8C032 		ldr	r3, [r3, #704]
+ 495 0246 1846     		mov	r0, r3
+ 496 0248 FFF7FEFF 		bl	HAL_HCD_GetCurrentSpeed
+ 497 024c 0346     		mov	r3, r0
+ 498 024e 012B     		cmp	r3, #1
+ 499 0250 07D0     		beq	.L17
+ 500 0252 012B     		cmp	r3, #1
+ 501 0254 02D3     		bcc	.L18
+ 502 0256 022B     		cmp	r3, #2
+ 503 0258 06D0     		beq	.L19
+ 504 025a 08E0     		b	.L22
+ 505              	.L18:
+ 220:../tasks/usb/usbh_conf.c ****   {
+ 221:../tasks/usb/usbh_conf.c ****   case 0: 
+ 222:../tasks/usb/usbh_conf.c ****     speed = USBH_SPEED_HIGH;
+ 506              		.loc 1 222 0
+ 507 025c 0023     		movs	r3, #0
+ 508 025e FB73     		strb	r3, [r7, #15]
+ 223:../tasks/usb/usbh_conf.c ****     break;
+ 509              		.loc 1 223 0
+ 510 0260 08E0     		b	.L20
+ 511              	.L17:
+ 224:../tasks/usb/usbh_conf.c **** 
+ 225:../tasks/usb/usbh_conf.c ****   case 1: 
+ 226:../tasks/usb/usbh_conf.c ****     speed = USBH_SPEED_FULL;    
+ 512              		.loc 1 226 0
+ 513 0262 0123     		movs	r3, #1
+ 514 0264 FB73     		strb	r3, [r7, #15]
+ 227:../tasks/usb/usbh_conf.c ****     break;
+ 515              		.loc 1 227 0
+ 516 0266 05E0     		b	.L20
+ 517              	.L19:
+ 228:../tasks/usb/usbh_conf.c ****     
+ 229:../tasks/usb/usbh_conf.c ****   case 2: 
+ 230:../tasks/usb/usbh_conf.c ****     speed = USBH_SPEED_LOW;   
+ 518              		.loc 1 230 0
+ 519 0268 0223     		movs	r3, #2
+ 520 026a FB73     		strb	r3, [r7, #15]
+ 231:../tasks/usb/usbh_conf.c ****     break;
+ 521              		.loc 1 231 0
+ 522 026c 02E0     		b	.L20
+ 523              	.L22:
+ 232:../tasks/usb/usbh_conf.c ****     
+ 233:../tasks/usb/usbh_conf.c ****    default:  
+ 234:../tasks/usb/usbh_conf.c ****     speed = USBH_SPEED_FULL;    
+ 524              		.loc 1 234 0
+ 525 026e 0123     		movs	r3, #1
+ 526 0270 FB73     		strb	r3, [r7, #15]
+ 235:../tasks/usb/usbh_conf.c ****     break;    
+ 527              		.loc 1 235 0
+ 528 0272 00BF     		nop
+ 529              	.L20:
+ 236:../tasks/usb/usbh_conf.c ****   }
+ 237:../tasks/usb/usbh_conf.c ****   return speed;
+ 530              		.loc 1 237 0
+ 531 0274 FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 238:../tasks/usb/usbh_conf.c **** }
+ 532              		.loc 1 238 0
+ 533 0276 1846     		mov	r0, r3
+ 534 0278 1037     		adds	r7, r7, #16
+ 535 027a BD46     		mov	sp, r7
+ 536              		@ sp needed
+ 537 027c 80BD     		pop	{r7, pc}
+ 538              		.cfi_endproc
+ 539              	.LFE65:
+ 541 027e 00BF     		.align	2
+ 542              		.global	USBH_LL_ResetPort
+ 543              		.thumb
+ 544              		.thumb_func
+ 546              	USBH_LL_ResetPort:
+ 547              	.LFB66:
+ 239:../tasks/usb/usbh_conf.c **** 
+ 240:../tasks/usb/usbh_conf.c **** /**
+ 241:../tasks/usb/usbh_conf.c ****   * @brief  Resets the Host Port of the Low Level Driver.
+ 242:../tasks/usb/usbh_conf.c ****   * @param  phost: Host handle
+ 243:../tasks/usb/usbh_conf.c ****   * @retval USBH Status
+ 244:../tasks/usb/usbh_conf.c ****   */
+ 245:../tasks/usb/usbh_conf.c **** USBH_StatusTypeDef USBH_LL_ResetPort (USBH_HandleTypeDef *phost) 
+ 246:../tasks/usb/usbh_conf.c **** {
+ 548              		.loc 1 246 0
+ 549              		.cfi_startproc
+ 550              		@ args = 0, pretend = 0, frame = 8
+ 551              		@ frame_needed = 1, uses_anonymous_args = 0
+ 552 0280 80B5     		push	{r7, lr}
+ 553              		.cfi_def_cfa_offset 8
+ 554              		.cfi_offset 7, -8
+ 555              		.cfi_offset 14, -4
+ 556 0282 82B0     		sub	sp, sp, #8
+ 557              		.cfi_def_cfa_offset 16
+ 558 0284 00AF     		add	r7, sp, #0
+ 559              		.cfi_def_cfa_register 7
+ 560 0286 7860     		str	r0, [r7, #4]
+ 247:../tasks/usb/usbh_conf.c ****   HAL_HCD_ResetPort(phost->pData);
+ 561              		.loc 1 247 0
+ 562 0288 7B68     		ldr	r3, [r7, #4]
+ 563 028a D3F8C032 		ldr	r3, [r3, #704]
+ 564 028e 1846     		mov	r0, r3
+ 565 0290 FFF7FEFF 		bl	HAL_HCD_ResetPort
+ 248:../tasks/usb/usbh_conf.c ****   return USBH_OK; 
+ 566              		.loc 1 248 0
+ 567 0294 0023     		movs	r3, #0
+ 249:../tasks/usb/usbh_conf.c **** }
+ 568              		.loc 1 249 0
+ 569 0296 1846     		mov	r0, r3
+ 570 0298 0837     		adds	r7, r7, #8
+ 571 029a BD46     		mov	sp, r7
+ 572              		@ sp needed
+ 573 029c 80BD     		pop	{r7, pc}
+ 574              		.cfi_endproc
+ 575              	.LFE66:
+ 577 029e 00BF     		.align	2
+ 578              		.global	USBH_LL_GetLastXferSize
+ 579              		.thumb
+ 580              		.thumb_func
+ 582              	USBH_LL_GetLastXferSize:
+ 583              	.LFB67:
+ 250:../tasks/usb/usbh_conf.c **** 
+ 251:../tasks/usb/usbh_conf.c **** /**
+ 252:../tasks/usb/usbh_conf.c ****   * @brief  Returns the last transfered packet size.
+ 253:../tasks/usb/usbh_conf.c ****   * @param  phost: Host handle
+ 254:../tasks/usb/usbh_conf.c ****   * @param  pipe: Pipe index   
+ 255:../tasks/usb/usbh_conf.c ****   * @retval Packet Size
+ 256:../tasks/usb/usbh_conf.c ****   */
+ 257:../tasks/usb/usbh_conf.c **** uint32_t USBH_LL_GetLastXferSize(USBH_HandleTypeDef *phost, uint8_t pipe)  
+ 258:../tasks/usb/usbh_conf.c **** {
+ 584              		.loc 1 258 0
+ 585              		.cfi_startproc
+ 586              		@ args = 0, pretend = 0, frame = 8
+ 587              		@ frame_needed = 1, uses_anonymous_args = 0
+ 588 02a0 80B5     		push	{r7, lr}
+ 589              		.cfi_def_cfa_offset 8
+ 590              		.cfi_offset 7, -8
+ 591              		.cfi_offset 14, -4
+ 592 02a2 82B0     		sub	sp, sp, #8
+ 593              		.cfi_def_cfa_offset 16
+ 594 02a4 00AF     		add	r7, sp, #0
+ 595              		.cfi_def_cfa_register 7
+ 596 02a6 7860     		str	r0, [r7, #4]
+ 597 02a8 0B46     		mov	r3, r1
+ 598 02aa FB70     		strb	r3, [r7, #3]
+ 259:../tasks/usb/usbh_conf.c ****   return HAL_HCD_HC_GetXferCount(phost->pData, pipe);
+ 599              		.loc 1 259 0
+ 600 02ac 7B68     		ldr	r3, [r7, #4]
+ 601 02ae D3F8C022 		ldr	r2, [r3, #704]
+ 602 02b2 FB78     		ldrb	r3, [r7, #3]	@ zero_extendqisi2
+ 603 02b4 1046     		mov	r0, r2
+ 604 02b6 1946     		mov	r1, r3
+ 605 02b8 FFF7FEFF 		bl	HAL_HCD_HC_GetXferCount
+ 606 02bc 0346     		mov	r3, r0
+ 260:../tasks/usb/usbh_conf.c **** }
+ 607              		.loc 1 260 0
+ 608 02be 1846     		mov	r0, r3
+ 609 02c0 0837     		adds	r7, r7, #8
+ 610 02c2 BD46     		mov	sp, r7
+ 611              		@ sp needed
+ 612 02c4 80BD     		pop	{r7, pc}
+ 613              		.cfi_endproc
+ 614              	.LFE67:
+ 616 02c6 00BF     		.align	2
+ 617              		.global	USBH_LL_OpenPipe
+ 618              		.thumb
+ 619              		.thumb_func
+ 621              	USBH_LL_OpenPipe:
+ 622              	.LFB68:
+ 261:../tasks/usb/usbh_conf.c **** 
+ 262:../tasks/usb/usbh_conf.c **** /**
+ 263:../tasks/usb/usbh_conf.c ****   * @brief  Opens a pipe of the Low Level Driver.
+ 264:../tasks/usb/usbh_conf.c ****   * @param  phost: Host handle
+ 265:../tasks/usb/usbh_conf.c ****   * @param  pipe: Pipe index
+ 266:../tasks/usb/usbh_conf.c ****   * @param  epnum: Endpoint Number
+ 267:../tasks/usb/usbh_conf.c ****   * @param  dev_address: Device USB address
+ 268:../tasks/usb/usbh_conf.c ****   * @param  speed: Device Speed 
+ 269:../tasks/usb/usbh_conf.c ****   * @param  ep_type: Endpoint Type
+ 270:../tasks/usb/usbh_conf.c ****   * @param  mps: Endpoint Max Packet Size                 
+ 271:../tasks/usb/usbh_conf.c ****   * @retval USBH Status
+ 272:../tasks/usb/usbh_conf.c ****   */
+ 273:../tasks/usb/usbh_conf.c **** USBH_StatusTypeDef USBH_LL_OpenPipe(USBH_HandleTypeDef *phost, 
+ 274:../tasks/usb/usbh_conf.c ****                                     uint8_t pipe,
+ 275:../tasks/usb/usbh_conf.c ****                                     uint8_t epnum,                                      
+ 276:../tasks/usb/usbh_conf.c ****                                     uint8_t dev_address,
+ 277:../tasks/usb/usbh_conf.c ****                                     uint8_t speed,
+ 278:../tasks/usb/usbh_conf.c ****                                     uint8_t ep_type,
+ 279:../tasks/usb/usbh_conf.c ****                                     uint16_t mps)
+ 280:../tasks/usb/usbh_conf.c **** {
+ 623              		.loc 1 280 0
+ 624              		.cfi_startproc
+ 625              		@ args = 12, pretend = 0, frame = 8
+ 626              		@ frame_needed = 1, uses_anonymous_args = 0
+ 627 02c8 90B5     		push	{r4, r7, lr}
+ 628              		.cfi_def_cfa_offset 12
+ 629              		.cfi_offset 4, -12
+ 630              		.cfi_offset 7, -8
+ 631              		.cfi_offset 14, -4
+ 632 02ca 87B0     		sub	sp, sp, #28
+ 633              		.cfi_def_cfa_offset 40
+ 634 02cc 04AF     		add	r7, sp, #16
+ 635              		.cfi_def_cfa 7, 24
+ 636 02ce 7860     		str	r0, [r7, #4]
+ 637 02d0 F970     		strb	r1, [r7, #3]
+ 638 02d2 BA70     		strb	r2, [r7, #2]
+ 639 02d4 7B70     		strb	r3, [r7, #1]
+ 281:../tasks/usb/usbh_conf.c ****   HAL_HCD_HC_Init(phost->pData,
+ 640              		.loc 1 281 0
+ 641 02d6 7B68     		ldr	r3, [r7, #4]
+ 642 02d8 D3F8C002 		ldr	r0, [r3, #704]
+ 643 02dc F978     		ldrb	r1, [r7, #3]	@ zero_extendqisi2
+ 644 02de BA78     		ldrb	r2, [r7, #2]	@ zero_extendqisi2
+ 645 02e0 7B78     		ldrb	r3, [r7, #1]	@ zero_extendqisi2
+ 646 02e2 3C7E     		ldrb	r4, [r7, #24]	@ zero_extendqisi2
+ 647 02e4 0094     		str	r4, [sp]
+ 648 02e6 3C7F     		ldrb	r4, [r7, #28]	@ zero_extendqisi2
+ 649 02e8 0194     		str	r4, [sp, #4]
+ 650 02ea 3C8C     		ldrh	r4, [r7, #32]
+ 651 02ec 0294     		str	r4, [sp, #8]
+ 652 02ee FFF7FEFF 		bl	HAL_HCD_HC_Init
+ 282:../tasks/usb/usbh_conf.c ****                   pipe,
+ 283:../tasks/usb/usbh_conf.c ****                   epnum,
+ 284:../tasks/usb/usbh_conf.c ****                   dev_address,
+ 285:../tasks/usb/usbh_conf.c ****                   speed,
+ 286:../tasks/usb/usbh_conf.c ****                   ep_type,
+ 287:../tasks/usb/usbh_conf.c ****                   mps);
+ 288:../tasks/usb/usbh_conf.c ****   return USBH_OK; 
+ 653              		.loc 1 288 0
+ 654 02f2 0023     		movs	r3, #0
+ 289:../tasks/usb/usbh_conf.c **** }
+ 655              		.loc 1 289 0
+ 656 02f4 1846     		mov	r0, r3
+ 657 02f6 0C37     		adds	r7, r7, #12
+ 658 02f8 BD46     		mov	sp, r7
+ 659              		@ sp needed
+ 660 02fa 90BD     		pop	{r4, r7, pc}
+ 661              		.cfi_endproc
+ 662              	.LFE68:
+ 664              		.align	2
+ 665              		.global	USBH_LL_ClosePipe
+ 666              		.thumb
+ 667              		.thumb_func
+ 669              	USBH_LL_ClosePipe:
+ 670              	.LFB69:
+ 290:../tasks/usb/usbh_conf.c **** 
+ 291:../tasks/usb/usbh_conf.c **** /**
+ 292:../tasks/usb/usbh_conf.c ****   * @brief  Closes a pipe of the Low Level Driver.
+ 293:../tasks/usb/usbh_conf.c ****   * @param  phost: Host handle
+ 294:../tasks/usb/usbh_conf.c ****   * @param  pipe: Pipe index               
+ 295:../tasks/usb/usbh_conf.c ****   * @retval USBH Status
+ 296:../tasks/usb/usbh_conf.c ****   */
+ 297:../tasks/usb/usbh_conf.c **** USBH_StatusTypeDef USBH_LL_ClosePipe(USBH_HandleTypeDef *phost, uint8_t pipe)   
+ 298:../tasks/usb/usbh_conf.c **** {
+ 671              		.loc 1 298 0
+ 672              		.cfi_startproc
+ 673              		@ args = 0, pretend = 0, frame = 8
+ 674              		@ frame_needed = 1, uses_anonymous_args = 0
+ 675 02fc 80B5     		push	{r7, lr}
+ 676              		.cfi_def_cfa_offset 8
+ 677              		.cfi_offset 7, -8
+ 678              		.cfi_offset 14, -4
+ 679 02fe 82B0     		sub	sp, sp, #8
+ 680              		.cfi_def_cfa_offset 16
+ 681 0300 00AF     		add	r7, sp, #0
+ 682              		.cfi_def_cfa_register 7
+ 683 0302 7860     		str	r0, [r7, #4]
+ 684 0304 0B46     		mov	r3, r1
+ 685 0306 FB70     		strb	r3, [r7, #3]
+ 299:../tasks/usb/usbh_conf.c ****   HAL_HCD_HC_Halt(phost->pData, pipe);
+ 686              		.loc 1 299 0
+ 687 0308 7B68     		ldr	r3, [r7, #4]
+ 688 030a D3F8C022 		ldr	r2, [r3, #704]
+ 689 030e FB78     		ldrb	r3, [r7, #3]	@ zero_extendqisi2
+ 690 0310 1046     		mov	r0, r2
+ 691 0312 1946     		mov	r1, r3
+ 692 0314 FFF7FEFF 		bl	HAL_HCD_HC_Halt
+ 300:../tasks/usb/usbh_conf.c ****   return USBH_OK;
+ 693              		.loc 1 300 0
+ 694 0318 0023     		movs	r3, #0
+ 301:../tasks/usb/usbh_conf.c **** }
+ 695              		.loc 1 301 0
+ 696 031a 1846     		mov	r0, r3
+ 697 031c 0837     		adds	r7, r7, #8
+ 698 031e BD46     		mov	sp, r7
+ 699              		@ sp needed
+ 700 0320 80BD     		pop	{r7, pc}
+ 701              		.cfi_endproc
+ 702              	.LFE69:
+ 704 0322 00BF     		.align	2
+ 705              		.global	USBH_LL_SubmitURB
+ 706              		.thumb
+ 707              		.thumb_func
+ 709              	USBH_LL_SubmitURB:
+ 710              	.LFB70:
+ 302:../tasks/usb/usbh_conf.c **** 
+ 303:../tasks/usb/usbh_conf.c **** /**
+ 304:../tasks/usb/usbh_conf.c ****   * @brief  Submits a new URB to the low level driver.
+ 305:../tasks/usb/usbh_conf.c ****   * @param  phost: Host handle
+ 306:../tasks/usb/usbh_conf.c ****   * @param  pipe: Pipe index    
+ 307:../tasks/usb/usbh_conf.c ****   *          This parameter can be a value from 1 to 15
+ 308:../tasks/usb/usbh_conf.c ****   * @param  direction: Channel number
+ 309:../tasks/usb/usbh_conf.c ****   *          This parameter can be one of these values:
+ 310:../tasks/usb/usbh_conf.c ****   *           0: Output 
+ 311:../tasks/usb/usbh_conf.c ****   *           1: Input
+ 312:../tasks/usb/usbh_conf.c ****   * @param  ep_type: Endpoint Type
+ 313:../tasks/usb/usbh_conf.c ****   *          This parameter can be one of these values:
+ 314:../tasks/usb/usbh_conf.c ****   *            @arg EP_TYPE_CTRL: Control type
+ 315:../tasks/usb/usbh_conf.c ****   *            @arg EP_TYPE_ISOC: Isochrounous type
+ 316:../tasks/usb/usbh_conf.c ****   *            @arg EP_TYPE_BULK: Bulk type
+ 317:../tasks/usb/usbh_conf.c ****   *            @arg EP_TYPE_INTR: Interrupt type
+ 318:../tasks/usb/usbh_conf.c ****   * @param  token: Endpoint Type
+ 319:../tasks/usb/usbh_conf.c ****   *          This parameter can be one of these values:
+ 320:../tasks/usb/usbh_conf.c ****   *            @arg 0: PID_SETUP
+ 321:../tasks/usb/usbh_conf.c ****   *            @arg 1: PID_DATA
+ 322:../tasks/usb/usbh_conf.c ****   * @param  pbuff: pointer to URB data
+ 323:../tasks/usb/usbh_conf.c ****   * @param  length: length of URB data
+ 324:../tasks/usb/usbh_conf.c ****   * @param  do_ping: activate do ping protocol (for high speed only)
+ 325:../tasks/usb/usbh_conf.c ****   *          This parameter can be one of these values:
+ 326:../tasks/usb/usbh_conf.c ****   *           0: do ping inactive 
+ 327:../tasks/usb/usbh_conf.c ****   *           1: do ping active 
+ 328:../tasks/usb/usbh_conf.c ****   * @retval USBH Status
+ 329:../tasks/usb/usbh_conf.c ****   */
+ 330:../tasks/usb/usbh_conf.c **** USBH_StatusTypeDef USBH_LL_SubmitURB(USBH_HandleTypeDef *phost, 
+ 331:../tasks/usb/usbh_conf.c ****                                      uint8_t pipe, 
+ 332:../tasks/usb/usbh_conf.c ****                                      uint8_t direction,
+ 333:../tasks/usb/usbh_conf.c ****                                      uint8_t ep_type,  
+ 334:../tasks/usb/usbh_conf.c ****                                      uint8_t token, 
+ 335:../tasks/usb/usbh_conf.c ****                                      uint8_t* pbuff, 
+ 336:../tasks/usb/usbh_conf.c ****                                      uint16_t length,
+ 337:../tasks/usb/usbh_conf.c ****                                      uint8_t do_ping) 
+ 338:../tasks/usb/usbh_conf.c **** {
+ 711              		.loc 1 338 0
+ 712              		.cfi_startproc
+ 713              		@ args = 16, pretend = 0, frame = 8
+ 714              		@ frame_needed = 1, uses_anonymous_args = 0
+ 715 0324 90B5     		push	{r4, r7, lr}
+ 716              		.cfi_def_cfa_offset 12
+ 717              		.cfi_offset 4, -12
+ 718              		.cfi_offset 7, -8
+ 719              		.cfi_offset 14, -4
+ 720 0326 87B0     		sub	sp, sp, #28
+ 721              		.cfi_def_cfa_offset 40
+ 722 0328 04AF     		add	r7, sp, #16
+ 723              		.cfi_def_cfa 7, 24
+ 724 032a 7860     		str	r0, [r7, #4]
+ 725 032c F970     		strb	r1, [r7, #3]
+ 726 032e BA70     		strb	r2, [r7, #2]
+ 727 0330 7B70     		strb	r3, [r7, #1]
+ 339:../tasks/usb/usbh_conf.c ****   HAL_HCD_HC_SubmitRequest(phost->pData,
+ 728              		.loc 1 339 0
+ 729 0332 7B68     		ldr	r3, [r7, #4]
+ 730 0334 D3F8C002 		ldr	r0, [r3, #704]
+ 731 0338 F978     		ldrb	r1, [r7, #3]	@ zero_extendqisi2
+ 732 033a BA78     		ldrb	r2, [r7, #2]	@ zero_extendqisi2
+ 733 033c 7B78     		ldrb	r3, [r7, #1]	@ zero_extendqisi2
+ 734 033e 3C7E     		ldrb	r4, [r7, #24]	@ zero_extendqisi2
+ 735 0340 0094     		str	r4, [sp]
+ 736 0342 FC69     		ldr	r4, [r7, #28]
+ 737 0344 0194     		str	r4, [sp, #4]
+ 738 0346 3C8C     		ldrh	r4, [r7, #32]
+ 739 0348 0294     		str	r4, [sp, #8]
+ 740 034a 97F82440 		ldrb	r4, [r7, #36]	@ zero_extendqisi2
+ 741 034e 0394     		str	r4, [sp, #12]
+ 742 0350 FFF7FEFF 		bl	HAL_HCD_HC_SubmitRequest
+ 340:../tasks/usb/usbh_conf.c ****                            pipe, 
+ 341:../tasks/usb/usbh_conf.c ****                            direction,
+ 342:../tasks/usb/usbh_conf.c ****                            ep_type,  
+ 343:../tasks/usb/usbh_conf.c ****                            token, 
+ 344:../tasks/usb/usbh_conf.c ****                            pbuff, 
+ 345:../tasks/usb/usbh_conf.c ****                            length,
+ 346:../tasks/usb/usbh_conf.c ****                            do_ping);
+ 347:../tasks/usb/usbh_conf.c ****   return USBH_OK;   
+ 743              		.loc 1 347 0
+ 744 0354 0023     		movs	r3, #0
+ 348:../tasks/usb/usbh_conf.c **** }
+ 745              		.loc 1 348 0
+ 746 0356 1846     		mov	r0, r3
+ 747 0358 0C37     		adds	r7, r7, #12
+ 748 035a BD46     		mov	sp, r7
+ 749              		@ sp needed
+ 750 035c 90BD     		pop	{r4, r7, pc}
+ 751              		.cfi_endproc
+ 752              	.LFE70:
+ 754 035e 00BF     		.align	2
+ 755              		.global	USBH_LL_GetURBState
+ 756              		.thumb
+ 757              		.thumb_func
+ 759              	USBH_LL_GetURBState:
+ 760              	.LFB71:
+ 349:../tasks/usb/usbh_conf.c **** 
+ 350:../tasks/usb/usbh_conf.c **** /**
+ 351:../tasks/usb/usbh_conf.c ****   * @brief  Gets a URB state from the low level driver.
+ 352:../tasks/usb/usbh_conf.c ****   * @param  phost: Host handle
+ 353:../tasks/usb/usbh_conf.c ****   * @param  pipe: Pipe index
+ 354:../tasks/usb/usbh_conf.c ****   *          This parameter can be a value from 1 to 15
+ 355:../tasks/usb/usbh_conf.c ****   * @retval URB state
+ 356:../tasks/usb/usbh_conf.c ****   *          This parameter can be one of these values:
+ 357:../tasks/usb/usbh_conf.c ****   *            @arg URB_IDLE
+ 358:../tasks/usb/usbh_conf.c ****   *            @arg URB_DONE
+ 359:../tasks/usb/usbh_conf.c ****   *            @arg URB_NOTREADY
+ 360:../tasks/usb/usbh_conf.c ****   *            @arg URB_NYET 
+ 361:../tasks/usb/usbh_conf.c ****   *            @arg URB_ERROR  
+ 362:../tasks/usb/usbh_conf.c ****   *            @arg URB_STALL      
+ 363:../tasks/usb/usbh_conf.c ****   */
+ 364:../tasks/usb/usbh_conf.c **** USBH_URBStateTypeDef USBH_LL_GetURBState(USBH_HandleTypeDef *phost, uint8_t pipe) 
+ 365:../tasks/usb/usbh_conf.c **** {
+ 761              		.loc 1 365 0
+ 762              		.cfi_startproc
+ 763              		@ args = 0, pretend = 0, frame = 8
+ 764              		@ frame_needed = 1, uses_anonymous_args = 0
+ 765 0360 80B5     		push	{r7, lr}
+ 766              		.cfi_def_cfa_offset 8
+ 767              		.cfi_offset 7, -8
+ 768              		.cfi_offset 14, -4
+ 769 0362 82B0     		sub	sp, sp, #8
+ 770              		.cfi_def_cfa_offset 16
+ 771 0364 00AF     		add	r7, sp, #0
+ 772              		.cfi_def_cfa_register 7
+ 773 0366 7860     		str	r0, [r7, #4]
+ 774 0368 0B46     		mov	r3, r1
+ 775 036a FB70     		strb	r3, [r7, #3]
+ 366:../tasks/usb/usbh_conf.c ****   return (USBH_URBStateTypeDef)HAL_HCD_HC_GetURBState (phost->pData, pipe);
+ 776              		.loc 1 366 0
+ 777 036c 7B68     		ldr	r3, [r7, #4]
+ 778 036e D3F8C022 		ldr	r2, [r3, #704]
+ 779 0372 FB78     		ldrb	r3, [r7, #3]	@ zero_extendqisi2
+ 780 0374 1046     		mov	r0, r2
+ 781 0376 1946     		mov	r1, r3
+ 782 0378 FFF7FEFF 		bl	HAL_HCD_HC_GetURBState
+ 783 037c 0346     		mov	r3, r0
+ 367:../tasks/usb/usbh_conf.c **** }
+ 784              		.loc 1 367 0
+ 785 037e 1846     		mov	r0, r3
+ 786 0380 0837     		adds	r7, r7, #8
+ 787 0382 BD46     		mov	sp, r7
+ 788              		@ sp needed
+ 789 0384 80BD     		pop	{r7, pc}
+ 790              		.cfi_endproc
+ 791              	.LFE71:
+ 793 0386 00BF     		.align	2
+ 794              		.global	USBH_LL_DriverVBUS
+ 795              		.thumb
+ 796              		.thumb_func
+ 798              	USBH_LL_DriverVBUS:
+ 799              	.LFB72:
+ 368:../tasks/usb/usbh_conf.c **** 
+ 369:../tasks/usb/usbh_conf.c **** /**
+ 370:../tasks/usb/usbh_conf.c ****   * @brief  Drives VBUS.
+ 371:../tasks/usb/usbh_conf.c ****   * @param  phost: Host handle
+ 372:../tasks/usb/usbh_conf.c ****   * @param  state: VBUS state
+ 373:../tasks/usb/usbh_conf.c ****   *          This parameter can be one of these values:
+ 374:../tasks/usb/usbh_conf.c ****   *           0: VBUS Active 
+ 375:../tasks/usb/usbh_conf.c ****   *           1: VBUS Inactive
+ 376:../tasks/usb/usbh_conf.c ****   * @retval USBH Status
+ 377:../tasks/usb/usbh_conf.c ****   */
+ 378:../tasks/usb/usbh_conf.c **** USBH_StatusTypeDef USBH_LL_DriverVBUS(USBH_HandleTypeDef *phost, uint8_t state)
+ 379:../tasks/usb/usbh_conf.c **** {
+ 800              		.loc 1 379 0
+ 801              		.cfi_startproc
+ 802              		@ args = 0, pretend = 0, frame = 8
+ 803              		@ frame_needed = 1, uses_anonymous_args = 0
+ 804 0388 80B5     		push	{r7, lr}
+ 805              		.cfi_def_cfa_offset 8
+ 806              		.cfi_offset 7, -8
+ 807              		.cfi_offset 14, -4
+ 808 038a 82B0     		sub	sp, sp, #8
+ 809              		.cfi_def_cfa_offset 16
+ 810 038c 00AF     		add	r7, sp, #0
+ 811              		.cfi_def_cfa_register 7
+ 812 038e 7860     		str	r0, [r7, #4]
+ 813 0390 0B46     		mov	r3, r1
+ 814 0392 FB70     		strb	r3, [r7, #3]
+ 380:../tasks/usb/usbh_conf.c ****   if(state == 0)
+ 815              		.loc 1 380 0
+ 816 0394 FB78     		ldrb	r3, [r7, #3]	@ zero_extendqisi2
+ 817 0396 002B     		cmp	r3, #0
+ 818 0398 08D1     		bne	.L36
+ 381:../tasks/usb/usbh_conf.c ****   {
+ 382:../tasks/usb/usbh_conf.c ****     HAL_GPIO_WritePin(GPIOH, GPIO_PIN_5, GPIO_PIN_SET);
+ 819              		.loc 1 382 0
+ 820 039a 4FF4E050 		mov	r0, #7168
+ 821 039e C4F20200 		movt	r0, 16386
+ 822 03a2 2021     		movs	r1, #32
+ 823 03a4 0122     		movs	r2, #1
+ 824 03a6 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 825 03aa 07E0     		b	.L37
+ 826              	.L36:
+ 383:../tasks/usb/usbh_conf.c ****   }
+ 384:../tasks/usb/usbh_conf.c ****   else
+ 385:../tasks/usb/usbh_conf.c ****   {
+ 386:../tasks/usb/usbh_conf.c ****     HAL_GPIO_WritePin(GPIOH, GPIO_PIN_5, GPIO_PIN_RESET);
+ 827              		.loc 1 386 0
+ 828 03ac 4FF4E050 		mov	r0, #7168
+ 829 03b0 C4F20200 		movt	r0, 16386
+ 830 03b4 2021     		movs	r1, #32
+ 831 03b6 0022     		movs	r2, #0
+ 832 03b8 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 833              	.L37:
+ 387:../tasks/usb/usbh_conf.c ****   }
+ 388:../tasks/usb/usbh_conf.c ****   
+ 389:../tasks/usb/usbh_conf.c ****   HAL_Delay(200);
+ 834              		.loc 1 389 0
+ 835 03bc C820     		movs	r0, #200
+ 836 03be FFF7FEFF 		bl	HAL_Delay
+ 390:../tasks/usb/usbh_conf.c ****   return USBH_OK;  
+ 837              		.loc 1 390 0
+ 838 03c2 0023     		movs	r3, #0
+ 391:../tasks/usb/usbh_conf.c **** }
+ 839              		.loc 1 391 0
+ 840 03c4 1846     		mov	r0, r3
+ 841 03c6 0837     		adds	r7, r7, #8
+ 842 03c8 BD46     		mov	sp, r7
+ 843              		@ sp needed
+ 844 03ca 80BD     		pop	{r7, pc}
+ 845              		.cfi_endproc
+ 846              	.LFE72:
+ 848              		.align	2
+ 849              		.global	USBH_LL_SetToggle
+ 850              		.thumb
+ 851              		.thumb_func
+ 853              	USBH_LL_SetToggle:
+ 854              	.LFB73:
+ 392:../tasks/usb/usbh_conf.c **** 
+ 393:../tasks/usb/usbh_conf.c **** /**
+ 394:../tasks/usb/usbh_conf.c ****   * @brief  Sets toggle for a pipe.
+ 395:../tasks/usb/usbh_conf.c ****   * @param  phost: Host handle
+ 396:../tasks/usb/usbh_conf.c ****   * @param  pipe: Pipe index   
+ 397:../tasks/usb/usbh_conf.c ****   * @param  toggle: toggle (0/1)
+ 398:../tasks/usb/usbh_conf.c ****   * @retval USBH Status
+ 399:../tasks/usb/usbh_conf.c ****   */
+ 400:../tasks/usb/usbh_conf.c **** USBH_StatusTypeDef USBH_LL_SetToggle(USBH_HandleTypeDef *phost, uint8_t pipe, uint8_t toggle)   
+ 401:../tasks/usb/usbh_conf.c **** {
+ 855              		.loc 1 401 0
+ 856              		.cfi_startproc
+ 857              		@ args = 0, pretend = 0, frame = 8
+ 858              		@ frame_needed = 1, uses_anonymous_args = 0
+ 859              		@ link register save eliminated.
+ 860 03cc 80B4     		push	{r7}
+ 861              		.cfi_def_cfa_offset 4
+ 862              		.cfi_offset 7, -4
+ 863 03ce 83B0     		sub	sp, sp, #12
+ 864              		.cfi_def_cfa_offset 16
+ 865 03d0 00AF     		add	r7, sp, #0
+ 866              		.cfi_def_cfa_register 7
+ 867 03d2 7860     		str	r0, [r7, #4]
+ 868 03d4 1346     		mov	r3, r2
+ 869 03d6 0A46     		mov	r2, r1
+ 870 03d8 FA70     		strb	r2, [r7, #3]
+ 871 03da BB70     		strb	r3, [r7, #2]
+ 402:../tasks/usb/usbh_conf.c ****   if(hhcd.hc[pipe].ep_is_in)
+ 872              		.loc 1 402 0
+ 873 03dc F978     		ldrb	r1, [r7, #3]	@ zero_extendqisi2
+ 874 03de 40F20002 		movw	r2, #:lower16:hhcd
+ 875 03e2 C0F20002 		movt	r2, #:upper16:hhcd
+ 876 03e6 0B46     		mov	r3, r1
+ 877 03e8 9B00     		lsls	r3, r3, #2
+ 878 03ea 0B44     		add	r3, r3, r1
+ 879 03ec DB00     		lsls	r3, r3, #3
+ 880 03ee 1344     		add	r3, r3, r2
+ 881 03f0 3033     		adds	r3, r3, #48
+ 882 03f2 DB78     		ldrb	r3, [r3, #3]	@ zero_extendqisi2
+ 883 03f4 002B     		cmp	r3, #0
+ 884 03f6 0DD0     		beq	.L40
+ 403:../tasks/usb/usbh_conf.c ****   {
+ 404:../tasks/usb/usbh_conf.c ****     hhcd.hc[pipe].toggle_in = toggle;
+ 885              		.loc 1 404 0
+ 886 03f8 F978     		ldrb	r1, [r7, #3]	@ zero_extendqisi2
+ 887 03fa 40F20002 		movw	r2, #:lower16:hhcd
+ 888 03fe C0F20002 		movt	r2, #:upper16:hhcd
+ 889 0402 0B46     		mov	r3, r1
+ 890 0404 9B00     		lsls	r3, r3, #2
+ 891 0406 0B44     		add	r3, r3, r1
+ 892 0408 DB00     		lsls	r3, r3, #3
+ 893 040a 1344     		add	r3, r3, r2
+ 894 040c 4833     		adds	r3, r3, #72
+ 895 040e BA78     		ldrb	r2, [r7, #2]
+ 896 0410 1A70     		strb	r2, [r3]
+ 897 0412 0CE0     		b	.L41
+ 898              	.L40:
+ 405:../tasks/usb/usbh_conf.c ****   }
+ 406:../tasks/usb/usbh_conf.c ****   else
+ 407:../tasks/usb/usbh_conf.c ****   {
+ 408:../tasks/usb/usbh_conf.c ****     hhcd.hc[pipe].toggle_out = toggle;
+ 899              		.loc 1 408 0
+ 900 0414 F978     		ldrb	r1, [r7, #3]	@ zero_extendqisi2
+ 901 0416 40F20002 		movw	r2, #:lower16:hhcd
+ 902 041a C0F20002 		movt	r2, #:upper16:hhcd
+ 903 041e 0B46     		mov	r3, r1
+ 904 0420 9B00     		lsls	r3, r3, #2
+ 905 0422 0B44     		add	r3, r3, r1
+ 906 0424 DB00     		lsls	r3, r3, #3
+ 907 0426 1344     		add	r3, r3, r2
+ 908 0428 4833     		adds	r3, r3, #72
+ 909 042a BA78     		ldrb	r2, [r7, #2]
+ 910 042c 5A70     		strb	r2, [r3, #1]
+ 911              	.L41:
+ 409:../tasks/usb/usbh_conf.c ****   }
+ 410:../tasks/usb/usbh_conf.c ****   return USBH_OK; 
+ 912              		.loc 1 410 0
+ 913 042e 0023     		movs	r3, #0
+ 411:../tasks/usb/usbh_conf.c **** }
+ 914              		.loc 1 411 0
+ 915 0430 1846     		mov	r0, r3
+ 916 0432 0C37     		adds	r7, r7, #12
+ 917 0434 BD46     		mov	sp, r7
+ 918              		@ sp needed
+ 919 0436 5DF8047B 		ldr	r7, [sp], #4
+ 920 043a 7047     		bx	lr
+ 921              		.cfi_endproc
+ 922              	.LFE73:
+ 924              		.align	2
+ 925              		.global	USBH_LL_GetToggle
+ 926              		.thumb
+ 927              		.thumb_func
+ 929              	USBH_LL_GetToggle:
+ 930              	.LFB74:
+ 412:../tasks/usb/usbh_conf.c **** 
+ 413:../tasks/usb/usbh_conf.c **** /**
+ 414:../tasks/usb/usbh_conf.c ****   * @brief  Returns the current toggle of a pipe.
+ 415:../tasks/usb/usbh_conf.c ****   * @param  phost: Host handle
+ 416:../tasks/usb/usbh_conf.c ****   * @param  pipe: Pipe index
+ 417:../tasks/usb/usbh_conf.c ****   * @retval toggle (0/1)
+ 418:../tasks/usb/usbh_conf.c ****   */
+ 419:../tasks/usb/usbh_conf.c **** uint8_t USBH_LL_GetToggle(USBH_HandleTypeDef *phost, uint8_t pipe)   
+ 420:../tasks/usb/usbh_conf.c **** {
+ 931              		.loc 1 420 0
+ 932              		.cfi_startproc
+ 933              		@ args = 0, pretend = 0, frame = 16
+ 934              		@ frame_needed = 1, uses_anonymous_args = 0
+ 935              		@ link register save eliminated.
+ 936 043c 80B4     		push	{r7}
+ 937              		.cfi_def_cfa_offset 4
+ 938              		.cfi_offset 7, -4
+ 939 043e 85B0     		sub	sp, sp, #20
+ 940              		.cfi_def_cfa_offset 24
+ 941 0440 00AF     		add	r7, sp, #0
+ 942              		.cfi_def_cfa_register 7
+ 943 0442 7860     		str	r0, [r7, #4]
+ 944 0444 0B46     		mov	r3, r1
+ 945 0446 FB70     		strb	r3, [r7, #3]
+ 421:../tasks/usb/usbh_conf.c ****   uint8_t toggle = 0;
+ 946              		.loc 1 421 0
+ 947 0448 0023     		movs	r3, #0
+ 948 044a FB73     		strb	r3, [r7, #15]
+ 422:../tasks/usb/usbh_conf.c ****   
+ 423:../tasks/usb/usbh_conf.c ****   if(hhcd.hc[pipe].ep_is_in)
+ 949              		.loc 1 423 0
+ 950 044c F978     		ldrb	r1, [r7, #3]	@ zero_extendqisi2
+ 951 044e 40F20002 		movw	r2, #:lower16:hhcd
+ 952 0452 C0F20002 		movt	r2, #:upper16:hhcd
+ 953 0456 0B46     		mov	r3, r1
+ 954 0458 9B00     		lsls	r3, r3, #2
+ 955 045a 0B44     		add	r3, r3, r1
+ 956 045c DB00     		lsls	r3, r3, #3
+ 957 045e 1344     		add	r3, r3, r2
+ 958 0460 3033     		adds	r3, r3, #48
+ 959 0462 DB78     		ldrb	r3, [r3, #3]	@ zero_extendqisi2
+ 960 0464 002B     		cmp	r3, #0
+ 961 0466 0DD0     		beq	.L44
+ 424:../tasks/usb/usbh_conf.c ****   {
+ 425:../tasks/usb/usbh_conf.c ****     toggle = hhcd.hc[pipe].toggle_in;
+ 962              		.loc 1 425 0
+ 963 0468 F978     		ldrb	r1, [r7, #3]	@ zero_extendqisi2
+ 964 046a 40F20002 		movw	r2, #:lower16:hhcd
+ 965 046e C0F20002 		movt	r2, #:upper16:hhcd
+ 966 0472 0B46     		mov	r3, r1
+ 967 0474 9B00     		lsls	r3, r3, #2
+ 968 0476 0B44     		add	r3, r3, r1
+ 969 0478 DB00     		lsls	r3, r3, #3
+ 970 047a 1344     		add	r3, r3, r2
+ 971 047c 4833     		adds	r3, r3, #72
+ 972 047e 1B78     		ldrb	r3, [r3]
+ 973 0480 FB73     		strb	r3, [r7, #15]
+ 974 0482 0CE0     		b	.L45
+ 975              	.L44:
+ 426:../tasks/usb/usbh_conf.c ****   }
+ 427:../tasks/usb/usbh_conf.c ****   else
+ 428:../tasks/usb/usbh_conf.c ****   {
+ 429:../tasks/usb/usbh_conf.c ****     toggle = hhcd.hc[pipe].toggle_out;
+ 976              		.loc 1 429 0
+ 977 0484 F978     		ldrb	r1, [r7, #3]	@ zero_extendqisi2
+ 978 0486 40F20002 		movw	r2, #:lower16:hhcd
+ 979 048a C0F20002 		movt	r2, #:upper16:hhcd
+ 980 048e 0B46     		mov	r3, r1
+ 981 0490 9B00     		lsls	r3, r3, #2
+ 982 0492 0B44     		add	r3, r3, r1
+ 983 0494 DB00     		lsls	r3, r3, #3
+ 984 0496 1344     		add	r3, r3, r2
+ 985 0498 4833     		adds	r3, r3, #72
+ 986 049a 5B78     		ldrb	r3, [r3, #1]
+ 987 049c FB73     		strb	r3, [r7, #15]
+ 988              	.L45:
+ 430:../tasks/usb/usbh_conf.c ****   }
+ 431:../tasks/usb/usbh_conf.c ****   return toggle; 
+ 989              		.loc 1 431 0
+ 990 049e FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 432:../tasks/usb/usbh_conf.c **** }
+ 991              		.loc 1 432 0
+ 992 04a0 1846     		mov	r0, r3
+ 993 04a2 1437     		adds	r7, r7, #20
+ 994 04a4 BD46     		mov	sp, r7
+ 995              		@ sp needed
+ 996 04a6 5DF8047B 		ldr	r7, [sp], #4
+ 997 04aa 7047     		bx	lr
+ 998              		.cfi_endproc
+ 999              	.LFE74:
+ 1001              		.align	2
+ 1002              		.global	USBH_Delay
+ 1003              		.thumb
+ 1004              		.thumb_func
+ 1006              	USBH_Delay:
+ 1007              	.LFB75:
+ 433:../tasks/usb/usbh_conf.c **** 
+ 434:../tasks/usb/usbh_conf.c **** /**
+ 435:../tasks/usb/usbh_conf.c ****   * @brief  Delay routine for the USB Host Library
+ 436:../tasks/usb/usbh_conf.c ****   * @param  Delay: Delay in ms
+ 437:../tasks/usb/usbh_conf.c ****   * @retval None
+ 438:../tasks/usb/usbh_conf.c ****   */
+ 439:../tasks/usb/usbh_conf.c **** void USBH_Delay(uint32_t Delay)
+ 440:../tasks/usb/usbh_conf.c **** {
+ 1008              		.loc 1 440 0
+ 1009              		.cfi_startproc
+ 1010              		@ args = 0, pretend = 0, frame = 8
+ 1011              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1012 04ac 80B5     		push	{r7, lr}
+ 1013              		.cfi_def_cfa_offset 8
+ 1014              		.cfi_offset 7, -8
+ 1015              		.cfi_offset 14, -4
+ 1016 04ae 82B0     		sub	sp, sp, #8
+ 1017              		.cfi_def_cfa_offset 16
+ 1018 04b0 00AF     		add	r7, sp, #0
+ 1019              		.cfi_def_cfa_register 7
+ 1020 04b2 7860     		str	r0, [r7, #4]
+ 441:../tasks/usb/usbh_conf.c ****   HAL_Delay(Delay);  
+ 1021              		.loc 1 441 0
+ 1022 04b4 7868     		ldr	r0, [r7, #4]
+ 1023 04b6 FFF7FEFF 		bl	HAL_Delay
+ 442:../tasks/usb/usbh_conf.c **** }
+ 1024              		.loc 1 442 0
+ 1025 04ba 0837     		adds	r7, r7, #8
+ 1026 04bc BD46     		mov	sp, r7
+ 1027              		@ sp needed
+ 1028 04be 80BD     		pop	{r7, pc}
+ 1029              		.cfi_endproc
+ 1030              	.LFE75:
+ 1032              	.Letext0:
+ 1033              		.file 2 "c:\\program files (x86)\\codesourcery\\arm-none-eabi\\include\\stdint.h"
+ 1034              		.file 3 "D:\\workspace\\console800480\\system/stm32f217xx.h"
+ 1035              		.file 4 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_hal_def.h"
+ 1036              		.file 5 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_hal_gpio.h"
+ 1037              		.file 6 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_ll_usb.h"
+ 1038              		.file 7 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_hal_hcd.h"
+ 1039              		.file 8 "D:\\workspace\\console800480\\tasks\\usb\\STM32_USB_HOST_Library\\Core\\Inc/usbh_def.h"
+ 1040              		.file 9 "D:\\workspace\\console800480\\system/core_cm3.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 usbh_conf.c
+                            *COM*:00000290 hhcd
+C:\Users\sagok\AppData\Local\Temp\ccEUSCVG.s:19     .text:00000000 $t
+C:\Users\sagok\AppData\Local\Temp\ccEUSCVG.s:24     .text:00000000 HAL_HCD_MspInit
+C:\Users\sagok\AppData\Local\Temp\ccEUSCVG.s:98     .text:00000078 HAL_HCD_MspDeInit
+C:\Users\sagok\AppData\Local\Temp\ccEUSCVG.s:135    .text:000000a4 HAL_HCD_SOF_Callback
+C:\Users\sagok\AppData\Local\Temp\ccEUSCVG.s:168    .text:000000c0 HAL_HCD_Connect_Callback
+C:\Users\sagok\AppData\Local\Temp\ccEUSCVG.s:201    .text:000000dc HAL_HCD_Disconnect_Callback
+C:\Users\sagok\AppData\Local\Temp\ccEUSCVG.s:234    .text:000000f8 HAL_HCD_HC_NotifyURBChange_Callback
+C:\Users\sagok\AppData\Local\Temp\ccEUSCVG.s:267    .text:00000114 USBH_LL_Init
+C:\Users\sagok\AppData\Local\Temp\ccEUSCVG.s:366    .text:000001d4 USBH_LL_DeInit
+C:\Users\sagok\AppData\Local\Temp\ccEUSCVG.s:402    .text:000001f4 USBH_LL_Start
+C:\Users\sagok\AppData\Local\Temp\ccEUSCVG.s:438    .text:00000214 USBH_LL_Stop
+C:\Users\sagok\AppData\Local\Temp\ccEUSCVG.s:474    .text:00000234 USBH_LL_GetSpeed
+C:\Users\sagok\AppData\Local\Temp\ccEUSCVG.s:546    .text:00000280 USBH_LL_ResetPort
+C:\Users\sagok\AppData\Local\Temp\ccEUSCVG.s:582    .text:000002a0 USBH_LL_GetLastXferSize
+C:\Users\sagok\AppData\Local\Temp\ccEUSCVG.s:621    .text:000002c8 USBH_LL_OpenPipe
+C:\Users\sagok\AppData\Local\Temp\ccEUSCVG.s:669    .text:000002fc USBH_LL_ClosePipe
+C:\Users\sagok\AppData\Local\Temp\ccEUSCVG.s:709    .text:00000324 USBH_LL_SubmitURB
+C:\Users\sagok\AppData\Local\Temp\ccEUSCVG.s:759    .text:00000360 USBH_LL_GetURBState
+C:\Users\sagok\AppData\Local\Temp\ccEUSCVG.s:798    .text:00000388 USBH_LL_DriverVBUS
+C:\Users\sagok\AppData\Local\Temp\ccEUSCVG.s:853    .text:000003cc USBH_LL_SetToggle
+C:\Users\sagok\AppData\Local\Temp\ccEUSCVG.s:929    .text:0000043c USBH_LL_GetToggle
+C:\Users\sagok\AppData\Local\Temp\ccEUSCVG.s:1006   .text:000004ac USBH_Delay
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.1.7f551ac7fcad8b79b9df4bfdaa536673
+                           .group:00000000 wm4.stm32f2xx_hal_conf.h.40.007126baefb9f966c36646edbf8040d2
+                           .group:00000000 wm4.stm32f2xx.h.57.5ec1581efc43612c411d33a8686e9ec7
+                           .group:00000000 wm4.stm32f217xx.h.52.9c940d76d00294b78837dc334c172fdd
+                           .group:00000000 wm4.core_cm3.h.32.49180ccb4d36cabd2d7016d2a51d91ae
+                           .group:00000000 wm4.newlib.h.8.384a112feabb3bef7b573ae48cde2e3b
+                           .group:00000000 wm4.features.h.22.6a4ca7cd053637cc1d0db6c16f39b2d7
+                           .group:00000000 wm4.config.h.183.aa62afef667fb61d15fa64c48beb2f14
+                           .group:00000000 wm4._ansi.h.23.5644b60c990a4800b02a6e654e88f93a
+                           .group:00000000 wm4.stdint.h.20.54ad762faa59e3c05491630641c8d8bf
+                           .group:00000000 wm4.core_cmInstr.h.25.f50f886f2edf670cf199b35fd96f5c91
+                           .group:00000000 wm4.core_cm3.h.130.63ab2348a6eed0fdb318040d970b676c
+                           .group:00000000 wm4.stm32f217xx.h.978.a5c681952b2f704a0e7f2ba21d08adf5
+                           .group:00000000 wm4.stm32f2xx.h.142.bc2155a1f7498bab16371e38413a9e41
+                           .group:00000000 wm4.stm32f2xx_hal_def.h.74.8ad2dc8aa82c4fd02e5aeaae592641ba
+                           .group:00000000 wm4.stm32f2xx_hal_rcc.h.142.ec0f91cc6576a6acebd17e6dd85829ae
+                           .group:00000000 wm4.stm32f2xx_hal_rcc_ex.h.40.0829033e864455c6bdd0db01f8ba5a50
+                           .group:00000000 wm4.stm32f2xx_hal_gpio.h.40.ba64e0bb94d9a68835f80159f39a86f1
+                           .group:00000000 wm4.stm32f2xx_hal_gpio_ex.h.40.24e547fd402281923f446b510381083f
+                           .group:00000000 wm4.stm32f2xx_hal_dma.h.40.5d9732ace2a21a4526ce8f0c52428fff
+                           .group:00000000 wm4.stm32f2xx_hal_cortex.h.40.e10263d2ec5d4fa79b4180ce1a38aff1
+                           .group:00000000 wm4.stm32f2xx_hal_adc.h.40.89ac8b78113cac4cf63847587daabac9
+                           .group:00000000 wm4.stm32f2xx_hal_adc_ex.h.40.7de68ed256ef25526ee31cc017f2c291
+                           .group:00000000 wm4.stm32f2xx_hal_flash.h.40.c3171719ce015e9cff20c795e44e886d
+                           .group:00000000 wm4.stm32f2xx_hal_flash_ex.h.40.7389508bd24a0aeb077bde0c9fb651eb
+                           .group:00000000 wm4.stm32f2xx_ll_fsmc.h.40.c1c32f2e1862f4dd342bd9b80fb895bb
+                           .group:00000000 wm4.stm32f2xx_hal_pwr.h.40.812df32e5c31b609a128e9db0eb4cbd0
+                           .group:00000000 wm4.stm32f2xx_hal_rtc.h.40.850fda5fe2cce8797446913dee18382f
+                           .group:00000000 wm4.stm32f2xx_hal_rtc_ex.h.40.f3e0c408e3bf4e8a0352d7ec9a18a822
+                           .group:00000000 wm4.stm32f2xx_ll_sdmmc.h.40.3719ab487c4b77401c572f459adf6eb7
+                           .group:00000000 wm4.stm32f2xx_hal_sd.h.58.760215394dcc316161a6482c0af9b866
+                           .group:00000000 wm4.stm32f2xx_hal_spi.h.40.7984243dbaba8b21c6392998a47e6987
+                           .group:00000000 wm4.stm32f2xx_hal_tim.h.40.d79172f25d0e9a15dc346aba8515bdd6
+                           .group:00000000 wm4.stm32f2xx_hal_tim_ex.h.40.361f280a7a3f60b4b238bb99ca728d83
+                           .group:00000000 wm4.stm32f2xx_hal_uart.h.40.d74def561ae6f78f40f477c8426ecbef
+                           .group:00000000 wm4.stm32f2xx_ll_usb.h.40.9b0206a05bc6ce3bec1648b51f22cb81
+                           .group:00000000 wm4.stm32f2xx_hal_pcd.h.99.11faba414c39e357b2f23364912d0605
+                           .group:00000000 wm4.stm32f2xx_hal_hcd.h.40.44ee5e972983ae0139ddbacdc75c44ef
+                           .group:00000000 wm4.stm32f2xx_hal.h.64.ed79ee83e52b151b3c365392b398f866
+                           .group:00000000 wm4.stdio.h.31.7c0e28c411445f3f9c5b11accf882760
+                           .group:00000000 wm4.stddef.h.184.159df79b4ca79c76561572a55985524c
+                           .group:00000000 wm4.stdarg.h.34.3a23a216c0c293b3d2ea2e89281481e6
+                           .group:00000000 wm4._default_types.h.6.5e12cd604db8ce00b62bb2f02708eaf3
+                           .group:00000000 wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea
+                           .group:00000000 wm4._types.h.59.db8450f33c1f6150c0372fa1091a887a
+                           .group:00000000 wm4.stddef.h.348.9a99de77b6ba3b4278b57e9cc6d6e349
+                           .group:00000000 wm4.reent.h.16.567d760e6ae9ad7f917851a308bd7a57
+                           .group:00000000 wm4.types.h.23.0d949686bbcadd1621462d4fa1f884f9
+                           .group:00000000 wm4.stddef.h.39.7e3d906ac58942e0b374c527445f5de5
+                           .group:00000000 wm4.types.h.2.e9cec8c90ab35f77d9f499e06ae02400
+                           .group:00000000 wm4.types.h.80.5759fe41f87f5211a5952dfb1fc64f19
+                           .group:00000000 wm4.stdio.h.2.4aa87247282eca6c8f36f9de33d8df1a
+                           .group:00000000 wm4.stdio.h.64.f9f1bb6b0d3d7e12f6a27968d859709c
+                           .group:00000000 wm4.stdlib.h.18.8bab2fb43ac4e90235390733c30a4530
+                           .group:00000000 wm4.stddef.h.158.a7efb00f6cbc6f43213b50e183c9830c
+                           .group:00000000 wm4.alloca.h.8.dfc0c703c47ec3e69746825b17d9e66d
+                           .group:00000000 wm4.stdlib.h.55.7091a050e07f1c4abd225630fe3d62f1
+                           .group:00000000 wm4.cdefs.h.56.efab90f4d89fbc41d6b3a5c5fb0d3d0f
+                           .group:00000000 wm4.string.h.15.dab3980bf35408a4c507182805e2de3a
+                           .group:00000000 wm4.string.h.126.6ff3aa59129e7f66b2c273baf353e066
+                           .group:00000000 wm4.LEDs.h.9.36ffa4b30bd168dc58d64fa6e53a9a30
+                           .group:00000000 wm4.usbh_conf.h.41.d72a4a1e5e10d8f062cf3fa4bcd8aa54
+                           .group:00000000 wm4.usbh_def.h.42.e5773f0fe2e07d0c2c7284f319cefcfb
+                           .group:00000000 wm4.usbh_ioreq.h.53.3586266a62e1adb6014256f47bfe28ae
+                           .group:00000000 wm4.usbh_ctlreq.h.30.baf76fe1032fc0ccc3b759e321acc69d
+                           .group:00000000 wm4.usbh_core.h.60.126ed10f424484efe8e3332cf8789488
+
+UNDEFINED SYMBOLS
+HAL_GPIO_Init
+HAL_NVIC_SetPriority
+HAL_NVIC_EnableIRQ
+USBH_LL_IncTimer
+USBH_LL_Connect
+USBH_LL_Disconnect
+HAL_HCD_Init
+HAL_HCD_GetCurrentFrame
+USBH_LL_SetTimer
+HAL_HCD_DeInit
+HAL_HCD_Start
+HAL_HCD_Stop
+HAL_HCD_GetCurrentSpeed
+HAL_HCD_ResetPort
+HAL_HCD_HC_GetXferCount
+HAL_HCD_HC_Init
+HAL_HCD_HC_Halt
+HAL_HCD_HC_SubmitRequest
+HAL_HCD_HC_GetURBState
+HAL_GPIO_WritePin
+HAL_Delay

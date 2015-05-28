@@ -1,0 +1,2005 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"LEDs.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.comm	UartHandle,60,4
+  19              		.global	aTxBuffer
+  20              		.data
+  21              		.align	2
+  24              	aTxBuffer:
+  25 0000 0A554152 		.ascii	"\012UART Debuger ready\012\000"
+  25      54204465 
+  25      62756765 
+  25      72207265 
+  25      6164790A 
+  26              		.comm	aRxBuffer,10,4
+  27              		.global	GPIO_PORT
+  28 0015 000000   		.align	2
+  31              	GPIO_PORT:
+  32 0018 00140240 		.word	1073878016
+  33 001c 00140240 		.word	1073878016
+  34 0020 00080240 		.word	1073874944
+  35 0024 00000240 		.word	1073872896
+  36 0028 00000240 		.word	1073872896
+  37 002c 00140240 		.word	1073878016
+  38 0030 00140240 		.word	1073878016
+  39 0034 00180240 		.word	1073879040
+  40 0038 00180240 		.word	1073879040
+  41 003c 000C0240 		.word	1073875968
+  42 0040 000C0240 		.word	1073875968
+  43 0044 00180240 		.word	1073879040
+  44              		.global	GPIO_PIN
+  45              		.section	.rodata
+  46              		.align	2
+  49              	GPIO_PIN:
+  50 0000 0002     		.short	512
+  51 0002 0004     		.short	1024
+  52 0004 0100     		.short	1
+  53 0006 2000     		.short	32
+  54 0008 4000     		.short	64
+  55 000a 0008     		.short	2048
+  56 000c 0010     		.short	4096
+  57 000e 4000     		.short	64
+  58 0010 8000     		.short	128
+  59 0012 0800     		.short	8
+  60 0014 4000     		.short	64
+  61 0016 0004     		.short	1024
+  62              		.global	TST_PORT
+  63              		.data
+  64              		.align	2
+  67              	TST_PORT:
+  68 0048 00100240 		.word	1073876992
+  69 004c 00100240 		.word	1073876992
+  70 0050 00180240 		.word	1073879040
+  71 0054 00180240 		.word	1073879040
+  72 0058 00180240 		.word	1073879040
+  73              		.global	TST_PIN
+  74              		.section	.rodata
+  75              		.align	2
+  78              	TST_PIN:
+  79 0018 4000     		.short	64
+  80 001a 0200     		.short	2
+  81 001c 0010     		.short	4096
+  82 001e 0008     		.short	2048
+  83 0020 0080     		.short	-32768
+  84 0022 0000     		.text
+  85              		.align	2
+  86              		.thumb
+  87              		.thumb_func
+  89              	Error_Handler:
+  90              	.LFB55:
+  91              		.file 1 "../src/LEDs.c"
+   1:../src/LEDs.c **** /*
+   2:../src/LEDs.c ****  * LEDs.c
+   3:../src/LEDs.c ****  *
+   4:../src/LEDs.c ****  *  Created on: 11.08.2014
+   5:../src/LEDs.c ****  *      Author: sagok
+   6:../src/LEDs.c ****  */
+   7:../src/LEDs.c **** 
+   8:../src/LEDs.c **** #include "stm32f2xx_hal.h"
+   9:../src/LEDs.c **** #include "LEDs.h"
+  10:../src/LEDs.c **** 
+  11:../src/LEDs.c **** 
+  12:../src/LEDs.c **** /* Private define ------------------------------------------------------------*/
+  13:../src/LEDs.c **** /* Private variables ---------------------------------------------------------*/
+  14:../src/LEDs.c **** /* UART handler declaration */
+  15:../src/LEDs.c **** UART_HandleTypeDef UartHandle;
+  16:../src/LEDs.c **** 
+  17:../src/LEDs.c **** /* Buffer used for transmission */
+  18:../src/LEDs.c **** uint8_t aTxBuffer[] = "\nUART Debuger ready\n";
+  19:../src/LEDs.c **** 
+  20:../src/LEDs.c **** /* Buffer used for reception */
+  21:../src/LEDs.c **** uint8_t aRxBuffer[RXBUFFERSIZE];
+  22:../src/LEDs.c **** /* Private function prototypes -----------------------------------------------*/
+  23:../src/LEDs.c **** 
+  24:../src/LEDs.c **** #ifdef __GNUC__
+  25:../src/LEDs.c **** /* With GCC/RAISONANCE, small printf (option LD Linker->Libraries->Small printf
+  26:../src/LEDs.c ****    set to 'Yes') calls __io_putchar() */
+  27:../src/LEDs.c **** #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
+  28:../src/LEDs.c **** #else
+  29:../src/LEDs.c **** #define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
+  30:../src/LEDs.c **** #endif /* __GNUC__ */
+  31:../src/LEDs.c **** 
+  32:../src/LEDs.c **** GPIO_TypeDef* GPIO_PORT[LEDn] = {LED0_GPIO_PORT,
+  33:../src/LEDs.c **** 								 LED1_GPIO_PORT,
+  34:../src/LEDs.c ****                                  LED2_GPIO_PORT,
+  35:../src/LEDs.c ****                                  LED3_GPIO_PORT,
+  36:../src/LEDs.c ****                                  LED4_GPIO_PORT,
+  37:../src/LEDs.c ****                                  LED5_GPIO_PORT,
+  38:../src/LEDs.c ****                                  LED6_GPIO_PORT,
+  39:../src/LEDs.c ****                                  LED7_GPIO_PORT,
+  40:../src/LEDs.c ****                                  LED8_GPIO_PORT,
+  41:../src/LEDs.c ****                                  LED9_GPIO_PORT,
+  42:../src/LEDs.c ****                                  LED10_GPIO_PORT,
+  43:../src/LEDs.c ****                                  LED11_GPIO_PORT};
+  44:../src/LEDs.c **** 
+  45:../src/LEDs.c **** const uint16_t GPIO_PIN[LEDn] = {LED0_PIN,
+  46:../src/LEDs.c **** 								 LED1_PIN,
+  47:../src/LEDs.c ****                                  LED2_PIN,
+  48:../src/LEDs.c ****                                  LED3_PIN,
+  49:../src/LEDs.c ****                                  LED4_PIN,
+  50:../src/LEDs.c ****                                  LED5_PIN,
+  51:../src/LEDs.c ****                                  LED6_PIN,
+  52:../src/LEDs.c ****                                  LED7_PIN,
+  53:../src/LEDs.c ****                                  LED8_PIN,
+  54:../src/LEDs.c ****                                  LED9_PIN,
+  55:../src/LEDs.c ****                                  LED10_PIN,
+  56:../src/LEDs.c ****                                  LED11_PIN};
+  57:../src/LEDs.c **** 
+  58:../src/LEDs.c **** GPIO_TypeDef* TST_PORT[TSTn] = {TST1_GPIO_PORT,
+  59:../src/LEDs.c **** 								TST3_GPIO_PORT,
+  60:../src/LEDs.c **** 								TST4_GPIO_PORT,
+  61:../src/LEDs.c **** 								TST5_GPIO_PORT,
+  62:../src/LEDs.c **** 								TST6_GPIO_PORT};
+  63:../src/LEDs.c **** 
+  64:../src/LEDs.c **** const uint16_t TST_PIN[TSTn] = {TST1_PIN,
+  65:../src/LEDs.c **** 								TST3_PIN,
+  66:../src/LEDs.c ****                                 TST4_PIN,
+  67:../src/LEDs.c **** 								TST5_PIN,
+  68:../src/LEDs.c **** 								TST6_PIN};
+  69:../src/LEDs.c **** /***********************************************************
+  70:../src/LEDs.c ****  *
+  71:../src/LEDs.c ****  ***********************************************************/
+  72:../src/LEDs.c **** static void Error_Handler(uint16_t	Nerror){
+  92              		.loc 1 72 0
+  93              		.cfi_startproc
+  94              		@ args = 0, pretend = 0, frame = 8
+  95              		@ frame_needed = 1, uses_anonymous_args = 0
+  96 0000 80B5     		push	{r7, lr}
+  97              		.cfi_def_cfa_offset 8
+  98              		.cfi_offset 7, -8
+  99              		.cfi_offset 14, -4
+ 100 0002 82B0     		sub	sp, sp, #8
+ 101              		.cfi_def_cfa_offset 16
+ 102 0004 00AF     		add	r7, sp, #0
+ 103              		.cfi_def_cfa_register 7
+ 104 0006 0346     		mov	r3, r0
+ 105 0008 FB80     		strh	r3, [r7, #6]	@ movhi
+  73:../src/LEDs.c **** 	TST_High(TST4);
+ 106              		.loc 1 73 0
+ 107 000a 0220     		movs	r0, #2
+ 108 000c FFF7FEFF 		bl	TST_High
+  74:../src/LEDs.c **** //	OutToAllLED(Nerror);
+  75:../src/LEDs.c **** }
+ 109              		.loc 1 75 0
+ 110 0010 0837     		adds	r7, r7, #8
+ 111 0012 BD46     		mov	sp, r7
+ 112              		@ sp needed
+ 113 0014 80BD     		pop	{r7, pc}
+ 114              		.cfi_endproc
+ 115              	.LFE55:
+ 117 0016 00BF     		.align	2
+ 118              		.global	Uart1_Init
+ 119              		.thumb
+ 120              		.thumb_func
+ 122              	Uart1_Init:
+ 123              	.LFB56:
+  76:../src/LEDs.c **** /***********************************************************
+  77:../src/LEDs.c ****  *
+  78:../src/LEDs.c ****  ***********************************************************/
+  79:../src/LEDs.c **** void Uart1_Init(void){
+ 124              		.loc 1 79 0
+ 125              		.cfi_startproc
+ 126              		@ args = 0, pretend = 0, frame = 0
+ 127              		@ frame_needed = 1, uses_anonymous_args = 0
+ 128 0018 80B5     		push	{r7, lr}
+ 129              		.cfi_def_cfa_offset 8
+ 130              		.cfi_offset 7, -8
+ 131              		.cfi_offset 14, -4
+ 132 001a 00AF     		add	r7, sp, #0
+ 133              		.cfi_def_cfa_register 7
+  80:../src/LEDs.c **** 
+  81:../src/LEDs.c **** 
+  82:../src/LEDs.c **** 	UartHandle.Instance        = USARTx;
+ 134              		.loc 1 82 0
+ 135 001c 40F20003 		movw	r3, #:lower16:UartHandle
+ 136 0020 C0F20003 		movt	r3, #:upper16:UartHandle
+ 137 0024 4FF48052 		mov	r2, #4096
+ 138 0028 C4F20102 		movt	r2, 16385
+ 139 002c 1A60     		str	r2, [r3]
+  83:../src/LEDs.c **** 	UartHandle.Init.BaudRate   = 115200;
+ 140              		.loc 1 83 0
+ 141 002e 40F20003 		movw	r3, #:lower16:UartHandle
+ 142 0032 C0F20003 		movt	r3, #:upper16:UartHandle
+ 143 0036 4FF4E132 		mov	r2, #115200
+ 144 003a 5A60     		str	r2, [r3, #4]
+  84:../src/LEDs.c **** 	UartHandle.Init.WordLength = UART_WORDLENGTH_8B;
+ 145              		.loc 1 84 0
+ 146 003c 40F20003 		movw	r3, #:lower16:UartHandle
+ 147 0040 C0F20003 		movt	r3, #:upper16:UartHandle
+ 148 0044 0022     		movs	r2, #0
+ 149 0046 9A60     		str	r2, [r3, #8]
+  85:../src/LEDs.c **** 	UartHandle.Init.StopBits   = UART_STOPBITS_1;
+ 150              		.loc 1 85 0
+ 151 0048 40F20003 		movw	r3, #:lower16:UartHandle
+ 152 004c C0F20003 		movt	r3, #:upper16:UartHandle
+ 153 0050 0022     		movs	r2, #0
+ 154 0052 DA60     		str	r2, [r3, #12]
+  86:../src/LEDs.c **** 	UartHandle.Init.Parity     = UART_PARITY_NONE;
+ 155              		.loc 1 86 0
+ 156 0054 40F20003 		movw	r3, #:lower16:UartHandle
+ 157 0058 C0F20003 		movt	r3, #:upper16:UartHandle
+ 158 005c 0022     		movs	r2, #0
+ 159 005e 1A61     		str	r2, [r3, #16]
+  87:../src/LEDs.c **** 	UartHandle.Init.HwFlowCtl  = UART_HWCONTROL_NONE;
+ 160              		.loc 1 87 0
+ 161 0060 40F20003 		movw	r3, #:lower16:UartHandle
+ 162 0064 C0F20003 		movt	r3, #:upper16:UartHandle
+ 163 0068 0022     		movs	r2, #0
+ 164 006a 9A61     		str	r2, [r3, #24]
+  88:../src/LEDs.c **** 	UartHandle.Init.Mode       = UART_MODE_TX_RX;
+ 165              		.loc 1 88 0
+ 166 006c 40F20003 		movw	r3, #:lower16:UartHandle
+ 167 0070 C0F20003 		movt	r3, #:upper16:UartHandle
+ 168 0074 0C22     		movs	r2, #12
+ 169 0076 5A61     		str	r2, [r3, #20]
+  89:../src/LEDs.c **** 
+  90:../src/LEDs.c **** 
+  91:../src/LEDs.c **** 	if(HAL_UART_Init(&UartHandle) != HAL_OK){	  Error_Handler(1);	}
+ 170              		.loc 1 91 0
+ 171 0078 40F20000 		movw	r0, #:lower16:UartHandle
+ 172 007c C0F20000 		movt	r0, #:upper16:UartHandle
+ 173 0080 FFF7FEFF 		bl	HAL_UART_Init
+ 174 0084 0346     		mov	r3, r0
+ 175 0086 002B     		cmp	r3, #0
+ 176 0088 02D0     		beq	.L3
+ 177              		.loc 1 91 0 is_stmt 0 discriminator 1
+ 178 008a 0120     		movs	r0, #1
+ 179 008c FFF7B8FF 		bl	Error_Handler
+ 180              	.L3:
+  92:../src/LEDs.c **** 
+  93:../src/LEDs.c **** 	  /*##-2- Start the transmission process #####################################*/
+  94:../src/LEDs.c **** 	  /* User start transmission data through "TxBuffer" buffer */
+  95:../src/LEDs.c **** 	  if (HAL_UART_Transmit_DMA(&UartHandle, (uint8_t *)aTxBuffer, TXBUFFERSIZE) != HAL_OK)
+ 181              		.loc 1 95 0 is_stmt 1
+ 182 0090 40F20000 		movw	r0, #:lower16:UartHandle
+ 183 0094 C0F20000 		movt	r0, #:upper16:UartHandle
+ 184 0098 40F20001 		movw	r1, #:lower16:aTxBuffer
+ 185 009c C0F20001 		movt	r1, #:upper16:aTxBuffer
+ 186 00a0 1422     		movs	r2, #20
+ 187 00a2 FFF7FEFF 		bl	HAL_UART_Transmit_DMA
+ 188 00a6 0346     		mov	r3, r0
+ 189 00a8 002B     		cmp	r3, #0
+ 190 00aa 02D0     		beq	.L2
+  96:../src/LEDs.c **** 	  {
+  97:../src/LEDs.c **** 	    /* Transfer error in transmission process */
+  98:../src/LEDs.c **** 	    Error_Handler(2);
+ 191              		.loc 1 98 0
+ 192 00ac 0220     		movs	r0, #2
+ 193 00ae FFF7A7FF 		bl	Error_Handler
+ 194              	.L2:
+  99:../src/LEDs.c **** 	  }
+ 100:../src/LEDs.c **** 
+ 101:../src/LEDs.c **** 	  /*##-3- Put UART peripheral in reception process ###########################*/
+ 102:../src/LEDs.c **** 	  /* Any data received will be stored in "RxBuffer" buffer : the number max of
+ 103:../src/LEDs.c **** 	     data received is 10 */
+ 104:../src/LEDs.c **** //	  if (HAL_UART_Receive_DMA(&UartHandle, (uint8_t *)aRxBuffer, RXBUFFERSIZE) != HAL_OK)
+ 105:../src/LEDs.c **** //	  {
+ 106:../src/LEDs.c **** 	    /* Transfer error in reception process */
+ 107:../src/LEDs.c **** //	    Error_Handler(3);
+ 108:../src/LEDs.c **** //	  }
+ 109:../src/LEDs.c **** 
+ 110:../src/LEDs.c **** 	  /*##-4- Wait for the end of the transfer ###################################*/
+ 111:../src/LEDs.c **** 	  /*  Before starting a new communication transfer, you need to check the current
+ 112:../src/LEDs.c **** 	      state of the peripheral; if it’s busy you need to wait for the end of current
+ 113:../src/LEDs.c **** 	      transfer before starting a new one.
+ 114:../src/LEDs.c **** 	      For simplicity reasons, this example is just waiting till the end of the
+ 115:../src/LEDs.c **** 	      transfer, but application may perform other tasks while transfer operation
+ 116:../src/LEDs.c **** 	      is ongoing. */
+ 117:../src/LEDs.c **** //	  while (HAL_UART_GetState(&UartHandle) != HAL_UART_STATE_READY)
+ 118:../src/LEDs.c **** //	  {
+ 119:../src/LEDs.c **** //	  }
+ 120:../src/LEDs.c **** 
+ 121:../src/LEDs.c **** 	  /*##-5- Send the received Buffer ###########################################*/
+ 122:../src/LEDs.c **** 	//  if (HAL_UART_Transmit_DMA(&UartHandle, (uint8_t *)aRxBuffer, RXBUFFERSIZE) != HAL_OK)
+ 123:../src/LEDs.c **** 	//  {
+ 124:../src/LEDs.c **** 	    /* Transfer error in transmission process */
+ 125:../src/LEDs.c **** 	//    Error_Handler(4);
+ 126:../src/LEDs.c **** 	//  }
+ 127:../src/LEDs.c **** 
+ 128:../src/LEDs.c **** 	  /*##-6- Wait for the end of the transfer ###################################*/
+ 129:../src/LEDs.c **** 	  /*  Before starting a new communication transfer, you need to check the current
+ 130:../src/LEDs.c **** 	      state of the peripheral; if it’s busy you need to wait for the end of current
+ 131:../src/LEDs.c **** 	      transfer before starting a new one.
+ 132:../src/LEDs.c **** 	      For simplicity reasons, this example is just waiting till the end of the
+ 133:../src/LEDs.c **** 	      transfer, but application may perform other tasks while transfer operation
+ 134:../src/LEDs.c **** 	      is ongoing. */
+ 135:../src/LEDs.c **** //	  while (HAL_UART_GetState(&UartHandle) != HAL_UART_STATE_READY)
+ 136:../src/LEDs.c **** //	  {
+ 137:../src/LEDs.c **** //	  }
+ 138:../src/LEDs.c **** 
+ 139:../src/LEDs.c **** }
+ 195              		.loc 1 139 0
+ 196 00b2 80BD     		pop	{r7, pc}
+ 197              		.cfi_endproc
+ 198              	.LFE56:
+ 200              		.align	2
+ 201              		.global	AllLEDs_Init
+ 202              		.thumb
+ 203              		.thumb_func
+ 205              	AllLEDs_Init:
+ 206              	.LFB57:
+ 140:../src/LEDs.c **** 
+ 141:../src/LEDs.c **** /***********************************************************
+ 142:../src/LEDs.c ****  *
+ 143:../src/LEDs.c ****  ***********************************************************/
+ 144:../src/LEDs.c **** void AllLEDs_Init(void){
+ 207              		.loc 1 144 0
+ 208              		.cfi_startproc
+ 209              		@ args = 0, pretend = 0, frame = 0
+ 210              		@ frame_needed = 1, uses_anonymous_args = 0
+ 211 00b4 80B5     		push	{r7, lr}
+ 212              		.cfi_def_cfa_offset 8
+ 213              		.cfi_offset 7, -8
+ 214              		.cfi_offset 14, -4
+ 215 00b6 00AF     		add	r7, sp, #0
+ 216              		.cfi_def_cfa_register 7
+ 145:../src/LEDs.c **** static unsigned int i;
+ 146:../src/LEDs.c **** 
+ 147:../src/LEDs.c **** 	for(i=LED0;i<=LED11;i++){
+ 217              		.loc 1 147 0
+ 218 00b8 40F20003 		movw	r3, #:lower16:i.7406
+ 219 00bc C0F20003 		movt	r3, #:upper16:i.7406
+ 220 00c0 0022     		movs	r2, #0
+ 221 00c2 1A60     		str	r2, [r3]
+ 222 00c4 1DE0     		b	.L6
+ 223              	.L7:
+ 148:../src/LEDs.c **** 		LED_Init(i,GPIO_MODE_OUTPUT_OD);
+ 224              		.loc 1 148 0 discriminator 2
+ 225 00c6 40F20003 		movw	r3, #:lower16:i.7406
+ 226 00ca C0F20003 		movt	r3, #:upper16:i.7406
+ 227 00ce 1B68     		ldr	r3, [r3]
+ 228 00d0 DBB2     		uxtb	r3, r3
+ 229 00d2 1846     		mov	r0, r3
+ 230 00d4 1121     		movs	r1, #17
+ 231 00d6 FFF7FEFF 		bl	LED_Init
+ 149:../src/LEDs.c **** 		LED_High(i);
+ 232              		.loc 1 149 0 discriminator 2
+ 233 00da 40F20003 		movw	r3, #:lower16:i.7406
+ 234 00de C0F20003 		movt	r3, #:upper16:i.7406
+ 235 00e2 1B68     		ldr	r3, [r3]
+ 236 00e4 DBB2     		uxtb	r3, r3
+ 237 00e6 1846     		mov	r0, r3
+ 238 00e8 FFF7FEFF 		bl	LED_High
+ 147:../src/LEDs.c **** 		LED_Init(i,GPIO_MODE_OUTPUT_OD);
+ 239              		.loc 1 147 0 discriminator 2
+ 240 00ec 40F20003 		movw	r3, #:lower16:i.7406
+ 241 00f0 C0F20003 		movt	r3, #:upper16:i.7406
+ 242 00f4 1B68     		ldr	r3, [r3]
+ 243 00f6 5A1C     		adds	r2, r3, #1
+ 244 00f8 40F20003 		movw	r3, #:lower16:i.7406
+ 245 00fc C0F20003 		movt	r3, #:upper16:i.7406
+ 246 0100 1A60     		str	r2, [r3]
+ 247              	.L6:
+ 147:../src/LEDs.c **** 		LED_Init(i,GPIO_MODE_OUTPUT_OD);
+ 248              		.loc 1 147 0 is_stmt 0 discriminator 1
+ 249 0102 40F20003 		movw	r3, #:lower16:i.7406
+ 250 0106 C0F20003 		movt	r3, #:upper16:i.7406
+ 251 010a 1B68     		ldr	r3, [r3]
+ 252 010c 0B2B     		cmp	r3, #11
+ 253 010e DAD9     		bls	.L7
+ 150:../src/LEDs.c **** 	}
+ 151:../src/LEDs.c **** }
+ 254              		.loc 1 151 0 is_stmt 1
+ 255 0110 80BD     		pop	{r7, pc}
+ 256              		.cfi_endproc
+ 257              	.LFE57:
+ 259 0112 00BF     		.align	2
+ 260              		.global	OutToAllLED
+ 261              		.thumb
+ 262              		.thumb_func
+ 264              	OutToAllLED:
+ 265              	.LFB58:
+ 152:../src/LEDs.c **** /***********************************************************
+ 153:../src/LEDs.c ****  *
+ 154:../src/LEDs.c ****  ***********************************************************/
+ 155:../src/LEDs.c **** void OutToAllLED(uint16_t DataToOut){
+ 266              		.loc 1 155 0
+ 267              		.cfi_startproc
+ 268              		@ args = 0, pretend = 0, frame = 8
+ 269              		@ frame_needed = 1, uses_anonymous_args = 0
+ 270 0114 80B5     		push	{r7, lr}
+ 271              		.cfi_def_cfa_offset 8
+ 272              		.cfi_offset 7, -8
+ 273              		.cfi_offset 14, -4
+ 274 0116 82B0     		sub	sp, sp, #8
+ 275              		.cfi_def_cfa_offset 16
+ 276 0118 00AF     		add	r7, sp, #0
+ 277              		.cfi_def_cfa_register 7
+ 278 011a 0346     		mov	r3, r0
+ 279 011c FB80     		strh	r3, [r7, #6]	@ movhi
+ 156:../src/LEDs.c **** static unsigned int i;
+ 157:../src/LEDs.c **** 
+ 158:../src/LEDs.c **** 	for(i=LED0;i<=LED11;i++){
+ 280              		.loc 1 158 0
+ 281 011e 40F20003 		movw	r3, #:lower16:i.7413
+ 282 0122 C0F20003 		movt	r3, #:upper16:i.7413
+ 283 0126 0022     		movs	r2, #0
+ 284 0128 1A60     		str	r2, [r3]
+ 285 012a 2AE0     		b	.L9
+ 286              	.L12:
+ 159:../src/LEDs.c **** 		if   (DataToOut & 0x800>>i) LED_Low(i);
+ 287              		.loc 1 159 0
+ 288 012c FA88     		ldrh	r2, [r7, #6]
+ 289 012e 40F20003 		movw	r3, #:lower16:i.7413
+ 290 0132 C0F20003 		movt	r3, #:upper16:i.7413
+ 291 0136 1B68     		ldr	r3, [r3]
+ 292 0138 4FF40061 		mov	r1, #2048
+ 293 013c 41FA03F3 		asr	r3, r1, r3
+ 294 0140 1340     		ands	r3, r3, r2
+ 295 0142 002B     		cmp	r3, #0
+ 296 0144 09D0     		beq	.L10
+ 297              		.loc 1 159 0 is_stmt 0 discriminator 1
+ 298 0146 40F20003 		movw	r3, #:lower16:i.7413
+ 299 014a C0F20003 		movt	r3, #:upper16:i.7413
+ 300 014e 1B68     		ldr	r3, [r3]
+ 301 0150 DBB2     		uxtb	r3, r3
+ 302 0152 1846     		mov	r0, r3
+ 303 0154 FFF7FEFF 		bl	LED_Low
+ 304 0158 08E0     		b	.L11
+ 305              	.L10:
+ 160:../src/LEDs.c **** 		else LED_High(i);
+ 306              		.loc 1 160 0 is_stmt 1
+ 307 015a 40F20003 		movw	r3, #:lower16:i.7413
+ 308 015e C0F20003 		movt	r3, #:upper16:i.7413
+ 309 0162 1B68     		ldr	r3, [r3]
+ 310 0164 DBB2     		uxtb	r3, r3
+ 311 0166 1846     		mov	r0, r3
+ 312 0168 FFF7FEFF 		bl	LED_High
+ 313              	.L11:
+ 158:../src/LEDs.c **** 		if   (DataToOut & 0x800>>i) LED_Low(i);
+ 314              		.loc 1 158 0
+ 315 016c 40F20003 		movw	r3, #:lower16:i.7413
+ 316 0170 C0F20003 		movt	r3, #:upper16:i.7413
+ 317 0174 1B68     		ldr	r3, [r3]
+ 318 0176 5A1C     		adds	r2, r3, #1
+ 319 0178 40F20003 		movw	r3, #:lower16:i.7413
+ 320 017c C0F20003 		movt	r3, #:upper16:i.7413
+ 321 0180 1A60     		str	r2, [r3]
+ 322              	.L9:
+ 158:../src/LEDs.c **** 		if   (DataToOut & 0x800>>i) LED_Low(i);
+ 323              		.loc 1 158 0 is_stmt 0 discriminator 1
+ 324 0182 40F20003 		movw	r3, #:lower16:i.7413
+ 325 0186 C0F20003 		movt	r3, #:upper16:i.7413
+ 326 018a 1B68     		ldr	r3, [r3]
+ 327 018c 0B2B     		cmp	r3, #11
+ 328 018e CDD9     		bls	.L12
+ 161:../src/LEDs.c **** 	}
+ 162:../src/LEDs.c **** }
+ 329              		.loc 1 162 0 is_stmt 1
+ 330 0190 0837     		adds	r7, r7, #8
+ 331 0192 BD46     		mov	sp, r7
+ 332              		@ sp needed
+ 333 0194 80BD     		pop	{r7, pc}
+ 334              		.cfi_endproc
+ 335              	.LFE58:
+ 337 0196 00BF     		.align	2
+ 338              		.global	AllTSTs_Init
+ 339              		.thumb
+ 340              		.thumb_func
+ 342              	AllTSTs_Init:
+ 343              	.LFB59:
+ 163:../src/LEDs.c **** /***********************************************************
+ 164:../src/LEDs.c ****  *
+ 165:../src/LEDs.c ****  ***********************************************************/
+ 166:../src/LEDs.c **** void AllTSTs_Init(void){
+ 344              		.loc 1 166 0
+ 345              		.cfi_startproc
+ 346              		@ args = 0, pretend = 0, frame = 0
+ 347              		@ frame_needed = 1, uses_anonymous_args = 0
+ 348 0198 80B5     		push	{r7, lr}
+ 349              		.cfi_def_cfa_offset 8
+ 350              		.cfi_offset 7, -8
+ 351              		.cfi_offset 14, -4
+ 352 019a 00AF     		add	r7, sp, #0
+ 353              		.cfi_def_cfa_register 7
+ 167:../src/LEDs.c **** static unsigned int i;
+ 168:../src/LEDs.c **** 
+ 169:../src/LEDs.c **** 	for(i=TST1;i<=TST6;i++){
+ 354              		.loc 1 169 0
+ 355 019c 40F20003 		movw	r3, #:lower16:i.7420
+ 356 01a0 C0F20003 		movt	r3, #:upper16:i.7420
+ 357 01a4 0022     		movs	r2, #0
+ 358 01a6 1A60     		str	r2, [r3]
+ 359 01a8 13E0     		b	.L14
+ 360              	.L15:
+ 170:../src/LEDs.c **** 		TST_Init(i);
+ 361              		.loc 1 170 0 discriminator 2
+ 362 01aa 40F20003 		movw	r3, #:lower16:i.7420
+ 363 01ae C0F20003 		movt	r3, #:upper16:i.7420
+ 364 01b2 1B68     		ldr	r3, [r3]
+ 365 01b4 DBB2     		uxtb	r3, r3
+ 366 01b6 1846     		mov	r0, r3
+ 367 01b8 FFF7FEFF 		bl	TST_Init
+ 169:../src/LEDs.c **** 		TST_Init(i);
+ 368              		.loc 1 169 0 discriminator 2
+ 369 01bc 40F20003 		movw	r3, #:lower16:i.7420
+ 370 01c0 C0F20003 		movt	r3, #:upper16:i.7420
+ 371 01c4 1B68     		ldr	r3, [r3]
+ 372 01c6 5A1C     		adds	r2, r3, #1
+ 373 01c8 40F20003 		movw	r3, #:lower16:i.7420
+ 374 01cc C0F20003 		movt	r3, #:upper16:i.7420
+ 375 01d0 1A60     		str	r2, [r3]
+ 376              	.L14:
+ 169:../src/LEDs.c **** 		TST_Init(i);
+ 377              		.loc 1 169 0 is_stmt 0 discriminator 1
+ 378 01d2 40F20003 		movw	r3, #:lower16:i.7420
+ 379 01d6 C0F20003 		movt	r3, #:upper16:i.7420
+ 380 01da 1B68     		ldr	r3, [r3]
+ 381 01dc 042B     		cmp	r3, #4
+ 382 01de E4D9     		bls	.L15
+ 171:../src/LEDs.c **** 	}
+ 172:../src/LEDs.c **** }
+ 383              		.loc 1 172 0 is_stmt 1
+ 384 01e0 80BD     		pop	{r7, pc}
+ 385              		.cfi_endproc
+ 386              	.LFE59:
+ 388 01e2 00BF     		.align	2
+ 389              		.global	LED_Init
+ 390              		.thumb
+ 391              		.thumb_func
+ 393              	LED_Init:
+ 394              	.LFB60:
+ 173:../src/LEDs.c **** /***********************************************************
+ 174:../src/LEDs.c ****  *
+ 175:../src/LEDs.c ****  ***********************************************************/
+ 176:../src/LEDs.c **** void LED_Init(Led_TypeDef Led,uint32_t Mode)
+ 177:../src/LEDs.c **** {
+ 395              		.loc 1 177 0
+ 396              		.cfi_startproc
+ 397              		@ args = 0, pretend = 0, frame = 32
+ 398              		@ frame_needed = 1, uses_anonymous_args = 0
+ 399 01e4 80B5     		push	{r7, lr}
+ 400              		.cfi_def_cfa_offset 8
+ 401              		.cfi_offset 7, -8
+ 402              		.cfi_offset 14, -4
+ 403 01e6 88B0     		sub	sp, sp, #32
+ 404              		.cfi_def_cfa_offset 40
+ 405 01e8 00AF     		add	r7, sp, #0
+ 406              		.cfi_def_cfa_register 7
+ 407 01ea 0346     		mov	r3, r0
+ 408 01ec 3960     		str	r1, [r7]
+ 409 01ee FB71     		strb	r3, [r7, #7]
+ 178:../src/LEDs.c ****   GPIO_InitTypeDef  GPIO_InitStruct;
+ 179:../src/LEDs.c **** 
+ 180:../src/LEDs.c ****   /* Enable the GPIO_LED clock */
+ 181:../src/LEDs.c **** 
+ 182:../src/LEDs.c **** 	  LEDx_GPIO_CLK_ENABLE(Led);
+ 410              		.loc 1 182 0
+ 411 01f0 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 412 01f2 002B     		cmp	r3, #0
+ 413 01f4 0CD1     		bne	.L17
+ 414              		.loc 1 182 0 is_stmt 0 discriminator 1
+ 415 01f6 4FF46053 		mov	r3, #14336
+ 416 01fa C4F20203 		movt	r3, 16386
+ 417 01fe 4FF46052 		mov	r2, #14336
+ 418 0202 C4F20202 		movt	r2, 16386
+ 419 0206 126B     		ldr	r2, [r2, #48]
+ 420 0208 42F02002 		orr	r2, r2, #32
+ 421 020c 1A63     		str	r2, [r3, #48]
+ 422 020e ABE0     		b	.L18
+ 423              	.L17:
+ 424              		.loc 1 182 0 discriminator 2
+ 425 0210 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 426 0212 012B     		cmp	r3, #1
+ 427 0214 0CD1     		bne	.L19
+ 428              		.loc 1 182 0 discriminator 1
+ 429 0216 4FF46053 		mov	r3, #14336
+ 430 021a C4F20203 		movt	r3, 16386
+ 431 021e 4FF46052 		mov	r2, #14336
+ 432 0222 C4F20202 		movt	r2, 16386
+ 433 0226 126B     		ldr	r2, [r2, #48]
+ 434 0228 42F02002 		orr	r2, r2, #32
+ 435 022c 1A63     		str	r2, [r3, #48]
+ 436 022e 9BE0     		b	.L18
+ 437              	.L19:
+ 438              		.loc 1 182 0 discriminator 2
+ 439 0230 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 440 0232 022B     		cmp	r3, #2
+ 441 0234 0CD1     		bne	.L21
+ 442              		.loc 1 182 0 discriminator 1
+ 443 0236 4FF46053 		mov	r3, #14336
+ 444 023a C4F20203 		movt	r3, 16386
+ 445 023e 4FF46052 		mov	r2, #14336
+ 446 0242 C4F20202 		movt	r2, 16386
+ 447 0246 126B     		ldr	r2, [r2, #48]
+ 448 0248 42F00402 		orr	r2, r2, #4
+ 449 024c 1A63     		str	r2, [r3, #48]
+ 450 024e 8BE0     		b	.L18
+ 451              	.L21:
+ 452              		.loc 1 182 0 discriminator 2
+ 453 0250 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 454 0252 032B     		cmp	r3, #3
+ 455 0254 0CD1     		bne	.L23
+ 456              		.loc 1 182 0 discriminator 1
+ 457 0256 4FF46053 		mov	r3, #14336
+ 458 025a C4F20203 		movt	r3, 16386
+ 459 025e 4FF46052 		mov	r2, #14336
+ 460 0262 C4F20202 		movt	r2, 16386
+ 461 0266 126B     		ldr	r2, [r2, #48]
+ 462 0268 42F00102 		orr	r2, r2, #1
+ 463 026c 1A63     		str	r2, [r3, #48]
+ 464 026e 7BE0     		b	.L18
+ 465              	.L23:
+ 466              		.loc 1 182 0 discriminator 2
+ 467 0270 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 468 0272 042B     		cmp	r3, #4
+ 469 0274 0CD1     		bne	.L25
+ 470              		.loc 1 182 0 discriminator 1
+ 471 0276 4FF46053 		mov	r3, #14336
+ 472 027a C4F20203 		movt	r3, 16386
+ 473 027e 4FF46052 		mov	r2, #14336
+ 474 0282 C4F20202 		movt	r2, 16386
+ 475 0286 126B     		ldr	r2, [r2, #48]
+ 476 0288 42F00102 		orr	r2, r2, #1
+ 477 028c 1A63     		str	r2, [r3, #48]
+ 478 028e 6BE0     		b	.L18
+ 479              	.L25:
+ 480              		.loc 1 182 0 discriminator 2
+ 481 0290 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 482 0292 052B     		cmp	r3, #5
+ 483 0294 0CD1     		bne	.L27
+ 484              		.loc 1 182 0 discriminator 1
+ 485 0296 4FF46053 		mov	r3, #14336
+ 486 029a C4F20203 		movt	r3, 16386
+ 487 029e 4FF46052 		mov	r2, #14336
+ 488 02a2 C4F20202 		movt	r2, 16386
+ 489 02a6 126B     		ldr	r2, [r2, #48]
+ 490 02a8 42F02002 		orr	r2, r2, #32
+ 491 02ac 1A63     		str	r2, [r3, #48]
+ 492 02ae 5BE0     		b	.L18
+ 493              	.L27:
+ 494              		.loc 1 182 0 discriminator 2
+ 495 02b0 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 496 02b2 062B     		cmp	r3, #6
+ 497 02b4 0CD1     		bne	.L29
+ 498              		.loc 1 182 0 discriminator 1
+ 499 02b6 4FF46053 		mov	r3, #14336
+ 500 02ba C4F20203 		movt	r3, 16386
+ 501 02be 4FF46052 		mov	r2, #14336
+ 502 02c2 C4F20202 		movt	r2, 16386
+ 503 02c6 126B     		ldr	r2, [r2, #48]
+ 504 02c8 42F02002 		orr	r2, r2, #32
+ 505 02cc 1A63     		str	r2, [r3, #48]
+ 506 02ce 4BE0     		b	.L18
+ 507              	.L29:
+ 508              		.loc 1 182 0 discriminator 2
+ 509 02d0 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 510 02d2 072B     		cmp	r3, #7
+ 511 02d4 0CD1     		bne	.L31
+ 512              		.loc 1 182 0 discriminator 1
+ 513 02d6 4FF46053 		mov	r3, #14336
+ 514 02da C4F20203 		movt	r3, 16386
+ 515 02de 4FF46052 		mov	r2, #14336
+ 516 02e2 C4F20202 		movt	r2, 16386
+ 517 02e6 126B     		ldr	r2, [r2, #48]
+ 518 02e8 42F04002 		orr	r2, r2, #64
+ 519 02ec 1A63     		str	r2, [r3, #48]
+ 520 02ee 3BE0     		b	.L18
+ 521              	.L31:
+ 522              		.loc 1 182 0 discriminator 2
+ 523 02f0 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 524 02f2 082B     		cmp	r3, #8
+ 525 02f4 0CD1     		bne	.L33
+ 526              		.loc 1 182 0 discriminator 1
+ 527 02f6 4FF46053 		mov	r3, #14336
+ 528 02fa C4F20203 		movt	r3, 16386
+ 529 02fe 4FF46052 		mov	r2, #14336
+ 530 0302 C4F20202 		movt	r2, 16386
+ 531 0306 126B     		ldr	r2, [r2, #48]
+ 532 0308 42F04002 		orr	r2, r2, #64
+ 533 030c 1A63     		str	r2, [r3, #48]
+ 534 030e 2BE0     		b	.L18
+ 535              	.L33:
+ 536              		.loc 1 182 0 discriminator 2
+ 537 0310 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 538 0312 092B     		cmp	r3, #9
+ 539 0314 0CD1     		bne	.L35
+ 540              		.loc 1 182 0 discriminator 1
+ 541 0316 4FF46053 		mov	r3, #14336
+ 542 031a C4F20203 		movt	r3, 16386
+ 543 031e 4FF46052 		mov	r2, #14336
+ 544 0322 C4F20202 		movt	r2, 16386
+ 545 0326 126B     		ldr	r2, [r2, #48]
+ 546 0328 42F00802 		orr	r2, r2, #8
+ 547 032c 1A63     		str	r2, [r3, #48]
+ 548 032e 1BE0     		b	.L18
+ 549              	.L35:
+ 550              		.loc 1 182 0 discriminator 2
+ 551 0330 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 552 0332 0A2B     		cmp	r3, #10
+ 553 0334 0CD1     		bne	.L37
+ 554              		.loc 1 182 0 discriminator 1
+ 555 0336 4FF46053 		mov	r3, #14336
+ 556 033a C4F20203 		movt	r3, 16386
+ 557 033e 4FF46052 		mov	r2, #14336
+ 558 0342 C4F20202 		movt	r2, 16386
+ 559 0346 126B     		ldr	r2, [r2, #48]
+ 560 0348 42F00802 		orr	r2, r2, #8
+ 561 034c 1A63     		str	r2, [r3, #48]
+ 562 034e 0BE0     		b	.L18
+ 563              	.L37:
+ 564              		.loc 1 182 0 discriminator 2
+ 565 0350 4FF46053 		mov	r3, #14336
+ 566 0354 C4F20203 		movt	r3, 16386
+ 567 0358 4FF46052 		mov	r2, #14336
+ 568 035c C4F20202 		movt	r2, 16386
+ 569 0360 126B     		ldr	r2, [r2, #48]
+ 570 0362 42F04002 		orr	r2, r2, #64
+ 571 0366 1A63     		str	r2, [r3, #48]
+ 572              	.L18:
+ 183:../src/LEDs.c **** 
+ 184:../src/LEDs.c **** 	  /* Configure the GPIO_LED pin */
+ 185:../src/LEDs.c **** 	  GPIO_InitStruct.Pin = GPIO_PIN[Led];
+ 573              		.loc 1 185 0 is_stmt 1
+ 574 0368 FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+ 575 036a 40F20003 		movw	r3, #:lower16:GPIO_PIN
+ 576 036e C0F20003 		movt	r3, #:upper16:GPIO_PIN
+ 577 0372 33F81230 		ldrh	r3, [r3, r2, lsl #1]
+ 578 0376 FB60     		str	r3, [r7, #12]
+ 186:../src/LEDs.c **** 	  GPIO_InitStruct.Mode = Mode;//GPIO_MODE_OUTPUT_OD;
+ 579              		.loc 1 186 0
+ 580 0378 3B68     		ldr	r3, [r7]
+ 581 037a 3B61     		str	r3, [r7, #16]
+ 187:../src/LEDs.c **** 	  GPIO_InitStruct.Pull = GPIO_PULLUP;
+ 582              		.loc 1 187 0
+ 583 037c 0123     		movs	r3, #1
+ 584 037e 7B61     		str	r3, [r7, #20]
+ 188:../src/LEDs.c **** 	  GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
+ 585              		.loc 1 188 0
+ 586 0380 0023     		movs	r3, #0
+ 587 0382 BB61     		str	r3, [r7, #24]
+ 189:../src/LEDs.c **** 
+ 190:../src/LEDs.c **** 	  HAL_GPIO_Init(GPIO_PORT[Led], &GPIO_InitStruct);
+ 588              		.loc 1 190 0
+ 589 0384 FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+ 590 0386 40F20003 		movw	r3, #:lower16:GPIO_PORT
+ 591 038a C0F20003 		movt	r3, #:upper16:GPIO_PORT
+ 592 038e 53F82220 		ldr	r2, [r3, r2, lsl #2]
+ 593 0392 07F10C03 		add	r3, r7, #12
+ 594 0396 1046     		mov	r0, r2
+ 595 0398 1946     		mov	r1, r3
+ 596 039a FFF7FEFF 		bl	HAL_GPIO_Init
+ 191:../src/LEDs.c **** }
+ 597              		.loc 1 191 0
+ 598 039e 2037     		adds	r7, r7, #32
+ 599 03a0 BD46     		mov	sp, r7
+ 600              		@ sp needed
+ 601 03a2 80BD     		pop	{r7, pc}
+ 602              		.cfi_endproc
+ 603              	.LFE60:
+ 605              		.align	2
+ 606              		.global	TST_Init
+ 607              		.thumb
+ 608              		.thumb_func
+ 610              	TST_Init:
+ 611              	.LFB61:
+ 192:../src/LEDs.c **** /***********************************************************
+ 193:../src/LEDs.c ****  *
+ 194:../src/LEDs.c ****  ***********************************************************/
+ 195:../src/LEDs.c **** void TST_Init(Led_TypeDef TST)
+ 196:../src/LEDs.c **** {
+ 612              		.loc 1 196 0
+ 613              		.cfi_startproc
+ 614              		@ args = 0, pretend = 0, frame = 32
+ 615              		@ frame_needed = 1, uses_anonymous_args = 0
+ 616 03a4 80B5     		push	{r7, lr}
+ 617              		.cfi_def_cfa_offset 8
+ 618              		.cfi_offset 7, -8
+ 619              		.cfi_offset 14, -4
+ 620 03a6 88B0     		sub	sp, sp, #32
+ 621              		.cfi_def_cfa_offset 40
+ 622 03a8 00AF     		add	r7, sp, #0
+ 623              		.cfi_def_cfa_register 7
+ 624 03aa 0346     		mov	r3, r0
+ 625 03ac FB71     		strb	r3, [r7, #7]
+ 197:../src/LEDs.c ****   GPIO_InitTypeDef  GPIO_InitStruct;
+ 198:../src/LEDs.c **** 
+ 199:../src/LEDs.c ****   /* Enable the GPIO_LED clock */
+ 200:../src/LEDs.c ****   TSTx_GPIO_CLK_ENABLE(TST);
+ 626              		.loc 1 200 0
+ 627 03ae FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 628 03b0 002B     		cmp	r3, #0
+ 629 03b2 0CD1     		bne	.L40
+ 630              		.loc 1 200 0 is_stmt 0 discriminator 1
+ 631 03b4 4FF46053 		mov	r3, #14336
+ 632 03b8 C4F20203 		movt	r3, 16386
+ 633 03bc 4FF46052 		mov	r2, #14336
+ 634 03c0 C4F20202 		movt	r2, 16386
+ 635 03c4 126B     		ldr	r2, [r2, #48]
+ 636 03c6 42F01002 		orr	r2, r2, #16
+ 637 03ca 1A63     		str	r2, [r3, #48]
+ 638 03cc 3BE0     		b	.L41
+ 639              	.L40:
+ 640              		.loc 1 200 0 discriminator 2
+ 641 03ce FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 642 03d0 012B     		cmp	r3, #1
+ 643 03d2 0CD1     		bne	.L42
+ 644              		.loc 1 200 0 discriminator 1
+ 645 03d4 4FF46053 		mov	r3, #14336
+ 646 03d8 C4F20203 		movt	r3, 16386
+ 647 03dc 4FF46052 		mov	r2, #14336
+ 648 03e0 C4F20202 		movt	r2, 16386
+ 649 03e4 126B     		ldr	r2, [r2, #48]
+ 650 03e6 42F01002 		orr	r2, r2, #16
+ 651 03ea 1A63     		str	r2, [r3, #48]
+ 652 03ec 2BE0     		b	.L41
+ 653              	.L42:
+ 654              		.loc 1 200 0 discriminator 2
+ 655 03ee FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 656 03f0 022B     		cmp	r3, #2
+ 657 03f2 0CD1     		bne	.L44
+ 658              		.loc 1 200 0 discriminator 1
+ 659 03f4 4FF46053 		mov	r3, #14336
+ 660 03f8 C4F20203 		movt	r3, 16386
+ 661 03fc 4FF46052 		mov	r2, #14336
+ 662 0400 C4F20202 		movt	r2, 16386
+ 663 0404 126B     		ldr	r2, [r2, #48]
+ 664 0406 42F04002 		orr	r2, r2, #64
+ 665 040a 1A63     		str	r2, [r3, #48]
+ 666 040c 1BE0     		b	.L41
+ 667              	.L44:
+ 668              		.loc 1 200 0 discriminator 2
+ 669 040e FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 670 0410 032B     		cmp	r3, #3
+ 671 0412 0CD1     		bne	.L46
+ 672              		.loc 1 200 0 discriminator 1
+ 673 0414 4FF46053 		mov	r3, #14336
+ 674 0418 C4F20203 		movt	r3, 16386
+ 675 041c 4FF46052 		mov	r2, #14336
+ 676 0420 C4F20202 		movt	r2, 16386
+ 677 0424 126B     		ldr	r2, [r2, #48]
+ 678 0426 42F04002 		orr	r2, r2, #64
+ 679 042a 1A63     		str	r2, [r3, #48]
+ 680 042c 0BE0     		b	.L41
+ 681              	.L46:
+ 682              		.loc 1 200 0 discriminator 2
+ 683 042e 4FF46053 		mov	r3, #14336
+ 684 0432 C4F20203 		movt	r3, 16386
+ 685 0436 4FF46052 		mov	r2, #14336
+ 686 043a C4F20202 		movt	r2, 16386
+ 687 043e 126B     		ldr	r2, [r2, #48]
+ 688 0440 42F04002 		orr	r2, r2, #64
+ 689 0444 1A63     		str	r2, [r3, #48]
+ 690              	.L41:
+ 201:../src/LEDs.c **** 
+ 202:../src/LEDs.c ****   /* Configure the GPIO_LED pin */
+ 203:../src/LEDs.c ****   GPIO_InitStruct.Pin = TST_PIN[TST];
+ 691              		.loc 1 203 0 is_stmt 1
+ 692 0446 FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+ 693 0448 40F20003 		movw	r3, #:lower16:TST_PIN
+ 694 044c C0F20003 		movt	r3, #:upper16:TST_PIN
+ 695 0450 33F81230 		ldrh	r3, [r3, r2, lsl #1]
+ 696 0454 FB60     		str	r3, [r7, #12]
+ 204:../src/LEDs.c ****   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+ 697              		.loc 1 204 0
+ 698 0456 0123     		movs	r3, #1
+ 699 0458 3B61     		str	r3, [r7, #16]
+ 205:../src/LEDs.c ****   GPIO_InitStruct.Pull = GPIO_PULLUP;
+ 700              		.loc 1 205 0
+ 701 045a 0123     		movs	r3, #1
+ 702 045c 7B61     		str	r3, [r7, #20]
+ 206:../src/LEDs.c ****   GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
+ 703              		.loc 1 206 0
+ 704 045e 0023     		movs	r3, #0
+ 705 0460 BB61     		str	r3, [r7, #24]
+ 207:../src/LEDs.c **** 
+ 208:../src/LEDs.c ****   HAL_GPIO_Init(TST_PORT[TST], &GPIO_InitStruct);
+ 706              		.loc 1 208 0
+ 707 0462 FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+ 708 0464 40F20003 		movw	r3, #:lower16:TST_PORT
+ 709 0468 C0F20003 		movt	r3, #:upper16:TST_PORT
+ 710 046c 53F82220 		ldr	r2, [r3, r2, lsl #2]
+ 711 0470 07F10C03 		add	r3, r7, #12
+ 712 0474 1046     		mov	r0, r2
+ 713 0476 1946     		mov	r1, r3
+ 714 0478 FFF7FEFF 		bl	HAL_GPIO_Init
+ 209:../src/LEDs.c **** }
+ 715              		.loc 1 209 0
+ 716 047c 2037     		adds	r7, r7, #32
+ 717 047e BD46     		mov	sp, r7
+ 718              		@ sp needed
+ 719 0480 80BD     		pop	{r7, pc}
+ 720              		.cfi_endproc
+ 721              	.LFE61:
+ 723 0482 00BF     		.align	2
+ 724              		.global	ReadInputDataBit
+ 725              		.thumb
+ 726              		.thumb_func
+ 728              	ReadInputDataBit:
+ 729              	.LFB62:
+ 210:../src/LEDs.c **** /************************************************************************************
+ 211:../src/LEDs.c ****  * ReadInputDataBit
+ 212:../src/LEDs.c **** *************************************************************************************/
+ 213:../src/LEDs.c **** uint8_t ReadInputDataBit(Led_TypeDef Led)
+ 214:../src/LEDs.c **** {
+ 730              		.loc 1 214 0
+ 731              		.cfi_startproc
+ 732              		@ args = 0, pretend = 0, frame = 16
+ 733              		@ frame_needed = 1, uses_anonymous_args = 0
+ 734              		@ link register save eliminated.
+ 735 0484 80B4     		push	{r7}
+ 736              		.cfi_def_cfa_offset 4
+ 737              		.cfi_offset 7, -4
+ 738 0486 85B0     		sub	sp, sp, #20
+ 739              		.cfi_def_cfa_offset 24
+ 740 0488 00AF     		add	r7, sp, #0
+ 741              		.cfi_def_cfa_register 7
+ 742 048a 0346     		mov	r3, r0
+ 743 048c FB71     		strb	r3, [r7, #7]
+ 215:../src/LEDs.c ****  uint8_t bitstatus = 0x00;
+ 744              		.loc 1 215 0
+ 745 048e 0023     		movs	r3, #0
+ 746 0490 FB73     		strb	r3, [r7, #15]
+ 216:../src/LEDs.c **** 
+ 217:../src/LEDs.c ****  /* Check the parameters */
+ 218:../src/LEDs.c ****  assert_param(IS_GPIO_ALL_PERIPH(GPIO_PORT[Led]));
+ 219:../src/LEDs.c ****  assert_param(IS_GET_GPIO_PIN(GPIO_PIN[Led]));
+ 220:../src/LEDs.c **** 
+ 221:../src/LEDs.c ****  if ((GPIO_PORT[Led]->IDR & GPIO_PIN[Led]) != (uint32_t)Bit_RESET)
+ 747              		.loc 1 221 0
+ 748 0492 FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+ 749 0494 40F20003 		movw	r3, #:lower16:GPIO_PORT
+ 750 0498 C0F20003 		movt	r3, #:upper16:GPIO_PORT
+ 751 049c 53F82230 		ldr	r3, [r3, r2, lsl #2]
+ 752 04a0 1A69     		ldr	r2, [r3, #16]
+ 753 04a2 F979     		ldrb	r1, [r7, #7]	@ zero_extendqisi2
+ 754 04a4 40F20003 		movw	r3, #:lower16:GPIO_PIN
+ 755 04a8 C0F20003 		movt	r3, #:upper16:GPIO_PIN
+ 756 04ac 33F81130 		ldrh	r3, [r3, r1, lsl #1]
+ 757 04b0 1340     		ands	r3, r3, r2
+ 758 04b2 002B     		cmp	r3, #0
+ 759 04b4 02D0     		beq	.L49
+ 222:../src/LEDs.c ****  {
+ 223:../src/LEDs.c ****    bitstatus = (uint8_t)Bit_SET;
+ 760              		.loc 1 223 0
+ 761 04b6 0123     		movs	r3, #1
+ 762 04b8 FB73     		strb	r3, [r7, #15]
+ 763 04ba 01E0     		b	.L50
+ 764              	.L49:
+ 224:../src/LEDs.c ****  }
+ 225:../src/LEDs.c ****  else
+ 226:../src/LEDs.c ****  {
+ 227:../src/LEDs.c ****    bitstatus = (uint8_t)Bit_RESET;
+ 765              		.loc 1 227 0
+ 766 04bc 0023     		movs	r3, #0
+ 767 04be FB73     		strb	r3, [r7, #15]
+ 768              	.L50:
+ 228:../src/LEDs.c ****  }
+ 229:../src/LEDs.c ****  return bitstatus;
+ 769              		.loc 1 229 0
+ 770 04c0 FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 230:../src/LEDs.c **** }
+ 771              		.loc 1 230 0
+ 772 04c2 1846     		mov	r0, r3
+ 773 04c4 1437     		adds	r7, r7, #20
+ 774 04c6 BD46     		mov	sp, r7
+ 775              		@ sp needed
+ 776 04c8 5DF8047B 		ldr	r7, [sp], #4
+ 777 04cc 7047     		bx	lr
+ 778              		.cfi_endproc
+ 779              	.LFE62:
+ 781 04ce 00BF     		.align	2
+ 782              		.global	LED_Toggle
+ 783              		.thumb
+ 784              		.thumb_func
+ 786              	LED_Toggle:
+ 787              	.LFB63:
+ 231:../src/LEDs.c **** /***********************************************************
+ 232:../src/LEDs.c ****  *
+ 233:../src/LEDs.c ****  ***********************************************************/
+ 234:../src/LEDs.c **** void LED_Toggle(Led_TypeDef Led)
+ 235:../src/LEDs.c **** {
+ 788              		.loc 1 235 0
+ 789              		.cfi_startproc
+ 790              		@ args = 0, pretend = 0, frame = 8
+ 791              		@ frame_needed = 1, uses_anonymous_args = 0
+ 792 04d0 80B5     		push	{r7, lr}
+ 793              		.cfi_def_cfa_offset 8
+ 794              		.cfi_offset 7, -8
+ 795              		.cfi_offset 14, -4
+ 796 04d2 82B0     		sub	sp, sp, #8
+ 797              		.cfi_def_cfa_offset 16
+ 798 04d4 00AF     		add	r7, sp, #0
+ 799              		.cfi_def_cfa_register 7
+ 800 04d6 0346     		mov	r3, r0
+ 801 04d8 FB71     		strb	r3, [r7, #7]
+ 236:../src/LEDs.c ****   HAL_GPIO_TogglePin(GPIO_PORT[Led], GPIO_PIN[Led]);
+ 802              		.loc 1 236 0
+ 803 04da FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+ 804 04dc 40F20003 		movw	r3, #:lower16:GPIO_PORT
+ 805 04e0 C0F20003 		movt	r3, #:upper16:GPIO_PORT
+ 806 04e4 53F82220 		ldr	r2, [r3, r2, lsl #2]
+ 807 04e8 F979     		ldrb	r1, [r7, #7]	@ zero_extendqisi2
+ 808 04ea 40F20003 		movw	r3, #:lower16:GPIO_PIN
+ 809 04ee C0F20003 		movt	r3, #:upper16:GPIO_PIN
+ 810 04f2 33F81130 		ldrh	r3, [r3, r1, lsl #1]
+ 811 04f6 1046     		mov	r0, r2
+ 812 04f8 1946     		mov	r1, r3
+ 813 04fa FFF7FEFF 		bl	HAL_GPIO_TogglePin
+ 237:../src/LEDs.c **** }
+ 814              		.loc 1 237 0
+ 815 04fe 0837     		adds	r7, r7, #8
+ 816 0500 BD46     		mov	sp, r7
+ 817              		@ sp needed
+ 818 0502 80BD     		pop	{r7, pc}
+ 819              		.cfi_endproc
+ 820              	.LFE63:
+ 822              		.align	2
+ 823              		.global	LED_High
+ 824              		.thumb
+ 825              		.thumb_func
+ 827              	LED_High:
+ 828              	.LFB64:
+ 238:../src/LEDs.c **** /***********************************************************
+ 239:../src/LEDs.c ****  *
+ 240:../src/LEDs.c ****  ***********************************************************/
+ 241:../src/LEDs.c **** void LED_High(Led_TypeDef Led)
+ 242:../src/LEDs.c **** {
+ 829              		.loc 1 242 0
+ 830              		.cfi_startproc
+ 831              		@ args = 0, pretend = 0, frame = 8
+ 832              		@ frame_needed = 1, uses_anonymous_args = 0
+ 833 0504 80B5     		push	{r7, lr}
+ 834              		.cfi_def_cfa_offset 8
+ 835              		.cfi_offset 7, -8
+ 836              		.cfi_offset 14, -4
+ 837 0506 82B0     		sub	sp, sp, #8
+ 838              		.cfi_def_cfa_offset 16
+ 839 0508 00AF     		add	r7, sp, #0
+ 840              		.cfi_def_cfa_register 7
+ 841 050a 0346     		mov	r3, r0
+ 842 050c FB71     		strb	r3, [r7, #7]
+ 243:../src/LEDs.c **** 	HAL_GPIO_WritePin(GPIO_PORT[Led], GPIO_PIN[Led],GPIO_PIN_SET);
+ 843              		.loc 1 243 0
+ 844 050e FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+ 845 0510 40F20003 		movw	r3, #:lower16:GPIO_PORT
+ 846 0514 C0F20003 		movt	r3, #:upper16:GPIO_PORT
+ 847 0518 53F82220 		ldr	r2, [r3, r2, lsl #2]
+ 848 051c F979     		ldrb	r1, [r7, #7]	@ zero_extendqisi2
+ 849 051e 40F20003 		movw	r3, #:lower16:GPIO_PIN
+ 850 0522 C0F20003 		movt	r3, #:upper16:GPIO_PIN
+ 851 0526 33F81130 		ldrh	r3, [r3, r1, lsl #1]
+ 852 052a 1046     		mov	r0, r2
+ 853 052c 1946     		mov	r1, r3
+ 854 052e 0122     		movs	r2, #1
+ 855 0530 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 244:../src/LEDs.c **** }
+ 856              		.loc 1 244 0
+ 857 0534 0837     		adds	r7, r7, #8
+ 858 0536 BD46     		mov	sp, r7
+ 859              		@ sp needed
+ 860 0538 80BD     		pop	{r7, pc}
+ 861              		.cfi_endproc
+ 862              	.LFE64:
+ 864 053a 00BF     		.align	2
+ 865              		.global	LED_Low
+ 866              		.thumb
+ 867              		.thumb_func
+ 869              	LED_Low:
+ 870              	.LFB65:
+ 245:../src/LEDs.c **** /***********************************************************
+ 246:../src/LEDs.c ****  *
+ 247:../src/LEDs.c ****  ***********************************************************/
+ 248:../src/LEDs.c **** void LED_Low(Led_TypeDef Led)
+ 249:../src/LEDs.c **** {
+ 871              		.loc 1 249 0
+ 872              		.cfi_startproc
+ 873              		@ args = 0, pretend = 0, frame = 8
+ 874              		@ frame_needed = 1, uses_anonymous_args = 0
+ 875 053c 80B5     		push	{r7, lr}
+ 876              		.cfi_def_cfa_offset 8
+ 877              		.cfi_offset 7, -8
+ 878              		.cfi_offset 14, -4
+ 879 053e 82B0     		sub	sp, sp, #8
+ 880              		.cfi_def_cfa_offset 16
+ 881 0540 00AF     		add	r7, sp, #0
+ 882              		.cfi_def_cfa_register 7
+ 883 0542 0346     		mov	r3, r0
+ 884 0544 FB71     		strb	r3, [r7, #7]
+ 250:../src/LEDs.c **** 	HAL_GPIO_WritePin(GPIO_PORT[Led], GPIO_PIN[Led],GPIO_PIN_RESET);
+ 885              		.loc 1 250 0
+ 886 0546 FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+ 887 0548 40F20003 		movw	r3, #:lower16:GPIO_PORT
+ 888 054c C0F20003 		movt	r3, #:upper16:GPIO_PORT
+ 889 0550 53F82220 		ldr	r2, [r3, r2, lsl #2]
+ 890 0554 F979     		ldrb	r1, [r7, #7]	@ zero_extendqisi2
+ 891 0556 40F20003 		movw	r3, #:lower16:GPIO_PIN
+ 892 055a C0F20003 		movt	r3, #:upper16:GPIO_PIN
+ 893 055e 33F81130 		ldrh	r3, [r3, r1, lsl #1]
+ 894 0562 1046     		mov	r0, r2
+ 895 0564 1946     		mov	r1, r3
+ 896 0566 0022     		movs	r2, #0
+ 897 0568 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 251:../src/LEDs.c **** }
+ 898              		.loc 1 251 0
+ 899 056c 0837     		adds	r7, r7, #8
+ 900 056e BD46     		mov	sp, r7
+ 901              		@ sp needed
+ 902 0570 80BD     		pop	{r7, pc}
+ 903              		.cfi_endproc
+ 904              	.LFE65:
+ 906 0572 00BF     		.align	2
+ 907              		.global	TST_Toggle
+ 908              		.thumb
+ 909              		.thumb_func
+ 911              	TST_Toggle:
+ 912              	.LFB66:
+ 252:../src/LEDs.c **** /***********************************************************
+ 253:../src/LEDs.c ****  *
+ 254:../src/LEDs.c ****  ***********************************************************/
+ 255:../src/LEDs.c **** void TST_Toggle(Led_TypeDef TST)
+ 256:../src/LEDs.c **** {
+ 913              		.loc 1 256 0
+ 914              		.cfi_startproc
+ 915              		@ args = 0, pretend = 0, frame = 8
+ 916              		@ frame_needed = 1, uses_anonymous_args = 0
+ 917 0574 80B5     		push	{r7, lr}
+ 918              		.cfi_def_cfa_offset 8
+ 919              		.cfi_offset 7, -8
+ 920              		.cfi_offset 14, -4
+ 921 0576 82B0     		sub	sp, sp, #8
+ 922              		.cfi_def_cfa_offset 16
+ 923 0578 00AF     		add	r7, sp, #0
+ 924              		.cfi_def_cfa_register 7
+ 925 057a 0346     		mov	r3, r0
+ 926 057c FB71     		strb	r3, [r7, #7]
+ 257:../src/LEDs.c ****   HAL_GPIO_TogglePin(TST_PORT[TST], TST_PIN[TST]);
+ 927              		.loc 1 257 0
+ 928 057e FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+ 929 0580 40F20003 		movw	r3, #:lower16:TST_PORT
+ 930 0584 C0F20003 		movt	r3, #:upper16:TST_PORT
+ 931 0588 53F82220 		ldr	r2, [r3, r2, lsl #2]
+ 932 058c F979     		ldrb	r1, [r7, #7]	@ zero_extendqisi2
+ 933 058e 40F20003 		movw	r3, #:lower16:TST_PIN
+ 934 0592 C0F20003 		movt	r3, #:upper16:TST_PIN
+ 935 0596 33F81130 		ldrh	r3, [r3, r1, lsl #1]
+ 936 059a 1046     		mov	r0, r2
+ 937 059c 1946     		mov	r1, r3
+ 938 059e FFF7FEFF 		bl	HAL_GPIO_TogglePin
+ 258:../src/LEDs.c **** }
+ 939              		.loc 1 258 0
+ 940 05a2 0837     		adds	r7, r7, #8
+ 941 05a4 BD46     		mov	sp, r7
+ 942              		@ sp needed
+ 943 05a6 80BD     		pop	{r7, pc}
+ 944              		.cfi_endproc
+ 945              	.LFE66:
+ 947              		.align	2
+ 948              		.global	TST_High
+ 949              		.thumb
+ 950              		.thumb_func
+ 952              	TST_High:
+ 953              	.LFB67:
+ 259:../src/LEDs.c **** /***********************************************************
+ 260:../src/LEDs.c ****  *
+ 261:../src/LEDs.c ****  ***********************************************************/
+ 262:../src/LEDs.c **** void TST_High(Led_TypeDef TST)
+ 263:../src/LEDs.c **** {
+ 954              		.loc 1 263 0
+ 955              		.cfi_startproc
+ 956              		@ args = 0, pretend = 0, frame = 8
+ 957              		@ frame_needed = 1, uses_anonymous_args = 0
+ 958 05a8 80B5     		push	{r7, lr}
+ 959              		.cfi_def_cfa_offset 8
+ 960              		.cfi_offset 7, -8
+ 961              		.cfi_offset 14, -4
+ 962 05aa 82B0     		sub	sp, sp, #8
+ 963              		.cfi_def_cfa_offset 16
+ 964 05ac 00AF     		add	r7, sp, #0
+ 965              		.cfi_def_cfa_register 7
+ 966 05ae 0346     		mov	r3, r0
+ 967 05b0 FB71     		strb	r3, [r7, #7]
+ 264:../src/LEDs.c **** 	HAL_GPIO_WritePin(TST_PORT[TST], TST_PIN[TST],GPIO_PIN_SET);
+ 968              		.loc 1 264 0
+ 969 05b2 FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+ 970 05b4 40F20003 		movw	r3, #:lower16:TST_PORT
+ 971 05b8 C0F20003 		movt	r3, #:upper16:TST_PORT
+ 972 05bc 53F82220 		ldr	r2, [r3, r2, lsl #2]
+ 973 05c0 F979     		ldrb	r1, [r7, #7]	@ zero_extendqisi2
+ 974 05c2 40F20003 		movw	r3, #:lower16:TST_PIN
+ 975 05c6 C0F20003 		movt	r3, #:upper16:TST_PIN
+ 976 05ca 33F81130 		ldrh	r3, [r3, r1, lsl #1]
+ 977 05ce 1046     		mov	r0, r2
+ 978 05d0 1946     		mov	r1, r3
+ 979 05d2 0122     		movs	r2, #1
+ 980 05d4 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 265:../src/LEDs.c **** }
+ 981              		.loc 1 265 0
+ 982 05d8 0837     		adds	r7, r7, #8
+ 983 05da BD46     		mov	sp, r7
+ 984              		@ sp needed
+ 985 05dc 80BD     		pop	{r7, pc}
+ 986              		.cfi_endproc
+ 987              	.LFE67:
+ 989 05de 00BF     		.align	2
+ 990              		.global	TST_Low
+ 991              		.thumb
+ 992              		.thumb_func
+ 994              	TST_Low:
+ 995              	.LFB68:
+ 266:../src/LEDs.c **** /***********************************************************
+ 267:../src/LEDs.c ****  *
+ 268:../src/LEDs.c ****  ***********************************************************/
+ 269:../src/LEDs.c **** void TST_Low(Led_TypeDef TST)
+ 270:../src/LEDs.c **** {
+ 996              		.loc 1 270 0
+ 997              		.cfi_startproc
+ 998              		@ args = 0, pretend = 0, frame = 8
+ 999              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1000 05e0 80B5     		push	{r7, lr}
+ 1001              		.cfi_def_cfa_offset 8
+ 1002              		.cfi_offset 7, -8
+ 1003              		.cfi_offset 14, -4
+ 1004 05e2 82B0     		sub	sp, sp, #8
+ 1005              		.cfi_def_cfa_offset 16
+ 1006 05e4 00AF     		add	r7, sp, #0
+ 1007              		.cfi_def_cfa_register 7
+ 1008 05e6 0346     		mov	r3, r0
+ 1009 05e8 FB71     		strb	r3, [r7, #7]
+ 271:../src/LEDs.c **** 	HAL_GPIO_WritePin(TST_PORT[TST], TST_PIN[TST],GPIO_PIN_RESET);
+ 1010              		.loc 1 271 0
+ 1011 05ea FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+ 1012 05ec 40F20003 		movw	r3, #:lower16:TST_PORT
+ 1013 05f0 C0F20003 		movt	r3, #:upper16:TST_PORT
+ 1014 05f4 53F82220 		ldr	r2, [r3, r2, lsl #2]
+ 1015 05f8 F979     		ldrb	r1, [r7, #7]	@ zero_extendqisi2
+ 1016 05fa 40F20003 		movw	r3, #:lower16:TST_PIN
+ 1017 05fe C0F20003 		movt	r3, #:upper16:TST_PIN
+ 1018 0602 33F81130 		ldrh	r3, [r3, r1, lsl #1]
+ 1019 0606 1046     		mov	r0, r2
+ 1020 0608 1946     		mov	r1, r3
+ 1021 060a 0022     		movs	r2, #0
+ 1022 060c FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 272:../src/LEDs.c **** }
+ 1023              		.loc 1 272 0
+ 1024 0610 0837     		adds	r7, r7, #8
+ 1025 0612 BD46     		mov	sp, r7
+ 1026              		@ sp needed
+ 1027 0614 80BD     		pop	{r7, pc}
+ 1028              		.cfi_endproc
+ 1029              	.LFE68:
+ 1031 0616 00BF     		.align	2
+ 1032              		.global	__io_putchar
+ 1033              		.thumb
+ 1034              		.thumb_func
+ 1036              	__io_putchar:
+ 1037              	.LFB69:
+ 273:../src/LEDs.c **** 
+ 274:../src/LEDs.c **** /**
+ 275:../src/LEDs.c ****   * @brief  Retargets the C library printf function to the USART.
+ 276:../src/LEDs.c ****   * @param  None
+ 277:../src/LEDs.c ****   * @retval None
+ 278:../src/LEDs.c ****   */
+ 279:../src/LEDs.c **** PUTCHAR_PROTOTYPE
+ 280:../src/LEDs.c **** {
+ 1038              		.loc 1 280 0
+ 1039              		.cfi_startproc
+ 1040              		@ args = 0, pretend = 0, frame = 8
+ 1041              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1042 0618 80B5     		push	{r7, lr}
+ 1043              		.cfi_def_cfa_offset 8
+ 1044              		.cfi_offset 7, -8
+ 1045              		.cfi_offset 14, -4
+ 1046 061a 82B0     		sub	sp, sp, #8
+ 1047              		.cfi_def_cfa_offset 16
+ 1048 061c 00AF     		add	r7, sp, #0
+ 1049              		.cfi_def_cfa_register 7
+ 1050 061e 7860     		str	r0, [r7, #4]
+ 281:../src/LEDs.c ****   /* Place your implementation of fputc here */
+ 282:../src/LEDs.c ****   /* e.g. write a character to the EVAL_COM1 and Loop until the end of transmission */
+ 283:../src/LEDs.c ****   //HAL_UART_Transmit(&UartHandle, (uint8_t *)&ch, 1, 0xFFFF);
+ 284:../src/LEDs.c **** //	OutToAllLED(ch);
+ 285:../src/LEDs.c **** 
+ 286:../src/LEDs.c **** 	HAL_UART_Transmit_DMA(&UartHandle, (uint8_t *)&ch, 1);
+ 1051              		.loc 1 286 0
+ 1052 0620 3B1D     		adds	r3, r7, #4
+ 1053 0622 40F20000 		movw	r0, #:lower16:UartHandle
+ 1054 0626 C0F20000 		movt	r0, #:upper16:UartHandle
+ 1055 062a 1946     		mov	r1, r3
+ 1056 062c 0122     		movs	r2, #1
+ 1057 062e FFF7FEFF 		bl	HAL_UART_Transmit_DMA
+ 287:../src/LEDs.c **** 
+ 288:../src/LEDs.c ****   return ch;
+ 1058              		.loc 1 288 0
+ 1059 0632 7B68     		ldr	r3, [r7, #4]
+ 289:../src/LEDs.c **** }
+ 1060              		.loc 1 289 0
+ 1061 0634 1846     		mov	r0, r3
+ 1062 0636 0837     		adds	r7, r7, #8
+ 1063 0638 BD46     		mov	sp, r7
+ 1064              		@ sp needed
+ 1065 063a 80BD     		pop	{r7, pc}
+ 1066              		.cfi_endproc
+ 1067              	.LFE69:
+ 1069              		.align	2
+ 1070              		.global	HAL_UART_MspInit
+ 1071              		.thumb
+ 1072              		.thumb_func
+ 1074              	HAL_UART_MspInit:
+ 1075              	.LFB70:
+ 290:../src/LEDs.c **** /**
+ 291:../src/LEDs.c ****   * @brief UART MSP Initialization
+ 292:../src/LEDs.c ****   *        This function configures the hardware resources used in this example:
+ 293:../src/LEDs.c ****   *           - Peripheral's clock enable
+ 294:../src/LEDs.c ****   *           - Peripheral's GPIO Configuration
+ 295:../src/LEDs.c ****   * @param huart: UART handle pointer
+ 296:../src/LEDs.c ****   * @retval None
+ 297:../src/LEDs.c ****   */
+ 298:../src/LEDs.c **** void HAL_UART_MspInit(UART_HandleTypeDef *huart)
+ 299:../src/LEDs.c **** {
+ 1076              		.loc 1 299 0
+ 1077              		.cfi_startproc
+ 1078              		@ args = 0, pretend = 0, frame = 32
+ 1079              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1080 063c 80B5     		push	{r7, lr}
+ 1081              		.cfi_def_cfa_offset 8
+ 1082              		.cfi_offset 7, -8
+ 1083              		.cfi_offset 14, -4
+ 1084 063e 88B0     		sub	sp, sp, #32
+ 1085              		.cfi_def_cfa_offset 40
+ 1086 0640 00AF     		add	r7, sp, #0
+ 1087              		.cfi_def_cfa_register 7
+ 1088 0642 7860     		str	r0, [r7, #4]
+ 300:../src/LEDs.c ****   GPIO_InitTypeDef  GPIO_InitStruct;
+ 301:../src/LEDs.c **** 
+ 302:../src/LEDs.c ****   static DMA_HandleTypeDef hdma_tx;
+ 303:../src/LEDs.c ****   static DMA_HandleTypeDef hdma_rx;
+ 304:../src/LEDs.c **** 
+ 305:../src/LEDs.c **** 
+ 306:../src/LEDs.c **** 
+ 307:../src/LEDs.c ****   /*##-1- Enable peripherals and GPIO Clocks #################################*/
+ 308:../src/LEDs.c ****   /* Enable GPIO TX/RX clock */
+ 309:../src/LEDs.c ****   USARTx_TX_GPIO_CLK_ENABLE();
+ 1089              		.loc 1 309 0
+ 1090 0644 4FF46053 		mov	r3, #14336
+ 1091 0648 C4F20203 		movt	r3, 16386
+ 1092 064c 4FF46052 		mov	r2, #14336
+ 1093 0650 C4F20202 		movt	r2, 16386
+ 1094 0654 126B     		ldr	r2, [r2, #48]
+ 1095 0656 42F00102 		orr	r2, r2, #1
+ 1096 065a 1A63     		str	r2, [r3, #48]
+ 310:../src/LEDs.c ****   USARTx_RX_GPIO_CLK_ENABLE();
+ 1097              		.loc 1 310 0
+ 1098 065c 4FF46053 		mov	r3, #14336
+ 1099 0660 C4F20203 		movt	r3, 16386
+ 1100 0664 4FF46052 		mov	r2, #14336
+ 1101 0668 C4F20202 		movt	r2, 16386
+ 1102 066c 126B     		ldr	r2, [r2, #48]
+ 1103 066e 42F00102 		orr	r2, r2, #1
+ 1104 0672 1A63     		str	r2, [r3, #48]
+ 311:../src/LEDs.c ****   /* Enable USARTx clock */
+ 312:../src/LEDs.c ****   USARTx_CLK_ENABLE();
+ 1105              		.loc 1 312 0
+ 1106 0674 4FF46053 		mov	r3, #14336
+ 1107 0678 C4F20203 		movt	r3, 16386
+ 1108 067c 4FF46052 		mov	r2, #14336
+ 1109 0680 C4F20202 		movt	r2, 16386
+ 1110 0684 526C     		ldr	r2, [r2, #68]
+ 1111 0686 42F01002 		orr	r2, r2, #16
+ 1112 068a 5A64     		str	r2, [r3, #68]
+ 313:../src/LEDs.c ****   /* Enable DMA2 clock */
+ 314:../src/LEDs.c ****   DMAx_CLK_ENABLE();
+ 1113              		.loc 1 314 0
+ 1114 068c 4FF46053 		mov	r3, #14336
+ 1115 0690 C4F20203 		movt	r3, 16386
+ 1116 0694 4FF46052 		mov	r2, #14336
+ 1117 0698 C4F20202 		movt	r2, 16386
+ 1118 069c 126B     		ldr	r2, [r2, #48]
+ 1119 069e 42F48002 		orr	r2, r2, #4194304
+ 1120 06a2 1A63     		str	r2, [r3, #48]
+ 315:../src/LEDs.c **** 
+ 316:../src/LEDs.c ****   /*##-2- Configure peripheral GPIO ##########################################*/
+ 317:../src/LEDs.c ****   /* UART TX GPIO pin configuration  */
+ 318:../src/LEDs.c ****   GPIO_InitStruct.Pin       = USARTx_TX_PIN;
+ 1121              		.loc 1 318 0
+ 1122 06a4 4FF40073 		mov	r3, #512
+ 1123 06a8 FB60     		str	r3, [r7, #12]
+ 319:../src/LEDs.c ****   GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
+ 1124              		.loc 1 319 0
+ 1125 06aa 0223     		movs	r3, #2
+ 1126 06ac 3B61     		str	r3, [r7, #16]
+ 320:../src/LEDs.c ****   GPIO_InitStruct.Pull      = GPIO_PULLUP;
+ 1127              		.loc 1 320 0
+ 1128 06ae 0123     		movs	r3, #1
+ 1129 06b0 7B61     		str	r3, [r7, #20]
+ 321:../src/LEDs.c ****   GPIO_InitStruct.Speed     = GPIO_SPEED_FAST;
+ 1130              		.loc 1 321 0
+ 1131 06b2 0223     		movs	r3, #2
+ 1132 06b4 BB61     		str	r3, [r7, #24]
+ 322:../src/LEDs.c ****   GPIO_InitStruct.Alternate = USARTx_TX_AF;
+ 1133              		.loc 1 322 0
+ 1134 06b6 0723     		movs	r3, #7
+ 1135 06b8 FB61     		str	r3, [r7, #28]
+ 323:../src/LEDs.c **** 
+ 324:../src/LEDs.c ****   HAL_GPIO_Init(USARTx_TX_GPIO_PORT, &GPIO_InitStruct);
+ 1136              		.loc 1 324 0
+ 1137 06ba 07F10C03 		add	r3, r7, #12
+ 1138 06be 0020     		movs	r0, #0
+ 1139 06c0 C4F20200 		movt	r0, 16386
+ 1140 06c4 1946     		mov	r1, r3
+ 1141 06c6 FFF7FEFF 		bl	HAL_GPIO_Init
+ 325:../src/LEDs.c **** 
+ 326:../src/LEDs.c ****   /* UART RX GPIO pin configuration  */
+ 327:../src/LEDs.c ****    GPIO_InitStruct.Pin = USARTx_RX_PIN;
+ 1142              		.loc 1 327 0
+ 1143 06ca 4FF48063 		mov	r3, #1024
+ 1144 06ce FB60     		str	r3, [r7, #12]
+ 328:../src/LEDs.c ****    GPIO_InitStruct.Alternate = USARTx_RX_AF;
+ 1145              		.loc 1 328 0
+ 1146 06d0 0723     		movs	r3, #7
+ 1147 06d2 FB61     		str	r3, [r7, #28]
+ 329:../src/LEDs.c **** 
+ 330:../src/LEDs.c ****    HAL_GPIO_Init(USARTx_RX_GPIO_PORT, &GPIO_InitStruct);
+ 1148              		.loc 1 330 0
+ 1149 06d4 07F10C03 		add	r3, r7, #12
+ 1150 06d8 0020     		movs	r0, #0
+ 1151 06da C4F20200 		movt	r0, 16386
+ 1152 06de 1946     		mov	r1, r3
+ 1153 06e0 FFF7FEFF 		bl	HAL_GPIO_Init
+ 331:../src/LEDs.c **** 
+ 332:../src/LEDs.c ****   /*##-3- Configure the DMA streams ##########################################*/
+ 333:../src/LEDs.c ****   /* Configure the DMA handler for Transmission process */
+ 334:../src/LEDs.c ****   hdma_tx.Instance                 = USARTx_TX_DMA_STREAM;
+ 1154              		.loc 1 334 0
+ 1155 06e4 40F20003 		movw	r3, #:lower16:hdma_tx.7462
+ 1156 06e8 C0F20003 		movt	r3, #:upper16:hdma_tx.7462
+ 1157 06ec 46F2B842 		movw	r2, #25784
+ 1158 06f0 C4F20202 		movt	r2, 16386
+ 1159 06f4 1A60     		str	r2, [r3]
+ 335:../src/LEDs.c **** 
+ 336:../src/LEDs.c ****   hdma_tx.Init.Channel             = USARTx_TX_DMA_CHANNEL;
+ 1160              		.loc 1 336 0
+ 1161 06f6 40F20003 		movw	r3, #:lower16:hdma_tx.7462
+ 1162 06fa C0F20003 		movt	r3, #:upper16:hdma_tx.7462
+ 1163 06fe 4FF00062 		mov	r2, #134217728
+ 1164 0702 5A60     		str	r2, [r3, #4]
+ 337:../src/LEDs.c ****   hdma_tx.Init.Direction           = DMA_MEMORY_TO_PERIPH;
+ 1165              		.loc 1 337 0
+ 1166 0704 40F20003 		movw	r3, #:lower16:hdma_tx.7462
+ 1167 0708 C0F20003 		movt	r3, #:upper16:hdma_tx.7462
+ 1168 070c 4022     		movs	r2, #64
+ 1169 070e 9A60     		str	r2, [r3, #8]
+ 338:../src/LEDs.c ****   hdma_tx.Init.PeriphInc           = DMA_PINC_DISABLE;
+ 1170              		.loc 1 338 0
+ 1171 0710 40F20003 		movw	r3, #:lower16:hdma_tx.7462
+ 1172 0714 C0F20003 		movt	r3, #:upper16:hdma_tx.7462
+ 1173 0718 0022     		movs	r2, #0
+ 1174 071a DA60     		str	r2, [r3, #12]
+ 339:../src/LEDs.c ****   hdma_tx.Init.MemInc              = DMA_MINC_ENABLE;
+ 1175              		.loc 1 339 0
+ 1176 071c 40F20003 		movw	r3, #:lower16:hdma_tx.7462
+ 1177 0720 C0F20003 		movt	r3, #:upper16:hdma_tx.7462
+ 1178 0724 4FF48062 		mov	r2, #1024
+ 1179 0728 1A61     		str	r2, [r3, #16]
+ 340:../src/LEDs.c ****   hdma_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+ 1180              		.loc 1 340 0
+ 1181 072a 40F20003 		movw	r3, #:lower16:hdma_tx.7462
+ 1182 072e C0F20003 		movt	r3, #:upper16:hdma_tx.7462
+ 1183 0732 0022     		movs	r2, #0
+ 1184 0734 5A61     		str	r2, [r3, #20]
+ 341:../src/LEDs.c ****   hdma_tx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
+ 1185              		.loc 1 341 0
+ 1186 0736 40F20003 		movw	r3, #:lower16:hdma_tx.7462
+ 1187 073a C0F20003 		movt	r3, #:upper16:hdma_tx.7462
+ 1188 073e 0022     		movs	r2, #0
+ 1189 0740 9A61     		str	r2, [r3, #24]
+ 342:../src/LEDs.c ****   hdma_tx.Init.Mode                = DMA_NORMAL;//DMA_NORMAL;
+ 1190              		.loc 1 342 0
+ 1191 0742 40F20003 		movw	r3, #:lower16:hdma_tx.7462
+ 1192 0746 C0F20003 		movt	r3, #:upper16:hdma_tx.7462
+ 1193 074a 0022     		movs	r2, #0
+ 1194 074c DA61     		str	r2, [r3, #28]
+ 343:../src/LEDs.c ****   hdma_tx.Init.Priority            = DMA_PRIORITY_VERY_HIGH;//DMA_PRIORITY_LOW;
+ 1195              		.loc 1 343 0
+ 1196 074e 40F20003 		movw	r3, #:lower16:hdma_tx.7462
+ 1197 0752 C0F20003 		movt	r3, #:upper16:hdma_tx.7462
+ 1198 0756 4FF44032 		mov	r2, #196608
+ 1199 075a 1A62     		str	r2, [r3, #32]
+ 344:../src/LEDs.c ****   hdma_tx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
+ 1200              		.loc 1 344 0
+ 1201 075c 40F20003 		movw	r3, #:lower16:hdma_tx.7462
+ 1202 0760 C0F20003 		movt	r3, #:upper16:hdma_tx.7462
+ 1203 0764 0022     		movs	r2, #0
+ 1204 0766 5A62     		str	r2, [r3, #36]
+ 345:../src/LEDs.c ****   hdma_tx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
+ 1205              		.loc 1 345 0
+ 1206 0768 40F20003 		movw	r3, #:lower16:hdma_tx.7462
+ 1207 076c C0F20003 		movt	r3, #:upper16:hdma_tx.7462
+ 1208 0770 0322     		movs	r2, #3
+ 1209 0772 9A62     		str	r2, [r3, #40]
+ 346:../src/LEDs.c ****   hdma_tx.Init.MemBurst            = DMA_MBURST_INC4;
+ 1210              		.loc 1 346 0
+ 1211 0774 40F20003 		movw	r3, #:lower16:hdma_tx.7462
+ 1212 0778 C0F20003 		movt	r3, #:upper16:hdma_tx.7462
+ 1213 077c 4FF40002 		mov	r2, #8388608
+ 1214 0780 DA62     		str	r2, [r3, #44]
+ 347:../src/LEDs.c ****   hdma_tx.Init.PeriphBurst         = DMA_PBURST_INC4;
+ 1215              		.loc 1 347 0
+ 1216 0782 40F20003 		movw	r3, #:lower16:hdma_tx.7462
+ 1217 0786 C0F20003 		movt	r3, #:upper16:hdma_tx.7462
+ 1218 078a 4FF40012 		mov	r2, #2097152
+ 1219 078e 1A63     		str	r2, [r3, #48]
+ 348:../src/LEDs.c **** 
+ 349:../src/LEDs.c ****   HAL_DMA_Init(&hdma_tx);
+ 1220              		.loc 1 349 0
+ 1221 0790 40F20000 		movw	r0, #:lower16:hdma_tx.7462
+ 1222 0794 C0F20000 		movt	r0, #:upper16:hdma_tx.7462
+ 1223 0798 FFF7FEFF 		bl	HAL_DMA_Init
+ 350:../src/LEDs.c **** 
+ 351:../src/LEDs.c ****   /* Associate the initialized DMA handle to the UART handle */
+ 352:../src/LEDs.c ****   __HAL_LINKDMA(huart, hdmatx, hdma_tx);
+ 1224              		.loc 1 352 0
+ 1225 079c 7A68     		ldr	r2, [r7, #4]
+ 1226 079e 40F20003 		movw	r3, #:lower16:hdma_tx.7462
+ 1227 07a2 C0F20003 		movt	r3, #:upper16:hdma_tx.7462
+ 1228 07a6 1363     		str	r3, [r2, #48]
+ 1229 07a8 40F20003 		movw	r3, #:lower16:hdma_tx.7462
+ 1230 07ac C0F20003 		movt	r3, #:upper16:hdma_tx.7462
+ 1231 07b0 7A68     		ldr	r2, [r7, #4]
+ 1232 07b2 9A63     		str	r2, [r3, #56]
+ 353:../src/LEDs.c **** 
+ 354:../src/LEDs.c ****   /* Configure the DMA handler for reception process */
+ 355:../src/LEDs.c ****   hdma_rx.Instance                 = USARTx_RX_DMA_STREAM;
+ 1233              		.loc 1 355 0
+ 1234 07b4 40F20003 		movw	r3, #:lower16:hdma_rx.7463
+ 1235 07b8 C0F20003 		movt	r3, #:upper16:hdma_rx.7463
+ 1236 07bc 46F28842 		movw	r2, #25736
+ 1237 07c0 C4F20202 		movt	r2, 16386
+ 1238 07c4 1A60     		str	r2, [r3]
+ 356:../src/LEDs.c **** 
+ 357:../src/LEDs.c ****   hdma_rx.Init.Channel             = USARTx_RX_DMA_CHANNEL;
+ 1239              		.loc 1 357 0
+ 1240 07c6 40F20003 		movw	r3, #:lower16:hdma_rx.7463
+ 1241 07ca C0F20003 		movt	r3, #:upper16:hdma_rx.7463
+ 1242 07ce 4FF00062 		mov	r2, #134217728
+ 1243 07d2 5A60     		str	r2, [r3, #4]
+ 358:../src/LEDs.c ****   hdma_rx.Init.Direction           = DMA_PERIPH_TO_MEMORY;
+ 1244              		.loc 1 358 0
+ 1245 07d4 40F20003 		movw	r3, #:lower16:hdma_rx.7463
+ 1246 07d8 C0F20003 		movt	r3, #:upper16:hdma_rx.7463
+ 1247 07dc 0022     		movs	r2, #0
+ 1248 07de 9A60     		str	r2, [r3, #8]
+ 359:../src/LEDs.c ****   hdma_rx.Init.PeriphInc           = DMA_PINC_DISABLE;
+ 1249              		.loc 1 359 0
+ 1250 07e0 40F20003 		movw	r3, #:lower16:hdma_rx.7463
+ 1251 07e4 C0F20003 		movt	r3, #:upper16:hdma_rx.7463
+ 1252 07e8 0022     		movs	r2, #0
+ 1253 07ea DA60     		str	r2, [r3, #12]
+ 360:../src/LEDs.c ****   hdma_rx.Init.MemInc              = DMA_MINC_ENABLE;
+ 1254              		.loc 1 360 0
+ 1255 07ec 40F20003 		movw	r3, #:lower16:hdma_rx.7463
+ 1256 07f0 C0F20003 		movt	r3, #:upper16:hdma_rx.7463
+ 1257 07f4 4FF48062 		mov	r2, #1024
+ 1258 07f8 1A61     		str	r2, [r3, #16]
+ 361:../src/LEDs.c ****   hdma_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+ 1259              		.loc 1 361 0
+ 1260 07fa 40F20003 		movw	r3, #:lower16:hdma_rx.7463
+ 1261 07fe C0F20003 		movt	r3, #:upper16:hdma_rx.7463
+ 1262 0802 0022     		movs	r2, #0
+ 1263 0804 5A61     		str	r2, [r3, #20]
+ 362:../src/LEDs.c ****   hdma_rx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
+ 1264              		.loc 1 362 0
+ 1265 0806 40F20003 		movw	r3, #:lower16:hdma_rx.7463
+ 1266 080a C0F20003 		movt	r3, #:upper16:hdma_rx.7463
+ 1267 080e 0022     		movs	r2, #0
+ 1268 0810 9A61     		str	r2, [r3, #24]
+ 363:../src/LEDs.c ****   hdma_rx.Init.Mode                = DMA_NORMAL;
+ 1269              		.loc 1 363 0
+ 1270 0812 40F20003 		movw	r3, #:lower16:hdma_rx.7463
+ 1271 0816 C0F20003 		movt	r3, #:upper16:hdma_rx.7463
+ 1272 081a 0022     		movs	r2, #0
+ 1273 081c DA61     		str	r2, [r3, #28]
+ 364:../src/LEDs.c ****   hdma_rx.Init.Priority            = DMA_PRIORITY_HIGH;
+ 1274              		.loc 1 364 0
+ 1275 081e 40F20003 		movw	r3, #:lower16:hdma_rx.7463
+ 1276 0822 C0F20003 		movt	r3, #:upper16:hdma_rx.7463
+ 1277 0826 4FF40032 		mov	r2, #131072
+ 1278 082a 1A62     		str	r2, [r3, #32]
+ 365:../src/LEDs.c ****   hdma_rx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
+ 1279              		.loc 1 365 0
+ 1280 082c 40F20003 		movw	r3, #:lower16:hdma_rx.7463
+ 1281 0830 C0F20003 		movt	r3, #:upper16:hdma_rx.7463
+ 1282 0834 0022     		movs	r2, #0
+ 1283 0836 5A62     		str	r2, [r3, #36]
+ 366:../src/LEDs.c ****   hdma_rx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
+ 1284              		.loc 1 366 0
+ 1285 0838 40F20003 		movw	r3, #:lower16:hdma_rx.7463
+ 1286 083c C0F20003 		movt	r3, #:upper16:hdma_rx.7463
+ 1287 0840 0322     		movs	r2, #3
+ 1288 0842 9A62     		str	r2, [r3, #40]
+ 367:../src/LEDs.c ****   hdma_rx.Init.MemBurst            = DMA_MBURST_INC4;
+ 1289              		.loc 1 367 0
+ 1290 0844 40F20003 		movw	r3, #:lower16:hdma_rx.7463
+ 1291 0848 C0F20003 		movt	r3, #:upper16:hdma_rx.7463
+ 1292 084c 4FF40002 		mov	r2, #8388608
+ 1293 0850 DA62     		str	r2, [r3, #44]
+ 368:../src/LEDs.c ****   hdma_rx.Init.PeriphBurst         = DMA_PBURST_INC4;
+ 1294              		.loc 1 368 0
+ 1295 0852 40F20003 		movw	r3, #:lower16:hdma_rx.7463
+ 1296 0856 C0F20003 		movt	r3, #:upper16:hdma_rx.7463
+ 1297 085a 4FF40012 		mov	r2, #2097152
+ 1298 085e 1A63     		str	r2, [r3, #48]
+ 369:../src/LEDs.c **** 
+ 370:../src/LEDs.c ****   HAL_DMA_Init(&hdma_rx);
+ 1299              		.loc 1 370 0
+ 1300 0860 40F20000 		movw	r0, #:lower16:hdma_rx.7463
+ 1301 0864 C0F20000 		movt	r0, #:upper16:hdma_rx.7463
+ 1302 0868 FFF7FEFF 		bl	HAL_DMA_Init
+ 371:../src/LEDs.c **** 
+ 372:../src/LEDs.c ****   /* Associate the initialized DMA handle to the the UART handle */
+ 373:../src/LEDs.c ****   __HAL_LINKDMA(huart, hdmarx, hdma_rx);
+ 1303              		.loc 1 373 0
+ 1304 086c 7A68     		ldr	r2, [r7, #4]
+ 1305 086e 40F20003 		movw	r3, #:lower16:hdma_rx.7463
+ 1306 0872 C0F20003 		movt	r3, #:upper16:hdma_rx.7463
+ 1307 0876 5363     		str	r3, [r2, #52]
+ 1308 0878 40F20003 		movw	r3, #:lower16:hdma_rx.7463
+ 1309 087c C0F20003 		movt	r3, #:upper16:hdma_rx.7463
+ 1310 0880 7A68     		ldr	r2, [r7, #4]
+ 1311 0882 9A63     		str	r2, [r3, #56]
+ 374:../src/LEDs.c **** 
+ 375:../src/LEDs.c ****   /*##-4- Configure the NVIC for DMA #########################################*/
+ 376:../src/LEDs.c ****   /* NVIC configuration for DMA transfer complete interrupt (USARTx_TX) */
+ 377:../src/LEDs.c ****   HAL_NVIC_SetPriority(USARTx_DMA_TX_IRQn, 0, 1);	//0,1
+ 1312              		.loc 1 377 0
+ 1313 0884 4620     		movs	r0, #70
+ 1314 0886 0021     		movs	r1, #0
+ 1315 0888 0122     		movs	r2, #1
+ 1316 088a FFF7FEFF 		bl	HAL_NVIC_SetPriority
+ 378:../src/LEDs.c ****   HAL_NVIC_EnableIRQ(USARTx_DMA_TX_IRQn);
+ 1317              		.loc 1 378 0
+ 1318 088e 4620     		movs	r0, #70
+ 1319 0890 FFF7FEFF 		bl	HAL_NVIC_EnableIRQ
+ 379:../src/LEDs.c ****   /* NVIC configuration for DMA transfer complete interrupt (USARTx_RX) */
+ 380:../src/LEDs.c ****    HAL_NVIC_SetPriority(USARTx_DMA_RX_IRQn, 0, 0);
+ 1320              		.loc 1 380 0
+ 1321 0894 4420     		movs	r0, #68
+ 1322 0896 0021     		movs	r1, #0
+ 1323 0898 0022     		movs	r2, #0
+ 1324 089a FFF7FEFF 		bl	HAL_NVIC_SetPriority
+ 381:../src/LEDs.c ****    HAL_NVIC_EnableIRQ(USARTx_DMA_RX_IRQn);
+ 1325              		.loc 1 381 0
+ 1326 089e 4420     		movs	r0, #68
+ 1327 08a0 FFF7FEFF 		bl	HAL_NVIC_EnableIRQ
+ 382:../src/LEDs.c **** 
+ 383:../src/LEDs.c **** }
+ 1328              		.loc 1 383 0
+ 1329 08a4 2037     		adds	r7, r7, #32
+ 1330 08a6 BD46     		mov	sp, r7
+ 1331              		@ sp needed
+ 1332 08a8 80BD     		pop	{r7, pc}
+ 1333              		.cfi_endproc
+ 1334              	.LFE70:
+ 1336 08aa 00BF     		.align	2
+ 1337              		.global	HAL_UART_MspDeInit
+ 1338              		.thumb
+ 1339              		.thumb_func
+ 1341              	HAL_UART_MspDeInit:
+ 1342              	.LFB71:
+ 384:../src/LEDs.c **** 
+ 385:../src/LEDs.c **** /**
+ 386:../src/LEDs.c ****   * @brief UART MSP De-Initialization
+ 387:../src/LEDs.c ****   *        This function frees the hardware resources used in this example:
+ 388:../src/LEDs.c ****   *          - Disable the Peripheral's clock
+ 389:../src/LEDs.c ****   *          - Revert GPIO and NVIC configuration to their default state
+ 390:../src/LEDs.c ****   * @param huart: UART handle pointer
+ 391:../src/LEDs.c ****   * @retval None
+ 392:../src/LEDs.c ****   */
+ 393:../src/LEDs.c **** void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
+ 394:../src/LEDs.c **** {
+ 1343              		.loc 1 394 0
+ 1344              		.cfi_startproc
+ 1345              		@ args = 0, pretend = 0, frame = 8
+ 1346              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1347 08ac 80B5     		push	{r7, lr}
+ 1348              		.cfi_def_cfa_offset 8
+ 1349              		.cfi_offset 7, -8
+ 1350              		.cfi_offset 14, -4
+ 1351 08ae 82B0     		sub	sp, sp, #8
+ 1352              		.cfi_def_cfa_offset 16
+ 1353 08b0 00AF     		add	r7, sp, #0
+ 1354              		.cfi_def_cfa_register 7
+ 1355 08b2 7860     		str	r0, [r7, #4]
+ 395:../src/LEDs.c **** 
+ 396:../src/LEDs.c **** 	  static DMA_HandleTypeDef hdma_tx;
+ 397:../src/LEDs.c **** 	  static DMA_HandleTypeDef hdma_rx;
+ 398:../src/LEDs.c **** 
+ 399:../src/LEDs.c **** 	  /*##-1- Reset peripherals ##################################################*/
+ 400:../src/LEDs.c **** 	  USARTx_FORCE_RESET();
+ 1356              		.loc 1 400 0
+ 1357 08b4 4FF46053 		mov	r3, #14336
+ 1358 08b8 C4F20203 		movt	r3, 16386
+ 1359 08bc 4FF46052 		mov	r2, #14336
+ 1360 08c0 C4F20202 		movt	r2, 16386
+ 1361 08c4 526A     		ldr	r2, [r2, #36]
+ 1362 08c6 42F01002 		orr	r2, r2, #16
+ 1363 08ca 5A62     		str	r2, [r3, #36]
+ 401:../src/LEDs.c **** 	  USARTx_RELEASE_RESET();
+ 1364              		.loc 1 401 0
+ 1365 08cc 4FF46053 		mov	r3, #14336
+ 1366 08d0 C4F20203 		movt	r3, 16386
+ 1367 08d4 4FF46052 		mov	r2, #14336
+ 1368 08d8 C4F20202 		movt	r2, 16386
+ 1369 08dc 526A     		ldr	r2, [r2, #36]
+ 1370 08de 22F01002 		bic	r2, r2, #16
+ 1371 08e2 5A62     		str	r2, [r3, #36]
+ 402:../src/LEDs.c **** 
+ 403:../src/LEDs.c **** 	  /*##-2- Disable peripherals and GPIO Clocks #################################*/
+ 404:../src/LEDs.c **** 	  /* Configure UART Tx as alternate function  */
+ 405:../src/LEDs.c **** 	  HAL_GPIO_DeInit(USARTx_TX_GPIO_PORT, USARTx_TX_PIN);
+ 1372              		.loc 1 405 0
+ 1373 08e4 0020     		movs	r0, #0
+ 1374 08e6 C4F20200 		movt	r0, 16386
+ 1375 08ea 4FF40071 		mov	r1, #512
+ 1376 08ee FFF7FEFF 		bl	HAL_GPIO_DeInit
+ 406:../src/LEDs.c **** 	  /* Configure UART Rx as alternate function  */
+ 407:../src/LEDs.c **** 	  HAL_GPIO_DeInit(USARTx_RX_GPIO_PORT, USARTx_RX_PIN);
+ 1377              		.loc 1 407 0
+ 1378 08f2 0020     		movs	r0, #0
+ 1379 08f4 C4F20200 		movt	r0, 16386
+ 1380 08f8 4FF48061 		mov	r1, #1024
+ 1381 08fc FFF7FEFF 		bl	HAL_GPIO_DeInit
+ 408:../src/LEDs.c **** 
+ 409:../src/LEDs.c **** 	  /*##-3- Disable the DMA Streams ############################################*/
+ 410:../src/LEDs.c **** 	  /* De-Initialize the DMA Stream associate to transmission process */
+ 411:../src/LEDs.c **** 	  HAL_DMA_DeInit(&hdma_tx);
+ 1382              		.loc 1 411 0
+ 1383 0900 40F20000 		movw	r0, #:lower16:hdma_tx.7467
+ 1384 0904 C0F20000 		movt	r0, #:upper16:hdma_tx.7467
+ 1385 0908 FFF7FEFF 		bl	HAL_DMA_DeInit
+ 412:../src/LEDs.c **** 	  /* De-Initialize the DMA Stream associate to reception process */
+ 413:../src/LEDs.c **** 	  HAL_DMA_DeInit(&hdma_rx);
+ 1386              		.loc 1 413 0
+ 1387 090c 40F20000 		movw	r0, #:lower16:hdma_rx.7468
+ 1388 0910 C0F20000 		movt	r0, #:upper16:hdma_rx.7468
+ 1389 0914 FFF7FEFF 		bl	HAL_DMA_DeInit
+ 414:../src/LEDs.c **** 
+ 415:../src/LEDs.c **** 	  /*##-4- Disable the NVIC for DMA ###########################################*/
+ 416:../src/LEDs.c **** 	  HAL_NVIC_DisableIRQ(USARTx_DMA_TX_IRQn);
+ 1390              		.loc 1 416 0
+ 1391 0918 4620     		movs	r0, #70
+ 1392 091a FFF7FEFF 		bl	HAL_NVIC_DisableIRQ
+ 417:../src/LEDs.c **** 	  HAL_NVIC_DisableIRQ(USARTx_DMA_RX_IRQn);
+ 1393              		.loc 1 417 0
+ 1394 091e 4420     		movs	r0, #68
+ 1395 0920 FFF7FEFF 		bl	HAL_NVIC_DisableIRQ
+ 418:../src/LEDs.c **** }
+ 1396              		.loc 1 418 0
+ 1397 0924 0837     		adds	r7, r7, #8
+ 1398 0926 BD46     		mov	sp, r7
+ 1399              		@ sp needed
+ 1400 0928 80BD     		pop	{r7, pc}
+ 1401              		.cfi_endproc
+ 1402              	.LFE71:
+ 1404 092a 00BF     		.align	2
+ 1405              		.global	HAL_UART_TxCpltCallback
+ 1406              		.thumb
+ 1407              		.thumb_func
+ 1409              	HAL_UART_TxCpltCallback:
+ 1410              	.LFB72:
+ 419:../src/LEDs.c **** 
+ 420:../src/LEDs.c **** /**
+ 421:../src/LEDs.c ****   * @brief  Tx Transfer completed callback
+ 422:../src/LEDs.c ****   * @param  huart: UART handle.
+ 423:../src/LEDs.c ****   * @note   This example shows a simple way to report end of DMA Tx transfer, and
+ 424:../src/LEDs.c ****   *         you can add your own implementation.
+ 425:../src/LEDs.c ****   * @retval None
+ 426:../src/LEDs.c ****   */
+ 427:../src/LEDs.c **** void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+ 428:../src/LEDs.c **** {
+ 1411              		.loc 1 428 0
+ 1412              		.cfi_startproc
+ 1413              		@ args = 0, pretend = 0, frame = 8
+ 1414              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1415 092c 80B5     		push	{r7, lr}
+ 1416              		.cfi_def_cfa_offset 8
+ 1417              		.cfi_offset 7, -8
+ 1418              		.cfi_offset 14, -4
+ 1419 092e 82B0     		sub	sp, sp, #8
+ 1420              		.cfi_def_cfa_offset 16
+ 1421 0930 00AF     		add	r7, sp, #0
+ 1422              		.cfi_def_cfa_register 7
+ 1423 0932 7860     		str	r0, [r7, #4]
+ 429:../src/LEDs.c ****   /* Turn LED1 on: Transfer in transmission process is correct */
+ 430:../src/LEDs.c **** 	TST_High(TST1);
+ 1424              		.loc 1 430 0
+ 1425 0934 0020     		movs	r0, #0
+ 1426 0936 FFF7FEFF 		bl	TST_High
+ 431:../src/LEDs.c **** }
+ 1427              		.loc 1 431 0
+ 1428 093a 0837     		adds	r7, r7, #8
+ 1429 093c BD46     		mov	sp, r7
+ 1430              		@ sp needed
+ 1431 093e 80BD     		pop	{r7, pc}
+ 1432              		.cfi_endproc
+ 1433              	.LFE72:
+ 1435              		.align	2
+ 1436              		.global	HAL_UART_RxCpltCallback
+ 1437              		.thumb
+ 1438              		.thumb_func
+ 1440              	HAL_UART_RxCpltCallback:
+ 1441              	.LFB73:
+ 432:../src/LEDs.c **** void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+ 433:../src/LEDs.c **** {
+ 1442              		.loc 1 433 0
+ 1443              		.cfi_startproc
+ 1444              		@ args = 0, pretend = 0, frame = 8
+ 1445              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1446 0940 80B5     		push	{r7, lr}
+ 1447              		.cfi_def_cfa_offset 8
+ 1448              		.cfi_offset 7, -8
+ 1449              		.cfi_offset 14, -4
+ 1450 0942 82B0     		sub	sp, sp, #8
+ 1451              		.cfi_def_cfa_offset 16
+ 1452 0944 00AF     		add	r7, sp, #0
+ 1453              		.cfi_def_cfa_register 7
+ 1454 0946 7860     		str	r0, [r7, #4]
+ 434:../src/LEDs.c ****   /* Turn LED2 on: Transfer in reception process is correct */
+ 435:../src/LEDs.c **** //	TST_High(TST3);
+ 436:../src/LEDs.c **** 	TST_Toggle(TST3);
+ 1455              		.loc 1 436 0
+ 1456 0948 0120     		movs	r0, #1
+ 1457 094a FFF7FEFF 		bl	TST_Toggle
+ 437:../src/LEDs.c **** }
+ 1458              		.loc 1 437 0
+ 1459 094e 0837     		adds	r7, r7, #8
+ 1460 0950 BD46     		mov	sp, r7
+ 1461              		@ sp needed
+ 1462 0952 80BD     		pop	{r7, pc}
+ 1463              		.cfi_endproc
+ 1464              	.LFE73:
+ 1466              		.bss
+ 1467              		.align	2
+ 1468              	i.7406:
+ 1469 0000 00000000 		.space	4
+ 1470              		.align	2
+ 1471              	i.7413:
+ 1472 0004 00000000 		.space	4
+ 1473              		.align	2
+ 1474              	i.7420:
+ 1475 0008 00000000 		.space	4
+ 1476              		.align	2
+ 1477              	hdma_tx.7462:
+ 1478 000c 00000000 		.space	80
+ 1478      00000000 
+ 1478      00000000 
+ 1478      00000000 
+ 1478      00000000 
+ 1479              		.align	2
+ 1480              	hdma_rx.7463:
+ 1481 005c 00000000 		.space	80
+ 1481      00000000 
+ 1481      00000000 
+ 1481      00000000 
+ 1481      00000000 
+ 1482              		.align	2
+ 1483              	hdma_tx.7467:
+ 1484 00ac 00000000 		.space	80
+ 1484      00000000 
+ 1484      00000000 
+ 1484      00000000 
+ 1484      00000000 
+ 1485              		.align	2
+ 1486              	hdma_rx.7468:
+ 1487 00fc 00000000 		.space	80
+ 1487      00000000 
+ 1487      00000000 
+ 1487      00000000 
+ 1487      00000000 
+ 1488              		.text
+ 1489              	.Letext0:
+ 1490              		.file 2 "c:\\program files (x86)\\codesourcery\\arm-none-eabi\\include\\stdint.h"
+ 1491              		.file 3 "D:\\workspace\\console800480\\system/stm32f217xx.h"
+ 1492              		.file 4 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_hal_def.h"
+ 1493              		.file 5 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_hal_gpio.h"
+ 1494              		.file 6 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_hal_dma.h"
+ 1495              		.file 7 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_hal_uart.h"
+ 1496              		.file 8 "../src/LEDs.h"
+ 1497              		.file 9 "D:\\workspace\\console800480\\system/core_cm3.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 LEDs.c
+                            *COM*:0000003c UartHandle
+C:\Users\sagok\AppData\Local\Temp\ccRv9Lpj.s:24     .data:00000000 aTxBuffer
+C:\Users\sagok\AppData\Local\Temp\ccRv9Lpj.s:21     .data:00000000 $d
+                            *COM*:0000000a aRxBuffer
+C:\Users\sagok\AppData\Local\Temp\ccRv9Lpj.s:31     .data:00000018 GPIO_PORT
+C:\Users\sagok\AppData\Local\Temp\ccRv9Lpj.s:49     .rodata:00000000 GPIO_PIN
+C:\Users\sagok\AppData\Local\Temp\ccRv9Lpj.s:46     .rodata:00000000 $d
+C:\Users\sagok\AppData\Local\Temp\ccRv9Lpj.s:67     .data:00000048 TST_PORT
+C:\Users\sagok\AppData\Local\Temp\ccRv9Lpj.s:78     .rodata:00000018 TST_PIN
+C:\Users\sagok\AppData\Local\Temp\ccRv9Lpj.s:85     .text:00000000 $t
+C:\Users\sagok\AppData\Local\Temp\ccRv9Lpj.s:89     .text:00000000 Error_Handler
+C:\Users\sagok\AppData\Local\Temp\ccRv9Lpj.s:952    .text:000005a8 TST_High
+C:\Users\sagok\AppData\Local\Temp\ccRv9Lpj.s:122    .text:00000018 Uart1_Init
+C:\Users\sagok\AppData\Local\Temp\ccRv9Lpj.s:205    .text:000000b4 AllLEDs_Init
+C:\Users\sagok\AppData\Local\Temp\ccRv9Lpj.s:1468   .bss:00000000 i.7406
+C:\Users\sagok\AppData\Local\Temp\ccRv9Lpj.s:393    .text:000001e4 LED_Init
+C:\Users\sagok\AppData\Local\Temp\ccRv9Lpj.s:827    .text:00000504 LED_High
+C:\Users\sagok\AppData\Local\Temp\ccRv9Lpj.s:264    .text:00000114 OutToAllLED
+C:\Users\sagok\AppData\Local\Temp\ccRv9Lpj.s:1471   .bss:00000004 i.7413
+C:\Users\sagok\AppData\Local\Temp\ccRv9Lpj.s:869    .text:0000053c LED_Low
+C:\Users\sagok\AppData\Local\Temp\ccRv9Lpj.s:342    .text:00000198 AllTSTs_Init
+C:\Users\sagok\AppData\Local\Temp\ccRv9Lpj.s:1474   .bss:00000008 i.7420
+C:\Users\sagok\AppData\Local\Temp\ccRv9Lpj.s:610    .text:000003a4 TST_Init
+C:\Users\sagok\AppData\Local\Temp\ccRv9Lpj.s:728    .text:00000484 ReadInputDataBit
+C:\Users\sagok\AppData\Local\Temp\ccRv9Lpj.s:786    .text:000004d0 LED_Toggle
+C:\Users\sagok\AppData\Local\Temp\ccRv9Lpj.s:911    .text:00000574 TST_Toggle
+C:\Users\sagok\AppData\Local\Temp\ccRv9Lpj.s:994    .text:000005e0 TST_Low
+C:\Users\sagok\AppData\Local\Temp\ccRv9Lpj.s:1036   .text:00000618 __io_putchar
+C:\Users\sagok\AppData\Local\Temp\ccRv9Lpj.s:1074   .text:0000063c HAL_UART_MspInit
+C:\Users\sagok\AppData\Local\Temp\ccRv9Lpj.s:1477   .bss:0000000c hdma_tx.7462
+C:\Users\sagok\AppData\Local\Temp\ccRv9Lpj.s:1480   .bss:0000005c hdma_rx.7463
+C:\Users\sagok\AppData\Local\Temp\ccRv9Lpj.s:1341   .text:000008ac HAL_UART_MspDeInit
+C:\Users\sagok\AppData\Local\Temp\ccRv9Lpj.s:1483   .bss:000000ac hdma_tx.7467
+C:\Users\sagok\AppData\Local\Temp\ccRv9Lpj.s:1486   .bss:000000fc hdma_rx.7468
+C:\Users\sagok\AppData\Local\Temp\ccRv9Lpj.s:1409   .text:0000092c HAL_UART_TxCpltCallback
+C:\Users\sagok\AppData\Local\Temp\ccRv9Lpj.s:1440   .text:00000940 HAL_UART_RxCpltCallback
+C:\Users\sagok\AppData\Local\Temp\ccRv9Lpj.s:1467   .bss:00000000 $d
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.1.7f551ac7fcad8b79b9df4bfdaa536673
+                           .group:00000000 wm4.stm32f2xx_hal_conf.h.40.007126baefb9f966c36646edbf8040d2
+                           .group:00000000 wm4.stm32f2xx.h.57.5ec1581efc43612c411d33a8686e9ec7
+                           .group:00000000 wm4.stm32f217xx.h.52.9c940d76d00294b78837dc334c172fdd
+                           .group:00000000 wm4.core_cm3.h.32.49180ccb4d36cabd2d7016d2a51d91ae
+                           .group:00000000 wm4.newlib.h.8.384a112feabb3bef7b573ae48cde2e3b
+                           .group:00000000 wm4.features.h.22.6a4ca7cd053637cc1d0db6c16f39b2d7
+                           .group:00000000 wm4.config.h.183.aa62afef667fb61d15fa64c48beb2f14
+                           .group:00000000 wm4._ansi.h.23.5644b60c990a4800b02a6e654e88f93a
+                           .group:00000000 wm4.stdint.h.20.54ad762faa59e3c05491630641c8d8bf
+                           .group:00000000 wm4.core_cmInstr.h.25.f50f886f2edf670cf199b35fd96f5c91
+                           .group:00000000 wm4.core_cm3.h.130.63ab2348a6eed0fdb318040d970b676c
+                           .group:00000000 wm4.stm32f217xx.h.978.a5c681952b2f704a0e7f2ba21d08adf5
+                           .group:00000000 wm4.stm32f2xx.h.142.bc2155a1f7498bab16371e38413a9e41
+                           .group:00000000 wm4.stm32f2xx_hal_def.h.74.8ad2dc8aa82c4fd02e5aeaae592641ba
+                           .group:00000000 wm4.stm32f2xx_hal_rcc.h.142.ec0f91cc6576a6acebd17e6dd85829ae
+                           .group:00000000 wm4.stm32f2xx_hal_rcc_ex.h.40.0829033e864455c6bdd0db01f8ba5a50
+                           .group:00000000 wm4.stm32f2xx_hal_gpio.h.40.ba64e0bb94d9a68835f80159f39a86f1
+                           .group:00000000 wm4.stm32f2xx_hal_gpio_ex.h.40.24e547fd402281923f446b510381083f
+                           .group:00000000 wm4.stm32f2xx_hal_dma.h.40.5d9732ace2a21a4526ce8f0c52428fff
+                           .group:00000000 wm4.stm32f2xx_hal_cortex.h.40.e10263d2ec5d4fa79b4180ce1a38aff1
+                           .group:00000000 wm4.stm32f2xx_hal_adc.h.40.89ac8b78113cac4cf63847587daabac9
+                           .group:00000000 wm4.stm32f2xx_hal_adc_ex.h.40.7de68ed256ef25526ee31cc017f2c291
+                           .group:00000000 wm4.stm32f2xx_hal_flash.h.40.c3171719ce015e9cff20c795e44e886d
+                           .group:00000000 wm4.stm32f2xx_hal_flash_ex.h.40.7389508bd24a0aeb077bde0c9fb651eb
+                           .group:00000000 wm4.stm32f2xx_ll_fsmc.h.40.c1c32f2e1862f4dd342bd9b80fb895bb
+                           .group:00000000 wm4.stm32f2xx_hal_pwr.h.40.812df32e5c31b609a128e9db0eb4cbd0
+                           .group:00000000 wm4.stm32f2xx_hal_rtc.h.40.850fda5fe2cce8797446913dee18382f
+                           .group:00000000 wm4.stm32f2xx_hal_rtc_ex.h.40.f3e0c408e3bf4e8a0352d7ec9a18a822
+                           .group:00000000 wm4.stm32f2xx_ll_sdmmc.h.40.3719ab487c4b77401c572f459adf6eb7
+                           .group:00000000 wm4.stm32f2xx_hal_sd.h.58.760215394dcc316161a6482c0af9b866
+                           .group:00000000 wm4.stm32f2xx_hal_spi.h.40.7984243dbaba8b21c6392998a47e6987
+                           .group:00000000 wm4.stm32f2xx_hal_tim.h.40.d79172f25d0e9a15dc346aba8515bdd6
+                           .group:00000000 wm4.stm32f2xx_hal_tim_ex.h.40.361f280a7a3f60b4b238bb99ca728d83
+                           .group:00000000 wm4.stm32f2xx_hal_uart.h.40.d74def561ae6f78f40f477c8426ecbef
+                           .group:00000000 wm4.stm32f2xx_ll_usb.h.40.9b0206a05bc6ce3bec1648b51f22cb81
+                           .group:00000000 wm4.stm32f2xx_hal_pcd.h.99.11faba414c39e357b2f23364912d0605
+                           .group:00000000 wm4.stm32f2xx_hal_hcd.h.40.44ee5e972983ae0139ddbacdc75c44ef
+                           .group:00000000 wm4.stm32f2xx_hal.h.64.ed79ee83e52b151b3c365392b398f866
+                           .group:00000000 wm4.LEDs.h.9.36ffa4b30bd168dc58d64fa6e53a9a30
+
+UNDEFINED SYMBOLS
+HAL_UART_Init
+HAL_UART_Transmit_DMA
+HAL_GPIO_Init
+HAL_GPIO_TogglePin
+HAL_GPIO_WritePin
+HAL_DMA_Init
+HAL_NVIC_SetPriority
+HAL_NVIC_EnableIRQ
+HAL_GPIO_DeInit
+HAL_DMA_DeInit
+HAL_NVIC_DisableIRQ

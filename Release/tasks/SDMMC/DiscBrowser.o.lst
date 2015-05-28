@@ -1,0 +1,1139 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"DiscBrowser.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.section	.rodata
+  19              		.align	2
+  20              	.LC0:
+  21 0000 2F257300 		.ascii	"/%s\000"
+  22              		.align	2
+  23              	.LC1:
+  24 0004 25732F25 		.ascii	"%s/%s\011%02d:%02d:%u %02d.%02d.%02d \012\000"
+  24      73092530 
+  24      32643A25 
+  24      3032643A 
+  24      25752025 
+  25              		.text
+  26              		.align	2
+  27              		.global	scan_files
+  28              		.thumb
+  29              		.thumb_func
+  31              	scan_files:
+  32              	.LFB55:
+  33              		.file 1 "../tasks/SDMMC/DiscBrowser.c"
+   1:../tasks/SDMMC/DiscBrowser.c **** /*
+   2:../tasks/SDMMC/DiscBrowser.c ****  * DiscBrowser.c
+   3:../tasks/SDMMC/DiscBrowser.c ****  *
+   4:../tasks/SDMMC/DiscBrowser.c ****  *  Created on: 27.02.2015
+   5:../tasks/SDMMC/DiscBrowser.c ****  *      Author: sagok
+   6:../tasks/SDMMC/DiscBrowser.c ****  */
+   7:../tasks/SDMMC/DiscBrowser.c **** 
+   8:../tasks/SDMMC/DiscBrowser.c **** /* FatFs includes component */
+   9:../tasks/SDMMC/DiscBrowser.c **** #include "ff_gen_drv.h"
+  10:../tasks/SDMMC/DiscBrowser.c **** 
+  11:../tasks/SDMMC/DiscBrowser.c **** #include "RTC.h"
+  12:../tasks/SDMMC/DiscBrowser.c **** #include "Fonts/fonts.h"
+  13:../tasks/SDMMC/DiscBrowser.c **** 
+  14:../tasks/SDMMC/DiscBrowser.c **** /***********************************************************************
+  15:../tasks/SDMMC/DiscBrowser.c ****  *
+  16:../tasks/SDMMC/DiscBrowser.c ****  ***********************************************************************/
+  17:../tasks/SDMMC/DiscBrowser.c **** 
+  18:../tasks/SDMMC/DiscBrowser.c **** FRESULT scan_files (char* path)        /* Start node to be scanned (also used as work area) */
+  19:../tasks/SDMMC/DiscBrowser.c **** {
+  34              		.loc 1 19 0
+  35              		.cfi_startproc
+  36              		@ args = 0, pretend = 0, frame = 616
+  37              		@ frame_needed = 1, uses_anonymous_args = 0
+  38 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+  39              		.cfi_def_cfa_offset 20
+  40              		.cfi_offset 4, -20
+  41              		.cfi_offset 5, -16
+  42              		.cfi_offset 6, -12
+  43              		.cfi_offset 7, -8
+  44              		.cfi_offset 14, -4
+  45 0002 ADF5217D 		sub	sp, sp, #644
+  46              		.cfi_def_cfa_offset 664
+  47 0006 06AF     		add	r7, sp, #24
+  48              		.cfi_def_cfa 7, 640
+  49 0008 3B1D     		adds	r3, r7, #4
+  50 000a 1860     		str	r0, [r3]
+  20:../tasks/SDMMC/DiscBrowser.c ****     FRESULT res;
+  21:../tasks/SDMMC/DiscBrowser.c ****     FILINFO fno;
+  22:../tasks/SDMMC/DiscBrowser.c ****     DIR dir;
+  23:../tasks/SDMMC/DiscBrowser.c ****     int i;
+  24:../tasks/SDMMC/DiscBrowser.c ****     char *fn;   /* This function is assuming non-Unicode cfg. */
+  25:../tasks/SDMMC/DiscBrowser.c **** 	FILINFO FileInfo;
+  26:../tasks/SDMMC/DiscBrowser.c **** 
+  27:../tasks/SDMMC/DiscBrowser.c **** 
+  28:../tasks/SDMMC/DiscBrowser.c **** #if _USE_LFN
+  29:../tasks/SDMMC/DiscBrowser.c ****     static char lfn[_MAX_LFN + 1];   /* Buffer to store the LFN */
+  30:../tasks/SDMMC/DiscBrowser.c ****     fno.lfname = lfn;
+  31:../tasks/SDMMC/DiscBrowser.c ****     fno.lfsize = sizeof lfn;
+  32:../tasks/SDMMC/DiscBrowser.c **** #endif
+  33:../tasks/SDMMC/DiscBrowser.c **** 
+  34:../tasks/SDMMC/DiscBrowser.c **** 
+  35:../tasks/SDMMC/DiscBrowser.c ****     res = f_opendir(&dir, path);                       /* Open the directory */
+  51              		.loc 1 35 0
+  52 000c 07F12402 		add	r2, r7, #36
+  53 0010 3B1D     		adds	r3, r7, #4
+  54 0012 1046     		mov	r0, r2
+  55 0014 1968     		ldr	r1, [r3]
+  56 0016 FFF7FEFF 		bl	f_opendir
+  57 001a 0346     		mov	r3, r0
+  58 001c 87F86732 		strb	r3, [r7, #615]
+  36:../tasks/SDMMC/DiscBrowser.c ****     if (res == FR_OK) {
+  59              		.loc 1 36 0
+  60 0020 97F86732 		ldrb	r3, [r7, #615]	@ zero_extendqisi2
+  61 0024 002B     		cmp	r3, #0
+  62 0026 40F09180 		bne	.L2
+  37:../tasks/SDMMC/DiscBrowser.c ****         i = strlen(path);
+  63              		.loc 1 37 0
+  64 002a 3B1D     		adds	r3, r7, #4
+  65 002c 1868     		ldr	r0, [r3]
+  66 002e FFF7FEFF 		bl	strlen
+  67 0032 0346     		mov	r3, r0
+  68 0034 C7F86032 		str	r3, [r7, #608]
+  69              	.L8:
+  38:../tasks/SDMMC/DiscBrowser.c ****         for (;;) {
+  39:../tasks/SDMMC/DiscBrowser.c ****             res = f_readdir(&dir, &fno);                   /* Read a directory item */
+  70              		.loc 1 39 0
+  71 0038 07F12402 		add	r2, r7, #36
+  72 003c 07F51173 		add	r3, r7, #580
+  73 0040 1046     		mov	r0, r2
+  74 0042 1946     		mov	r1, r3
+  75 0044 FFF7FEFF 		bl	f_readdir
+  76 0048 0346     		mov	r3, r0
+  77 004a 87F86732 		strb	r3, [r7, #615]
+  40:../tasks/SDMMC/DiscBrowser.c ****             if (res != FR_OK || fno.fname[0] == 0) break;  /* Break on error or end of dir */
+  78              		.loc 1 40 0
+  79 004e 97F86732 		ldrb	r3, [r7, #615]	@ zero_extendqisi2
+  80 0052 002B     		cmp	r3, #0
+  81 0054 75D1     		bne	.L3
+  82              		.loc 1 40 0 is_stmt 0 discriminator 1
+  83 0056 97F84D32 		ldrb	r3, [r7, #589]	@ zero_extendqisi2
+  84 005a 002B     		cmp	r3, #0
+  85 005c 71D0     		beq	.L3
+  41:../tasks/SDMMC/DiscBrowser.c ****             if (fno.fname[0] == '.') continue;             /* Ignore dot entry */
+  86              		.loc 1 41 0 is_stmt 1
+  87 005e 97F84D32 		ldrb	r3, [r7, #589]	@ zero_extendqisi2
+  88 0062 2E2B     		cmp	r3, #46
+  89 0064 00D1     		bne	.L4
+  90              		.loc 1 41 0 is_stmt 0 discriminator 1
+  91 0066 6BE0     		b	.L5
+  92              	.L4:
+  42:../tasks/SDMMC/DiscBrowser.c **** #if _USE_LFN
+  43:../tasks/SDMMC/DiscBrowser.c ****             fn = *fno.lfname ? fno.lfname : fno.fname;
+  44:../tasks/SDMMC/DiscBrowser.c **** #else
+  45:../tasks/SDMMC/DiscBrowser.c ****             fn = fno.fname;
+  93              		.loc 1 45 0 is_stmt 1
+  94 0068 07F51173 		add	r3, r7, #580
+  95 006c 0933     		adds	r3, r3, #9
+  96 006e C7F85C32 		str	r3, [r7, #604]
+  46:../tasks/SDMMC/DiscBrowser.c **** #endif
+  47:../tasks/SDMMC/DiscBrowser.c ****             if (fno.fattrib & AM_DIR) {                    /* It is a directory */
+  97              		.loc 1 47 0
+  98 0072 97F84C32 		ldrb	r3, [r7, #588]	@ zero_extendqisi2
+  99 0076 03F01003 		and	r3, r3, #16
+ 100 007a 002B     		cmp	r3, #0
+ 101 007c 21D0     		beq	.L6
+  48:../tasks/SDMMC/DiscBrowser.c ****                 sprintf(&path[i], "/%s", fn);
+ 102              		.loc 1 48 0
+ 103 007e D7F86032 		ldr	r3, [r7, #608]
+ 104 0082 3A1D     		adds	r2, r7, #4
+ 105 0084 1268     		ldr	r2, [r2]
+ 106 0086 1344     		add	r3, r3, r2
+ 107 0088 1846     		mov	r0, r3
+ 108 008a 40F20001 		movw	r1, #:lower16:.LC0
+ 109 008e C0F20001 		movt	r1, #:upper16:.LC0
+ 110 0092 D7F85C22 		ldr	r2, [r7, #604]
+ 111 0096 FFF7FEFF 		bl	sprintf
+  49:../tasks/SDMMC/DiscBrowser.c ****                 res = scan_files(path);
+ 112              		.loc 1 49 0
+ 113 009a 3B1D     		adds	r3, r7, #4
+ 114 009c 1868     		ldr	r0, [r3]
+ 115 009e FFF7FEFF 		bl	scan_files
+ 116 00a2 0346     		mov	r3, r0
+ 117 00a4 87F86732 		strb	r3, [r7, #615]
+  50:../tasks/SDMMC/DiscBrowser.c ****                 if (res != FR_OK) break;
+ 118              		.loc 1 50 0
+ 119 00a8 97F86732 		ldrb	r3, [r7, #615]	@ zero_extendqisi2
+ 120 00ac 002B     		cmp	r3, #0
+ 121 00ae 00D0     		beq	.L7
+ 122              		.loc 1 50 0 is_stmt 0 discriminator 1
+ 123 00b0 47E0     		b	.L3
+ 124              	.L7:
+  51:../tasks/SDMMC/DiscBrowser.c ****                 path[i] = 0;
+ 125              		.loc 1 51 0 is_stmt 1
+ 126 00b2 D7F86032 		ldr	r3, [r7, #608]
+ 127 00b6 3A1D     		adds	r2, r7, #4
+ 128 00b8 1268     		ldr	r2, [r2]
+ 129 00ba 1344     		add	r3, r3, r2
+ 130 00bc 0022     		movs	r2, #0
+ 131 00be 1A70     		strb	r2, [r3]
+ 132 00c0 3EE0     		b	.L5
+ 133              	.L6:
+  52:../tasks/SDMMC/DiscBrowser.c ****             } else {                                       /* It is a file. */
+  53:../tasks/SDMMC/DiscBrowser.c **** 			    f_stat (fn,&FileInfo);					/* Get file status */
+ 134              		.loc 1 53 0
+ 135 00c2 07F10C03 		add	r3, r7, #12
+ 136 00c6 D7F85C02 		ldr	r0, [r7, #604]
+ 137 00ca 1946     		mov	r1, r3
+ 138 00cc FFF7FEFF 		bl	f_stat
+  54:../tasks/SDMMC/DiscBrowser.c **** 
+  55:../tasks/SDMMC/DiscBrowser.c **** 		//	    fno.fdate = (WORD)(((year - 1980) * 512U) | month * 32U | mday);
+  56:../tasks/SDMMC/DiscBrowser.c **** 		//	    fno.ftime = (WORD)(hour * 2048U | min * 32U | sec / 2U);
+  57:../tasks/SDMMC/DiscBrowser.c **** 
+  58:../tasks/SDMMC/DiscBrowser.c ****                 printf("%s/%s	%02d:%02d:%u %02d.%02d.%02d \n", path, fn, FileInfo.fdate & 0x1F,(Fil
+ 139              		.loc 1 58 0
+ 140 00d0 07F10C03 		add	r3, r7, #12
+ 141 00d4 9B88     		ldrh	r3, [r3, #4]
+ 142 00d6 03F01F03 		and	r3, r3, #31
+ 143 00da 07F10C02 		add	r2, r7, #12
+ 144 00de 9288     		ldrh	r2, [r2, #4]
+ 145 00e0 5209     		lsrs	r2, r2, #5
+ 146 00e2 92B2     		uxth	r2, r2
+ 147 00e4 02F00F06 		and	r6, r2, #15
+ 148 00e8 07F10C02 		add	r2, r7, #12
+ 149 00ec 9288     		ldrh	r2, [r2, #4]
+ 150 00ee 520A     		lsrs	r2, r2, #9
+ 151 00f0 92B2     		uxth	r2, r2
+ 152 00f2 02F07F02 		and	r2, r2, #127
+ 153 00f6 02F2BC75 		addw	r5, r2, #1980
+ 154 00fa 07F10C02 		add	r2, r7, #12
+ 155 00fe D288     		ldrh	r2, [r2, #6]
+ 156 0100 D20A     		lsrs	r2, r2, #11
+ 157 0102 92B2     		uxth	r2, r2
+ 158 0104 02F01F04 		and	r4, r2, #31
+ 159 0108 07F10C02 		add	r2, r7, #12
+ 160 010c D288     		ldrh	r2, [r2, #6]
+ 161 010e 5209     		lsrs	r2, r2, #5
+ 162 0110 92B2     		uxth	r2, r2
+ 163 0112 02F03F00 		and	r0, r2, #63
+ 164 0116 07F10C02 		add	r2, r7, #12
+ 165 011a D288     		ldrh	r2, [r2, #6]
+ 166 011c 02F01F01 		and	r1, r2, #31
+ 167 0120 3A1D     		adds	r2, r7, #4
+ 168 0122 0096     		str	r6, [sp]
+ 169 0124 0195     		str	r5, [sp, #4]
+ 170 0126 0294     		str	r4, [sp, #8]
+ 171 0128 0390     		str	r0, [sp, #12]
+ 172 012a 0491     		str	r1, [sp, #16]
+ 173 012c 40F20000 		movw	r0, #:lower16:.LC1
+ 174 0130 C0F20000 		movt	r0, #:upper16:.LC1
+ 175 0134 1168     		ldr	r1, [r2]
+ 176 0136 D7F85C22 		ldr	r2, [r7, #604]
+ 177 013a FFF7FEFF 		bl	printf
+  59:../tasks/SDMMC/DiscBrowser.c ****             }
+  60:../tasks/SDMMC/DiscBrowser.c ****         }
+ 178              		.loc 1 60 0
+ 179 013e 7BE7     		b	.L8
+ 180              	.L5:
+ 181 0140 7AE7     		b	.L8
+ 182              	.L3:
+  61:../tasks/SDMMC/DiscBrowser.c ****         f_closedir(&dir);
+ 183              		.loc 1 61 0
+ 184 0142 07F12403 		add	r3, r7, #36
+ 185 0146 1846     		mov	r0, r3
+ 186 0148 FFF7FEFF 		bl	f_closedir
+ 187              	.L2:
+  62:../tasks/SDMMC/DiscBrowser.c ****     }
+  63:../tasks/SDMMC/DiscBrowser.c **** 
+  64:../tasks/SDMMC/DiscBrowser.c ****     return res;
+ 188              		.loc 1 64 0
+ 189 014c 97F86732 		ldrb	r3, [r7, #615]	@ zero_extendqisi2
+  65:../tasks/SDMMC/DiscBrowser.c **** }
+ 190              		.loc 1 65 0
+ 191 0150 1846     		mov	r0, r3
+ 192 0152 07F51B77 		add	r7, r7, #620
+ 193 0156 BD46     		mov	sp, r7
+ 194              		@ sp needed
+ 195 0158 F0BD     		pop	{r4, r5, r6, r7, pc}
+ 196              		.cfi_endproc
+ 197              	.LFE55:
+ 199 015a 00BF     		.align	2
+ 200              		.global	Read_file_on_display
+ 201              		.thumb
+ 202              		.thumb_func
+ 204              	Read_file_on_display:
+ 205              	.LFB56:
+  66:../tasks/SDMMC/DiscBrowser.c **** 
+  67:../tasks/SDMMC/DiscBrowser.c **** /***********************************************************************
+  68:../tasks/SDMMC/DiscBrowser.c ****  *  Read a text file and display it
+  69:../tasks/SDMMC/DiscBrowser.c ****  ***********************************************************************/
+  70:../tasks/SDMMC/DiscBrowser.c **** 
+  71:../tasks/SDMMC/DiscBrowser.c **** //int main (void)
+  72:../tasks/SDMMC/DiscBrowser.c **** FRESULT Read_file_on_display (FATFS* FatFs, const TCHAR* path)
+  73:../tasks/SDMMC/DiscBrowser.c **** {
+ 206              		.loc 1 73 0
+ 207              		.cfi_startproc
+ 208              		@ args = 0, pretend = 0, frame = 656
+ 209              		@ frame_needed = 1, uses_anonymous_args = 0
+ 210 015c 80B5     		push	{r7, lr}
+ 211              		.cfi_def_cfa_offset 8
+ 212              		.cfi_offset 7, -8
+ 213              		.cfi_offset 14, -4
+ 214 015e ADF5247D 		sub	sp, sp, #656
+ 215              		.cfi_def_cfa_offset 664
+ 216 0162 00AF     		add	r7, sp, #0
+ 217              		.cfi_def_cfa_register 7
+ 218 0164 3B1D     		adds	r3, r7, #4
+ 219 0166 1860     		str	r0, [r3]
+ 220 0168 3B46     		mov	r3, r7
+ 221 016a 1960     		str	r1, [r3]
+  74:../tasks/SDMMC/DiscBrowser.c ****     FIL fil;       /* File object */
+  75:../tasks/SDMMC/DiscBrowser.c ****     char line[82]; /* Line buffer */
+  76:../tasks/SDMMC/DiscBrowser.c ****     FRESULT fr;    /* FatFs return code */
+  77:../tasks/SDMMC/DiscBrowser.c **** 
+  78:../tasks/SDMMC/DiscBrowser.c **** 
+  79:../tasks/SDMMC/DiscBrowser.c ****     /* Open a text file */
+  80:../tasks/SDMMC/DiscBrowser.c ****     fr = f_open(&fil,path, FA_READ);
+ 222              		.loc 1 80 0
+ 223 016c 07F16002 		add	r2, r7, #96
+ 224 0170 3B46     		mov	r3, r7
+ 225 0172 1046     		mov	r0, r2
+ 226 0174 1968     		ldr	r1, [r3]
+ 227 0176 0122     		movs	r2, #1
+ 228 0178 FFF7FEFF 		bl	f_open
+ 229 017c 0346     		mov	r3, r0
+ 230 017e 87F88F32 		strb	r3, [r7, #655]
+  81:../tasks/SDMMC/DiscBrowser.c ****     if (fr) return (int)fr;
+ 231              		.loc 1 81 0
+ 232 0182 97F88F32 		ldrb	r3, [r7, #655]	@ zero_extendqisi2
+ 233 0186 002B     		cmp	r3, #0
+ 234 0188 02D0     		beq	.L11
+ 235              		.loc 1 81 0 is_stmt 0 discriminator 1
+ 236 018a 97F88F32 		ldrb	r3, [r7, #655]	@ zero_extendqisi2
+ 237 018e 1AE0     		b	.L15
+ 238              	.L11:
+  82:../tasks/SDMMC/DiscBrowser.c **** 
+  83:../tasks/SDMMC/DiscBrowser.c ****     /* Read all lines and display it */
+  84:../tasks/SDMMC/DiscBrowser.c ****     while (f_gets(line, sizeof line, &fil))
+ 239              		.loc 1 84 0 is_stmt 1
+ 240 0190 04E0     		b	.L13
+ 241              	.L14:
+  85:../tasks/SDMMC/DiscBrowser.c ****         printf(line);
+ 242              		.loc 1 85 0
+ 243 0192 07F10C03 		add	r3, r7, #12
+ 244 0196 1846     		mov	r0, r3
+ 245 0198 FFF7FEFF 		bl	printf
+ 246              	.L13:
+  84:../tasks/SDMMC/DiscBrowser.c ****         printf(line);
+ 247              		.loc 1 84 0 discriminator 1
+ 248 019c 07F10C02 		add	r2, r7, #12
+ 249 01a0 07F16003 		add	r3, r7, #96
+ 250 01a4 1046     		mov	r0, r2
+ 251 01a6 5221     		movs	r1, #82
+ 252 01a8 1A46     		mov	r2, r3
+ 253 01aa FFF7FEFF 		bl	f_gets
+ 254 01ae 0346     		mov	r3, r0
+ 255 01b0 002B     		cmp	r3, #0
+ 256 01b2 EED1     		bne	.L14
+  86:../tasks/SDMMC/DiscBrowser.c **** 
+  87:../tasks/SDMMC/DiscBrowser.c ****     printf("\n");
+ 257              		.loc 1 87 0
+ 258 01b4 0A20     		movs	r0, #10
+ 259 01b6 FFF7FEFF 		bl	putchar
+  88:../tasks/SDMMC/DiscBrowser.c ****     /* Close the file */
+  89:../tasks/SDMMC/DiscBrowser.c ****     f_close(&fil);
+ 260              		.loc 1 89 0
+ 261 01ba 07F16003 		add	r3, r7, #96
+ 262 01be 1846     		mov	r0, r3
+ 263 01c0 FFF7FEFF 		bl	f_close
+  90:../tasks/SDMMC/DiscBrowser.c **** 
+  91:../tasks/SDMMC/DiscBrowser.c ****     return FR_OK;
+ 264              		.loc 1 91 0
+ 265 01c4 0023     		movs	r3, #0
+ 266              	.L15:
+  92:../tasks/SDMMC/DiscBrowser.c **** }
+ 267              		.loc 1 92 0
+ 268 01c6 1846     		mov	r0, r3
+ 269 01c8 07F52477 		add	r7, r7, #656
+ 270 01cc BD46     		mov	sp, r7
+ 271              		@ sp needed
+ 272 01ce 80BD     		pop	{r7, pc}
+ 273              		.cfi_endproc
+ 274              	.LFE56:
+ 276              		.align	2
+ 277              		.global	Read_Random_Bin_Fromfile
+ 278              		.thumb
+ 279              		.thumb_func
+ 281              	Read_Random_Bin_Fromfile:
+ 282              	.LFB57:
+  93:../tasks/SDMMC/DiscBrowser.c **** 
+  94:../tasks/SDMMC/DiscBrowser.c **** /***********************************************************************
+  95:../tasks/SDMMC/DiscBrowser.c ****  *
+  96:../tasks/SDMMC/DiscBrowser.c ****  ***********************************************************************/
+  97:../tasks/SDMMC/DiscBrowser.c **** FRESULT Read_Random_Bin_Fromfile(FIL* fp, DWORD adr, TCHAR* Tch, UINT size)
+  98:../tasks/SDMMC/DiscBrowser.c **** {
+ 283              		.loc 1 98 0
+ 284              		.cfi_startproc
+ 285              		@ args = 0, pretend = 0, frame = 24
+ 286              		@ frame_needed = 1, uses_anonymous_args = 0
+ 287 01d0 80B5     		push	{r7, lr}
+ 288              		.cfi_def_cfa_offset 8
+ 289              		.cfi_offset 7, -8
+ 290              		.cfi_offset 14, -4
+ 291 01d2 86B0     		sub	sp, sp, #24
+ 292              		.cfi_def_cfa_offset 32
+ 293 01d4 00AF     		add	r7, sp, #0
+ 294              		.cfi_def_cfa_register 7
+ 295 01d6 F860     		str	r0, [r7, #12]
+ 296 01d8 B960     		str	r1, [r7, #8]
+ 297 01da 7A60     		str	r2, [r7, #4]
+ 298 01dc 3B60     		str	r3, [r7]
+  99:../tasks/SDMMC/DiscBrowser.c **** 	FRESULT res;
+ 100:../tasks/SDMMC/DiscBrowser.c **** 	uint32_t bytesread;
+ 101:../tasks/SDMMC/DiscBrowser.c **** 
+ 102:../tasks/SDMMC/DiscBrowser.c **** 	f_lseek(fp,adr);
+ 299              		.loc 1 102 0
+ 300 01de F868     		ldr	r0, [r7, #12]
+ 301 01e0 B968     		ldr	r1, [r7, #8]
+ 302 01e2 FFF7FEFF 		bl	f_lseek
+ 103:../tasks/SDMMC/DiscBrowser.c **** 	res = f_read(fp, Tch, size, (void *)&bytesread);
+ 303              		.loc 1 103 0
+ 304 01e6 07F11003 		add	r3, r7, #16
+ 305 01ea F868     		ldr	r0, [r7, #12]
+ 306 01ec 7968     		ldr	r1, [r7, #4]
+ 307 01ee 3A68     		ldr	r2, [r7]
+ 308 01f0 FFF7FEFF 		bl	f_read
+ 309 01f4 0346     		mov	r3, r0
+ 310 01f6 FB75     		strb	r3, [r7, #23]
+ 104:../tasks/SDMMC/DiscBrowser.c **** 
+ 105:../tasks/SDMMC/DiscBrowser.c **** 	return	res;
+ 311              		.loc 1 105 0
+ 312 01f8 FB7D     		ldrb	r3, [r7, #23]	@ zero_extendqisi2
+ 106:../tasks/SDMMC/DiscBrowser.c **** }
+ 313              		.loc 1 106 0
+ 314 01fa 1846     		mov	r0, r3
+ 315 01fc 1837     		adds	r7, r7, #24
+ 316 01fe BD46     		mov	sp, r7
+ 317              		@ sp needed
+ 318 0200 80BD     		pop	{r7, pc}
+ 319              		.cfi_endproc
+ 320              	.LFE57:
+ 322 0202 00BF     		.align	2
+ 323              		.global	set_timestamp
+ 324              		.thumb
+ 325              		.thumb_func
+ 327              	set_timestamp:
+ 328              	.LFB58:
+ 107:../tasks/SDMMC/DiscBrowser.c **** 
+ 108:../tasks/SDMMC/DiscBrowser.c **** /***********************************************************************
+ 109:../tasks/SDMMC/DiscBrowser.c ****  *
+ 110:../tasks/SDMMC/DiscBrowser.c ****  ***********************************************************************/
+ 111:../tasks/SDMMC/DiscBrowser.c **** FRESULT set_timestamp (
+ 112:../tasks/SDMMC/DiscBrowser.c ****     char *obj,     /* ”казатель на им€ файла */
+ 113:../tasks/SDMMC/DiscBrowser.c ****     int year,
+ 114:../tasks/SDMMC/DiscBrowser.c ****     int month,
+ 115:../tasks/SDMMC/DiscBrowser.c ****     int mday,
+ 116:../tasks/SDMMC/DiscBrowser.c ****     int hour,
+ 117:../tasks/SDMMC/DiscBrowser.c ****     int min,
+ 118:../tasks/SDMMC/DiscBrowser.c ****     int sec
+ 119:../tasks/SDMMC/DiscBrowser.c **** )
+ 120:../tasks/SDMMC/DiscBrowser.c **** {
+ 329              		.loc 1 120 0
+ 330              		.cfi_startproc
+ 331              		@ args = 12, pretend = 0, frame = 40
+ 332              		@ frame_needed = 1, uses_anonymous_args = 0
+ 333 0204 80B5     		push	{r7, lr}
+ 334              		.cfi_def_cfa_offset 8
+ 335              		.cfi_offset 7, -8
+ 336              		.cfi_offset 14, -4
+ 337 0206 8AB0     		sub	sp, sp, #40
+ 338              		.cfi_def_cfa_offset 48
+ 339 0208 00AF     		add	r7, sp, #0
+ 340              		.cfi_def_cfa_register 7
+ 341 020a F860     		str	r0, [r7, #12]
+ 342 020c B960     		str	r1, [r7, #8]
+ 343 020e 7A60     		str	r2, [r7, #4]
+ 344 0210 3B60     		str	r3, [r7]
+ 121:../tasks/SDMMC/DiscBrowser.c ****     FILINFO fno;
+ 122:../tasks/SDMMC/DiscBrowser.c ****     fno.fdate = (WORD)(((year - 1980) * 512U) | month * 32U | mday);
+ 345              		.loc 1 122 0
+ 346 0212 BB68     		ldr	r3, [r7, #8]
+ 347 0214 A3F2BC73 		subw	r3, r3, #1980
+ 348 0218 9BB2     		uxth	r3, r3
+ 349 021a 5B02     		lsls	r3, r3, #9
+ 350 021c 9AB2     		uxth	r2, r3
+ 351 021e 7B68     		ldr	r3, [r7, #4]
+ 352 0220 9BB2     		uxth	r3, r3
+ 353 0222 5B01     		lsls	r3, r3, #5
+ 354 0224 9BB2     		uxth	r3, r3
+ 355 0226 1343     		orrs	r3, r3, r2
+ 356 0228 9AB2     		uxth	r2, r3
+ 357 022a 3B68     		ldr	r3, [r7]
+ 358 022c 9BB2     		uxth	r3, r3
+ 359 022e 1343     		orrs	r3, r3, r2
+ 360 0230 9BB2     		uxth	r3, r3
+ 361 0232 BB82     		strh	r3, [r7, #20]	@ movhi
+ 123:../tasks/SDMMC/DiscBrowser.c ****     fno.ftime = (WORD)(hour * 2048U | min * 32U | sec / 2U);
+ 362              		.loc 1 123 0
+ 363 0234 3B6B     		ldr	r3, [r7, #48]
+ 364 0236 9BB2     		uxth	r3, r3
+ 365 0238 DB02     		lsls	r3, r3, #11
+ 366 023a 9AB2     		uxth	r2, r3
+ 367 023c 7B6B     		ldr	r3, [r7, #52]
+ 368 023e 9BB2     		uxth	r3, r3
+ 369 0240 5B01     		lsls	r3, r3, #5
+ 370 0242 9BB2     		uxth	r3, r3
+ 371 0244 1343     		orrs	r3, r3, r2
+ 372 0246 9AB2     		uxth	r2, r3
+ 373 0248 BB6B     		ldr	r3, [r7, #56]
+ 374 024a 5B08     		lsrs	r3, r3, #1
+ 375 024c 9BB2     		uxth	r3, r3
+ 376 024e 1343     		orrs	r3, r3, r2
+ 377 0250 9BB2     		uxth	r3, r3
+ 378 0252 FB82     		strh	r3, [r7, #22]	@ movhi
+ 124:../tasks/SDMMC/DiscBrowser.c ****     return f_utime(obj, &fno);
+ 379              		.loc 1 124 0
+ 380 0254 07F11003 		add	r3, r7, #16
+ 381 0258 F868     		ldr	r0, [r7, #12]
+ 382 025a 1946     		mov	r1, r3
+ 383 025c FFF7FEFF 		bl	f_utime
+ 384 0260 0346     		mov	r3, r0
+ 125:../tasks/SDMMC/DiscBrowser.c **** }
+ 385              		.loc 1 125 0
+ 386 0262 1846     		mov	r0, r3
+ 387 0264 2837     		adds	r7, r7, #40
+ 388 0266 BD46     		mov	sp, r7
+ 389              		@ sp needed
+ 390 0268 80BD     		pop	{r7, pc}
+ 391              		.cfi_endproc
+ 392              	.LFE58:
+ 394              		.section	.rodata
+ 395              		.align	2
+ 396              	.LC2:
+ 397 0028 5B525443 		.ascii	"[RTC] %u %u %u %u %u %u\012\000"
+ 397      5D202575 
+ 397      20257520 
+ 397      25752025 
+ 397      75202575 
+ 398 0041 000000   		.align	2
+ 399              	.LC3:
+ 400 0044 6C6F672E 		.ascii	"log.txt\000"
+ 400      74787400 
+ 401              		.align	2
+ 402              	.LC4:
+ 403 004c 5B53445D 		.ascii	"[SD] 'log.txt' file open error (%d)\012\000"
+ 403      20276C6F 
+ 403      672E7478 
+ 403      74272066 
+ 403      696C6520 
+ 404              		.text
+ 405 026a 00BF     		.align	2
+ 406              		.global	Write_to_logFile
+ 407              		.thumb
+ 408              		.thumb_func
+ 410              	Write_to_logFile:
+ 411              	.LFB59:
+ 126:../tasks/SDMMC/DiscBrowser.c **** /***********************************************************************
+ 127:../tasks/SDMMC/DiscBrowser.c ****  *
+ 128:../tasks/SDMMC/DiscBrowser.c ****  ***********************************************************************/
+ 129:../tasks/SDMMC/DiscBrowser.c **** FRESULT Write_to_logFile(FIL* fp, TCHAR* Tch, BYTE size)
+ 130:../tasks/SDMMC/DiscBrowser.c **** {
+ 412              		.loc 1 130 0
+ 413              		.cfi_startproc
+ 414              		@ args = 0, pretend = 0, frame = 32
+ 415              		@ frame_needed = 1, uses_anonymous_args = 0
+ 416 026c B0B5     		push	{r4, r5, r7, lr}
+ 417              		.cfi_def_cfa_offset 16
+ 418              		.cfi_offset 4, -16
+ 419              		.cfi_offset 5, -12
+ 420              		.cfi_offset 7, -8
+ 421              		.cfi_offset 14, -4
+ 422 026e 8CB0     		sub	sp, sp, #48
+ 423              		.cfi_def_cfa_offset 64
+ 424 0270 04AF     		add	r7, sp, #16
+ 425              		.cfi_def_cfa 7, 48
+ 426 0272 F860     		str	r0, [r7, #12]
+ 427 0274 B960     		str	r1, [r7, #8]
+ 428 0276 1346     		mov	r3, r2
+ 429 0278 FB71     		strb	r3, [r7, #7]
+ 131:../tasks/SDMMC/DiscBrowser.c **** 	FRESULT 	res;
+ 132:../tasks/SDMMC/DiscBrowser.c **** 	uint32_t 	byteswritten;
+ 133:../tasks/SDMMC/DiscBrowser.c **** 	uint8_t		Hours,Minutes,Seconds;
+ 134:../tasks/SDMMC/DiscBrowser.c **** 	uint8_t			Date,Month,Year;
+ 135:../tasks/SDMMC/DiscBrowser.c **** 
+ 136:../tasks/SDMMC/DiscBrowser.c **** extern uint8_t 	aShowTime[50];
+ 137:../tasks/SDMMC/DiscBrowser.c **** extern uint8_t 	aShowDate[50];
+ 138:../tasks/SDMMC/DiscBrowser.c **** 
+ 139:../tasks/SDMMC/DiscBrowser.c **** 	RTC_GetTime(&Hours, &Minutes,&Seconds);
+ 430              		.loc 1 139 0
+ 431 027a 07F11701 		add	r1, r7, #23
+ 432 027e 07F11602 		add	r2, r7, #22
+ 433 0282 07F11503 		add	r3, r7, #21
+ 434 0286 0846     		mov	r0, r1
+ 435 0288 1146     		mov	r1, r2
+ 436 028a 1A46     		mov	r2, r3
+ 437 028c FFF7FEFF 		bl	RTC_GetTime
+ 140:../tasks/SDMMC/DiscBrowser.c **** 	RTC_GetDate(&Date,&Month,&Year);
+ 438              		.loc 1 140 0
+ 439 0290 07F11401 		add	r1, r7, #20
+ 440 0294 07F11302 		add	r2, r7, #19
+ 441 0298 07F11203 		add	r3, r7, #18
+ 442 029c 0846     		mov	r0, r1
+ 443 029e 1146     		mov	r1, r2
+ 444 02a0 1A46     		mov	r2, r3
+ 445 02a2 FFF7FEFF 		bl	RTC_GetDate
+ 141:../tasks/SDMMC/DiscBrowser.c **** 
+ 142:../tasks/SDMMC/DiscBrowser.c **** 	printf("[RTC] %u %u %u %u %u %u\n",Hours,Minutes,Seconds,Date,Month,Year);
+ 446              		.loc 1 142 0
+ 447 02a6 FB7D     		ldrb	r3, [r7, #23]	@ zero_extendqisi2
+ 448 02a8 1946     		mov	r1, r3
+ 449 02aa BB7D     		ldrb	r3, [r7, #22]	@ zero_extendqisi2
+ 450 02ac 1A46     		mov	r2, r3
+ 451 02ae 7B7D     		ldrb	r3, [r7, #21]	@ zero_extendqisi2
+ 452 02b0 387D     		ldrb	r0, [r7, #20]	@ zero_extendqisi2
+ 453 02b2 0546     		mov	r5, r0
+ 454 02b4 F87C     		ldrb	r0, [r7, #19]	@ zero_extendqisi2
+ 455 02b6 0446     		mov	r4, r0
+ 456 02b8 B87C     		ldrb	r0, [r7, #18]	@ zero_extendqisi2
+ 457 02ba 0095     		str	r5, [sp]
+ 458 02bc 0194     		str	r4, [sp, #4]
+ 459 02be 0290     		str	r0, [sp, #8]
+ 460 02c0 40F20000 		movw	r0, #:lower16:.LC2
+ 461 02c4 C0F20000 		movt	r0, #:upper16:.LC2
+ 462 02c8 FFF7FEFF 		bl	printf
+ 143:../tasks/SDMMC/DiscBrowser.c **** 
+ 144:../tasks/SDMMC/DiscBrowser.c **** 	res = f_open(fp, "log.txt",  FA_OPEN_ALWAYS | FA_WRITE);		// создадим файл если его нет
+ 463              		.loc 1 144 0
+ 464 02cc F868     		ldr	r0, [r7, #12]
+ 465 02ce 40F20001 		movw	r1, #:lower16:.LC3
+ 466 02d2 C0F20001 		movt	r1, #:upper16:.LC3
+ 467 02d6 1222     		movs	r2, #18
+ 468 02d8 FFF7FEFF 		bl	f_open
+ 469 02dc 0346     		mov	r3, r0
+ 470 02de FB77     		strb	r3, [r7, #31]
+ 145:../tasks/SDMMC/DiscBrowser.c **** 	 if(res != FR_OK)
+ 471              		.loc 1 145 0
+ 472 02e0 FB7F     		ldrb	r3, [r7, #31]	@ zero_extendqisi2
+ 473 02e2 002B     		cmp	r3, #0
+ 474 02e4 09D0     		beq	.L21
+ 146:../tasks/SDMMC/DiscBrowser.c **** 	 {
+ 147:../tasks/SDMMC/DiscBrowser.c **** 		printf("[SD] 'log.txt' file open error (%d)\n",res);
+ 475              		.loc 1 147 0
+ 476 02e6 FB7F     		ldrb	r3, [r7, #31]	@ zero_extendqisi2
+ 477 02e8 40F20000 		movw	r0, #:lower16:.LC4
+ 478 02ec C0F20000 		movt	r0, #:upper16:.LC4
+ 479 02f0 1946     		mov	r1, r3
+ 480 02f2 FFF7FEFF 		bl	printf
+ 148:../tasks/SDMMC/DiscBrowser.c **** 		return (FR_INT_ERR);
+ 481              		.loc 1 148 0
+ 482 02f6 0223     		movs	r3, #2
+ 483 02f8 35E0     		b	.L23
+ 484              	.L21:
+ 149:../tasks/SDMMC/DiscBrowser.c **** 	 } else {
+ 150:../tasks/SDMMC/DiscBrowser.c **** 	 f_lseek(fp,f_size(fp));										// го в конец файла.
+ 485              		.loc 1 150 0
+ 486 02fa FB68     		ldr	r3, [r7, #12]
+ 487 02fc D3F80C32 		ldr	r3, [r3, #524]
+ 488 0300 F868     		ldr	r0, [r7, #12]
+ 489 0302 1946     		mov	r1, r3
+ 490 0304 FFF7FEFF 		bl	f_lseek
+ 151:../tasks/SDMMC/DiscBrowser.c **** 	 f_write(fp, aShowDate, 11, (void *)&byteswritten);
+ 491              		.loc 1 151 0
+ 492 0308 07F11803 		add	r3, r7, #24
+ 493 030c F868     		ldr	r0, [r7, #12]
+ 494 030e 40F20001 		movw	r1, #:lower16:aShowDate
+ 495 0312 C0F20001 		movt	r1, #:upper16:aShowDate
+ 496 0316 0B22     		movs	r2, #11
+ 497 0318 FFF7FEFF 		bl	f_write
+ 152:../tasks/SDMMC/DiscBrowser.c **** 	 f_write(fp, aShowTime, 9, (void *)&byteswritten);
+ 498              		.loc 1 152 0
+ 499 031c 07F11803 		add	r3, r7, #24
+ 500 0320 F868     		ldr	r0, [r7, #12]
+ 501 0322 40F20001 		movw	r1, #:lower16:aShowTime
+ 502 0326 C0F20001 		movt	r1, #:upper16:aShowTime
+ 503 032a 0922     		movs	r2, #9
+ 504 032c FFF7FEFF 		bl	f_write
+ 153:../tasks/SDMMC/DiscBrowser.c **** 	 f_write(fp, Tch, size, (void *)&byteswritten);
+ 505              		.loc 1 153 0
+ 506 0330 FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+ 507 0332 07F11803 		add	r3, r7, #24
+ 508 0336 F868     		ldr	r0, [r7, #12]
+ 509 0338 B968     		ldr	r1, [r7, #8]
+ 510 033a FFF7FEFF 		bl	f_write
+ 154:../tasks/SDMMC/DiscBrowser.c **** 	 f_close(fp);
+ 511              		.loc 1 154 0
+ 512 033e F868     		ldr	r0, [r7, #12]
+ 513 0340 FFF7FEFF 		bl	f_close
+ 155:../tasks/SDMMC/DiscBrowser.c **** 	 set_timestamp("log.txt",2015,4,14,13,20,10);
+ 514              		.loc 1 155 0
+ 515 0344 0D23     		movs	r3, #13
+ 516 0346 0093     		str	r3, [sp]
+ 517 0348 1423     		movs	r3, #20
+ 518 034a 0193     		str	r3, [sp, #4]
+ 519 034c 0A23     		movs	r3, #10
+ 520 034e 0293     		str	r3, [sp, #8]
+ 521 0350 40F20000 		movw	r0, #:lower16:.LC3
+ 522 0354 C0F20000 		movt	r0, #:upper16:.LC3
+ 523 0358 40F2DF71 		movw	r1, #2015
+ 524 035c 0422     		movs	r2, #4
+ 525 035e 0E23     		movs	r3, #14
+ 526 0360 FFF7FEFF 		bl	set_timestamp
+ 156:../tasks/SDMMC/DiscBrowser.c **** 
+ 157:../tasks/SDMMC/DiscBrowser.c **** 	return (FR_OK);
+ 527              		.loc 1 157 0
+ 528 0364 0023     		movs	r3, #0
+ 529              	.L23:
+ 158:../tasks/SDMMC/DiscBrowser.c **** 
+ 159:../tasks/SDMMC/DiscBrowser.c **** 	}
+ 160:../tasks/SDMMC/DiscBrowser.c **** }
+ 530              		.loc 1 160 0
+ 531 0366 1846     		mov	r0, r3
+ 532 0368 2037     		adds	r7, r7, #32
+ 533 036a BD46     		mov	sp, r7
+ 534              		@ sp needed
+ 535 036c B0BD     		pop	{r4, r5, r7, pc}
+ 536              		.cfi_endproc
+ 537              	.LFE59:
+ 539 036e 00BF     		.align	2
+ 540              		.global	Write_to_HexFile
+ 541              		.thumb
+ 542              		.thumb_func
+ 544              	Write_to_HexFile:
+ 545              	.LFB60:
+ 161:../tasks/SDMMC/DiscBrowser.c **** 
+ 162:../tasks/SDMMC/DiscBrowser.c **** /***********************************************************************
+ 163:../tasks/SDMMC/DiscBrowser.c ****  *
+ 164:../tasks/SDMMC/DiscBrowser.c ****  ***********************************************************************/
+ 165:../tasks/SDMMC/DiscBrowser.c **** FRESULT Write_to_HexFile(FIL* fp, TCHAR* Tch, BYTE size)
+ 166:../tasks/SDMMC/DiscBrowser.c **** {
+ 546              		.loc 1 166 0
+ 547              		.cfi_startproc
+ 548              		@ args = 0, pretend = 0, frame = 24
+ 549              		@ frame_needed = 1, uses_anonymous_args = 0
+ 550 0370 80B5     		push	{r7, lr}
+ 551              		.cfi_def_cfa_offset 8
+ 552              		.cfi_offset 7, -8
+ 553              		.cfi_offset 14, -4
+ 554 0372 86B0     		sub	sp, sp, #24
+ 555              		.cfi_def_cfa_offset 32
+ 556 0374 00AF     		add	r7, sp, #0
+ 557              		.cfi_def_cfa_register 7
+ 558 0376 F860     		str	r0, [r7, #12]
+ 559 0378 B960     		str	r1, [r7, #8]
+ 560 037a 1346     		mov	r3, r2
+ 561 037c FB71     		strb	r3, [r7, #7]
+ 167:../tasks/SDMMC/DiscBrowser.c **** 	uint32_t 	byteswritten;
+ 168:../tasks/SDMMC/DiscBrowser.c **** 
+ 169:../tasks/SDMMC/DiscBrowser.c **** 	 f_write(fp, Tch, 1, (void *)&byteswritten);
+ 562              		.loc 1 169 0
+ 563 037e 07F11403 		add	r3, r7, #20
+ 564 0382 F868     		ldr	r0, [r7, #12]
+ 565 0384 B968     		ldr	r1, [r7, #8]
+ 566 0386 0122     		movs	r2, #1
+ 567 0388 FFF7FEFF 		bl	f_write
+ 170:../tasks/SDMMC/DiscBrowser.c **** 
+ 171:../tasks/SDMMC/DiscBrowser.c **** 	return (FR_OK);
+ 568              		.loc 1 171 0
+ 569 038c 0023     		movs	r3, #0
+ 172:../tasks/SDMMC/DiscBrowser.c **** 
+ 173:../tasks/SDMMC/DiscBrowser.c **** }
+ 570              		.loc 1 173 0
+ 571 038e 1846     		mov	r0, r3
+ 572 0390 1837     		adds	r7, r7, #24
+ 573 0392 BD46     		mov	sp, r7
+ 574              		@ sp needed
+ 575 0394 80BD     		pop	{r7, pc}
+ 576              		.cfi_endproc
+ 577              	.LFE60:
+ 579              		.section	.rodata
+ 580 0071 000000   		.align	2
+ 581              	.LC5:
+ 582 0074 2F666F6E 		.ascii	"/fonts\000"
+ 582      747300
+ 583 007b 00       		.align	2
+ 584              	.LC6:
+ 585 007c 636F7572 		.ascii	"cour36b.FFN\000"
+ 585      3336622E 
+ 585      46464E00 
+ 586              		.align	2
+ 587              	.LC7:
+ 588 0088 5B4F7065 		.ascii	"[OpenFontFile] :not open the cour36b.FFN file\000"
+ 588      6E466F6E 
+ 588      7446696C 
+ 588      655D203A 
+ 588      6E6F7420 
+ 589 00b6 0000     		.align	2
+ 590              	.LC8:
+ 591 00b8 2F00     		.ascii	"/\000"
+ 592 00ba 0000     		.align	2
+ 593              	.LC9:
+ 594 00bc 5B4F7065 		.ascii	"[OpenFontFile] :not open the FontFile\012\000"
+ 594      6E466F6E 
+ 594      7446696C 
+ 594      655D203A 
+ 594      6E6F7420 
+ 595 00e3 00       		.align	2
+ 596              	.LC10:
+ 597 00e4 5B4F7065 		.ascii	"[OpenFontFile] :open the cour36b.FFN file\000"
+ 597      6E466F6E 
+ 597      7446696C 
+ 597      655D203A 
+ 597      6F70656E 
+ 598 010e 0000     		.align	2
+ 599              	.LC11:
+ 600 0110 636F7572 		.ascii	"cour36b.fbn\000"
+ 600      3336622E 
+ 600      66626E00 
+ 601              		.align	2
+ 602              	.LC12:
+ 603 011c 636F7572 		.ascii	"cour36b.FBN\000"
+ 603      3336622E 
+ 603      46424E00 
+ 604              		.text
+ 605 0396 00BF     		.align	2
+ 606              		.global	OpenFontFile
+ 607              		.thumb
+ 608              		.thumb_func
+ 610              	OpenFontFile:
+ 611              	.LFB61:
+ 174:../tasks/SDMMC/DiscBrowser.c **** 
+ 175:../tasks/SDMMC/DiscBrowser.c **** /***********************************************************************
+ 176:../tasks/SDMMC/DiscBrowser.c ****  *
+ 177:../tasks/SDMMC/DiscBrowser.c ****  ***********************************************************************/
+ 178:../tasks/SDMMC/DiscBrowser.c **** FRESULT OpenFontFile(FIL* FFile, sFONT* Font){
+ 612              		.loc 1 178 0
+ 613              		.cfi_startproc
+ 614              		@ args = 0, pretend = 0, frame = 576
+ 615              		@ frame_needed = 1, uses_anonymous_args = 0
+ 616 0398 80B5     		push	{r7, lr}
+ 617              		.cfi_def_cfa_offset 8
+ 618              		.cfi_offset 7, -8
+ 619              		.cfi_offset 14, -4
+ 620 039a ADF5107D 		sub	sp, sp, #576
+ 621              		.cfi_def_cfa_offset 584
+ 622 039e 00AF     		add	r7, sp, #0
+ 623              		.cfi_def_cfa_register 7
+ 624 03a0 3B1D     		adds	r3, r7, #4
+ 625 03a2 1860     		str	r0, [r3]
+ 626 03a4 3B46     		mov	r3, r7
+ 627 03a6 1960     		str	r1, [r3]
+ 179:../tasks/SDMMC/DiscBrowser.c **** 	char		byteread[5];
+ 180:../tasks/SDMMC/DiscBrowser.c **** 	uint8_t		error;
+ 181:../tasks/SDMMC/DiscBrowser.c **** 	FIL 		LogFileOnSD;
+ 182:../tasks/SDMMC/DiscBrowser.c **** 
+ 183:../tasks/SDMMC/DiscBrowser.c **** //scan_files("fonts");
+ 184:../tasks/SDMMC/DiscBrowser.c **** f_chdir("/fonts");											// сменим директорию
+ 628              		.loc 1 184 0
+ 629 03a8 40F20000 		movw	r0, #:lower16:.LC5
+ 630 03ac C0F20000 		movt	r0, #:upper16:.LC5
+ 631 03b0 FFF7FEFF 		bl	f_chdir
+ 185:../tasks/SDMMC/DiscBrowser.c ****    if(f_open(FFile, "cour36b.FFN", FA_READ) != FR_OK)		//"Arial36B.FFN"
+ 632              		.loc 1 185 0
+ 633 03b4 3B1D     		adds	r3, r7, #4
+ 634 03b6 1868     		ldr	r0, [r3]
+ 635 03b8 40F20001 		movw	r1, #:lower16:.LC6
+ 636 03bc C0F20001 		movt	r1, #:upper16:.LC6
+ 637 03c0 0122     		movs	r2, #1
+ 638 03c2 FFF7FEFF 		bl	f_open
+ 639 03c6 0346     		mov	r3, r0
+ 640 03c8 002B     		cmp	r3, #0
+ 641 03ca 17D0     		beq	.L27
+ 186:../tasks/SDMMC/DiscBrowser.c **** 	{
+ 187:../tasks/SDMMC/DiscBrowser.c **** 		printf("[OpenFontFile] :not open the cour36b.FFN file\n");
+ 642              		.loc 1 187 0
+ 643 03cc 40F20000 		movw	r0, #:lower16:.LC7
+ 644 03d0 C0F20000 		movt	r0, #:upper16:.LC7
+ 645 03d4 FFF7FEFF 		bl	puts
+ 188:../tasks/SDMMC/DiscBrowser.c **** 		f_chdir("/");											// сменим директорию
+ 646              		.loc 1 188 0
+ 647 03d8 40F20000 		movw	r0, #:lower16:.LC8
+ 648 03dc C0F20000 		movt	r0, #:upper16:.LC8
+ 649 03e0 FFF7FEFF 		bl	f_chdir
+ 189:../tasks/SDMMC/DiscBrowser.c **** 		Write_to_logFile(&LogFileOnSD, (char *)"[OpenFontFile] :not open the FontFile\n",sizeof("[OpenFon
+ 650              		.loc 1 189 0
+ 651 03e4 07F10C03 		add	r3, r7, #12
+ 652 03e8 1846     		mov	r0, r3
+ 653 03ea 40F20001 		movw	r1, #:lower16:.LC9
+ 654 03ee C0F20001 		movt	r1, #:upper16:.LC9
+ 655 03f2 2622     		movs	r2, #38
+ 656 03f4 FFF7FEFF 		bl	Write_to_logFile
+ 190:../tasks/SDMMC/DiscBrowser.c **** 		return FR_NO_FILE;
+ 657              		.loc 1 190 0
+ 658 03f8 0423     		movs	r3, #4
+ 659 03fa 4CE0     		b	.L31
+ 660              	.L27:
+ 191:../tasks/SDMMC/DiscBrowser.c **** 	} else {
+ 192:../tasks/SDMMC/DiscBrowser.c **** 		printf("[OpenFontFile] :open the cour36b.FFN file\n");
+ 661              		.loc 1 192 0
+ 662 03fc 40F20000 		movw	r0, #:lower16:.LC10
+ 663 0400 C0F20000 		movt	r0, #:upper16:.LC10
+ 664 0404 FFF7FEFF 		bl	puts
+ 193:../tasks/SDMMC/DiscBrowser.c **** 		error = f_gets(&byteread[0],5,FFile);
+ 665              		.loc 1 193 0
+ 666 0408 07F50E72 		add	r2, r7, #568
+ 667 040c 3B1D     		adds	r3, r7, #4
+ 668 040e 1046     		mov	r0, r2
+ 669 0410 0521     		movs	r1, #5
+ 670 0412 1A68     		ldr	r2, [r3]
+ 671 0414 FFF7FEFF 		bl	f_gets
+ 672 0418 0346     		mov	r3, r0
+ 673 041a 87F83F32 		strb	r3, [r7, #575]
+ 194:../tasks/SDMMC/DiscBrowser.c **** 		if (error == 0) {f_close(FFile); return FR_NOT_READY;}
+ 674              		.loc 1 194 0
+ 675 041e 97F83F32 		ldrb	r3, [r7, #575]	@ zero_extendqisi2
+ 676 0422 002B     		cmp	r3, #0
+ 677 0424 05D1     		bne	.L29
+ 678              		.loc 1 194 0 is_stmt 0 discriminator 1
+ 679 0426 3B1D     		adds	r3, r7, #4
+ 680 0428 1868     		ldr	r0, [r3]
+ 681 042a FFF7FEFF 		bl	f_close
+ 682 042e 0323     		movs	r3, #3
+ 683 0430 31E0     		b	.L31
+ 684              	.L29:
+ 195:../tasks/SDMMC/DiscBrowser.c **** 
+ 196:../tasks/SDMMC/DiscBrowser.c **** 		Font->Width = (uint16_t)byteread[0]<<8 | (uint16_t)byteread[1];
+ 685              		.loc 1 196 0 is_stmt 1
+ 686 0432 97F83832 		ldrb	r3, [r7, #568]	@ zero_extendqisi2
+ 687 0436 1B02     		lsls	r3, r3, #8
+ 688 0438 9AB2     		uxth	r2, r3
+ 689 043a 97F83932 		ldrb	r3, [r7, #569]	@ zero_extendqisi2
+ 690 043e 1343     		orrs	r3, r3, r2
+ 691 0440 9BB2     		uxth	r3, r3
+ 692 0442 9AB2     		uxth	r2, r3
+ 693 0444 3B46     		mov	r3, r7
+ 694 0446 1B68     		ldr	r3, [r3]
+ 695 0448 9A80     		strh	r2, [r3, #4]	@ movhi
+ 197:../tasks/SDMMC/DiscBrowser.c **** 		Font->Height = (uint16_t)byteread[2]<<8 | (uint16_t)byteread[3];
+ 696              		.loc 1 197 0
+ 697 044a 97F83A32 		ldrb	r3, [r7, #570]	@ zero_extendqisi2
+ 698 044e 1B02     		lsls	r3, r3, #8
+ 699 0450 9AB2     		uxth	r2, r3
+ 700 0452 97F83B32 		ldrb	r3, [r7, #571]	@ zero_extendqisi2
+ 701 0456 1343     		orrs	r3, r3, r2
+ 702 0458 9BB2     		uxth	r3, r3
+ 703 045a 9AB2     		uxth	r2, r3
+ 704 045c 3B46     		mov	r3, r7
+ 705 045e 1B68     		ldr	r3, [r3]
+ 706 0460 DA80     		strh	r2, [r3, #6]	@ movhi
+ 198:../tasks/SDMMC/DiscBrowser.c **** 		Font->table =(uint8_t *)"cour36b.fbn";
+ 707              		.loc 1 198 0
+ 708 0462 3B46     		mov	r3, r7
+ 709 0464 1A68     		ldr	r2, [r3]
+ 710 0466 40F20003 		movw	r3, #:lower16:.LC11
+ 711 046a C0F20003 		movt	r3, #:upper16:.LC11
+ 712 046e 1360     		str	r3, [r2]
+ 199:../tasks/SDMMC/DiscBrowser.c **** 		f_close(FFile);
+ 713              		.loc 1 199 0
+ 714 0470 3B1D     		adds	r3, r7, #4
+ 715 0472 1868     		ldr	r0, [r3]
+ 716 0474 FFF7FEFF 		bl	f_close
+ 200:../tasks/SDMMC/DiscBrowser.c **** 	}
+ 201:../tasks/SDMMC/DiscBrowser.c ****    if (f_open(FFile, "cour36b.FBN", FA_READ) != FR_OK)   return FR_NO_FILE;
+ 717              		.loc 1 201 0
+ 718 0478 3B1D     		adds	r3, r7, #4
+ 719 047a 1868     		ldr	r0, [r3]
+ 720 047c 40F20001 		movw	r1, #:lower16:.LC12
+ 721 0480 C0F20001 		movt	r1, #:upper16:.LC12
+ 722 0484 0122     		movs	r2, #1
+ 723 0486 FFF7FEFF 		bl	f_open
+ 724 048a 0346     		mov	r3, r0
+ 725 048c 002B     		cmp	r3, #0
+ 726 048e 01D0     		beq	.L30
+ 727              		.loc 1 201 0 is_stmt 0 discriminator 1
+ 728 0490 0423     		movs	r3, #4
+ 729 0492 00E0     		b	.L31
+ 730              	.L30:
+ 202:../tasks/SDMMC/DiscBrowser.c ****    return FR_OK;
+ 731              		.loc 1 202 0 is_stmt 1
+ 732 0494 0023     		movs	r3, #0
+ 733              	.L31:
+ 203:../tasks/SDMMC/DiscBrowser.c **** }
+ 734              		.loc 1 203 0
+ 735 0496 1846     		mov	r0, r3
+ 736 0498 07F51077 		add	r7, r7, #576
+ 737 049c BD46     		mov	sp, r7
+ 738              		@ sp needed
+ 739 049e 80BD     		pop	{r7, pc}
+ 740              		.cfi_endproc
+ 741              	.LFE61:
+ 743              		.align	2
+ 744              		.global	CloseFontFile
+ 745              		.thumb
+ 746              		.thumb_func
+ 748              	CloseFontFile:
+ 749              	.LFB62:
+ 204:../tasks/SDMMC/DiscBrowser.c **** /***********************************************************************
+ 205:../tasks/SDMMC/DiscBrowser.c ****  *
+ 206:../tasks/SDMMC/DiscBrowser.c ****  ***********************************************************************/
+ 207:../tasks/SDMMC/DiscBrowser.c **** FRESULT CloseFontFile(FIL* FFile){
+ 750              		.loc 1 207 0
+ 751              		.cfi_startproc
+ 752              		@ args = 0, pretend = 0, frame = 8
+ 753              		@ frame_needed = 1, uses_anonymous_args = 0
+ 754 04a0 80B5     		push	{r7, lr}
+ 755              		.cfi_def_cfa_offset 8
+ 756              		.cfi_offset 7, -8
+ 757              		.cfi_offset 14, -4
+ 758 04a2 82B0     		sub	sp, sp, #8
+ 759              		.cfi_def_cfa_offset 16
+ 760 04a4 00AF     		add	r7, sp, #0
+ 761              		.cfi_def_cfa_register 7
+ 762 04a6 7860     		str	r0, [r7, #4]
+ 208:../tasks/SDMMC/DiscBrowser.c **** 
+ 209:../tasks/SDMMC/DiscBrowser.c **** 	f_close(FFile);
+ 763              		.loc 1 209 0
+ 764 04a8 7868     		ldr	r0, [r7, #4]
+ 765 04aa FFF7FEFF 		bl	f_close
+ 210:../tasks/SDMMC/DiscBrowser.c **** 	f_chdir("/");
+ 766              		.loc 1 210 0
+ 767 04ae 40F20000 		movw	r0, #:lower16:.LC8
+ 768 04b2 C0F20000 		movt	r0, #:upper16:.LC8
+ 769 04b6 FFF7FEFF 		bl	f_chdir
+ 211:../tasks/SDMMC/DiscBrowser.c **** return FR_OK;
+ 770              		.loc 1 211 0
+ 771 04ba 0023     		movs	r3, #0
+ 212:../tasks/SDMMC/DiscBrowser.c **** }
+ 772              		.loc 1 212 0
+ 773 04bc 1846     		mov	r0, r3
+ 774 04be 0837     		adds	r7, r7, #8
+ 775 04c0 BD46     		mov	sp, r7
+ 776              		@ sp needed
+ 777 04c2 80BD     		pop	{r7, pc}
+ 778              		.cfi_endproc
+ 779              	.LFE62:
+ 781              	.Letext0:
+ 782              		.file 2 "../tasks/SDMMC/integer.h"
+ 783              		.file 3 "c:\\program files (x86)\\codesourcery\\arm-none-eabi\\include\\stdint.h"
+ 784              		.file 4 "../tasks/SDMMC/ff.h"
+ 785              		.file 5 "D:\\workspace\\console800480\\tasks\\display/Fonts/fonts.h"
+ 786              		.file 6 "D:\\workspace\\console800480\\system/core_cm3.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 DiscBrowser.c
+C:\Users\sagok\AppData\Local\Temp\ccNVmiS5.s:19     .rodata:00000000 $d
+C:\Users\sagok\AppData\Local\Temp\ccNVmiS5.s:20     .rodata:00000000 .LC0
+C:\Users\sagok\AppData\Local\Temp\ccNVmiS5.s:23     .rodata:00000004 .LC1
+C:\Users\sagok\AppData\Local\Temp\ccNVmiS5.s:26     .text:00000000 $t
+C:\Users\sagok\AppData\Local\Temp\ccNVmiS5.s:31     .text:00000000 scan_files
+C:\Users\sagok\AppData\Local\Temp\ccNVmiS5.s:204    .text:0000015c Read_file_on_display
+C:\Users\sagok\AppData\Local\Temp\ccNVmiS5.s:281    .text:000001d0 Read_Random_Bin_Fromfile
+C:\Users\sagok\AppData\Local\Temp\ccNVmiS5.s:327    .text:00000204 set_timestamp
+C:\Users\sagok\AppData\Local\Temp\ccNVmiS5.s:396    .rodata:00000028 .LC2
+C:\Users\sagok\AppData\Local\Temp\ccNVmiS5.s:399    .rodata:00000044 .LC3
+C:\Users\sagok\AppData\Local\Temp\ccNVmiS5.s:402    .rodata:0000004c .LC4
+C:\Users\sagok\AppData\Local\Temp\ccNVmiS5.s:410    .text:0000026c Write_to_logFile
+C:\Users\sagok\AppData\Local\Temp\ccNVmiS5.s:544    .text:00000370 Write_to_HexFile
+C:\Users\sagok\AppData\Local\Temp\ccNVmiS5.s:581    .rodata:00000074 .LC5
+C:\Users\sagok\AppData\Local\Temp\ccNVmiS5.s:584    .rodata:0000007c .LC6
+C:\Users\sagok\AppData\Local\Temp\ccNVmiS5.s:587    .rodata:00000088 .LC7
+C:\Users\sagok\AppData\Local\Temp\ccNVmiS5.s:590    .rodata:000000b8 .LC8
+C:\Users\sagok\AppData\Local\Temp\ccNVmiS5.s:593    .rodata:000000bc .LC9
+C:\Users\sagok\AppData\Local\Temp\ccNVmiS5.s:596    .rodata:000000e4 .LC10
+C:\Users\sagok\AppData\Local\Temp\ccNVmiS5.s:599    .rodata:00000110 .LC11
+C:\Users\sagok\AppData\Local\Temp\ccNVmiS5.s:602    .rodata:0000011c .LC12
+C:\Users\sagok\AppData\Local\Temp\ccNVmiS5.s:610    .text:00000398 OpenFontFile
+C:\Users\sagok\AppData\Local\Temp\ccNVmiS5.s:748    .text:000004a0 CloseFontFile
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.1.7f551ac7fcad8b79b9df4bfdaa536673
+                           .group:00000000 wm4.diskio.h.6.8da7330f9b93c43e88f440080fbc00d0
+                           .group:00000000 wm4.diskio.h.43.17c6f92f3f6ff58b941e8553c0aeafe2
+                           .group:00000000 wm4.stm32f2xx_hal_conf.h.40.007126baefb9f966c36646edbf8040d2
+                           .group:00000000 wm4.stm32f2xx.h.57.5ec1581efc43612c411d33a8686e9ec7
+                           .group:00000000 wm4.stm32f217xx.h.52.9c940d76d00294b78837dc334c172fdd
+                           .group:00000000 wm4.core_cm3.h.32.49180ccb4d36cabd2d7016d2a51d91ae
+                           .group:00000000 wm4.newlib.h.8.384a112feabb3bef7b573ae48cde2e3b
+                           .group:00000000 wm4.features.h.22.6a4ca7cd053637cc1d0db6c16f39b2d7
+                           .group:00000000 wm4.config.h.183.aa62afef667fb61d15fa64c48beb2f14
+                           .group:00000000 wm4._ansi.h.23.5644b60c990a4800b02a6e654e88f93a
+                           .group:00000000 wm4.stdint.h.20.54ad762faa59e3c05491630641c8d8bf
+                           .group:00000000 wm4.core_cmInstr.h.25.f50f886f2edf670cf199b35fd96f5c91
+                           .group:00000000 wm4.core_cm3.h.130.63ab2348a6eed0fdb318040d970b676c
+                           .group:00000000 wm4.stm32f217xx.h.978.a5c681952b2f704a0e7f2ba21d08adf5
+                           .group:00000000 wm4.stm32f2xx.h.142.bc2155a1f7498bab16371e38413a9e41
+                           .group:00000000 wm4.stm32f2xx_hal_def.h.74.8ad2dc8aa82c4fd02e5aeaae592641ba
+                           .group:00000000 wm4.stm32f2xx_hal_rcc.h.142.ec0f91cc6576a6acebd17e6dd85829ae
+                           .group:00000000 wm4.stm32f2xx_hal_rcc_ex.h.40.0829033e864455c6bdd0db01f8ba5a50
+                           .group:00000000 wm4.stm32f2xx_hal_gpio.h.40.ba64e0bb94d9a68835f80159f39a86f1
+                           .group:00000000 wm4.stm32f2xx_hal_gpio_ex.h.40.24e547fd402281923f446b510381083f
+                           .group:00000000 wm4.stm32f2xx_hal_dma.h.40.5d9732ace2a21a4526ce8f0c52428fff
+                           .group:00000000 wm4.stm32f2xx_hal_cortex.h.40.e10263d2ec5d4fa79b4180ce1a38aff1
+                           .group:00000000 wm4.stm32f2xx_hal_adc.h.40.89ac8b78113cac4cf63847587daabac9
+                           .group:00000000 wm4.stm32f2xx_hal_adc_ex.h.40.7de68ed256ef25526ee31cc017f2c291
+                           .group:00000000 wm4.stm32f2xx_hal_flash.h.40.c3171719ce015e9cff20c795e44e886d
+                           .group:00000000 wm4.stm32f2xx_hal_flash_ex.h.40.7389508bd24a0aeb077bde0c9fb651eb
+                           .group:00000000 wm4.stm32f2xx_ll_fsmc.h.40.c1c32f2e1862f4dd342bd9b80fb895bb
+                           .group:00000000 wm4.stm32f2xx_hal_pwr.h.40.812df32e5c31b609a128e9db0eb4cbd0
+                           .group:00000000 wm4.stm32f2xx_hal_rtc.h.40.850fda5fe2cce8797446913dee18382f
+                           .group:00000000 wm4.stm32f2xx_hal_rtc_ex.h.40.f3e0c408e3bf4e8a0352d7ec9a18a822
+                           .group:00000000 wm4.stm32f2xx_ll_sdmmc.h.40.3719ab487c4b77401c572f459adf6eb7
+                           .group:00000000 wm4.stm32f2xx_hal_sd.h.58.760215394dcc316161a6482c0af9b866
+                           .group:00000000 wm4.stm32f2xx_hal_spi.h.40.7984243dbaba8b21c6392998a47e6987
+                           .group:00000000 wm4.stm32f2xx_hal_tim.h.40.d79172f25d0e9a15dc346aba8515bdd6
+                           .group:00000000 wm4.stm32f2xx_hal_tim_ex.h.40.361f280a7a3f60b4b238bb99ca728d83
+                           .group:00000000 wm4.stm32f2xx_hal_uart.h.40.d74def561ae6f78f40f477c8426ecbef
+                           .group:00000000 wm4.stm32f2xx_ll_usb.h.40.9b0206a05bc6ce3bec1648b51f22cb81
+                           .group:00000000 wm4.stm32f2xx_hal_pcd.h.99.11faba414c39e357b2f23364912d0605
+                           .group:00000000 wm4.stm32f2xx_hal_hcd.h.40.44ee5e972983ae0139ddbacdc75c44ef
+                           .group:00000000 wm4.stm32f2xx_hal.h.64.ed79ee83e52b151b3c365392b398f866
+                           .group:00000000 wm4.stdio.h.31.7c0e28c411445f3f9c5b11accf882760
+                           .group:00000000 wm4.stddef.h.184.159df79b4ca79c76561572a55985524c
+                           .group:00000000 wm4.stdarg.h.34.3a23a216c0c293b3d2ea2e89281481e6
+                           .group:00000000 wm4._default_types.h.6.5e12cd604db8ce00b62bb2f02708eaf3
+                           .group:00000000 wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea
+                           .group:00000000 wm4._types.h.59.db8450f33c1f6150c0372fa1091a887a
+                           .group:00000000 wm4.stddef.h.348.9a99de77b6ba3b4278b57e9cc6d6e349
+                           .group:00000000 wm4.reent.h.16.567d760e6ae9ad7f917851a308bd7a57
+                           .group:00000000 wm4.types.h.23.0d949686bbcadd1621462d4fa1f884f9
+                           .group:00000000 wm4.stddef.h.39.7e3d906ac58942e0b374c527445f5de5
+                           .group:00000000 wm4.types.h.2.e9cec8c90ab35f77d9f499e06ae02400
+                           .group:00000000 wm4.types.h.80.5759fe41f87f5211a5952dfb1fc64f19
+                           .group:00000000 wm4.stdio.h.2.4aa87247282eca6c8f36f9de33d8df1a
+                           .group:00000000 wm4.stdio.h.64.f9f1bb6b0d3d7e12f6a27968d859709c
+                           .group:00000000 wm4.stdlib.h.18.8bab2fb43ac4e90235390733c30a4530
+                           .group:00000000 wm4.stddef.h.158.a7efb00f6cbc6f43213b50e183c9830c
+                           .group:00000000 wm4.alloca.h.8.dfc0c703c47ec3e69746825b17d9e66d
+                           .group:00000000 wm4.stdlib.h.55.7091a050e07f1c4abd225630fe3d62f1
+                           .group:00000000 wm4.cdefs.h.56.efab90f4d89fbc41d6b3a5c5fb0d3d0f
+                           .group:00000000 wm4.string.h.15.dab3980bf35408a4c507182805e2de3a
+                           .group:00000000 wm4.string.h.126.6ff3aa59129e7f66b2c273baf353e066
+                           .group:00000000 wm4.LEDs.h.9.36ffa4b30bd168dc58d64fa6e53a9a30
+                           .group:00000000 wm4.usbh_conf.h.41.d72a4a1e5e10d8f062cf3fa4bcd8aa54
+                           .group:00000000 wm4.usbh_def.h.42.e5773f0fe2e07d0c2c7284f319cefcfb
+                           .group:00000000 wm4.usbh_ioreq.h.53.3586266a62e1adb6014256f47bfe28ae
+                           .group:00000000 wm4.usbh_ctlreq.h.30.baf76fe1032fc0ccc3b759e321acc69d
+                           .group:00000000 wm4.usbh_core.h.60.126ed10f424484efe8e3332cf8789488
+                           .group:00000000 wm4.usbh_msc_bot.h.150.7a573dd4700e98f78a08f0e60cd8a2e8
+                           .group:00000000 wm4.usbh_msc_scsi.h.30.7ac65aef8ad2b1cb473eb44388537ea2
+                           .group:00000000 wm4.usbh_msc.h.92.1eaed72009e45245618cff3cc0ab5900
+                           .group:00000000 wm4.ffconf.h.19.cf478c53f215b23144e0b163e0b92c6c
+                           .group:00000000 wm4.ff.h.45.ea85cd9763a25d97ae88799c83ef7c63
+                           .group:00000000 wm4.RTC.h.9.d2e9f8e3c405bedc3cda5764e7f71017
+                           .group:00000000 wm4.fonts.h.40.da354735f9216c5e20df37a85cbaf4e6
+
+UNDEFINED SYMBOLS
+f_opendir
+strlen
+f_readdir
+sprintf
+f_stat
+printf
+f_closedir
+f_open
+f_gets
+putchar
+f_close
+f_lseek
+f_read
+f_utime
+RTC_GetTime
+RTC_GetDate
+aShowDate
+f_write
+aShowTime
+f_chdir
+puts

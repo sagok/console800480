@@ -1,0 +1,485 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"diskio.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.align	2
+  19              		.global	disk_initialize
+  20              		.thumb
+  21              		.thumb_func
+  23              	disk_initialize:
+  24              	.LFB55:
+  25              		.file 1 "../tasks/SDMMC/diskio.c"
+   1:../tasks/SDMMC/diskio.c **** /*-----------------------------------------------------------------------*/
+   2:../tasks/SDMMC/diskio.c **** /* Low level disk I/O module skeleton for FatFs     (C)ChaN, 2013        */
+   3:../tasks/SDMMC/diskio.c **** /*                                                                       */
+   4:../tasks/SDMMC/diskio.c **** /*   Portions COPYRIGHT 2014 STMicroelectronics                          */
+   5:../tasks/SDMMC/diskio.c **** /*   Portions Copyright (C) 2012, ChaN, all right reserved               */
+   6:../tasks/SDMMC/diskio.c **** /*-----------------------------------------------------------------------*/
+   7:../tasks/SDMMC/diskio.c **** /* If a working storage control module is available, it should be        */
+   8:../tasks/SDMMC/diskio.c **** /* attached to the FatFs via a glue function rather than modifying it.   */
+   9:../tasks/SDMMC/diskio.c **** /* This is an example of glue functions to attach various exsisting      */
+  10:../tasks/SDMMC/diskio.c **** /* storage control module to the FatFs module with a defined API.        */
+  11:../tasks/SDMMC/diskio.c **** /*-----------------------------------------------------------------------*/
+  12:../tasks/SDMMC/diskio.c **** 
+  13:../tasks/SDMMC/diskio.c **** /**
+  14:../tasks/SDMMC/diskio.c ****   ******************************************************************************
+  15:../tasks/SDMMC/diskio.c ****   * @file    diskio.c 
+  16:../tasks/SDMMC/diskio.c ****   * @author  MCD Application Team
+  17:../tasks/SDMMC/diskio.c ****   * @version V1.0.0
+  18:../tasks/SDMMC/diskio.c ****   * @date    18-February-2014
+  19:../tasks/SDMMC/diskio.c ****   * @brief   FatFs low level disk I/O module.
+  20:../tasks/SDMMC/diskio.c ****   ******************************************************************************
+  21:../tasks/SDMMC/diskio.c ****   * @attention
+  22:../tasks/SDMMC/diskio.c ****   *
+  23:../tasks/SDMMC/diskio.c ****   * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+  24:../tasks/SDMMC/diskio.c ****   * You may not use this file except in compliance with the License.
+  25:../tasks/SDMMC/diskio.c ****   * You may obtain a copy of the License at:
+  26:../tasks/SDMMC/diskio.c ****   *
+  27:../tasks/SDMMC/diskio.c ****   *        http://www.st.com/software_license_agreement_liberty_v2
+  28:../tasks/SDMMC/diskio.c ****   *
+  29:../tasks/SDMMC/diskio.c ****   * Unless required by applicable law or agreed to in writing, software 
+  30:../tasks/SDMMC/diskio.c ****   * distributed under the License is distributed on an "AS IS" BASIS, 
+  31:../tasks/SDMMC/diskio.c ****   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  32:../tasks/SDMMC/diskio.c ****   * See the License for the specific language governing permissions and
+  33:../tasks/SDMMC/diskio.c ****   * limitations under the License.
+  34:../tasks/SDMMC/diskio.c ****   *
+  35:../tasks/SDMMC/diskio.c ****   ******************************************************************************
+  36:../tasks/SDMMC/diskio.c ****   */ 
+  37:../tasks/SDMMC/diskio.c **** 
+  38:../tasks/SDMMC/diskio.c **** /* Includes ------------------------------------------------------------------*/
+  39:../tasks/SDMMC/diskio.c **** #include "diskio.h"
+  40:../tasks/SDMMC/diskio.c **** #include "ff_gen_drv.h"
+  41:../tasks/SDMMC/diskio.c **** 
+  42:../tasks/SDMMC/diskio.c **** /* Private typedef -----------------------------------------------------------*/
+  43:../tasks/SDMMC/diskio.c **** /* Private define ------------------------------------------------------------*/
+  44:../tasks/SDMMC/diskio.c **** /* Private variables ---------------------------------------------------------*/
+  45:../tasks/SDMMC/diskio.c **** extern Disk_drvTypeDef  disk;
+  46:../tasks/SDMMC/diskio.c **** 
+  47:../tasks/SDMMC/diskio.c **** /* Private function prototypes -----------------------------------------------*/
+  48:../tasks/SDMMC/diskio.c **** /* Private functions ---------------------------------------------------------*/
+  49:../tasks/SDMMC/diskio.c **** 
+  50:../tasks/SDMMC/diskio.c **** /**
+  51:../tasks/SDMMC/diskio.c ****   * @brief  Initializes a Drive
+  52:../tasks/SDMMC/diskio.c ****   * @param  pdrv: Physical drive number (0..)
+  53:../tasks/SDMMC/diskio.c ****   * @retval DSTATUS: Operation status
+  54:../tasks/SDMMC/diskio.c ****   */
+  55:../tasks/SDMMC/diskio.c **** DSTATUS disk_initialize(BYTE pdrv)
+  56:../tasks/SDMMC/diskio.c **** {
+  26              		.loc 1 56 0
+  27              		.cfi_startproc
+  28              		@ args = 0, pretend = 0, frame = 16
+  29              		@ frame_needed = 1, uses_anonymous_args = 0
+  30 0000 80B5     		push	{r7, lr}
+  31              		.cfi_def_cfa_offset 8
+  32              		.cfi_offset 7, -8
+  33              		.cfi_offset 14, -4
+  34 0002 84B0     		sub	sp, sp, #16
+  35              		.cfi_def_cfa_offset 24
+  36 0004 00AF     		add	r7, sp, #0
+  37              		.cfi_def_cfa_register 7
+  38 0006 0346     		mov	r3, r0
+  39 0008 FB71     		strb	r3, [r7, #7]
+  57:../tasks/SDMMC/diskio.c ****   DSTATUS stat;
+  58:../tasks/SDMMC/diskio.c ****   
+  59:../tasks/SDMMC/diskio.c ****   stat = disk.drv[pdrv]->disk_initialize();
+  40              		.loc 1 59 0
+  41 000a FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+  42 000c 40F20003 		movw	r3, #:lower16:disk
+  43 0010 C0F20003 		movt	r3, #:upper16:disk
+  44 0014 53F82230 		ldr	r3, [r3, r2, lsl #2]
+  45 0018 1B68     		ldr	r3, [r3]
+  46 001a 9847     		blx	r3
+  47 001c 0346     		mov	r3, r0
+  48 001e FB73     		strb	r3, [r7, #15]
+  60:../tasks/SDMMC/diskio.c ****   return stat;
+  49              		.loc 1 60 0
+  50 0020 FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+  61:../tasks/SDMMC/diskio.c **** }
+  51              		.loc 1 61 0
+  52 0022 1846     		mov	r0, r3
+  53 0024 1037     		adds	r7, r7, #16
+  54 0026 BD46     		mov	sp, r7
+  55              		@ sp needed
+  56 0028 80BD     		pop	{r7, pc}
+  57              		.cfi_endproc
+  58              	.LFE55:
+  60 002a 00BF     		.align	2
+  61              		.global	disk_status
+  62              		.thumb
+  63              		.thumb_func
+  65              	disk_status:
+  66              	.LFB56:
+  62:../tasks/SDMMC/diskio.c **** 
+  63:../tasks/SDMMC/diskio.c **** /**
+  64:../tasks/SDMMC/diskio.c ****   * @brief  Gets Disk Status 
+  65:../tasks/SDMMC/diskio.c ****   * @param  pdrv: Physical drive number (0..)
+  66:../tasks/SDMMC/diskio.c ****   * @retval DSTATUS: Operation status
+  67:../tasks/SDMMC/diskio.c ****   */
+  68:../tasks/SDMMC/diskio.c **** DSTATUS disk_status(BYTE pdrv)
+  69:../tasks/SDMMC/diskio.c **** {
+  67              		.loc 1 69 0
+  68              		.cfi_startproc
+  69              		@ args = 0, pretend = 0, frame = 16
+  70              		@ frame_needed = 1, uses_anonymous_args = 0
+  71 002c 80B5     		push	{r7, lr}
+  72              		.cfi_def_cfa_offset 8
+  73              		.cfi_offset 7, -8
+  74              		.cfi_offset 14, -4
+  75 002e 84B0     		sub	sp, sp, #16
+  76              		.cfi_def_cfa_offset 24
+  77 0030 00AF     		add	r7, sp, #0
+  78              		.cfi_def_cfa_register 7
+  79 0032 0346     		mov	r3, r0
+  80 0034 FB71     		strb	r3, [r7, #7]
+  70:../tasks/SDMMC/diskio.c ****   DSTATUS stat;
+  71:../tasks/SDMMC/diskio.c ****   
+  72:../tasks/SDMMC/diskio.c ****   stat = disk.drv[pdrv]->disk_status();
+  81              		.loc 1 72 0
+  82 0036 FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+  83 0038 40F20003 		movw	r3, #:lower16:disk
+  84 003c C0F20003 		movt	r3, #:upper16:disk
+  85 0040 53F82230 		ldr	r3, [r3, r2, lsl #2]
+  86 0044 5B68     		ldr	r3, [r3, #4]
+  87 0046 9847     		blx	r3
+  88 0048 0346     		mov	r3, r0
+  89 004a FB73     		strb	r3, [r7, #15]
+  73:../tasks/SDMMC/diskio.c ****   return stat;
+  90              		.loc 1 73 0
+  91 004c FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+  74:../tasks/SDMMC/diskio.c **** }
+  92              		.loc 1 74 0
+  93 004e 1846     		mov	r0, r3
+  94 0050 1037     		adds	r7, r7, #16
+  95 0052 BD46     		mov	sp, r7
+  96              		@ sp needed
+  97 0054 80BD     		pop	{r7, pc}
+  98              		.cfi_endproc
+  99              	.LFE56:
+ 101 0056 00BF     		.align	2
+ 102              		.global	disk_read
+ 103              		.thumb
+ 104              		.thumb_func
+ 106              	disk_read:
+ 107              	.LFB57:
+  75:../tasks/SDMMC/diskio.c **** 
+  76:../tasks/SDMMC/diskio.c **** /**
+  77:../tasks/SDMMC/diskio.c ****   * @brief  Reads Sector(s) 
+  78:../tasks/SDMMC/diskio.c ****   * @param  pdrv: Physical drive number (0..)
+  79:../tasks/SDMMC/diskio.c ****   * @param  *buff: Data buffer to store read data
+  80:../tasks/SDMMC/diskio.c ****   * @param  sector: Sector address (LBA)
+  81:../tasks/SDMMC/diskio.c ****   * @param  count: Number of sectors to read (1..128)
+  82:../tasks/SDMMC/diskio.c ****   * @retval DRESULT: Operation result
+  83:../tasks/SDMMC/diskio.c ****   */
+  84:../tasks/SDMMC/diskio.c **** DRESULT disk_read(BYTE pdrv, BYTE *buff, DWORD sector, BYTE count)
+  85:../tasks/SDMMC/diskio.c **** {
+ 108              		.loc 1 85 0
+ 109              		.cfi_startproc
+ 110              		@ args = 0, pretend = 0, frame = 24
+ 111              		@ frame_needed = 1, uses_anonymous_args = 0
+ 112 0058 80B5     		push	{r7, lr}
+ 113              		.cfi_def_cfa_offset 8
+ 114              		.cfi_offset 7, -8
+ 115              		.cfi_offset 14, -4
+ 116 005a 86B0     		sub	sp, sp, #24
+ 117              		.cfi_def_cfa_offset 32
+ 118 005c 00AF     		add	r7, sp, #0
+ 119              		.cfi_def_cfa_register 7
+ 120 005e B960     		str	r1, [r7, #8]
+ 121 0060 7A60     		str	r2, [r7, #4]
+ 122 0062 0246     		mov	r2, r0
+ 123 0064 FA73     		strb	r2, [r7, #15]
+ 124 0066 BB73     		strb	r3, [r7, #14]
+  86:../tasks/SDMMC/diskio.c ****   DRESULT res;
+  87:../tasks/SDMMC/diskio.c **** //	printf("[IO] I:disk_read\n");
+  88:../tasks/SDMMC/diskio.c ****  
+  89:../tasks/SDMMC/diskio.c ****   res = disk.drv[pdrv]->disk_read(buff, sector, count);
+ 125              		.loc 1 89 0
+ 126 0068 FA7B     		ldrb	r2, [r7, #15]	@ zero_extendqisi2
+ 127 006a 40F20003 		movw	r3, #:lower16:disk
+ 128 006e C0F20003 		movt	r3, #:upper16:disk
+ 129 0072 53F82230 		ldr	r3, [r3, r2, lsl #2]
+ 130 0076 9B68     		ldr	r3, [r3, #8]
+ 131 0078 BA7B     		ldrb	r2, [r7, #14]	@ zero_extendqisi2
+ 132 007a B868     		ldr	r0, [r7, #8]
+ 133 007c 7968     		ldr	r1, [r7, #4]
+ 134 007e 9847     		blx	r3
+ 135 0080 0346     		mov	r3, r0
+ 136 0082 FB75     		strb	r3, [r7, #23]
+  90:../tasks/SDMMC/diskio.c ****   return res;
+ 137              		.loc 1 90 0
+ 138 0084 FB7D     		ldrb	r3, [r7, #23]	@ zero_extendqisi2
+  91:../tasks/SDMMC/diskio.c **** }
+ 139              		.loc 1 91 0
+ 140 0086 1846     		mov	r0, r3
+ 141 0088 1837     		adds	r7, r7, #24
+ 142 008a BD46     		mov	sp, r7
+ 143              		@ sp needed
+ 144 008c 80BD     		pop	{r7, pc}
+ 145              		.cfi_endproc
+ 146              	.LFE57:
+ 148 008e 00BF     		.align	2
+ 149              		.global	disk_write
+ 150              		.thumb
+ 151              		.thumb_func
+ 153              	disk_write:
+ 154              	.LFB58:
+  92:../tasks/SDMMC/diskio.c **** 
+  93:../tasks/SDMMC/diskio.c **** /**
+  94:../tasks/SDMMC/diskio.c ****   * @brief  Writes Sector(s)  
+  95:../tasks/SDMMC/diskio.c ****   * @param  pdrv: Physical drive number (0..)
+  96:../tasks/SDMMC/diskio.c ****   * @param  *buff: Data to be written
+  97:../tasks/SDMMC/diskio.c ****   * @param  sector: Sector address (LBA)
+  98:../tasks/SDMMC/diskio.c ****   * @param  count: Number of sectors to write (1..128)
+  99:../tasks/SDMMC/diskio.c ****   * @retval DRESULT: Operation result
+ 100:../tasks/SDMMC/diskio.c ****   */
+ 101:../tasks/SDMMC/diskio.c **** #if _USE_WRITE == 1
+ 102:../tasks/SDMMC/diskio.c **** DRESULT disk_write(BYTE pdrv, const BYTE *buff, DWORD sector, BYTE count)
+ 103:../tasks/SDMMC/diskio.c **** {
+ 155              		.loc 1 103 0
+ 156              		.cfi_startproc
+ 157              		@ args = 0, pretend = 0, frame = 24
+ 158              		@ frame_needed = 1, uses_anonymous_args = 0
+ 159 0090 80B5     		push	{r7, lr}
+ 160              		.cfi_def_cfa_offset 8
+ 161              		.cfi_offset 7, -8
+ 162              		.cfi_offset 14, -4
+ 163 0092 86B0     		sub	sp, sp, #24
+ 164              		.cfi_def_cfa_offset 32
+ 165 0094 00AF     		add	r7, sp, #0
+ 166              		.cfi_def_cfa_register 7
+ 167 0096 B960     		str	r1, [r7, #8]
+ 168 0098 7A60     		str	r2, [r7, #4]
+ 169 009a 0246     		mov	r2, r0
+ 170 009c FA73     		strb	r2, [r7, #15]
+ 171 009e BB73     		strb	r3, [r7, #14]
+ 104:../tasks/SDMMC/diskio.c ****   DRESULT res;
+ 105:../tasks/SDMMC/diskio.c ****   
+ 106:../tasks/SDMMC/diskio.c ****   res = disk.drv[pdrv]->disk_write(buff, sector, count);
+ 172              		.loc 1 106 0
+ 173 00a0 FA7B     		ldrb	r2, [r7, #15]	@ zero_extendqisi2
+ 174 00a2 40F20003 		movw	r3, #:lower16:disk
+ 175 00a6 C0F20003 		movt	r3, #:upper16:disk
+ 176 00aa 53F82230 		ldr	r3, [r3, r2, lsl #2]
+ 177 00ae DB68     		ldr	r3, [r3, #12]
+ 178 00b0 BA7B     		ldrb	r2, [r7, #14]	@ zero_extendqisi2
+ 179 00b2 B868     		ldr	r0, [r7, #8]
+ 180 00b4 7968     		ldr	r1, [r7, #4]
+ 181 00b6 9847     		blx	r3
+ 182 00b8 0346     		mov	r3, r0
+ 183 00ba FB75     		strb	r3, [r7, #23]
+ 107:../tasks/SDMMC/diskio.c ****   return res;
+ 184              		.loc 1 107 0
+ 185 00bc FB7D     		ldrb	r3, [r7, #23]	@ zero_extendqisi2
+ 108:../tasks/SDMMC/diskio.c **** }
+ 186              		.loc 1 108 0
+ 187 00be 1846     		mov	r0, r3
+ 188 00c0 1837     		adds	r7, r7, #24
+ 189 00c2 BD46     		mov	sp, r7
+ 190              		@ sp needed
+ 191 00c4 80BD     		pop	{r7, pc}
+ 192              		.cfi_endproc
+ 193              	.LFE58:
+ 195 00c6 00BF     		.align	2
+ 196              		.global	disk_ioctl
+ 197              		.thumb
+ 198              		.thumb_func
+ 200              	disk_ioctl:
+ 201              	.LFB59:
+ 109:../tasks/SDMMC/diskio.c **** #endif /* _USE_WRITE == 1 */
+ 110:../tasks/SDMMC/diskio.c **** 
+ 111:../tasks/SDMMC/diskio.c **** /**
+ 112:../tasks/SDMMC/diskio.c ****   * @brief  I/O control operation  
+ 113:../tasks/SDMMC/diskio.c ****   * @param  pdrv: Physical drive number (0..)
+ 114:../tasks/SDMMC/diskio.c ****   * @param  cmd: Control code
+ 115:../tasks/SDMMC/diskio.c ****   * @param  *buff: Buffer to send/receive control data
+ 116:../tasks/SDMMC/diskio.c ****   * @retval DRESULT: Operation result
+ 117:../tasks/SDMMC/diskio.c ****   */
+ 118:../tasks/SDMMC/diskio.c **** #if _USE_IOCTL == 1
+ 119:../tasks/SDMMC/diskio.c **** DRESULT disk_ioctl(BYTE pdrv, BYTE cmd, void *buff)
+ 120:../tasks/SDMMC/diskio.c **** {
+ 202              		.loc 1 120 0
+ 203              		.cfi_startproc
+ 204              		@ args = 0, pretend = 0, frame = 16
+ 205              		@ frame_needed = 1, uses_anonymous_args = 0
+ 206 00c8 80B5     		push	{r7, lr}
+ 207              		.cfi_def_cfa_offset 8
+ 208              		.cfi_offset 7, -8
+ 209              		.cfi_offset 14, -4
+ 210 00ca 84B0     		sub	sp, sp, #16
+ 211              		.cfi_def_cfa_offset 24
+ 212 00cc 00AF     		add	r7, sp, #0
+ 213              		.cfi_def_cfa_register 7
+ 214 00ce 0B46     		mov	r3, r1
+ 215 00d0 3A60     		str	r2, [r7]
+ 216 00d2 0246     		mov	r2, r0
+ 217 00d4 FA71     		strb	r2, [r7, #7]
+ 218 00d6 BB71     		strb	r3, [r7, #6]
+ 121:../tasks/SDMMC/diskio.c ****   DRESULT res;
+ 122:../tasks/SDMMC/diskio.c **** 
+ 123:../tasks/SDMMC/diskio.c ****   res = disk.drv[pdrv]->disk_ioctl(cmd, buff);
+ 219              		.loc 1 123 0
+ 220 00d8 FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+ 221 00da 40F20003 		movw	r3, #:lower16:disk
+ 222 00de C0F20003 		movt	r3, #:upper16:disk
+ 223 00e2 53F82230 		ldr	r3, [r3, r2, lsl #2]
+ 224 00e6 1B69     		ldr	r3, [r3, #16]
+ 225 00e8 BA79     		ldrb	r2, [r7, #6]	@ zero_extendqisi2
+ 226 00ea 1046     		mov	r0, r2
+ 227 00ec 3968     		ldr	r1, [r7]
+ 228 00ee 9847     		blx	r3
+ 229 00f0 0346     		mov	r3, r0
+ 230 00f2 FB73     		strb	r3, [r7, #15]
+ 124:../tasks/SDMMC/diskio.c ****   return res;
+ 231              		.loc 1 124 0
+ 232 00f4 FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 125:../tasks/SDMMC/diskio.c **** }
+ 233              		.loc 1 125 0
+ 234 00f6 1846     		mov	r0, r3
+ 235 00f8 1037     		adds	r7, r7, #16
+ 236 00fa BD46     		mov	sp, r7
+ 237              		@ sp needed
+ 238 00fc 80BD     		pop	{r7, pc}
+ 239              		.cfi_endproc
+ 240              	.LFE59:
+ 242 00fe 00BF     		.align	2
+ 243              		.global	get_fattime
+ 244              		.thumb
+ 245              		.thumb_func
+ 247              	get_fattime:
+ 248              	.LFB60:
+ 126:../tasks/SDMMC/diskio.c **** #endif /* _USE_IOCTL == 1 */
+ 127:../tasks/SDMMC/diskio.c **** 
+ 128:../tasks/SDMMC/diskio.c **** /**
+ 129:../tasks/SDMMC/diskio.c ****   * @brief  Gets Time from RTC 
+ 130:../tasks/SDMMC/diskio.c ****   * @param  None
+ 131:../tasks/SDMMC/diskio.c ****   * @retval Time in DWORD
+ 132:../tasks/SDMMC/diskio.c ****   */
+ 133:../tasks/SDMMC/diskio.c **** DWORD get_fattime (void)
+ 134:../tasks/SDMMC/diskio.c **** {
+ 249              		.loc 1 134 0
+ 250              		.cfi_startproc
+ 251              		@ args = 0, pretend = 0, frame = 0
+ 252              		@ frame_needed = 1, uses_anonymous_args = 0
+ 253              		@ link register save eliminated.
+ 254 0100 80B4     		push	{r7}
+ 255              		.cfi_def_cfa_offset 4
+ 256              		.cfi_offset 7, -4
+ 257 0102 00AF     		add	r7, sp, #0
+ 258              		.cfi_def_cfa_register 7
+ 135:../tasks/SDMMC/diskio.c ****   return 0;
+ 259              		.loc 1 135 0
+ 260 0104 0023     		movs	r3, #0
+ 136:../tasks/SDMMC/diskio.c **** }
+ 261              		.loc 1 136 0
+ 262 0106 1846     		mov	r0, r3
+ 263 0108 BD46     		mov	sp, r7
+ 264              		@ sp needed
+ 265 010a 5DF8047B 		ldr	r7, [sp], #4
+ 266 010e 7047     		bx	lr
+ 267              		.cfi_endproc
+ 268              	.LFE60:
+ 270              	.Letext0:
+ 271              		.file 2 "../tasks/SDMMC/integer.h"
+ 272              		.file 3 "../tasks/SDMMC/diskio.h"
+ 273              		.file 4 "c:\\program files (x86)\\codesourcery\\arm-none-eabi\\include\\stdint.h"
+ 274              		.file 5 "../tasks/SDMMC/ff_gen_drv.h"
+ 275              		.file 6 "D:\\workspace\\console800480\\system/core_cm3.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 diskio.c
+C:\Users\sagok\AppData\Local\Temp\ccoDGQIe.s:18     .text:00000000 $t
+C:\Users\sagok\AppData\Local\Temp\ccoDGQIe.s:23     .text:00000000 disk_initialize
+C:\Users\sagok\AppData\Local\Temp\ccoDGQIe.s:65     .text:0000002c disk_status
+C:\Users\sagok\AppData\Local\Temp\ccoDGQIe.s:106    .text:00000058 disk_read
+C:\Users\sagok\AppData\Local\Temp\ccoDGQIe.s:153    .text:00000090 disk_write
+C:\Users\sagok\AppData\Local\Temp\ccoDGQIe.s:200    .text:000000c8 disk_ioctl
+C:\Users\sagok\AppData\Local\Temp\ccoDGQIe.s:247    .text:00000100 get_fattime
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.1.7f551ac7fcad8b79b9df4bfdaa536673
+                           .group:00000000 wm4.diskio.h.6.8da7330f9b93c43e88f440080fbc00d0
+                           .group:00000000 wm4.diskio.h.43.17c6f92f3f6ff58b941e8553c0aeafe2
+                           .group:00000000 wm4.stm32f2xx_hal_conf.h.40.007126baefb9f966c36646edbf8040d2
+                           .group:00000000 wm4.stm32f2xx.h.57.5ec1581efc43612c411d33a8686e9ec7
+                           .group:00000000 wm4.stm32f217xx.h.52.9c940d76d00294b78837dc334c172fdd
+                           .group:00000000 wm4.core_cm3.h.32.49180ccb4d36cabd2d7016d2a51d91ae
+                           .group:00000000 wm4.newlib.h.8.384a112feabb3bef7b573ae48cde2e3b
+                           .group:00000000 wm4.features.h.22.6a4ca7cd053637cc1d0db6c16f39b2d7
+                           .group:00000000 wm4.config.h.183.aa62afef667fb61d15fa64c48beb2f14
+                           .group:00000000 wm4._ansi.h.23.5644b60c990a4800b02a6e654e88f93a
+                           .group:00000000 wm4.stdint.h.20.54ad762faa59e3c05491630641c8d8bf
+                           .group:00000000 wm4.core_cmInstr.h.25.f50f886f2edf670cf199b35fd96f5c91
+                           .group:00000000 wm4.core_cm3.h.130.63ab2348a6eed0fdb318040d970b676c
+                           .group:00000000 wm4.stm32f217xx.h.978.a5c681952b2f704a0e7f2ba21d08adf5
+                           .group:00000000 wm4.stm32f2xx.h.142.bc2155a1f7498bab16371e38413a9e41
+                           .group:00000000 wm4.stm32f2xx_hal_def.h.74.8ad2dc8aa82c4fd02e5aeaae592641ba
+                           .group:00000000 wm4.stm32f2xx_hal_rcc.h.142.ec0f91cc6576a6acebd17e6dd85829ae
+                           .group:00000000 wm4.stm32f2xx_hal_rcc_ex.h.40.0829033e864455c6bdd0db01f8ba5a50
+                           .group:00000000 wm4.stm32f2xx_hal_gpio.h.40.ba64e0bb94d9a68835f80159f39a86f1
+                           .group:00000000 wm4.stm32f2xx_hal_gpio_ex.h.40.24e547fd402281923f446b510381083f
+                           .group:00000000 wm4.stm32f2xx_hal_dma.h.40.5d9732ace2a21a4526ce8f0c52428fff
+                           .group:00000000 wm4.stm32f2xx_hal_cortex.h.40.e10263d2ec5d4fa79b4180ce1a38aff1
+                           .group:00000000 wm4.stm32f2xx_hal_adc.h.40.89ac8b78113cac4cf63847587daabac9
+                           .group:00000000 wm4.stm32f2xx_hal_adc_ex.h.40.7de68ed256ef25526ee31cc017f2c291
+                           .group:00000000 wm4.stm32f2xx_hal_flash.h.40.c3171719ce015e9cff20c795e44e886d
+                           .group:00000000 wm4.stm32f2xx_hal_flash_ex.h.40.7389508bd24a0aeb077bde0c9fb651eb
+                           .group:00000000 wm4.stm32f2xx_ll_fsmc.h.40.c1c32f2e1862f4dd342bd9b80fb895bb
+                           .group:00000000 wm4.stm32f2xx_hal_pwr.h.40.812df32e5c31b609a128e9db0eb4cbd0
+                           .group:00000000 wm4.stm32f2xx_hal_rtc.h.40.850fda5fe2cce8797446913dee18382f
+                           .group:00000000 wm4.stm32f2xx_hal_rtc_ex.h.40.f3e0c408e3bf4e8a0352d7ec9a18a822
+                           .group:00000000 wm4.stm32f2xx_ll_sdmmc.h.40.3719ab487c4b77401c572f459adf6eb7
+                           .group:00000000 wm4.stm32f2xx_hal_sd.h.58.760215394dcc316161a6482c0af9b866
+                           .group:00000000 wm4.stm32f2xx_hal_spi.h.40.7984243dbaba8b21c6392998a47e6987
+                           .group:00000000 wm4.stm32f2xx_hal_tim.h.40.d79172f25d0e9a15dc346aba8515bdd6
+                           .group:00000000 wm4.stm32f2xx_hal_tim_ex.h.40.361f280a7a3f60b4b238bb99ca728d83
+                           .group:00000000 wm4.stm32f2xx_hal_uart.h.40.d74def561ae6f78f40f477c8426ecbef
+                           .group:00000000 wm4.stm32f2xx_ll_usb.h.40.9b0206a05bc6ce3bec1648b51f22cb81
+                           .group:00000000 wm4.stm32f2xx_hal_pcd.h.99.11faba414c39e357b2f23364912d0605
+                           .group:00000000 wm4.stm32f2xx_hal_hcd.h.40.44ee5e972983ae0139ddbacdc75c44ef
+                           .group:00000000 wm4.stm32f2xx_hal.h.64.ed79ee83e52b151b3c365392b398f866
+                           .group:00000000 wm4.stdio.h.31.7c0e28c411445f3f9c5b11accf882760
+                           .group:00000000 wm4.stddef.h.184.159df79b4ca79c76561572a55985524c
+                           .group:00000000 wm4.stdarg.h.34.3a23a216c0c293b3d2ea2e89281481e6
+                           .group:00000000 wm4._default_types.h.6.5e12cd604db8ce00b62bb2f02708eaf3
+                           .group:00000000 wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea
+                           .group:00000000 wm4._types.h.59.db8450f33c1f6150c0372fa1091a887a
+                           .group:00000000 wm4.stddef.h.348.9a99de77b6ba3b4278b57e9cc6d6e349
+                           .group:00000000 wm4.reent.h.16.567d760e6ae9ad7f917851a308bd7a57
+                           .group:00000000 wm4.types.h.23.0d949686bbcadd1621462d4fa1f884f9
+                           .group:00000000 wm4.stddef.h.39.7e3d906ac58942e0b374c527445f5de5
+                           .group:00000000 wm4.types.h.2.e9cec8c90ab35f77d9f499e06ae02400
+                           .group:00000000 wm4.types.h.80.5759fe41f87f5211a5952dfb1fc64f19
+                           .group:00000000 wm4.stdio.h.2.4aa87247282eca6c8f36f9de33d8df1a
+                           .group:00000000 wm4.stdio.h.64.f9f1bb6b0d3d7e12f6a27968d859709c
+                           .group:00000000 wm4.stdlib.h.18.8bab2fb43ac4e90235390733c30a4530
+                           .group:00000000 wm4.stddef.h.158.a7efb00f6cbc6f43213b50e183c9830c
+                           .group:00000000 wm4.alloca.h.8.dfc0c703c47ec3e69746825b17d9e66d
+                           .group:00000000 wm4.stdlib.h.55.7091a050e07f1c4abd225630fe3d62f1
+                           .group:00000000 wm4.cdefs.h.56.efab90f4d89fbc41d6b3a5c5fb0d3d0f
+                           .group:00000000 wm4.string.h.15.dab3980bf35408a4c507182805e2de3a
+                           .group:00000000 wm4.string.h.126.6ff3aa59129e7f66b2c273baf353e066
+                           .group:00000000 wm4.LEDs.h.9.36ffa4b30bd168dc58d64fa6e53a9a30
+                           .group:00000000 wm4.usbh_conf.h.41.d72a4a1e5e10d8f062cf3fa4bcd8aa54
+                           .group:00000000 wm4.usbh_def.h.42.e5773f0fe2e07d0c2c7284f319cefcfb
+                           .group:00000000 wm4.usbh_ioreq.h.53.3586266a62e1adb6014256f47bfe28ae
+                           .group:00000000 wm4.usbh_ctlreq.h.30.baf76fe1032fc0ccc3b759e321acc69d
+                           .group:00000000 wm4.usbh_core.h.60.126ed10f424484efe8e3332cf8789488
+                           .group:00000000 wm4.usbh_msc_bot.h.150.7a573dd4700e98f78a08f0e60cd8a2e8
+                           .group:00000000 wm4.usbh_msc_scsi.h.30.7ac65aef8ad2b1cb473eb44388537ea2
+                           .group:00000000 wm4.usbh_msc.h.92.1eaed72009e45245618cff3cc0ab5900
+                           .group:00000000 wm4.ffconf.h.19.cf478c53f215b23144e0b163e0b92c6c
+                           .group:00000000 wm4.ff.h.45.ea85cd9763a25d97ae88799c83ef7c63
+
+UNDEFINED SYMBOLS
+disk

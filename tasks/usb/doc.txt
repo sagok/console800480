@@ -1,0 +1,7 @@
+Давайте для начала определимся, CDC_Transmit_FS или CDC_Receive_FS.
+CDC_Transmit_FS вызывается по желанию. Я пробовал и из главного цикла, и из CDC_Receive_FS.
+
+CDC_Receive_FS в моём случае (stm32f072) вызывается по такой цепочке: 
+USB_IRQHandler -> HAL_PCD_IRQHandler -> PCD_EP_ISR_Handler -> HAL_PCD_DataOutStageCallback -> USBD_LL_DataOutStage -> USBD_CDC_DataOut -> CDC_Receive_FS.
+ 
+Вызывается колбэк не напрямую, а через табличку указателей, которая регистрируется в функции MX_USB_DEVICE_Init (usb_device.c)

@@ -1,0 +1,1733 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"ts_calibration.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.comm	uSdHandle,96,4
+  19              		.comm	SD_CardInfo,88,8
+  20              		.bss
+  21              	Calibration_Done:
+  22 0000 00       		.space	1
+  23 0001 00       		.align	1
+  24              	A1:
+  25 0002 0000     		.space	2
+  26              		.align	1
+  27              	A2:
+  28 0004 0000     		.space	2
+  29              		.align	1
+  30              	B1:
+  31 0006 0000     		.space	2
+  32              		.align	1
+  33              	B2:
+  34 0008 0000     		.space	2
+  35 000a 0000     		.align	2
+  36              	aPhysX:
+  37 000c 00000000 		.space	4
+  38              		.align	2
+  39              	aPhysY:
+  40 0010 00000000 		.space	4
+  41              		.align	2
+  42              	aLogX:
+  43 0014 00000000 		.space	4
+  44              		.align	2
+  45              	aLogY:
+  46 0018 00000000 		.space	4
+  47              		.global	tcState
+  48              		.align	1
+  51              	tcState:
+  52 001c 0000     		.space	2
+  53              		.comm	xPos,10,4
+  54              		.comm	yPos,10,4
+  55              		.comm	axc,4,4
+  56              		.comm	ayc,4,4
+  57              		.comm	bxc,4,4
+  58              		.comm	byc,4,4
+  59              		.section	.rodata
+  60              		.align	2
+  61              	.LC0:
+  62 0000 666F6E74 		.ascii	"fonts\000"
+  62      7300
+  63 0006 0000     		.align	2
+  64              	.LC1:
+  65 0008 2F666F6E 		.ascii	"/fonts\000"
+  65      747300
+  66 000f 00       		.align	2
+  67              	.LC2:
+  68 0010 636F7572 		.ascii	"cour36b.FFN\000"
+  68      3336622E 
+  68      46464E00 
+  69              		.align	2
+  70              	.LC3:
+  71 001c 5B44705D 		.ascii	"[Dp] :not open the cour36b.FFN file\000"
+  71      203A6E6F 
+  71      74206F70 
+  71      656E2074 
+  71      68652063 
+  72              		.align	2
+  73              	.LC4:
+  74 0040 2F00     		.ascii	"/\000"
+  75 0042 0000     		.align	2
+  76              	.LC5:
+  77 0044 5B44705D 		.ascii	"[Dp] :not open the cour36b.FFN file\012\000"
+  77      203A6E6F 
+  77      74206F70 
+  77      656E2074 
+  77      68652063 
+  78 0069 000000   		.align	2
+  79              	.LC6:
+  80 006c 5B44705D 		.ascii	"[Dp] :open the cour36b.FFN file\000"
+  80      203A6F70 
+  80      656E2074 
+  80      68652063 
+  80      6F757233 
+  81              		.align	2
+  82              	.LC7:
+  83 008c 636F7572 		.ascii	"cour36b.fbn\000"
+  83      3336622E 
+  83      66626E00 
+  84              		.align	2
+  85              	.LC8:
+  86 0098 57696474 		.ascii	"Width: %u \012\000"
+  86      683A2025 
+  86      75200A00 
+  87              		.align	2
+  88              	.LC9:
+  89 00a4 48656967 		.ascii	"Height: %u \012\000"
+  89      68743A20 
+  89      2575200A 
+  89      00
+  90 00b1 000000   		.align	2
+  91              	.LC10:
+  92 00b4 636F7572 		.ascii	"cour36b.FBN\000"
+  92      3336622E 
+  92      46424E00 
+  93              		.align	2
+  94              	.LC11:
+  95 00c0 CAE0EBE8 		.ascii	"\312\340\353\350\341\360\356\342\352\340 \361\345\355"
+  95      E1F0EEE2 
+  95      EAE020F1 
+  95      E5ED
+  96 00ce F1EEF0ED 		.ascii	"\361\356\360\355\356\343\356 \375\352\360\340\355\340"
+  96      EEE3EE20 
+  96      FDEAF0E0 
+  96      EDE0
+  97 00dc 00       		.ascii	"\000"
+  98 00dd 000000   		.align	2
+  99              	.LC12:
+ 100 00e0 CDE0E6EC 		.ascii	"\315\340\346\354\350\362\345 \342 \366\345\355\362\360"
+ 100      E8F2E520 
+ 100      E220F6E5 
+ 100      EDF2F0
+ 101 00ef 20EAF0F3 		.ascii	" \352\360\363\343\340\000"
+ 101      E3E000
+ 102              		.text
+ 103              		.align	2
+ 104              		.global	touchCalibration
+ 105              		.thumb
+ 106              		.thumb_func
+ 108              	touchCalibration:
+ 109              	.LFB55:
+ 110              		.file 1 "../tasks/display/ts_calibration.c"
+   1:../tasks/display/ts_calibration.c **** /**
+   2:../tasks/display/ts_calibration.c ****   ******************************************************************************
+   3:../tasks/display/ts_calibration.c ****   * @file    ts_calibration.c 
+   4:../tasks/display/ts_calibration.c ****   * @author  MCD Application Team
+   5:../tasks/display/ts_calibration.c ****   * @version V1.1.0
+   6:../tasks/display/ts_calibration.c ****   * @date    13-March-2014
+   7:../tasks/display/ts_calibration.c ****   * @brief   This example code shows how to calibrate the touchscreen.
+   8:../tasks/display/ts_calibration.c ****   ******************************************************************************
+   9:../tasks/display/ts_calibration.c ****   * @attention
+  10:../tasks/display/ts_calibration.c ****   *
+  11:../tasks/display/ts_calibration.c ****   * <h2><center>&copy; COPYRIGHT(c) 2014 STMicroelectronics</center></h2>
+  12:../tasks/display/ts_calibration.c ****   *
+  13:../tasks/display/ts_calibration.c ****   * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+  14:../tasks/display/ts_calibration.c ****   * You may not use this file except in compliance with the License.
+  15:../tasks/display/ts_calibration.c ****   * You may obtain a copy of the License at:
+  16:../tasks/display/ts_calibration.c ****   *
+  17:../tasks/display/ts_calibration.c ****   *        http://www.st.com/software_license_agreement_liberty_v2
+  18:../tasks/display/ts_calibration.c ****   *
+  19:../tasks/display/ts_calibration.c ****   * Unless required by applicable law or agreed to in writing, software 
+  20:../tasks/display/ts_calibration.c ****   * distributed under the License is distributed on an "AS IS" BASIS, 
+  21:../tasks/display/ts_calibration.c ****   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  22:../tasks/display/ts_calibration.c ****   * See the License for the specific language governing permissions and
+  23:../tasks/display/ts_calibration.c ****   * limitations under the License.
+  24:../tasks/display/ts_calibration.c ****   *
+  25:../tasks/display/ts_calibration.c ****   ******************************************************************************
+  26:../tasks/display/ts_calibration.c ****   */
+  27:../tasks/display/ts_calibration.c **** 
+  28:../tasks/display/ts_calibration.c **** /* Includes ------------------------------------------------------------------*/
+  29:../tasks/display/ts_calibration.c **** #include "main.h"
+  30:../tasks/display/ts_calibration.c **** #include "Board_lcd.h"
+  31:../tasks/display/ts_calibration.c **** #include "Board_ts.h"
+  32:../tasks/display/ts_calibration.c **** #include "ADS7843_TS.h"
+  33:../tasks/display/ts_calibration.c **** 
+  34:../tasks/display/ts_calibration.c **** /* FatFs includes component */
+  35:../tasks/display/ts_calibration.c **** #include "ff_gen_drv.h"
+  36:../tasks/display/ts_calibration.c **** #include "DiscBrowser.h"
+  37:../tasks/display/ts_calibration.c **** 
+  38:../tasks/display/ts_calibration.c **** //#include "stm32f2xx_hal.h"
+  39:../tasks/display/ts_calibration.c **** /** @addtogroup STM32F2xx_HAL_Applications
+  40:../tasks/display/ts_calibration.c ****   * @{
+  41:../tasks/display/ts_calibration.c ****   */
+  42:../tasks/display/ts_calibration.c **** 
+  43:../tasks/display/ts_calibration.c **** /** @addtogroup LCD_Paint
+  44:../tasks/display/ts_calibration.c ****   * @{
+  45:../tasks/display/ts_calibration.c ****   */
+  46:../tasks/display/ts_calibration.c **** 
+  47:../tasks/display/ts_calibration.c **** /* Private typedef -----------------------------------------------------------*/
+  48:../tasks/display/ts_calibration.c **** /* Private define ------------------------------------------------------------*/
+  49:../tasks/display/ts_calibration.c **** /* Private macro -------------------------------------------------------------*/
+  50:../tasks/display/ts_calibration.c **** /* Private variables ---------------------------------------------------------*/
+  51:../tasks/display/ts_calibration.c **** extern TS_StateTypeDef  TS_State;
+  52:../tasks/display/ts_calibration.c **** static uint8_t Calibration_Done = 0;
+  53:../tasks/display/ts_calibration.c **** static int16_t  A1, A2, B1, B2;
+  54:../tasks/display/ts_calibration.c **** static int16_t aPhysX[2], aPhysY[2], aLogX[2], aLogY[2];
+  55:../tasks/display/ts_calibration.c **** 
+  56:../tasks/display/ts_calibration.c **** uint16_t tcState = 0;
+  57:../tasks/display/ts_calibration.c **** 
+  58:../tasks/display/ts_calibration.c **** int16_t xPos[5], yPos[5], axc[2], ayc[2], bxc[2], byc[2];
+  59:../tasks/display/ts_calibration.c **** /* Private function prototypes -----------------------------------------------*/
+  60:../tasks/display/ts_calibration.c **** /* Exported types ------------------------------------------------------------*/
+  61:../tasks/display/ts_calibration.c **** /* Exported constants --------------------------------------------------------*/
+  62:../tasks/display/ts_calibration.c **** #define CONVERTED_FRAME_BUFFER                   0x64000000
+  63:../tasks/display/ts_calibration.c **** /* Exported macro ------------------------------------------------------------*/
+  64:../tasks/display/ts_calibration.c **** /* Exported functions ------------------------------------------------------- */
+  65:../tasks/display/ts_calibration.c **** //void Touchscreen_Calibration (void);
+  66:../tasks/display/ts_calibration.c **** uint16_t Calibration_GetX(uint16_t x);
+  67:../tasks/display/ts_calibration.c **** uint16_t Calibration_GetY(uint16_t y);
+  68:../tasks/display/ts_calibration.c **** uint8_t  IsCalibrationDone(void);
+  69:../tasks/display/ts_calibration.c **** 
+  70:../tasks/display/ts_calibration.c **** static void TouchscreenCalibration_SetHint(void);
+  71:../tasks/display/ts_calibration.c **** static void GetPhysValues(int16_t LogX, int16_t LogY, int16_t * pPhysX, int16_t * pPhysY) ;
+  72:../tasks/display/ts_calibration.c **** static void WaitForPressedState(uint8_t Pressed) ;
+  73:../tasks/display/ts_calibration.c **** /* Private functions ---------------------------------------------------------*/
+  74:../tasks/display/ts_calibration.c **** 
+  75:../tasks/display/ts_calibration.c **** uint16_t touchCalibration(void)
+  76:../tasks/display/ts_calibration.c **** {
+ 111              		.loc 1 76 0
+ 112              		.cfi_startproc
+ 113              		@ args = 0, pretend = 0, frame = 272
+ 114              		@ frame_needed = 1, uses_anonymous_args = 0
+ 115 0000 B0B5     		push	{r4, r5, r7, lr}
+ 116              		.cfi_def_cfa_offset 16
+ 117              		.cfi_offset 4, -16
+ 118              		.cfi_offset 5, -12
+ 119              		.cfi_offset 7, -8
+ 120              		.cfi_offset 14, -4
+ 121 0002 C6B0     		sub	sp, sp, #280
+ 122              		.cfi_def_cfa_offset 296
+ 123 0004 02AF     		add	r7, sp, #8
+ 124              		.cfi_def_cfa 7, 288
+  77:../tasks/display/ts_calibration.c **** 	static uint16_t flag, counter = 0;
+  78:../tasks/display/ts_calibration.c **** 	static FIL 	FFile;
+  79:../tasks/display/ts_calibration.c **** 	extern FIL LogFileOnSD;
+  80:../tasks/display/ts_calibration.c **** 	sFONT Font;
+  81:../tasks/display/ts_calibration.c **** 	char		byteread[255];
+  82:../tasks/display/ts_calibration.c **** 	uint8_t	error;
+  83:../tasks/display/ts_calibration.c **** 
+  84:../tasks/display/ts_calibration.c **** 	counter++;
+ 125              		.loc 1 84 0
+ 126 0006 40F20003 		movw	r3, #:lower16:counter.10575
+ 127 000a C0F20003 		movt	r3, #:upper16:counter.10575
+ 128 000e 1B88     		ldrh	r3, [r3]
+ 129 0010 0133     		adds	r3, r3, #1
+ 130 0012 9AB2     		uxth	r2, r3
+ 131 0014 40F20003 		movw	r3, #:lower16:counter.10575
+ 132 0018 C0F20003 		movt	r3, #:upper16:counter.10575
+ 133 001c 1A80     		strh	r2, [r3]	@ movhi
+  85:../tasks/display/ts_calibration.c **** 	if (counter > 6000)
+ 134              		.loc 1 85 0
+ 135 001e 40F20003 		movw	r3, #:lower16:counter.10575
+ 136 0022 C0F20003 		movt	r3, #:upper16:counter.10575
+ 137 0026 1A88     		ldrh	r2, [r3]
+ 138 0028 41F27073 		movw	r3, #6000
+ 139 002c 9A42     		cmp	r2, r3
+ 140 002e 0ED9     		bls	.L2
+  86:../tasks/display/ts_calibration.c **** 	{
+  87:../tasks/display/ts_calibration.c **** 		touchSetCoef(11, -17, -15, 256);
+ 141              		.loc 1 87 0
+ 142 0030 0B20     		movs	r0, #11
+ 143 0032 6FF01001 		mvn	r1, #16
+ 144 0036 6FF00E02 		mvn	r2, #14
+ 145 003a 4FF48073 		mov	r3, #256
+ 146 003e FFF7FEFF 		bl	touchSetCoef
+  88:../tasks/display/ts_calibration.c **** 		tcState = 9;
+ 147              		.loc 1 88 0
+ 148 0042 40F20003 		movw	r3, #:lower16:tcState
+ 149 0046 C0F20003 		movt	r3, #:upper16:tcState
+ 150 004a 0922     		movs	r2, #9
+ 151 004c 1A80     		strh	r2, [r3]	@ movhi
+ 152              	.L2:
+  89:../tasks/display/ts_calibration.c **** 	}
+  90:../tasks/display/ts_calibration.c **** 	switch (tcState)
+ 153              		.loc 1 90 0
+ 154 004e 40F20003 		movw	r3, #:lower16:tcState
+ 155 0052 C0F20003 		movt	r3, #:upper16:tcState
+ 156 0056 1B88     		ldrh	r3, [r3]
+ 157 0058 002B     		cmp	r3, #0
+ 158 005a 40F0E680 		bne	.L3
+  91:../tasks/display/ts_calibration.c **** 	{
+  92:../tasks/display/ts_calibration.c **** 	case 0:	// left top corner draw
+  93:../tasks/display/ts_calibration.c **** 
+  94:../tasks/display/ts_calibration.c **** 		/* Clear the LCD */
+  95:../tasks/display/ts_calibration.c **** 		BSP_LCD_Clear(LCD_COLOR_WHITE);
+ 159              		.loc 1 95 0
+ 160 005e 4FF6FF70 		movw	r0, #65535
+ 161 0062 FFF7FEFF 		bl	BSP_LCD_Clear
+  96:../tasks/display/ts_calibration.c **** 
+  97:../tasks/display/ts_calibration.c **** 		/* Set Touchscreen Demo description */
+  98:../tasks/display/ts_calibration.c **** 		BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+ 162              		.loc 1 98 0
+ 163 0066 0020     		movs	r0, #0
+ 164 0068 FFF7FEFF 		bl	BSP_LCD_SetTextColor
+  99:../tasks/display/ts_calibration.c **** 		BSP_LCD_SetBackColor(LCD_COLOR_WHITE);
+ 165              		.loc 1 99 0
+ 166 006c 4FF6FF70 		movw	r0, #65535
+ 167 0070 FFF7FEFF 		bl	BSP_LCD_SetBackColor
+ 100:../tasks/display/ts_calibration.c **** 
+ 101:../tasks/display/ts_calibration.c **** 		scan_files("fonts");
+ 168              		.loc 1 101 0
+ 169 0074 40F20000 		movw	r0, #:lower16:.LC0
+ 170 0078 C0F20000 		movt	r0, #:upper16:.LC0
+ 171 007c FFF7FEFF 		bl	scan_files
+ 102:../tasks/display/ts_calibration.c **** 		f_chdir("/fonts");											// сменим директорию
+ 172              		.loc 1 102 0
+ 173 0080 40F20000 		movw	r0, #:lower16:.LC1
+ 174 0084 C0F20000 		movt	r0, #:upper16:.LC1
+ 175 0088 FFF7FEFF 		bl	f_chdir
+ 103:../tasks/display/ts_calibration.c **** 		   if(f_open(&FFile, "cour36b.FFN", FA_READ) != FR_OK)		//"Arial36B.FFN"
+ 176              		.loc 1 103 0
+ 177 008c 40F20000 		movw	r0, #:lower16:FFile.10576
+ 178 0090 C0F20000 		movt	r0, #:upper16:FFile.10576
+ 179 0094 40F20001 		movw	r1, #:lower16:.LC2
+ 180 0098 C0F20001 		movt	r1, #:upper16:.LC2
+ 181 009c 0122     		movs	r2, #1
+ 182 009e FFF7FEFF 		bl	f_open
+ 183 00a2 0346     		mov	r3, r0
+ 184 00a4 002B     		cmp	r3, #0
+ 185 00a6 17D0     		beq	.L5
+ 104:../tasks/display/ts_calibration.c **** 			{
+ 105:../tasks/display/ts_calibration.c **** 				printf("[Dp] :not open the cour36b.FFN file\n");
+ 186              		.loc 1 105 0
+ 187 00a8 40F20000 		movw	r0, #:lower16:.LC3
+ 188 00ac C0F20000 		movt	r0, #:upper16:.LC3
+ 189 00b0 FFF7FEFF 		bl	puts
+ 106:../tasks/display/ts_calibration.c **** 				f_chdir("/");											// сменим директорию
+ 190              		.loc 1 106 0
+ 191 00b4 40F20000 		movw	r0, #:lower16:.LC4
+ 192 00b8 C0F20000 		movt	r0, #:upper16:.LC4
+ 193 00bc FFF7FEFF 		bl	f_chdir
+ 107:../tasks/display/ts_calibration.c **** 				Write_to_logFile(&LogFileOnSD, (char *)"[Dp] :not open the cour36b.FFN file\n",sizeof("[Dp] :no
+ 194              		.loc 1 107 0
+ 195 00c0 40F20000 		movw	r0, #:lower16:LogFileOnSD
+ 196 00c4 C0F20000 		movt	r0, #:upper16:LogFileOnSD
+ 197 00c8 40F20001 		movw	r1, #:lower16:.LC5
+ 198 00cc C0F20001 		movt	r1, #:upper16:.LC5
+ 199 00d0 2422     		movs	r2, #36
+ 200 00d2 FFF7FEFF 		bl	Write_to_logFile
+ 201 00d6 45E0     		b	.L6
+ 202              	.L5:
+ 108:../tasks/display/ts_calibration.c **** 			} else {
+ 109:../tasks/display/ts_calibration.c **** 				printf("[Dp] :open the cour36b.FFN file\n");
+ 203              		.loc 1 109 0
+ 204 00d8 40F20000 		movw	r0, #:lower16:.LC6
+ 205 00dc C0F20000 		movt	r0, #:upper16:.LC6
+ 206 00e0 FFF7FEFF 		bl	puts
+ 110:../tasks/display/ts_calibration.c **** 				error = f_gets(&byteread[0],255,&FFile);					// читаем строку
+ 207              		.loc 1 110 0
+ 208 00e4 3B1D     		adds	r3, r7, #4
+ 209 00e6 1846     		mov	r0, r3
+ 210 00e8 FF21     		movs	r1, #255
+ 211 00ea 40F20002 		movw	r2, #:lower16:FFile.10576
+ 212 00ee C0F20002 		movt	r2, #:upper16:FFile.10576
+ 213 00f2 FFF7FEFF 		bl	f_gets
+ 214 00f6 0346     		mov	r3, r0
+ 215 00f8 87F80F31 		strb	r3, [r7, #271]
+ 111:../tasks/display/ts_calibration.c **** 				Font.Width = (uint16_t)byteread[0]<<8 | (uint16_t)byteread[1];
+ 216              		.loc 1 111 0
+ 217 00fc 3B1D     		adds	r3, r7, #4
+ 218 00fe 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 219 0100 1B02     		lsls	r3, r3, #8
+ 220 0102 9AB2     		uxth	r2, r3
+ 221 0104 3B1D     		adds	r3, r7, #4
+ 222 0106 5B78     		ldrb	r3, [r3, #1]	@ zero_extendqisi2
+ 223 0108 1343     		orrs	r3, r3, r2
+ 224 010a 9BB2     		uxth	r3, r3
+ 225 010c 9BB2     		uxth	r3, r3
+ 226 010e A7F80831 		strh	r3, [r7, #264]	@ movhi
+ 112:../tasks/display/ts_calibration.c **** 				Font.Height = (uint16_t)byteread[2]<<8 | (uint16_t)byteread[3];
+ 227              		.loc 1 112 0
+ 228 0112 3B1D     		adds	r3, r7, #4
+ 229 0114 9B78     		ldrb	r3, [r3, #2]	@ zero_extendqisi2
+ 230 0116 1B02     		lsls	r3, r3, #8
+ 231 0118 9AB2     		uxth	r2, r3
+ 232 011a 3B1D     		adds	r3, r7, #4
+ 233 011c DB78     		ldrb	r3, [r3, #3]	@ zero_extendqisi2
+ 234 011e 1343     		orrs	r3, r3, r2
+ 235 0120 9BB2     		uxth	r3, r3
+ 236 0122 9BB2     		uxth	r3, r3
+ 237 0124 A7F80A31 		strh	r3, [r7, #266]	@ movhi
+ 113:../tasks/display/ts_calibration.c **** 				Font.table =(uint8_t *)"cour36b.fbn";
+ 238              		.loc 1 113 0
+ 239 0128 40F20003 		movw	r3, #:lower16:.LC7
+ 240 012c C0F20003 		movt	r3, #:upper16:.LC7
+ 241 0130 C7F80431 		str	r3, [r7, #260]
+ 114:../tasks/display/ts_calibration.c **** 				printf("Width: %u \n",Font.Width);
+ 242              		.loc 1 114 0
+ 243 0134 B7F80831 		ldrh	r3, [r7, #264]
+ 244 0138 40F20000 		movw	r0, #:lower16:.LC8
+ 245 013c C0F20000 		movt	r0, #:upper16:.LC8
+ 246 0140 1946     		mov	r1, r3
+ 247 0142 FFF7FEFF 		bl	printf
+ 115:../tasks/display/ts_calibration.c **** 				printf("Height: %u \n",Font.Height);
+ 248              		.loc 1 115 0
+ 249 0146 B7F80A31 		ldrh	r3, [r7, #266]
+ 250 014a 40F20000 		movw	r0, #:lower16:.LC9
+ 251 014e C0F20000 		movt	r0, #:upper16:.LC9
+ 252 0152 1946     		mov	r1, r3
+ 253 0154 FFF7FEFF 		bl	printf
+ 116:../tasks/display/ts_calibration.c **** 				f_close(&FFile);
+ 254              		.loc 1 116 0
+ 255 0158 40F20000 		movw	r0, #:lower16:FFile.10576
+ 256 015c C0F20000 		movt	r0, #:upper16:FFile.10576
+ 257 0160 FFF7FEFF 		bl	f_close
+ 258              	.L6:
+ 117:../tasks/display/ts_calibration.c **** 			}
+ 118:../tasks/display/ts_calibration.c **** 		   f_open(&FFile, "cour36b.FBN", FA_READ);
+ 259              		.loc 1 118 0
+ 260 0164 40F20000 		movw	r0, #:lower16:FFile.10576
+ 261 0168 C0F20000 		movt	r0, #:upper16:FFile.10576
+ 262 016c 40F20001 		movw	r1, #:lower16:.LC10
+ 263 0170 C0F20001 		movt	r1, #:upper16:.LC10
+ 264 0174 0122     		movs	r2, #1
+ 265 0176 FFF7FEFF 		bl	f_open
+ 119:../tasks/display/ts_calibration.c **** 
+ 120:../tasks/display/ts_calibration.c **** 		   BSP_LCD_DisplayStringAt(&FFile,BSP_LCD_GetXSize()/2, BSP_LCD_GetYSize()/2,  "Калибровка сенсор
+ 266              		.loc 1 120 0
+ 267 017a FFF7FEFF 		bl	BSP_LCD_GetXSize
+ 268 017e 0346     		mov	r3, r0
+ 269 0180 5B08     		lsrs	r3, r3, #1
+ 270 0182 9CB2     		uxth	r4, r3
+ 271 0184 FFF7FEFF 		bl	BSP_LCD_GetYSize
+ 272 0188 0346     		mov	r3, r0
+ 273 018a 5B08     		lsrs	r3, r3, #1
+ 274 018c 9BB2     		uxth	r3, r3
+ 275 018e 0322     		movs	r2, #3
+ 276 0190 0092     		str	r2, [sp]
+ 277 0192 40F20000 		movw	r0, #:lower16:FFile.10576
+ 278 0196 C0F20000 		movt	r0, #:upper16:FFile.10576
+ 279 019a 2146     		mov	r1, r4
+ 280 019c 1A46     		mov	r2, r3
+ 281 019e 40F20003 		movw	r3, #:lower16:.LC11
+ 282 01a2 C0F20003 		movt	r3, #:upper16:.LC11
+ 283 01a6 FFF7FEFF 		bl	BSP_LCD_DisplayStringAt
+ 121:../tasks/display/ts_calibration.c **** 		   BSP_LCD_DisplayStringAt(&FFile,BSP_LCD_GetXSize()/2, BSP_LCD_GetYSize()/2 + BSP_LCD_GetTextHei
+ 284              		.loc 1 121 0
+ 285 01aa FFF7FEFF 		bl	BSP_LCD_GetXSize
+ 286 01ae 0346     		mov	r3, r0
+ 287 01b0 5B08     		lsrs	r3, r3, #1
+ 288 01b2 9CB2     		uxth	r4, r3
+ 289 01b4 FFF7FEFF 		bl	BSP_LCD_GetYSize
+ 290 01b8 0346     		mov	r3, r0
+ 291 01ba 5B08     		lsrs	r3, r3, #1
+ 292 01bc 9DB2     		uxth	r5, r3
+ 293 01be FFF7FEFF 		bl	BSP_LCD_GetTextHeight
+ 294 01c2 0346     		mov	r3, r0
+ 295 01c4 2B44     		add	r3, r3, r5
+ 296 01c6 9BB2     		uxth	r3, r3
+ 297 01c8 0122     		movs	r2, #1
+ 298 01ca 0092     		str	r2, [sp]
+ 299 01cc 40F20000 		movw	r0, #:lower16:FFile.10576
+ 300 01d0 C0F20000 		movt	r0, #:upper16:FFile.10576
+ 301 01d4 2146     		mov	r1, r4
+ 302 01d6 1A46     		mov	r2, r3
+ 303 01d8 40F20003 		movw	r3, #:lower16:.LC12
+ 304 01dc C0F20003 		movt	r3, #:upper16:.LC12
+ 305 01e0 FFF7FEFF 		bl	BSP_LCD_DisplayStringAt
+ 122:../tasks/display/ts_calibration.c **** 		   BSP_LCD_DrawCircle(10,10,5);
+ 306              		.loc 1 122 0
+ 307 01e4 0A20     		movs	r0, #10
+ 308 01e6 0A21     		movs	r1, #10
+ 309 01e8 0522     		movs	r2, #5
+ 310 01ea FFF7FEFF 		bl	BSP_LCD_DrawCircle
+ 123:../tasks/display/ts_calibration.c **** 			flag = 0;
+ 311              		.loc 1 123 0
+ 312 01ee 40F20003 		movw	r3, #:lower16:flag.10574
+ 313 01f2 C0F20003 		movt	r3, #:upper16:flag.10574
+ 314 01f6 0022     		movs	r2, #0
+ 315 01f8 1A80     		strh	r2, [r3]	@ movhi
+ 124:../tasks/display/ts_calibration.c **** 		   if (getTouchState() == 0)
+ 316              		.loc 1 124 0
+ 317 01fa FFF7FEFF 		bl	getTouchState
+ 318 01fe 0346     		mov	r3, r0
+ 319 0200 002B     		cmp	r3, #0
+ 320 0202 0BD1     		bne	.L7
+ 125:../tasks/display/ts_calibration.c **** 			tcState++;
+ 321              		.loc 1 125 0
+ 322 0204 40F20003 		movw	r3, #:lower16:tcState
+ 323 0208 C0F20003 		movt	r3, #:upper16:tcState
+ 324 020c 1B88     		ldrh	r3, [r3]
+ 325 020e 0133     		adds	r3, r3, #1
+ 326 0210 9AB2     		uxth	r2, r3
+ 327 0212 40F20003 		movw	r3, #:lower16:tcState
+ 328 0216 C0F20003 		movt	r3, #:upper16:tcState
+ 329 021a 1A80     		strh	r2, [r3]	@ movhi
+ 330              	.L7:
+ 126:../tasks/display/ts_calibration.c **** 
+ 127:../tasks/display/ts_calibration.c **** 		    f_close(&FFile);
+ 331              		.loc 1 127 0
+ 332 021c 40F20000 		movw	r0, #:lower16:FFile.10576
+ 333 0220 C0F20000 		movt	r0, #:upper16:FFile.10576
+ 334 0224 FFF7FEFF 		bl	f_close
+ 128:../tasks/display/ts_calibration.c **** 		break;
+ 335              		.loc 1 128 0
+ 336 0228 00BF     		nop
+ 337              	.L3:
+ 129:../tasks/display/ts_calibration.c **** 	}
+ 130:../tasks/display/ts_calibration.c **** 
+ 131:../tasks/display/ts_calibration.c **** 	return tcState;
+ 338              		.loc 1 131 0
+ 339 022a 40F20003 		movw	r3, #:lower16:tcState
+ 340 022e C0F20003 		movt	r3, #:upper16:tcState
+ 341 0232 1B88     		ldrh	r3, [r3]
+ 132:../tasks/display/ts_calibration.c **** }
+ 342              		.loc 1 132 0
+ 343 0234 1846     		mov	r0, r3
+ 344 0236 07F58877 		add	r7, r7, #272
+ 345 023a BD46     		mov	sp, r7
+ 346              		@ sp needed
+ 347 023c B0BD     		pop	{r4, r5, r7, pc}
+ 348              		.cfi_endproc
+ 349              	.LFE55:
+ 351              		.section	.rodata
+ 352 00f6 0000     		.align	2
+ 353              	.LC13:
+ 354 00f8 546F7563 		.ascii	"TouchscreenCalibration_SetHint\000"
+ 354      68736372 
+ 354      65656E43 
+ 354      616C6962 
+ 354      72617469 
+ 355 0117 00       		.align	2
+ 356              	.LC14:
+ 357 0118 4253505F 		.ascii	"BSP_TS_Init: %d\012\000"
+ 357      54535F49 
+ 357      6E69743A 
+ 357      2025640A 
+ 357      00
+ 358 0129 000000   		.align	2
+ 359              	.LC15:
+ 360 012c 4552524F 		.ascii	"ERROR\000"
+ 360      5200
+ 361 0132 0000     		.align	2
+ 362              	.LC16:
+ 363 0134 546F7563 		.ascii	"Touchscreen cannot be initialized\000"
+ 363      68736372 
+ 363      65656E20 
+ 363      63616E6E 
+ 363      6F742062 
+ 364 0156 0000     		.align	2
+ 365              	.LC17:
+ 366 0158 73746174 		.ascii	"status = TS_OK,%d,%d,%d,%d\012\000"
+ 366      7573203D 
+ 366      2054535F 
+ 366      4F4B2C25 
+ 366      642C2564 
+ 367              		.align	2
+ 368              	.LC18:
+ 369 0174 47657450 		.ascii	"GetPhysValues,%d\012\000"
+ 369      68797356 
+ 369      616C7565 
+ 369      732C2564 
+ 369      0A00
+ 370 0186 0000     		.align	2
+ 371              	.LC19:
+ 372 0188 43616C69 		.ascii	"Calibration_Done\000"
+ 372      62726174 
+ 372      696F6E5F 
+ 372      446F6E65 
+ 372      00
+ 373              		.text
+ 374 023e 00BF     		.align	2
+ 375              		.global	Touchscreen_Calibration
+ 376              		.thumb
+ 377              		.thumb_func
+ 379              	Touchscreen_Calibration:
+ 380              	.LFB56:
+ 133:../tasks/display/ts_calibration.c **** 
+ 134:../tasks/display/ts_calibration.c **** /**
+ 135:../tasks/display/ts_calibration.c ****   * @brief  Performs the TS calibration
+ 136:../tasks/display/ts_calibration.c ****   * @param  None
+ 137:../tasks/display/ts_calibration.c ****   * @retval None
+ 138:../tasks/display/ts_calibration.c ****   */
+ 139:../tasks/display/ts_calibration.c **** void Touchscreen_Calibration (void)
+ 140:../tasks/display/ts_calibration.c **** { 
+ 381              		.loc 1 140 0
+ 382              		.cfi_startproc
+ 383              		@ args = 0, pretend = 0, frame = 568
+ 384              		@ frame_needed = 1, uses_anonymous_args = 0
+ 385 0240 90B5     		push	{r4, r7, lr}
+ 386              		.cfi_def_cfa_offset 12
+ 387              		.cfi_offset 4, -12
+ 388              		.cfi_offset 7, -8
+ 389              		.cfi_offset 14, -4
+ 390 0242 ADF5117D 		sub	sp, sp, #580
+ 391              		.cfi_def_cfa_offset 592
+ 392 0246 02AF     		add	r7, sp, #8
+ 393              		.cfi_def_cfa 7, 584
+ 141:../tasks/display/ts_calibration.c ****   uint8_t status = 0;
+ 394              		.loc 1 141 0
+ 395 0248 0023     		movs	r3, #0
+ 396 024a 87F83632 		strb	r3, [r7, #566]
+ 142:../tasks/display/ts_calibration.c ****   uint8_t i = 0;
+ 397              		.loc 1 142 0
+ 398 024e 0023     		movs	r3, #0
+ 399 0250 87F83732 		strb	r3, [r7, #567]
+ 143:../tasks/display/ts_calibration.c ****   FIL FFile;
+ 144:../tasks/display/ts_calibration.c ****   sFONT Font;
+ 145:../tasks/display/ts_calibration.c **** 
+ 146:../tasks/display/ts_calibration.c ****   TouchscreenCalibration_SetHint();
+ 400              		.loc 1 146 0
+ 401 0254 00F088F9 		bl	TouchscreenCalibration_SetHint
+ 147:../tasks/display/ts_calibration.c ****   printf("TouchscreenCalibration_SetHint\n");
+ 402              		.loc 1 147 0
+ 403 0258 40F20000 		movw	r0, #:lower16:.LC13
+ 404 025c C0F20000 		movt	r0, #:upper16:.LC13
+ 405 0260 FFF7FEFF 		bl	puts
+ 148:../tasks/display/ts_calibration.c **** 
+ 149:../tasks/display/ts_calibration.c ****   status = BSP_TS_Init(BSP_LCD_GetXSize(), BSP_LCD_GetYSize());
+ 406              		.loc 1 149 0
+ 407 0264 FFF7FEFF 		bl	BSP_LCD_GetXSize
+ 408 0268 0346     		mov	r3, r0
+ 409 026a 9CB2     		uxth	r4, r3
+ 410 026c FFF7FEFF 		bl	BSP_LCD_GetYSize
+ 411 0270 0346     		mov	r3, r0
+ 412 0272 9BB2     		uxth	r3, r3
+ 413 0274 2046     		mov	r0, r4
+ 414 0276 1946     		mov	r1, r3
+ 415 0278 FFF7FEFF 		bl	BSP_TS_Init
+ 416 027c 0346     		mov	r3, r0
+ 417 027e 87F83632 		strb	r3, [r7, #566]
+ 150:../tasks/display/ts_calibration.c ****   printf("BSP_TS_Init: %d\n",status);
+ 418              		.loc 1 150 0
+ 419 0282 97F83632 		ldrb	r3, [r7, #566]	@ zero_extendqisi2
+ 420 0286 40F20000 		movw	r0, #:lower16:.LC14
+ 421 028a C0F20000 		movt	r0, #:upper16:.LC14
+ 422 028e 1946     		mov	r1, r3
+ 423 0290 FFF7FEFF 		bl	printf
+ 151:../tasks/display/ts_calibration.c ****   
+ 152:../tasks/display/ts_calibration.c ****   if (status != TS_OK)
+ 424              		.loc 1 152 0
+ 425 0294 97F83632 		ldrb	r3, [r7, #566]	@ zero_extendqisi2
+ 426 0298 002B     		cmp	r3, #0
+ 427 029a 39D0     		beq	.L10
+ 153:../tasks/display/ts_calibration.c ****   {
+ 154:../tasks/display/ts_calibration.c ****     BSP_LCD_SetBackColor(LCD_COLOR_WHITE); 
+ 428              		.loc 1 154 0
+ 429 029c 4FF6FF70 		movw	r0, #65535
+ 430 02a0 FFF7FEFF 		bl	BSP_LCD_SetBackColor
+ 155:../tasks/display/ts_calibration.c ****     BSP_LCD_SetTextColor(LCD_COLOR_RED);
+ 431              		.loc 1 155 0
+ 432 02a4 4FF47840 		mov	r0, #63488
+ 433 02a8 FFF7FEFF 		bl	BSP_LCD_SetTextColor
+ 156:../tasks/display/ts_calibration.c ****     OpenFontFile(&FFile,&Font);
+ 434              		.loc 1 156 0
+ 435 02ac 07F10802 		add	r2, r7, #8
+ 436 02b0 3B46     		mov	r3, r7
+ 437 02b2 1046     		mov	r0, r2
+ 438 02b4 1946     		mov	r1, r3
+ 439 02b6 FFF7FEFF 		bl	OpenFontFile
+ 157:../tasks/display/ts_calibration.c ****     BSP_LCD_DisplayStringAt(&FFile,0, BSP_LCD_GetYSize()- 95,(void *)"ERROR", CENTER_MODE);
+ 440              		.loc 1 157 0
+ 441 02ba FFF7FEFF 		bl	BSP_LCD_GetYSize
+ 442 02be 0346     		mov	r3, r0
+ 443 02c0 9BB2     		uxth	r3, r3
+ 444 02c2 5F3B     		subs	r3, r3, #95
+ 445 02c4 9BB2     		uxth	r3, r3
+ 446 02c6 07F10802 		add	r2, r7, #8
+ 447 02ca 0121     		movs	r1, #1
+ 448 02cc 0091     		str	r1, [sp]
+ 449 02ce 1046     		mov	r0, r2
+ 450 02d0 0021     		movs	r1, #0
+ 451 02d2 1A46     		mov	r2, r3
+ 452 02d4 40F20003 		movw	r3, #:lower16:.LC15
+ 453 02d8 C0F20003 		movt	r3, #:upper16:.LC15
+ 454 02dc FFF7FEFF 		bl	BSP_LCD_DisplayStringAt
+ 158:../tasks/display/ts_calibration.c ****     BSP_LCD_DisplayStringAt(&FFile,0, BSP_LCD_GetYSize()- 80,(void *)"Touchscreen cannot be initial
+ 455              		.loc 1 158 0
+ 456 02e0 FFF7FEFF 		bl	BSP_LCD_GetYSize
+ 457 02e4 0346     		mov	r3, r0
+ 458 02e6 9BB2     		uxth	r3, r3
+ 459 02e8 503B     		subs	r3, r3, #80
+ 460 02ea 9BB2     		uxth	r3, r3
+ 461 02ec 07F10802 		add	r2, r7, #8
+ 462 02f0 0121     		movs	r1, #1
+ 463 02f2 0091     		str	r1, [sp]
+ 464 02f4 1046     		mov	r0, r2
+ 465 02f6 0021     		movs	r1, #0
+ 466 02f8 1A46     		mov	r2, r3
+ 467 02fa 40F20003 		movw	r3, #:lower16:.LC16
+ 468 02fe C0F20003 		movt	r3, #:upper16:.LC16
+ 469 0302 FFF7FEFF 		bl	BSP_LCD_DisplayStringAt
+ 159:../tasks/display/ts_calibration.c ****     CloseFontFile(&FFile);
+ 470              		.loc 1 159 0
+ 471 0306 07F10803 		add	r3, r7, #8
+ 472 030a 1846     		mov	r0, r3
+ 473 030c FFF7FEFF 		bl	CloseFontFile
+ 474              	.L10:
+ 160:../tasks/display/ts_calibration.c ****   }
+ 161:../tasks/display/ts_calibration.c ****   
+ 162:../tasks/display/ts_calibration.c ****   while (1)
+ 163:../tasks/display/ts_calibration.c ****   {
+ 164:../tasks/display/ts_calibration.c ****     if (status == TS_OK)
+ 475              		.loc 1 164 0
+ 476 0310 97F83632 		ldrb	r3, [r7, #566]	@ zero_extendqisi2
+ 477 0314 002B     		cmp	r3, #0
+ 478 0316 40F01F81 		bne	.L11
+ 165:../tasks/display/ts_calibration.c ****     {
+ 166:../tasks/display/ts_calibration.c ****       aLogX[0] = 30;
+ 479              		.loc 1 166 0
+ 480 031a 40F20003 		movw	r3, #:lower16:aLogX
+ 481 031e C0F20003 		movt	r3, #:upper16:aLogX
+ 482 0322 1E22     		movs	r2, #30
+ 483 0324 1A80     		strh	r2, [r3]	@ movhi
+ 167:../tasks/display/ts_calibration.c ****       aLogY[0] = 30;
+ 484              		.loc 1 167 0
+ 485 0326 40F20003 		movw	r3, #:lower16:aLogY
+ 486 032a C0F20003 		movt	r3, #:upper16:aLogY
+ 487 032e 1E22     		movs	r2, #30
+ 488 0330 1A80     		strh	r2, [r3]	@ movhi
+ 168:../tasks/display/ts_calibration.c ****       aLogX[1] = BSP_LCD_GetXSize() - 30;
+ 489              		.loc 1 168 0
+ 490 0332 FFF7FEFF 		bl	BSP_LCD_GetXSize
+ 491 0336 0346     		mov	r3, r0
+ 492 0338 9BB2     		uxth	r3, r3
+ 493 033a 1E3B     		subs	r3, r3, #30
+ 494 033c 9BB2     		uxth	r3, r3
+ 495 033e 9AB2     		uxth	r2, r3
+ 496 0340 40F20003 		movw	r3, #:lower16:aLogX
+ 497 0344 C0F20003 		movt	r3, #:upper16:aLogX
+ 498 0348 5A80     		strh	r2, [r3, #2]	@ movhi
+ 169:../tasks/display/ts_calibration.c ****       aLogY[1] = BSP_LCD_GetYSize() - 30;
+ 499              		.loc 1 169 0
+ 500 034a FFF7FEFF 		bl	BSP_LCD_GetYSize
+ 501 034e 0346     		mov	r3, r0
+ 502 0350 9BB2     		uxth	r3, r3
+ 503 0352 1E3B     		subs	r3, r3, #30
+ 504 0354 9BB2     		uxth	r3, r3
+ 505 0356 9AB2     		uxth	r2, r3
+ 506 0358 40F20003 		movw	r3, #:lower16:aLogY
+ 507 035c C0F20003 		movt	r3, #:upper16:aLogY
+ 508 0360 5A80     		strh	r2, [r3, #2]	@ movhi
+ 170:../tasks/display/ts_calibration.c **** 
+ 171:../tasks/display/ts_calibration.c ****       printf("status = TS_OK,%d,%d,%d,%d\n",aLogX[0],aLogY[0],aLogX[1],aLogY[1]);
+ 509              		.loc 1 171 0
+ 510 0362 40F20003 		movw	r3, #:lower16:aLogX
+ 511 0366 C0F20003 		movt	r3, #:upper16:aLogX
+ 512 036a 1B88     		ldrh	r3, [r3]
+ 513 036c 19B2     		sxth	r1, r3
+ 514 036e 40F20003 		movw	r3, #:lower16:aLogY
+ 515 0372 C0F20003 		movt	r3, #:upper16:aLogY
+ 516 0376 1B88     		ldrh	r3, [r3]
+ 517 0378 1AB2     		sxth	r2, r3
+ 518 037a 40F20003 		movw	r3, #:lower16:aLogX
+ 519 037e C0F20003 		movt	r3, #:upper16:aLogX
+ 520 0382 5B88     		ldrh	r3, [r3, #2]
+ 521 0384 1CB2     		sxth	r4, r3
+ 522 0386 40F20003 		movw	r3, #:lower16:aLogY
+ 523 038a C0F20003 		movt	r3, #:upper16:aLogY
+ 524 038e 5B88     		ldrh	r3, [r3, #2]
+ 525 0390 1BB2     		sxth	r3, r3
+ 526 0392 0093     		str	r3, [sp]
+ 527 0394 40F20000 		movw	r0, #:lower16:.LC17
+ 528 0398 C0F20000 		movt	r0, #:upper16:.LC17
+ 529 039c 2346     		mov	r3, r4
+ 530 039e FFF7FEFF 		bl	printf
+ 172:../tasks/display/ts_calibration.c **** 
+ 173:../tasks/display/ts_calibration.c ****       for (i = 0; i < 2; i++) 
+ 531              		.loc 1 173 0
+ 532 03a2 0023     		movs	r3, #0
+ 533 03a4 87F83732 		strb	r3, [r7, #567]
+ 534 03a8 31E0     		b	.L12
+ 535              	.L13:
+ 174:../tasks/display/ts_calibration.c ****       {
+ 175:../tasks/display/ts_calibration.c ****         GetPhysValues(aLogX[i], aLogY[i], &aPhysX[i], &aPhysY[i]);
+ 536              		.loc 1 175 0 discriminator 2
+ 537 03aa 97F83722 		ldrb	r2, [r7, #567]	@ zero_extendqisi2
+ 538 03ae 40F20003 		movw	r3, #:lower16:aLogX
+ 539 03b2 C0F20003 		movt	r3, #:upper16:aLogX
+ 540 03b6 33F81200 		ldrh	r0, [r3, r2, lsl #1]
+ 541 03ba 97F83722 		ldrb	r2, [r7, #567]	@ zero_extendqisi2
+ 542 03be 40F20003 		movw	r3, #:lower16:aLogY
+ 543 03c2 C0F20003 		movt	r3, #:upper16:aLogY
+ 544 03c6 33F81210 		ldrh	r1, [r3, r2, lsl #1]
+ 545 03ca 97F83732 		ldrb	r3, [r7, #567]	@ zero_extendqisi2
+ 546 03ce 5A00     		lsls	r2, r3, #1
+ 547 03d0 40F20003 		movw	r3, #:lower16:aPhysX
+ 548 03d4 C0F20003 		movt	r3, #:upper16:aPhysX
+ 549 03d8 1A44     		add	r2, r2, r3
+ 550 03da 97F83732 		ldrb	r3, [r7, #567]	@ zero_extendqisi2
+ 551 03de 5C00     		lsls	r4, r3, #1
+ 552 03e0 40F20003 		movw	r3, #:lower16:aPhysY
+ 553 03e4 C0F20003 		movt	r3, #:upper16:aPhysY
+ 554 03e8 2344     		add	r3, r3, r4
+ 555 03ea 00B2     		sxth	r0, r0
+ 556 03ec 09B2     		sxth	r1, r1
+ 557 03ee 00F0F7F8 		bl	GetPhysValues
+ 176:../tasks/display/ts_calibration.c ****         printf("GetPhysValues,%d\n",i);
+ 558              		.loc 1 176 0 discriminator 2
+ 559 03f2 97F83732 		ldrb	r3, [r7, #567]	@ zero_extendqisi2
+ 560 03f6 40F20000 		movw	r0, #:lower16:.LC18
+ 561 03fa C0F20000 		movt	r0, #:upper16:.LC18
+ 562 03fe 1946     		mov	r1, r3
+ 563 0400 FFF7FEFF 		bl	printf
+ 173:../tasks/display/ts_calibration.c ****       {
+ 564              		.loc 1 173 0 discriminator 2
+ 565 0404 97F83732 		ldrb	r3, [r7, #567]	@ zero_extendqisi2
+ 566 0408 0133     		adds	r3, r3, #1
+ 567 040a 87F83732 		strb	r3, [r7, #567]
+ 568              	.L12:
+ 173:../tasks/display/ts_calibration.c ****       {
+ 569              		.loc 1 173 0 is_stmt 0 discriminator 1
+ 570 040e 97F83732 		ldrb	r3, [r7, #567]	@ zero_extendqisi2
+ 571 0412 012B     		cmp	r3, #1
+ 572 0414 C9D9     		bls	.L13
+ 177:../tasks/display/ts_calibration.c **** 
+ 178:../tasks/display/ts_calibration.c ****       }
+ 179:../tasks/display/ts_calibration.c ****       A1 = (1000 * ( aLogX[1] - aLogX[0]))/ ( aPhysX[1] - aPhysX[0]); 
+ 573              		.loc 1 179 0 is_stmt 1
+ 574 0416 40F20003 		movw	r3, #:lower16:aLogX
+ 575 041a C0F20003 		movt	r3, #:upper16:aLogX
+ 576 041e 5B88     		ldrh	r3, [r3, #2]
+ 577 0420 1AB2     		sxth	r2, r3
+ 578 0422 40F20003 		movw	r3, #:lower16:aLogX
+ 579 0426 C0F20003 		movt	r3, #:upper16:aLogX
+ 580 042a 1B88     		ldrh	r3, [r3]
+ 581 042c 1BB2     		sxth	r3, r3
+ 582 042e D31A     		subs	r3, r2, r3
+ 583 0430 4FF47A72 		mov	r2, #1000
+ 584 0434 02FB03F2 		mul	r2, r2, r3
+ 585 0438 40F20003 		movw	r3, #:lower16:aPhysX
+ 586 043c C0F20003 		movt	r3, #:upper16:aPhysX
+ 587 0440 5B88     		ldrh	r3, [r3, #2]
+ 588 0442 19B2     		sxth	r1, r3
+ 589 0444 40F20003 		movw	r3, #:lower16:aPhysX
+ 590 0448 C0F20003 		movt	r3, #:upper16:aPhysX
+ 591 044c 1B88     		ldrh	r3, [r3]
+ 592 044e 1BB2     		sxth	r3, r3
+ 593 0450 CB1A     		subs	r3, r1, r3
+ 594 0452 92FBF3F3 		sdiv	r3, r2, r3
+ 595 0456 9AB2     		uxth	r2, r3
+ 596 0458 40F20003 		movw	r3, #:lower16:A1
+ 597 045c C0F20003 		movt	r3, #:upper16:A1
+ 598 0460 1A80     		strh	r2, [r3]	@ movhi
+ 180:../tasks/display/ts_calibration.c ****       B1 = (1000 * aLogX[0]) - A1 * aPhysX[0]; 
+ 599              		.loc 1 180 0
+ 600 0462 40F20003 		movw	r3, #:lower16:aLogX
+ 601 0466 C0F20003 		movt	r3, #:upper16:aLogX
+ 602 046a 1B88     		ldrh	r3, [r3]
+ 603 046c 9BB2     		uxth	r3, r3
+ 604 046e 1A46     		mov	r2, r3	@ movhi
+ 605 0470 5201     		lsls	r2, r2, #5
+ 606 0472 D21A     		subs	r2, r2, r3
+ 607 0474 9200     		lsls	r2, r2, #2
+ 608 0476 1344     		add	r3, r3, r2
+ 609 0478 DB00     		lsls	r3, r3, #3
+ 610 047a 9AB2     		uxth	r2, r3
+ 611 047c 40F20003 		movw	r3, #:lower16:aPhysX
+ 612 0480 C0F20003 		movt	r3, #:upper16:aPhysX
+ 613 0484 1B88     		ldrh	r3, [r3]
+ 614 0486 99B2     		uxth	r1, r3
+ 615 0488 40F20003 		movw	r3, #:lower16:A1
+ 616 048c C0F20003 		movt	r3, #:upper16:A1
+ 617 0490 1B88     		ldrh	r3, [r3]
+ 618 0492 9BB2     		uxth	r3, r3
+ 619 0494 03FB01F3 		mul	r3, r3, r1
+ 620 0498 9BB2     		uxth	r3, r3
+ 621 049a D31A     		subs	r3, r2, r3
+ 622 049c 9BB2     		uxth	r3, r3
+ 623 049e 9AB2     		uxth	r2, r3
+ 624 04a0 40F20003 		movw	r3, #:lower16:B1
+ 625 04a4 C0F20003 		movt	r3, #:upper16:B1
+ 626 04a8 1A80     		strh	r2, [r3]	@ movhi
+ 181:../tasks/display/ts_calibration.c ****       
+ 182:../tasks/display/ts_calibration.c ****       A2 = (1000 * ( aLogY[1] - aLogY[0]))/ ( aPhysY[1] - aPhysY[0]); 
+ 627              		.loc 1 182 0
+ 628 04aa 40F20003 		movw	r3, #:lower16:aLogY
+ 629 04ae C0F20003 		movt	r3, #:upper16:aLogY
+ 630 04b2 5B88     		ldrh	r3, [r3, #2]
+ 631 04b4 1AB2     		sxth	r2, r3
+ 632 04b6 40F20003 		movw	r3, #:lower16:aLogY
+ 633 04ba C0F20003 		movt	r3, #:upper16:aLogY
+ 634 04be 1B88     		ldrh	r3, [r3]
+ 635 04c0 1BB2     		sxth	r3, r3
+ 636 04c2 D31A     		subs	r3, r2, r3
+ 637 04c4 4FF47A72 		mov	r2, #1000
+ 638 04c8 02FB03F2 		mul	r2, r2, r3
+ 639 04cc 40F20003 		movw	r3, #:lower16:aPhysY
+ 640 04d0 C0F20003 		movt	r3, #:upper16:aPhysY
+ 641 04d4 5B88     		ldrh	r3, [r3, #2]
+ 642 04d6 19B2     		sxth	r1, r3
+ 643 04d8 40F20003 		movw	r3, #:lower16:aPhysY
+ 644 04dc C0F20003 		movt	r3, #:upper16:aPhysY
+ 645 04e0 1B88     		ldrh	r3, [r3]
+ 646 04e2 1BB2     		sxth	r3, r3
+ 647 04e4 CB1A     		subs	r3, r1, r3
+ 648 04e6 92FBF3F3 		sdiv	r3, r2, r3
+ 649 04ea 9AB2     		uxth	r2, r3
+ 650 04ec 40F20003 		movw	r3, #:lower16:A2
+ 651 04f0 C0F20003 		movt	r3, #:upper16:A2
+ 652 04f4 1A80     		strh	r2, [r3]	@ movhi
+ 183:../tasks/display/ts_calibration.c ****       B2 = (1000 * aLogY[0]) - A2 * aPhysY[0]; 
+ 653              		.loc 1 183 0
+ 654 04f6 40F20003 		movw	r3, #:lower16:aLogY
+ 655 04fa C0F20003 		movt	r3, #:upper16:aLogY
+ 656 04fe 1B88     		ldrh	r3, [r3]
+ 657 0500 9BB2     		uxth	r3, r3
+ 658 0502 1A46     		mov	r2, r3	@ movhi
+ 659 0504 5201     		lsls	r2, r2, #5
+ 660 0506 D21A     		subs	r2, r2, r3
+ 661 0508 9200     		lsls	r2, r2, #2
+ 662 050a 1344     		add	r3, r3, r2
+ 663 050c DB00     		lsls	r3, r3, #3
+ 664 050e 9AB2     		uxth	r2, r3
+ 665 0510 40F20003 		movw	r3, #:lower16:aPhysY
+ 666 0514 C0F20003 		movt	r3, #:upper16:aPhysY
+ 667 0518 1B88     		ldrh	r3, [r3]
+ 668 051a 99B2     		uxth	r1, r3
+ 669 051c 40F20003 		movw	r3, #:lower16:A2
+ 670 0520 C0F20003 		movt	r3, #:upper16:A2
+ 671 0524 1B88     		ldrh	r3, [r3]
+ 672 0526 9BB2     		uxth	r3, r3
+ 673 0528 03FB01F3 		mul	r3, r3, r1
+ 674 052c 9BB2     		uxth	r3, r3
+ 675 052e D31A     		subs	r3, r2, r3
+ 676 0530 9BB2     		uxth	r3, r3
+ 677 0532 9AB2     		uxth	r2, r3
+ 678 0534 40F20003 		movw	r3, #:lower16:B2
+ 679 0538 C0F20003 		movt	r3, #:upper16:B2
+ 680 053c 1A80     		strh	r2, [r3]	@ movhi
+ 184:../tasks/display/ts_calibration.c ****       
+ 185:../tasks/display/ts_calibration.c ****       Calibration_Done = 1;
+ 681              		.loc 1 185 0
+ 682 053e 40F20003 		movw	r3, #:lower16:Calibration_Done
+ 683 0542 C0F20003 		movt	r3, #:upper16:Calibration_Done
+ 684 0546 0122     		movs	r2, #1
+ 685 0548 1A70     		strb	r2, [r3]
+ 186:../tasks/display/ts_calibration.c ****       printf("Calibration_Done\n");
+ 686              		.loc 1 186 0
+ 687 054a 40F20000 		movw	r0, #:lower16:.LC19
+ 688 054e C0F20000 		movt	r0, #:upper16:.LC19
+ 689 0552 FFF7FEFF 		bl	puts
+ 187:../tasks/display/ts_calibration.c **** 
+ 188:../tasks/display/ts_calibration.c ****       return;
+ 690              		.loc 1 188 0
+ 691 0556 03E0     		b	.L16
+ 692              	.L11:
+ 189:../tasks/display/ts_calibration.c ****     }
+ 190:../tasks/display/ts_calibration.c ****    
+ 191:../tasks/display/ts_calibration.c ****     HAL_Delay(5);
+ 693              		.loc 1 191 0
+ 694 0558 0520     		movs	r0, #5
+ 695 055a FFF7FEFF 		bl	HAL_Delay
+ 192:../tasks/display/ts_calibration.c ****   }
+ 696              		.loc 1 192 0
+ 697 055e D7E6     		b	.L10
+ 698              	.L16:
+ 193:../tasks/display/ts_calibration.c **** }
+ 699              		.loc 1 193 0
+ 700 0560 07F50F77 		add	r7, r7, #572
+ 701 0564 BD46     		mov	sp, r7
+ 702              		@ sp needed
+ 703 0566 90BD     		pop	{r4, r7, pc}
+ 704              		.cfi_endproc
+ 705              	.LFE56:
+ 707              		.section	.rodata
+ 708 0199 000000   		.align	2
+ 709              	.LC20:
+ 710 019c CAE0EBE8 		.ascii	"\312\340\353\350\341\360\356\342\352\340\000"
+ 710      E1F0EEE2 
+ 710      EAE000
+ 711              		.text
+ 712              		.align	2
+ 713              		.thumb
+ 714              		.thumb_func
+ 716              	TouchscreenCalibration_SetHint:
+ 717              	.LFB57:
+ 194:../tasks/display/ts_calibration.c **** 
+ 195:../tasks/display/ts_calibration.c **** /**
+ 196:../tasks/display/ts_calibration.c ****   * @brief  Display calibration hint
+ 197:../tasks/display/ts_calibration.c ****   * @param  None
+ 198:../tasks/display/ts_calibration.c ****   * @retval None
+ 199:../tasks/display/ts_calibration.c ****   */
+ 200:../tasks/display/ts_calibration.c **** static void TouchscreenCalibration_SetHint(void)
+ 201:../tasks/display/ts_calibration.c **** {
+ 718              		.loc 1 201 0
+ 719              		.cfi_startproc
+ 720              		@ args = 0, pretend = 0, frame = 568
+ 721              		@ frame_needed = 1, uses_anonymous_args = 0
+ 722 0568 B0B5     		push	{r4, r5, r7, lr}
+ 723              		.cfi_def_cfa_offset 16
+ 724              		.cfi_offset 4, -16
+ 725              		.cfi_offset 5, -12
+ 726              		.cfi_offset 7, -8
+ 727              		.cfi_offset 14, -4
+ 728 056a ADF5107D 		sub	sp, sp, #576
+ 729              		.cfi_def_cfa_offset 592
+ 730 056e 02AF     		add	r7, sp, #8
+ 731              		.cfi_def_cfa 7, 584
+ 202:../tasks/display/ts_calibration.c ****   FIL	Fontfile;
+ 203:../tasks/display/ts_calibration.c ****   sFONT Font;
+ 204:../tasks/display/ts_calibration.c **** 
+ 205:../tasks/display/ts_calibration.c ****   /* Clear the LCD */ 
+ 206:../tasks/display/ts_calibration.c ****   BSP_LCD_Clear(LCD_COLOR_WHITE);
+ 732              		.loc 1 206 0
+ 733 0570 4FF6FF70 		movw	r0, #65535
+ 734 0574 FFF7FEFF 		bl	BSP_LCD_Clear
+ 207:../tasks/display/ts_calibration.c ****   
+ 208:../tasks/display/ts_calibration.c ****   /* Set Touchscreen Demo description */
+ 209:../tasks/display/ts_calibration.c ****   BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+ 735              		.loc 1 209 0
+ 736 0578 0020     		movs	r0, #0
+ 737 057a FFF7FEFF 		bl	BSP_LCD_SetTextColor
+ 210:../tasks/display/ts_calibration.c ****   BSP_LCD_SetBackColor(LCD_COLOR_WHITE);
+ 738              		.loc 1 210 0
+ 739 057e 4FF6FF70 		movw	r0, #65535
+ 740 0582 FFF7FEFF 		bl	BSP_LCD_SetBackColor
+ 211:../tasks/display/ts_calibration.c ****   OpenFontFile(&Fontfile,&Font);
+ 741              		.loc 1 211 0
+ 742 0586 07F10C02 		add	r2, r7, #12
+ 743 058a 3B1D     		adds	r3, r7, #4
+ 744 058c 1046     		mov	r0, r2
+ 745 058e 1946     		mov	r1, r3
+ 746 0590 FFF7FEFF 		bl	OpenFontFile
+ 212:../tasks/display/ts_calibration.c **** //  BSP_LCD_SetFont((uint16_t *)&Font.table);		//DrawProp.FileName
+ 213:../tasks/display/ts_calibration.c **** 
+ 214:../tasks/display/ts_calibration.c ****   BSP_LCD_DisplayStringAt(&Fontfile, BSP_LCD_GetXSize()/2, BSP_LCD_GetYSize()/2-BSP_LCD_GetTextHeig
+ 747              		.loc 1 214 0
+ 748 0594 FFF7FEFF 		bl	BSP_LCD_GetXSize
+ 749 0598 0346     		mov	r3, r0
+ 750 059a 5B08     		lsrs	r3, r3, #1
+ 751 059c 9CB2     		uxth	r4, r3
+ 752 059e FFF7FEFF 		bl	BSP_LCD_GetYSize
+ 753 05a2 0346     		mov	r3, r0
+ 754 05a4 5B08     		lsrs	r3, r3, #1
+ 755 05a6 9DB2     		uxth	r5, r3
+ 756 05a8 FFF7FEFF 		bl	BSP_LCD_GetTextHeight
+ 757 05ac 0346     		mov	r3, r0
+ 758 05ae EB1A     		subs	r3, r5, r3
+ 759 05b0 9BB2     		uxth	r3, r3
+ 760 05b2 07F10C02 		add	r2, r7, #12
+ 761 05b6 0121     		movs	r1, #1
+ 762 05b8 0091     		str	r1, [sp]
+ 763 05ba 1046     		mov	r0, r2
+ 764 05bc 2146     		mov	r1, r4
+ 765 05be 1A46     		mov	r2, r3
+ 766 05c0 40F20003 		movw	r3, #:lower16:.LC20
+ 767 05c4 C0F20003 		movt	r3, #:upper16:.LC20
+ 768 05c8 FFF7FEFF 		bl	BSP_LCD_DisplayStringAt
+ 215:../tasks/display/ts_calibration.c **** 
+ 216:../tasks/display/ts_calibration.c **** //  BSP_LCD_DisplayStringAt(&Fontfile, BSP_LCD_GetXSize()/2, BSP_LCD_GetYSize()/2-BSP_LCD_GetTextHe
+ 217:../tasks/display/ts_calibration.c **** //  BSP_LCD_DisplayStringAt(&Fontfile, BSP_LCD_GetXSize()/2, BSP_LCD_GetYSize()/2,(void *)"you need
+ 218:../tasks/display/ts_calibration.c **** //  BSP_LCD_DisplayStringAt(&Fontfile, BSP_LCD_GetXSize()/2, BSP_LCD_GetYSize()/2+BSP_LCD_GetTextHe
+ 219:../tasks/display/ts_calibration.c ****   CloseFontFile(&Fontfile);
+ 769              		.loc 1 219 0
+ 770 05cc 07F10C03 		add	r3, r7, #12
+ 771 05d0 1846     		mov	r0, r3
+ 772 05d2 FFF7FEFF 		bl	CloseFontFile
+ 220:../tasks/display/ts_calibration.c **** 
+ 221:../tasks/display/ts_calibration.c **** }
+ 773              		.loc 1 221 0
+ 774 05d6 07F50E77 		add	r7, r7, #568
+ 775 05da BD46     		mov	sp, r7
+ 776              		@ sp needed
+ 777 05dc B0BD     		pop	{r4, r5, r7, pc}
+ 778              		.cfi_endproc
+ 779              	.LFE57:
+ 781              		.section	.rodata
+ 782 01a7 00       		.align	2
+ 783              	.LC21:
+ 784 01a8 5B54535D 		.ascii	"[TS] I:GetPhysValues - WaitForPressedState.......\000"
+ 784      20493A47 
+ 784      65745068 
+ 784      79735661 
+ 784      6C756573 
+ 785 01da 0000     		.align	2
+ 786              	.LC22:
+ 787 01dc 5B54535D 		.ascii	"[TS] I:GetPhysValues - WaitForPressedState(1). X=%d"
+ 787      20493A47 
+ 787      65745068 
+ 787      79735661 
+ 787      6C756573 
+ 788 020f 2C20593D 		.ascii	", Y=%d\012\000"
+ 788      25640A00 
+ 789 0217 00       		.align	2
+ 790              	.LC23:
+ 791 0218 5B54535D 		.ascii	"[TS] I:GetPhysValues - BSP_TS_GetState X=%d, Y=%d\012"
+ 791      20493A47 
+ 791      65745068 
+ 791      79735661 
+ 791      6C756573 
+ 792 024a 00       		.ascii	"\000"
+ 793 024b 00       		.align	2
+ 794              	.LC24:
+ 795 024c 5B54535D 		.ascii	"[TS] I:GetPhysValues - WaitForPressedState(0)\000"
+ 795      20493A47 
+ 795      65745068 
+ 795      79735661 
+ 795      6C756573 
+ 796              		.text
+ 797 05de 00BF     		.align	2
+ 798              		.thumb
+ 799              		.thumb_func
+ 801              	GetPhysValues:
+ 802              	.LFB58:
+ 222:../tasks/display/ts_calibration.c **** 
+ 223:../tasks/display/ts_calibration.c **** 
+ 224:../tasks/display/ts_calibration.c **** /**
+ 225:../tasks/display/ts_calibration.c ****   * @brief  Get Physical position
+ 226:../tasks/display/ts_calibration.c ****   * @param  LogX : logical X position
+ 227:../tasks/display/ts_calibration.c ****   * @param  LogY : logical Y position
+ 228:../tasks/display/ts_calibration.c ****   * @param  pPhysX : Physical X position
+ 229:../tasks/display/ts_calibration.c ****   * @param  pPhysY : Physical Y position
+ 230:../tasks/display/ts_calibration.c ****   * @retval None
+ 231:../tasks/display/ts_calibration.c ****   */
+ 232:../tasks/display/ts_calibration.c **** static void GetPhysValues(int16_t LogX, int16_t LogY, int16_t * pPhysX, int16_t * pPhysY) 
+ 233:../tasks/display/ts_calibration.c **** {
+ 803              		.loc 1 233 0
+ 804              		.cfi_startproc
+ 805              		@ args = 0, pretend = 0, frame = 16
+ 806              		@ frame_needed = 1, uses_anonymous_args = 0
+ 807 05e0 80B5     		push	{r7, lr}
+ 808              		.cfi_def_cfa_offset 8
+ 809              		.cfi_offset 7, -8
+ 810              		.cfi_offset 14, -4
+ 811 05e2 84B0     		sub	sp, sp, #16
+ 812              		.cfi_def_cfa_offset 24
+ 813 05e4 00AF     		add	r7, sp, #0
+ 814              		.cfi_def_cfa_register 7
+ 815 05e6 BA60     		str	r2, [r7, #8]
+ 816 05e8 7B60     		str	r3, [r7, #4]
+ 817 05ea 0346     		mov	r3, r0	@ movhi
+ 818 05ec FB81     		strh	r3, [r7, #14]	@ movhi
+ 819 05ee 0B46     		mov	r3, r1	@ movhi
+ 820 05f0 BB81     		strh	r3, [r7, #12]	@ movhi
+ 234:../tasks/display/ts_calibration.c ****   /* Draw the ring */
+ 235:../tasks/display/ts_calibration.c ****   BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+ 821              		.loc 1 235 0
+ 822 05f2 0020     		movs	r0, #0
+ 823 05f4 FFF7FEFF 		bl	BSP_LCD_SetTextColor
+ 236:../tasks/display/ts_calibration.c ****   BSP_LCD_FillCircle(LogX, LogY, 5);
+ 824              		.loc 1 236 0
+ 825 05f8 FA89     		ldrh	r2, [r7, #14]
+ 826 05fa BB89     		ldrh	r3, [r7, #12]
+ 827 05fc 1046     		mov	r0, r2
+ 828 05fe 1946     		mov	r1, r3
+ 829 0600 0522     		movs	r2, #5
+ 830 0602 FFF7FEFF 		bl	BSP_LCD_FillCircle
+ 237:../tasks/display/ts_calibration.c ****   BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+ 831              		.loc 1 237 0
+ 832 0606 4FF6FF70 		movw	r0, #65535
+ 833 060a FFF7FEFF 		bl	BSP_LCD_SetTextColor
+ 238:../tasks/display/ts_calibration.c ****   BSP_LCD_FillCircle(LogX, LogY, 2);
+ 834              		.loc 1 238 0
+ 835 060e FA89     		ldrh	r2, [r7, #14]
+ 836 0610 BB89     		ldrh	r3, [r7, #12]
+ 837 0612 1046     		mov	r0, r2
+ 838 0614 1946     		mov	r1, r3
+ 839 0616 0222     		movs	r2, #2
+ 840 0618 FFF7FEFF 		bl	BSP_LCD_FillCircle
+ 239:../tasks/display/ts_calibration.c **** 
+ 240:../tasks/display/ts_calibration.c ****   printf("[TS] I:GetPhysValues - WaitForPressedState.......\n");
+ 841              		.loc 1 240 0
+ 842 061c 40F20000 		movw	r0, #:lower16:.LC21
+ 843 0620 C0F20000 		movt	r0, #:upper16:.LC21
+ 844 0624 FFF7FEFF 		bl	puts
+ 241:../tasks/display/ts_calibration.c **** 
+ 242:../tasks/display/ts_calibration.c ****   /* Wait until touch is pressed */
+ 243:../tasks/display/ts_calibration.c ****   WaitForPressedState(1);
+ 845              		.loc 1 243 0
+ 846 0628 0120     		movs	r0, #1
+ 847 062a 00F053F8 		bl	WaitForPressedState
+ 244:../tasks/display/ts_calibration.c ****   printf("[TS] I:GetPhysValues - WaitForPressedState(1). X=%d, Y=%d\n",TS_State.x,TS_State.y);
+ 848              		.loc 1 244 0
+ 849 062e 40F20003 		movw	r3, #:lower16:TS_State
+ 850 0632 C0F20003 		movt	r3, #:upper16:TS_State
+ 851 0636 5B88     		ldrh	r3, [r3, #2]
+ 852 0638 1A46     		mov	r2, r3
+ 853 063a 40F20003 		movw	r3, #:lower16:TS_State
+ 854 063e C0F20003 		movt	r3, #:upper16:TS_State
+ 855 0642 9B88     		ldrh	r3, [r3, #4]
+ 856 0644 40F20000 		movw	r0, #:lower16:.LC22
+ 857 0648 C0F20000 		movt	r0, #:upper16:.LC22
+ 858 064c 1146     		mov	r1, r2
+ 859 064e 1A46     		mov	r2, r3
+ 860 0650 FFF7FEFF 		bl	printf
+ 245:../tasks/display/ts_calibration.c **** 
+ 246:../tasks/display/ts_calibration.c ****   BSP_TS_GetState(&TS_State);
+ 861              		.loc 1 246 0
+ 862 0654 40F20000 		movw	r0, #:lower16:TS_State
+ 863 0658 C0F20000 		movt	r0, #:upper16:TS_State
+ 864 065c FFF7FEFF 		bl	BSP_TS_GetState
+ 247:../tasks/display/ts_calibration.c ****   *pPhysX = TS_State.x;
+ 865              		.loc 1 247 0
+ 866 0660 40F20003 		movw	r3, #:lower16:TS_State
+ 867 0664 C0F20003 		movt	r3, #:upper16:TS_State
+ 868 0668 5B88     		ldrh	r3, [r3, #2]
+ 869 066a 9AB2     		uxth	r2, r3
+ 870 066c BB68     		ldr	r3, [r7, #8]
+ 871 066e 1A80     		strh	r2, [r3]	@ movhi
+ 248:../tasks/display/ts_calibration.c ****   *pPhysY = TS_State.y; 
+ 872              		.loc 1 248 0
+ 873 0670 40F20003 		movw	r3, #:lower16:TS_State
+ 874 0674 C0F20003 		movt	r3, #:upper16:TS_State
+ 875 0678 9B88     		ldrh	r3, [r3, #4]
+ 876 067a 9AB2     		uxth	r2, r3
+ 877 067c 7B68     		ldr	r3, [r7, #4]
+ 878 067e 1A80     		strh	r2, [r3]	@ movhi
+ 249:../tasks/display/ts_calibration.c ****   
+ 250:../tasks/display/ts_calibration.c ****   printf("[TS] I:GetPhysValues - BSP_TS_GetState X=%d, Y=%d\n",TS_State.x,TS_State.y);
+ 879              		.loc 1 250 0
+ 880 0680 40F20003 		movw	r3, #:lower16:TS_State
+ 881 0684 C0F20003 		movt	r3, #:upper16:TS_State
+ 882 0688 5B88     		ldrh	r3, [r3, #2]
+ 883 068a 1A46     		mov	r2, r3
+ 884 068c 40F20003 		movw	r3, #:lower16:TS_State
+ 885 0690 C0F20003 		movt	r3, #:upper16:TS_State
+ 886 0694 9B88     		ldrh	r3, [r3, #4]
+ 887 0696 40F20000 		movw	r0, #:lower16:.LC23
+ 888 069a C0F20000 		movt	r0, #:upper16:.LC23
+ 889 069e 1146     		mov	r1, r2
+ 890 06a0 1A46     		mov	r2, r3
+ 891 06a2 FFF7FEFF 		bl	printf
+ 251:../tasks/display/ts_calibration.c **** 
+ 252:../tasks/display/ts_calibration.c ****   /* Wait until touch is released */
+ 253:../tasks/display/ts_calibration.c ****   WaitForPressedState(0);
+ 892              		.loc 1 253 0
+ 893 06a6 0020     		movs	r0, #0
+ 894 06a8 00F014F8 		bl	WaitForPressedState
+ 254:../tasks/display/ts_calibration.c ****   printf("[TS] I:GetPhysValues - WaitForPressedState(0)\n");
+ 895              		.loc 1 254 0
+ 896 06ac 40F20000 		movw	r0, #:lower16:.LC24
+ 897 06b0 C0F20000 		movt	r0, #:upper16:.LC24
+ 898 06b4 FFF7FEFF 		bl	puts
+ 255:../tasks/display/ts_calibration.c **** 
+ 256:../tasks/display/ts_calibration.c ****   BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+ 899              		.loc 1 256 0
+ 900 06b8 4FF6FF70 		movw	r0, #65535
+ 901 06bc FFF7FEFF 		bl	BSP_LCD_SetTextColor
+ 257:../tasks/display/ts_calibration.c ****   BSP_LCD_FillCircle(LogX, LogY, 5);
+ 902              		.loc 1 257 0
+ 903 06c0 FA89     		ldrh	r2, [r7, #14]
+ 904 06c2 BB89     		ldrh	r3, [r7, #12]
+ 905 06c4 1046     		mov	r0, r2
+ 906 06c6 1946     		mov	r1, r3
+ 907 06c8 0522     		movs	r2, #5
+ 908 06ca FFF7FEFF 		bl	BSP_LCD_FillCircle
+ 258:../tasks/display/ts_calibration.c **** }
+ 909              		.loc 1 258 0
+ 910 06ce 1037     		adds	r7, r7, #16
+ 911 06d0 BD46     		mov	sp, r7
+ 912              		@ sp needed
+ 913 06d2 80BD     		pop	{r7, pc}
+ 914              		.cfi_endproc
+ 915              	.LFE58:
+ 917              		.section	.rodata
+ 918 027a 0000     		.align	2
+ 919              	.LC25:
+ 920 027c 5B54535D 		.ascii	"[TS] I: WaitForPressedState->BSP_TS_GetState, %d \012"
+ 920      20493A20 
+ 920      57616974 
+ 920      466F7250 
+ 920      72657373 
+ 921 02ae 00       		.ascii	"\000"
+ 922 02af 00       		.text
+ 923              		.align	2
+ 924              		.thumb
+ 925              		.thumb_func
+ 927              	WaitForPressedState:
+ 928              	.LFB59:
+ 259:../tasks/display/ts_calibration.c **** 
+ 260:../tasks/display/ts_calibration.c **** /**
+ 261:../tasks/display/ts_calibration.c ****   * @brief  wait for touch detected
+ 262:../tasks/display/ts_calibration.c ****   * @param  Pressed: touch pressed. 
+ 263:../tasks/display/ts_calibration.c ****   * @retval None
+ 264:../tasks/display/ts_calibration.c ****   */
+ 265:../tasks/display/ts_calibration.c **** static void WaitForPressedState(uint8_t Pressed) 
+ 266:../tasks/display/ts_calibration.c **** {
+ 929              		.loc 1 266 0
+ 930              		.cfi_startproc
+ 931              		@ args = 0, pretend = 0, frame = 24
+ 932              		@ frame_needed = 1, uses_anonymous_args = 0
+ 933 06d4 80B5     		push	{r7, lr}
+ 934              		.cfi_def_cfa_offset 8
+ 935              		.cfi_offset 7, -8
+ 936              		.cfi_offset 14, -4
+ 937 06d6 86B0     		sub	sp, sp, #24
+ 938              		.cfi_def_cfa_offset 32
+ 939 06d8 00AF     		add	r7, sp, #0
+ 940              		.cfi_def_cfa_register 7
+ 941 06da 0346     		mov	r3, r0
+ 942 06dc FB71     		strb	r3, [r7, #7]
+ 943              	.L26:
+ 267:../tasks/display/ts_calibration.c ****   TS_StateTypeDef  State;
+ 268:../tasks/display/ts_calibration.c ****   
+ 269:../tasks/display/ts_calibration.c ****   do 
+ 270:../tasks/display/ts_calibration.c ****   {
+ 271:../tasks/display/ts_calibration.c ****     BSP_TS_GetState(&State);
+ 944              		.loc 1 271 0
+ 945 06de 07F10C03 		add	r3, r7, #12
+ 946 06e2 1846     		mov	r0, r3
+ 947 06e4 FFF7FEFF 		bl	BSP_TS_GetState
+ 272:../tasks/display/ts_calibration.c ****     if (State.TouchDetected) printf("[TS] I: WaitForPressedState->BSP_TS_GetState, %d \n",State.Tou
+ 948              		.loc 1 272 0
+ 949 06e8 BB89     		ldrh	r3, [r7, #12]
+ 950 06ea 002B     		cmp	r3, #0
+ 951 06ec 07D0     		beq	.L20
+ 952              		.loc 1 272 0 is_stmt 0 discriminator 1
+ 953 06ee BB89     		ldrh	r3, [r7, #12]
+ 954 06f0 40F20000 		movw	r0, #:lower16:.LC25
+ 955 06f4 C0F20000 		movt	r0, #:upper16:.LC25
+ 956 06f8 1946     		mov	r1, r3
+ 957 06fa FFF7FEFF 		bl	printf
+ 958              	.L20:
+ 273:../tasks/display/ts_calibration.c **** 
+ 274:../tasks/display/ts_calibration.c ****     HAL_Delay(10);
+ 959              		.loc 1 274 0 is_stmt 1
+ 960 06fe 0A20     		movs	r0, #10
+ 961 0700 FFF7FEFF 		bl	HAL_Delay
+ 275:../tasks/display/ts_calibration.c ****     if (State.TouchDetected == Pressed) 
+ 962              		.loc 1 275 0
+ 963 0704 BA89     		ldrh	r2, [r7, #12]
+ 964 0706 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 965 0708 9BB2     		uxth	r3, r3
+ 966 070a 9A42     		cmp	r2, r3
+ 967 070c 1BD1     		bne	.L21
+ 968              	.LBB2:
+ 276:../tasks/display/ts_calibration.c ****     {
+ 277:../tasks/display/ts_calibration.c ****       uint16_t TimeStart = HAL_GetTick();
+ 969              		.loc 1 277 0
+ 970 070e FFF7FEFF 		bl	HAL_GetTick
+ 971 0712 0346     		mov	r3, r0
+ 972 0714 FB82     		strh	r3, [r7, #22]	@ movhi
+ 973              	.L25:
+ 278:../tasks/display/ts_calibration.c ****       do {
+ 279:../tasks/display/ts_calibration.c ****         BSP_TS_GetState(&State);      
+ 974              		.loc 1 279 0
+ 975 0716 07F10C03 		add	r3, r7, #12
+ 976 071a 1846     		mov	r0, r3
+ 977 071c FFF7FEFF 		bl	BSP_TS_GetState
+ 280:../tasks/display/ts_calibration.c ****         HAL_Delay(10);
+ 978              		.loc 1 280 0
+ 979 0720 0A20     		movs	r0, #10
+ 980 0722 FFF7FEFF 		bl	HAL_Delay
+ 281:../tasks/display/ts_calibration.c ****         if (State.TouchDetected != Pressed) 
+ 981              		.loc 1 281 0
+ 982 0726 BA89     		ldrh	r2, [r7, #12]
+ 983 0728 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 984 072a 9BB2     		uxth	r3, r3
+ 985 072c 9A42     		cmp	r2, r3
+ 986 072e 00D0     		beq	.L22
+ 282:../tasks/display/ts_calibration.c ****         {
+ 283:../tasks/display/ts_calibration.c ****           break;
+ 987              		.loc 1 283 0
+ 988 0730 09E0     		b	.L21
+ 989              	.L22:
+ 284:../tasks/display/ts_calibration.c ****         } else if ((HAL_GetTick() - 100) > TimeStart) 
+ 990              		.loc 1 284 0
+ 991 0732 FFF7FEFF 		bl	HAL_GetTick
+ 992 0736 0346     		mov	r3, r0
+ 993 0738 A3F16402 		sub	r2, r3, #100
+ 994 073c FB8A     		ldrh	r3, [r7, #22]
+ 995 073e 9A42     		cmp	r2, r3
+ 996 0740 00D9     		bls	.L23
+ 285:../tasks/display/ts_calibration.c ****         {
+ 286:../tasks/display/ts_calibration.c ****           return;
+ 997              		.loc 1 286 0
+ 998 0742 01E0     		b	.L28
+ 999              	.L23:
+ 287:../tasks/display/ts_calibration.c ****         }
+ 288:../tasks/display/ts_calibration.c ****       } while (1);
+ 1000              		.loc 1 288 0
+ 1001 0744 E7E7     		b	.L25
+ 1002              	.L21:
+ 1003              	.LBE2:
+ 289:../tasks/display/ts_calibration.c ****     }
+ 290:../tasks/display/ts_calibration.c ****   } while (1);
+ 1004              		.loc 1 290 0
+ 1005 0746 CAE7     		b	.L26
+ 1006              	.L28:
+ 291:../tasks/display/ts_calibration.c **** }
+ 1007              		.loc 1 291 0
+ 1008 0748 1837     		adds	r7, r7, #24
+ 1009 074a BD46     		mov	sp, r7
+ 1010              		@ sp needed
+ 1011 074c 80BD     		pop	{r7, pc}
+ 1012              		.cfi_endproc
+ 1013              	.LFE59:
+ 1015 074e 00BF     		.align	2
+ 1016              		.global	Calibration_GetX
+ 1017              		.thumb
+ 1018              		.thumb_func
+ 1020              	Calibration_GetX:
+ 1021              	.LFB60:
+ 292:../tasks/display/ts_calibration.c **** 
+ 293:../tasks/display/ts_calibration.c **** /**
+ 294:../tasks/display/ts_calibration.c ****   * @brief  Calibrate X position
+ 295:../tasks/display/ts_calibration.c ****   * @param  x : X position
+ 296:../tasks/display/ts_calibration.c ****   * @retval calibrated x
+ 297:../tasks/display/ts_calibration.c ****   */
+ 298:../tasks/display/ts_calibration.c **** uint16_t Calibration_GetX(uint16_t x)
+ 299:../tasks/display/ts_calibration.c **** {
+ 1022              		.loc 1 299 0
+ 1023              		.cfi_startproc
+ 1024              		@ args = 0, pretend = 0, frame = 8
+ 1025              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1026              		@ link register save eliminated.
+ 1027 0750 80B4     		push	{r7}
+ 1028              		.cfi_def_cfa_offset 4
+ 1029              		.cfi_offset 7, -4
+ 1030 0752 83B0     		sub	sp, sp, #12
+ 1031              		.cfi_def_cfa_offset 16
+ 1032 0754 00AF     		add	r7, sp, #0
+ 1033              		.cfi_def_cfa_register 7
+ 1034 0756 0346     		mov	r3, r0
+ 1035 0758 FB80     		strh	r3, [r7, #6]	@ movhi
+ 300:../tasks/display/ts_calibration.c ****   return (((A1 * x) + B1)/1000);
+ 1036              		.loc 1 300 0
+ 1037 075a 40F20003 		movw	r3, #:lower16:A1
+ 1038 075e C0F20003 		movt	r3, #:upper16:A1
+ 1039 0762 1B88     		ldrh	r3, [r3]
+ 1040 0764 1BB2     		sxth	r3, r3
+ 1041 0766 FA88     		ldrh	r2, [r7, #6]
+ 1042 0768 02FB03F2 		mul	r2, r2, r3
+ 1043 076c 40F20003 		movw	r3, #:lower16:B1
+ 1044 0770 C0F20003 		movt	r3, #:upper16:B1
+ 1045 0774 1B88     		ldrh	r3, [r3]
+ 1046 0776 1BB2     		sxth	r3, r3
+ 1047 0778 1A44     		add	r2, r2, r3
+ 1048 077a 44F6D353 		movw	r3, #19923
+ 1049 077e C1F26203 		movt	r3, 4194
+ 1050 0782 83FB0213 		smull	r1, r3, r3, r2
+ 1051 0786 9911     		asrs	r1, r3, #6
+ 1052 0788 D317     		asrs	r3, r2, #31
+ 1053 078a CB1A     		subs	r3, r1, r3
+ 1054 078c 9BB2     		uxth	r3, r3
+ 301:../tasks/display/ts_calibration.c **** }
+ 1055              		.loc 1 301 0
+ 1056 078e 1846     		mov	r0, r3
+ 1057 0790 0C37     		adds	r7, r7, #12
+ 1058 0792 BD46     		mov	sp, r7
+ 1059              		@ sp needed
+ 1060 0794 5DF8047B 		ldr	r7, [sp], #4
+ 1061 0798 7047     		bx	lr
+ 1062              		.cfi_endproc
+ 1063              	.LFE60:
+ 1065 079a 00BF     		.align	2
+ 1066              		.global	Calibration_GetY
+ 1067              		.thumb
+ 1068              		.thumb_func
+ 1070              	Calibration_GetY:
+ 1071              	.LFB61:
+ 302:../tasks/display/ts_calibration.c **** 
+ 303:../tasks/display/ts_calibration.c **** /**
+ 304:../tasks/display/ts_calibration.c ****   * @brief  Calibrate Y position
+ 305:../tasks/display/ts_calibration.c ****   * @param  y : Y position
+ 306:../tasks/display/ts_calibration.c ****   * @retval calibrated y
+ 307:../tasks/display/ts_calibration.c ****   */
+ 308:../tasks/display/ts_calibration.c **** uint16_t Calibration_GetY(uint16_t y)
+ 309:../tasks/display/ts_calibration.c **** {
+ 1072              		.loc 1 309 0
+ 1073              		.cfi_startproc
+ 1074              		@ args = 0, pretend = 0, frame = 8
+ 1075              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1076              		@ link register save eliminated.
+ 1077 079c 80B4     		push	{r7}
+ 1078              		.cfi_def_cfa_offset 4
+ 1079              		.cfi_offset 7, -4
+ 1080 079e 83B0     		sub	sp, sp, #12
+ 1081              		.cfi_def_cfa_offset 16
+ 1082 07a0 00AF     		add	r7, sp, #0
+ 1083              		.cfi_def_cfa_register 7
+ 1084 07a2 0346     		mov	r3, r0
+ 1085 07a4 FB80     		strh	r3, [r7, #6]	@ movhi
+ 310:../tasks/display/ts_calibration.c ****   return (((A2 * y) + B2)/1000);
+ 1086              		.loc 1 310 0
+ 1087 07a6 40F20003 		movw	r3, #:lower16:A2
+ 1088 07aa C0F20003 		movt	r3, #:upper16:A2
+ 1089 07ae 1B88     		ldrh	r3, [r3]
+ 1090 07b0 1BB2     		sxth	r3, r3
+ 1091 07b2 FA88     		ldrh	r2, [r7, #6]
+ 1092 07b4 02FB03F2 		mul	r2, r2, r3
+ 1093 07b8 40F20003 		movw	r3, #:lower16:B2
+ 1094 07bc C0F20003 		movt	r3, #:upper16:B2
+ 1095 07c0 1B88     		ldrh	r3, [r3]
+ 1096 07c2 1BB2     		sxth	r3, r3
+ 1097 07c4 1A44     		add	r2, r2, r3
+ 1098 07c6 44F6D353 		movw	r3, #19923
+ 1099 07ca C1F26203 		movt	r3, 4194
+ 1100 07ce 83FB0213 		smull	r1, r3, r3, r2
+ 1101 07d2 9911     		asrs	r1, r3, #6
+ 1102 07d4 D317     		asrs	r3, r2, #31
+ 1103 07d6 CB1A     		subs	r3, r1, r3
+ 1104 07d8 9BB2     		uxth	r3, r3
+ 311:../tasks/display/ts_calibration.c **** }
+ 1105              		.loc 1 311 0
+ 1106 07da 1846     		mov	r0, r3
+ 1107 07dc 0C37     		adds	r7, r7, #12
+ 1108 07de BD46     		mov	sp, r7
+ 1109              		@ sp needed
+ 1110 07e0 5DF8047B 		ldr	r7, [sp], #4
+ 1111 07e4 7047     		bx	lr
+ 1112              		.cfi_endproc
+ 1113              	.LFE61:
+ 1115 07e6 00BF     		.align	2
+ 1116              		.global	IsCalibrationDone
+ 1117              		.thumb
+ 1118              		.thumb_func
+ 1120              	IsCalibrationDone:
+ 1121              	.LFB62:
+ 312:../tasks/display/ts_calibration.c **** 
+ 313:../tasks/display/ts_calibration.c **** /**check if the TS is calibrated
+ 314:../tasks/display/ts_calibration.c ****   * @param  None
+ 315:../tasks/display/ts_calibration.c **** * @retval calibration state (1 : calibrated / 0: no)
+ 316:../tasks/display/ts_calibration.c ****   */
+ 317:../tasks/display/ts_calibration.c **** uint8_t IsCalibrationDone(void)
+ 318:../tasks/display/ts_calibration.c **** {
+ 1122              		.loc 1 318 0
+ 1123              		.cfi_startproc
+ 1124              		@ args = 0, pretend = 0, frame = 0
+ 1125              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1126              		@ link register save eliminated.
+ 1127 07e8 80B4     		push	{r7}
+ 1128              		.cfi_def_cfa_offset 4
+ 1129              		.cfi_offset 7, -4
+ 1130 07ea 00AF     		add	r7, sp, #0
+ 1131              		.cfi_def_cfa_register 7
+ 319:../tasks/display/ts_calibration.c ****   return (Calibration_Done);
+ 1132              		.loc 1 319 0
+ 1133 07ec 40F20003 		movw	r3, #:lower16:Calibration_Done
+ 1134 07f0 C0F20003 		movt	r3, #:upper16:Calibration_Done
+ 1135 07f4 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 320:../tasks/display/ts_calibration.c **** }
+ 1136              		.loc 1 320 0
+ 1137 07f6 1846     		mov	r0, r3
+ 1138 07f8 BD46     		mov	sp, r7
+ 1139              		@ sp needed
+ 1140 07fa 5DF8047B 		ldr	r7, [sp], #4
+ 1141 07fe 7047     		bx	lr
+ 1142              		.cfi_endproc
+ 1143              	.LFE62:
+ 1145              		.bss
+ 1146              		.align	1
+ 1147              	counter.10575:
+ 1148 001e 0000     		.space	2
+ 1149              		.align	2
+ 1150              	FFile.10576:
+ 1151 0020 00000000 		.space	556
+ 1151      00000000 
+ 1151      00000000 
+ 1151      00000000 
+ 1151      00000000 
+ 1152              		.align	1
+ 1153              	flag.10574:
+ 1154 024c 0000     		.space	2
+ 1155 024e 0000     		.text
+ 1156              	.Letext0:
+ 1157              		.file 2 "c:\\program files (x86)\\codesourcery\\arm-none-eabi\\include\\stdint.h"
+ 1158              		.file 3 "D:\\workspace\\console800480\\system/stm32f217xx.h"
+ 1159              		.file 4 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_hal_def.h"
+ 1160              		.file 5 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_hal_dma.h"
+ 1161              		.file 6 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_ll_sdmmc.h"
+ 1162              		.file 7 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_hal_sd.h"
+ 1163              		.file 8 "D:\\workspace\\console800480\\tasks\\SDMMC/integer.h"
+ 1164              		.file 9 "../tasks/display/Fonts\\fonts.h"
+ 1165              		.file 10 "D:\\workspace\\console800480\\tasks\\SDMMC/ff.h"
+ 1166              		.file 11 "../tasks/display/Board_lcd.h"
+ 1167              		.file 12 "../tasks/display/Board_ts.h"
+ 1168              		.file 13 "D:\\workspace\\console800480\\system/core_cm3.h"
+ 1169              		.file 14 "D:\\workspace\\console800480/main.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 ts_calibration.c
+                            *COM*:00000060 uSdHandle
+                            *COM*:00000058 SD_CardInfo
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:21     .bss:00000000 Calibration_Done
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:22     .bss:00000000 $d
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:24     .bss:00000002 A1
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:27     .bss:00000004 A2
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:30     .bss:00000006 B1
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:33     .bss:00000008 B2
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:36     .bss:0000000c aPhysX
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:39     .bss:00000010 aPhysY
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:42     .bss:00000014 aLogX
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:45     .bss:00000018 aLogY
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:51     .bss:0000001c tcState
+                            *COM*:0000000a xPos
+                            *COM*:0000000a yPos
+                            *COM*:00000004 axc
+                            *COM*:00000004 ayc
+                            *COM*:00000004 bxc
+                            *COM*:00000004 byc
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:60     .rodata:00000000 $d
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:61     .rodata:00000000 .LC0
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:64     .rodata:00000008 .LC1
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:67     .rodata:00000010 .LC2
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:70     .rodata:0000001c .LC3
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:73     .rodata:00000040 .LC4
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:76     .rodata:00000044 .LC5
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:79     .rodata:0000006c .LC6
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:82     .rodata:0000008c .LC7
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:85     .rodata:00000098 .LC8
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:88     .rodata:000000a4 .LC9
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:91     .rodata:000000b4 .LC10
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:94     .rodata:000000c0 .LC11
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:99     .rodata:000000e0 .LC12
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:103    .text:00000000 $t
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:108    .text:00000000 touchCalibration
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:1147   .bss:0000001e counter.10575
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:1150   .bss:00000020 FFile.10576
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:1153   .bss:0000024c flag.10574
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:353    .rodata:000000f8 .LC13
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:356    .rodata:00000118 .LC14
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:359    .rodata:0000012c .LC15
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:362    .rodata:00000134 .LC16
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:365    .rodata:00000158 .LC17
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:368    .rodata:00000174 .LC18
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:371    .rodata:00000188 .LC19
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:379    .text:00000240 Touchscreen_Calibration
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:716    .text:00000568 TouchscreenCalibration_SetHint
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:801    .text:000005e0 GetPhysValues
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:709    .rodata:0000019c .LC20
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:783    .rodata:000001a8 .LC21
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:786    .rodata:000001dc .LC22
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:790    .rodata:00000218 .LC23
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:794    .rodata:0000024c .LC24
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:927    .text:000006d4 WaitForPressedState
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:919    .rodata:0000027c .LC25
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:1020   .text:00000750 Calibration_GetX
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:1070   .text:0000079c Calibration_GetY
+C:\Users\sagok\AppData\Local\Temp\cckoMdTV.s:1120   .text:000007e8 IsCalibrationDone
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.1.7f551ac7fcad8b79b9df4bfdaa536673
+                           .group:00000000 wm4.stm32f2xx_hal_conf.h.40.007126baefb9f966c36646edbf8040d2
+                           .group:00000000 wm4.stm32f2xx.h.57.5ec1581efc43612c411d33a8686e9ec7
+                           .group:00000000 wm4.stm32f217xx.h.52.9c940d76d00294b78837dc334c172fdd
+                           .group:00000000 wm4.core_cm3.h.32.49180ccb4d36cabd2d7016d2a51d91ae
+                           .group:00000000 wm4.newlib.h.8.384a112feabb3bef7b573ae48cde2e3b
+                           .group:00000000 wm4.features.h.22.6a4ca7cd053637cc1d0db6c16f39b2d7
+                           .group:00000000 wm4.config.h.183.aa62afef667fb61d15fa64c48beb2f14
+                           .group:00000000 wm4._ansi.h.23.5644b60c990a4800b02a6e654e88f93a
+                           .group:00000000 wm4.stdint.h.20.54ad762faa59e3c05491630641c8d8bf
+                           .group:00000000 wm4.core_cmInstr.h.25.f50f886f2edf670cf199b35fd96f5c91
+                           .group:00000000 wm4.core_cm3.h.130.63ab2348a6eed0fdb318040d970b676c
+                           .group:00000000 wm4.stm32f217xx.h.978.a5c681952b2f704a0e7f2ba21d08adf5
+                           .group:00000000 wm4.stm32f2xx.h.142.bc2155a1f7498bab16371e38413a9e41
+                           .group:00000000 wm4.stm32f2xx_hal_def.h.74.8ad2dc8aa82c4fd02e5aeaae592641ba
+                           .group:00000000 wm4.stm32f2xx_hal_rcc.h.142.ec0f91cc6576a6acebd17e6dd85829ae
+                           .group:00000000 wm4.stm32f2xx_hal_rcc_ex.h.40.0829033e864455c6bdd0db01f8ba5a50
+                           .group:00000000 wm4.stm32f2xx_hal_gpio.h.40.ba64e0bb94d9a68835f80159f39a86f1
+                           .group:00000000 wm4.stm32f2xx_hal_gpio_ex.h.40.24e547fd402281923f446b510381083f
+                           .group:00000000 wm4.stm32f2xx_hal_dma.h.40.5d9732ace2a21a4526ce8f0c52428fff
+                           .group:00000000 wm4.stm32f2xx_hal_cortex.h.40.e10263d2ec5d4fa79b4180ce1a38aff1
+                           .group:00000000 wm4.stm32f2xx_hal_adc.h.40.89ac8b78113cac4cf63847587daabac9
+                           .group:00000000 wm4.stm32f2xx_hal_adc_ex.h.40.7de68ed256ef25526ee31cc017f2c291
+                           .group:00000000 wm4.stm32f2xx_hal_flash.h.40.c3171719ce015e9cff20c795e44e886d
+                           .group:00000000 wm4.stm32f2xx_hal_flash_ex.h.40.7389508bd24a0aeb077bde0c9fb651eb
+                           .group:00000000 wm4.stm32f2xx_ll_fsmc.h.40.c1c32f2e1862f4dd342bd9b80fb895bb
+                           .group:00000000 wm4.stm32f2xx_hal_pwr.h.40.812df32e5c31b609a128e9db0eb4cbd0
+                           .group:00000000 wm4.stm32f2xx_hal_rtc.h.40.850fda5fe2cce8797446913dee18382f
+                           .group:00000000 wm4.stm32f2xx_hal_rtc_ex.h.40.f3e0c408e3bf4e8a0352d7ec9a18a822
+                           .group:00000000 wm4.stm32f2xx_ll_sdmmc.h.40.3719ab487c4b77401c572f459adf6eb7
+                           .group:00000000 wm4.stm32f2xx_hal_sd.h.58.760215394dcc316161a6482c0af9b866
+                           .group:00000000 wm4.stm32f2xx_hal_spi.h.40.7984243dbaba8b21c6392998a47e6987
+                           .group:00000000 wm4.stm32f2xx_hal_tim.h.40.d79172f25d0e9a15dc346aba8515bdd6
+                           .group:00000000 wm4.stm32f2xx_hal_tim_ex.h.40.361f280a7a3f60b4b238bb99ca728d83
+                           .group:00000000 wm4.stm32f2xx_hal_uart.h.40.d74def561ae6f78f40f477c8426ecbef
+                           .group:00000000 wm4.stm32f2xx_ll_usb.h.40.9b0206a05bc6ce3bec1648b51f22cb81
+                           .group:00000000 wm4.stm32f2xx_hal_pcd.h.99.11faba414c39e357b2f23364912d0605
+                           .group:00000000 wm4.stm32f2xx_hal_hcd.h.40.44ee5e972983ae0139ddbacdc75c44ef
+                           .group:00000000 wm4.stm32f2xx_hal.h.64.ed79ee83e52b151b3c365392b398f866
+                           .group:00000000 wm4.stdio.h.31.7c0e28c411445f3f9c5b11accf882760
+                           .group:00000000 wm4.stddef.h.184.159df79b4ca79c76561572a55985524c
+                           .group:00000000 wm4.stdarg.h.34.3a23a216c0c293b3d2ea2e89281481e6
+                           .group:00000000 wm4._default_types.h.6.5e12cd604db8ce00b62bb2f02708eaf3
+                           .group:00000000 wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea
+                           .group:00000000 wm4._types.h.59.db8450f33c1f6150c0372fa1091a887a
+                           .group:00000000 wm4.stddef.h.348.9a99de77b6ba3b4278b57e9cc6d6e349
+                           .group:00000000 wm4.reent.h.16.567d760e6ae9ad7f917851a308bd7a57
+                           .group:00000000 wm4.types.h.23.0d949686bbcadd1621462d4fa1f884f9
+                           .group:00000000 wm4.stddef.h.39.7e3d906ac58942e0b374c527445f5de5
+                           .group:00000000 wm4.types.h.2.e9cec8c90ab35f77d9f499e06ae02400
+                           .group:00000000 wm4.types.h.80.5759fe41f87f5211a5952dfb1fc64f19
+                           .group:00000000 wm4.stdio.h.2.4aa87247282eca6c8f36f9de33d8df1a
+                           .group:00000000 wm4.stdio.h.64.f9f1bb6b0d3d7e12f6a27968d859709c
+                           .group:00000000 wm4.stdlib.h.18.8bab2fb43ac4e90235390733c30a4530
+                           .group:00000000 wm4.stddef.h.158.a7efb00f6cbc6f43213b50e183c9830c
+                           .group:00000000 wm4.alloca.h.8.dfc0c703c47ec3e69746825b17d9e66d
+                           .group:00000000 wm4.stdlib.h.55.7091a050e07f1c4abd225630fe3d62f1
+                           .group:00000000 wm4.cdefs.h.56.efab90f4d89fbc41d6b3a5c5fb0d3d0f
+                           .group:00000000 wm4.string.h.15.dab3980bf35408a4c507182805e2de3a
+                           .group:00000000 wm4.string.h.126.6ff3aa59129e7f66b2c273baf353e066
+                           .group:00000000 wm4.Display.h.39.49592f1e6d055d6383457fd20cdd98de
+                           .group:00000000 wm4.usbd_conf.h.42.6b5dabdfef26be13dabbf5c06e1837cb
+                           .group:00000000 wm4.usbd_def.h.54.f0a777e557f44b0cdc32a86cdf6d44e8
+                           .group:00000000 wm4.usbd_cdc.h.48.93470a15f0b6146c8b31621ae3de674b
+                           .group:00000000 wm4.ampire800480.h.41.5ff3ff7f2f2f1dee044ea79164b8097b
+                           .group:00000000 wm4.ili9320.h.50.f761f52cfdd99924b98cb91d8ee9ccd3
+                           .group:00000000 wm4.fonts.h.40.da354735f9216c5e20df37a85cbaf4e6
+                           .group:00000000 wm4.diskio.h.6.8da7330f9b93c43e88f440080fbc00d0
+                           .group:00000000 wm4.diskio.h.43.17c6f92f3f6ff58b941e8553c0aeafe2
+                           .group:00000000 wm4.LEDs.h.9.36ffa4b30bd168dc58d64fa6e53a9a30
+                           .group:00000000 wm4.usbh_conf.h.41.d72a4a1e5e10d8f062cf3fa4bcd8aa54
+                           .group:00000000 wm4.usbh_def.h.42.e5773f0fe2e07d0c2c7284f319cefcfb
+                           .group:00000000 wm4.usbh_ioreq.h.53.3586266a62e1adb6014256f47bfe28ae
+                           .group:00000000 wm4.usbh_ctlreq.h.30.baf76fe1032fc0ccc3b759e321acc69d
+                           .group:00000000 wm4.usbh_core.h.60.126ed10f424484efe8e3332cf8789488
+                           .group:00000000 wm4.usbh_msc_bot.h.150.7a573dd4700e98f78a08f0e60cd8a2e8
+                           .group:00000000 wm4.usbh_msc_scsi.h.30.7ac65aef8ad2b1cb473eb44388537ea2
+                           .group:00000000 wm4.usbh_msc.h.92.1eaed72009e45245618cff3cc0ab5900
+                           .group:00000000 wm4.ffconf.h.19.cf478c53f215b23144e0b163e0b92c6c
+                           .group:00000000 wm4.ff.h.45.ea85cd9763a25d97ae88799c83ef7c63
+                           .group:00000000 wm4.Board_lcd.h.71.7c41836bcc6ef6378c5f61621a36b530
+                           .group:00000000 wm4.Board_ts.h.41.c41babb61a3a924314e935cb36fe44f4
+                           .group:00000000 wm4.ADS7843_TS.h.60.5447ee5bfeeab537372be7be33333aa0
+
+UNDEFINED SYMBOLS
+touchSetCoef
+BSP_LCD_Clear
+BSP_LCD_SetTextColor
+BSP_LCD_SetBackColor
+scan_files
+f_chdir
+f_open
+puts
+LogFileOnSD
+Write_to_logFile
+f_gets
+printf
+f_close
+BSP_LCD_GetXSize
+BSP_LCD_GetYSize
+BSP_LCD_DisplayStringAt
+BSP_LCD_GetTextHeight
+BSP_LCD_DrawCircle
+getTouchState
+BSP_TS_Init
+OpenFontFile
+CloseFontFile
+HAL_Delay
+BSP_LCD_FillCircle
+TS_State
+BSP_TS_GetState
+HAL_GetTick

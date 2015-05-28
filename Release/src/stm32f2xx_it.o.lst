@@ -1,0 +1,869 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"stm32f2xx_it.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.comm	uSdHandle,96,4
+  19              		.comm	SD_CardInfo,88,8
+  20              		.align	2
+  21              		.global	NMI_Handler
+  22              		.thumb
+  23              		.thumb_func
+  25              	NMI_Handler:
+  26              	.LFB55:
+  27              		.file 1 "../src/stm32f2xx_it.c"
+   1:../src/stm32f2xx_it.c **** /**
+   2:../src/stm32f2xx_it.c ****   ******************************************************************************
+   3:../src/stm32f2xx_it.c ****   * @file    GPIO/GPIO_IOToggle/Src/stm32f2xx_it.c 
+   4:../src/stm32f2xx_it.c ****   * @author  MCD Application Team
+   5:../src/stm32f2xx_it.c ****   * @version V1.1.0
+   6:../src/stm32f2xx_it.c ****   * @date    13-March-2014
+   7:../src/stm32f2xx_it.c ****   * @brief   Main Interrupt Service Routines.
+   8:../src/stm32f2xx_it.c ****   *          This file provides template for all exceptions handler and 
+   9:../src/stm32f2xx_it.c ****   *          peripherals interrupt service routine.
+  10:../src/stm32f2xx_it.c ****   ******************************************************************************
+  11:../src/stm32f2xx_it.c ****   * @attention
+  12:../src/stm32f2xx_it.c ****   *
+  13:../src/stm32f2xx_it.c ****   * <h2><center>&copy; COPYRIGHT(c) 2014 STMicroelectronics</center></h2>
+  14:../src/stm32f2xx_it.c ****   *
+  15:../src/stm32f2xx_it.c ****   * Redistribution and use in source and binary forms, with or without modification,
+  16:../src/stm32f2xx_it.c ****   * are permitted provided that the following conditions are met:
+  17:../src/stm32f2xx_it.c ****   *   1. Redistributions of source code must retain the above copyright notice,
+  18:../src/stm32f2xx_it.c ****   *      this list of conditions and the following disclaimer.
+  19:../src/stm32f2xx_it.c ****   *   2. Redistributions in binary form must reproduce the above copyright notice,
+  20:../src/stm32f2xx_it.c ****   *      this list of conditions and the following disclaimer in the documentation
+  21:../src/stm32f2xx_it.c ****   *      and/or other materials provided with the distribution.
+  22:../src/stm32f2xx_it.c ****   *   3. Neither the name of STMicroelectronics nor the names of its contributors
+  23:../src/stm32f2xx_it.c ****   *      may be used to endorse or promote products derived from this software
+  24:../src/stm32f2xx_it.c ****   *      without specific prior written permission.
+  25:../src/stm32f2xx_it.c ****   *
+  26:../src/stm32f2xx_it.c ****   * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  27:../src/stm32f2xx_it.c ****   * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  28:../src/stm32f2xx_it.c ****   * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+  29:../src/stm32f2xx_it.c ****   * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+  30:../src/stm32f2xx_it.c ****   * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+  31:../src/stm32f2xx_it.c ****   * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+  32:../src/stm32f2xx_it.c ****   * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+  33:../src/stm32f2xx_it.c ****   * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+  34:../src/stm32f2xx_it.c ****   * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  35:../src/stm32f2xx_it.c ****   * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  36:../src/stm32f2xx_it.c ****   *
+  37:../src/stm32f2xx_it.c ****   ******************************************************************************
+  38:../src/stm32f2xx_it.c ****   */
+  39:../src/stm32f2xx_it.c **** 
+  40:../src/stm32f2xx_it.c **** /* Includes ------------------------------------------------------------------*/
+  41:../src/stm32f2xx_it.c **** #include "stm32f2xx_it.h"
+  42:../src/stm32f2xx_it.c **** #include "main.h"
+  43:../src/stm32f2xx_it.c **** #include "LEDs.h"
+  44:../src/stm32f2xx_it.c **** //#include "sd_diskio.h"
+  45:../src/stm32f2xx_it.c **** 
+  46:../src/stm32f2xx_it.c **** /* Scheduler includes. */
+  47:../src/stm32f2xx_it.c **** #include "FreeRTOS.h"
+  48:../src/stm32f2xx_it.c **** #include "task.h"
+  49:../src/stm32f2xx_it.c **** #include "queue.h"
+  50:../src/stm32f2xx_it.c **** #include "semphr.h"
+  51:../src/stm32f2xx_it.c **** 
+  52:../src/stm32f2xx_it.c **** /** @addtogroup STM32F2xx_HAL_Examples
+  53:../src/stm32f2xx_it.c ****   * @{
+  54:../src/stm32f2xx_it.c ****   */
+  55:../src/stm32f2xx_it.c **** 
+  56:../src/stm32f2xx_it.c **** /** @addtogroup GPIO_IOToggle
+  57:../src/stm32f2xx_it.c ****   * @{
+  58:../src/stm32f2xx_it.c ****   */
+  59:../src/stm32f2xx_it.c **** 
+  60:../src/stm32f2xx_it.c **** /* Private typedef -----------------------------------------------------------*/
+  61:../src/stm32f2xx_it.c **** /* Private define ------------------------------------------------------------*/
+  62:../src/stm32f2xx_it.c **** /* Private macro -------------------------------------------------------------*/
+  63:../src/stm32f2xx_it.c **** /* Private variables ---------------------------------------------------------*/
+  64:../src/stm32f2xx_it.c **** extern PCD_HandleTypeDef hpcd;
+  65:../src/stm32f2xx_it.c **** extern HCD_HandleTypeDef hhcd;
+  66:../src/stm32f2xx_it.c **** 
+  67:../src/stm32f2xx_it.c **** /* UART handler declared in "usbd_cdc_interface.c" file */
+  68:../src/stm32f2xx_it.c **** extern UART_HandleTypeDef 	UartHandle;
+  69:../src/stm32f2xx_it.c **** extern SD_HandleTypeDef 	uSdHandle;
+  70:../src/stm32f2xx_it.c **** //extern SPI_HandleTypeDef 	SpiHandle;
+  71:../src/stm32f2xx_it.c **** extern ADC_HandleTypeDef    AdcHandle;
+  72:../src/stm32f2xx_it.c **** 
+  73:../src/stm32f2xx_it.c **** 
+  74:../src/stm32f2xx_it.c **** extern xSemaphoreHandle 	xSemaphore_USBInt;			//
+  75:../src/stm32f2xx_it.c **** 
+  76:../src/stm32f2xx_it.c **** /* Private function prototypes -----------------------------------------------*/
+  77:../src/stm32f2xx_it.c **** /* Private functions ---------------------------------------------------------*/
+  78:../src/stm32f2xx_it.c **** 
+  79:../src/stm32f2xx_it.c **** /******************************************************************************/
+  80:../src/stm32f2xx_it.c **** /*            Cortex-M3 Processor Exceptions Handlers                         */
+  81:../src/stm32f2xx_it.c **** /******************************************************************************/
+  82:../src/stm32f2xx_it.c **** 
+  83:../src/stm32f2xx_it.c **** /**
+  84:../src/stm32f2xx_it.c ****   * @brief   This function handles NMI exception.
+  85:../src/stm32f2xx_it.c ****   * @param  None
+  86:../src/stm32f2xx_it.c ****   * @retval None
+  87:../src/stm32f2xx_it.c ****   */
+  88:../src/stm32f2xx_it.c **** void NMI_Handler(void)
+  89:../src/stm32f2xx_it.c **** {
+  28              		.loc 1 89 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 1, uses_anonymous_args = 0
+  32              		@ link register save eliminated.
+  33 0000 80B4     		push	{r7}
+  34              		.cfi_def_cfa_offset 4
+  35              		.cfi_offset 7, -4
+  36 0002 00AF     		add	r7, sp, #0
+  37              		.cfi_def_cfa_register 7
+  90:../src/stm32f2xx_it.c **** }
+  38              		.loc 1 90 0
+  39 0004 BD46     		mov	sp, r7
+  40              		@ sp needed
+  41 0006 5DF8047B 		ldr	r7, [sp], #4
+  42 000a 7047     		bx	lr
+  43              		.cfi_endproc
+  44              	.LFE55:
+  46              		.align	2
+  47              		.global	HardFault_Handler
+  48              		.thumb
+  49              		.thumb_func
+  51              	HardFault_Handler:
+  52              	.LFB56:
+  91:../src/stm32f2xx_it.c **** 
+  92:../src/stm32f2xx_it.c **** /**
+  93:../src/stm32f2xx_it.c ****   * @brief  This function handles Hard Fault exception.
+  94:../src/stm32f2xx_it.c ****   * @param  None
+  95:../src/stm32f2xx_it.c ****   * @retval None
+  96:../src/stm32f2xx_it.c ****   */
+  97:../src/stm32f2xx_it.c **** void HardFault_Handler(void)
+  98:../src/stm32f2xx_it.c **** {
+  53              		.loc 1 98 0
+  54              		.cfi_startproc
+  55              		@ args = 0, pretend = 0, frame = 0
+  56              		@ frame_needed = 1, uses_anonymous_args = 0
+  57              		@ link register save eliminated.
+  58 000c 80B4     		push	{r7}
+  59              		.cfi_def_cfa_offset 4
+  60              		.cfi_offset 7, -4
+  61 000e 00AF     		add	r7, sp, #0
+  62              		.cfi_def_cfa_register 7
+  63              	.L3:
+  99:../src/stm32f2xx_it.c ****   /* Go to infinite loop when Hard Fault exception occurs */
+ 100:../src/stm32f2xx_it.c ****   while (1)
+ 101:../src/stm32f2xx_it.c ****   {
+ 102:../src/stm32f2xx_it.c ****   }
+  64              		.loc 1 102 0 discriminator 1
+  65 0010 FEE7     		b	.L3
+  66              		.cfi_endproc
+  67              	.LFE56:
+  69 0012 00BF     		.align	2
+  70              		.global	MemManage_Handler
+  71              		.thumb
+  72              		.thumb_func
+  74              	MemManage_Handler:
+  75              	.LFB57:
+ 103:../src/stm32f2xx_it.c **** }
+ 104:../src/stm32f2xx_it.c **** 
+ 105:../src/stm32f2xx_it.c **** /**
+ 106:../src/stm32f2xx_it.c ****   * @brief  This function handles Memory Manage exception.
+ 107:../src/stm32f2xx_it.c ****   * @param  None
+ 108:../src/stm32f2xx_it.c ****   * @retval None
+ 109:../src/stm32f2xx_it.c ****   */
+ 110:../src/stm32f2xx_it.c **** void MemManage_Handler(void)
+ 111:../src/stm32f2xx_it.c **** {
+  76              		.loc 1 111 0
+  77              		.cfi_startproc
+  78              		@ args = 0, pretend = 0, frame = 0
+  79              		@ frame_needed = 1, uses_anonymous_args = 0
+  80              		@ link register save eliminated.
+  81 0014 80B4     		push	{r7}
+  82              		.cfi_def_cfa_offset 4
+  83              		.cfi_offset 7, -4
+  84 0016 00AF     		add	r7, sp, #0
+  85              		.cfi_def_cfa_register 7
+  86              	.L5:
+ 112:../src/stm32f2xx_it.c ****   /* Go to infinite loop when Memory Manage exception occurs */
+ 113:../src/stm32f2xx_it.c ****   while (1)
+ 114:../src/stm32f2xx_it.c ****   {
+ 115:../src/stm32f2xx_it.c ****   }
+  87              		.loc 1 115 0 discriminator 1
+  88 0018 FEE7     		b	.L5
+  89              		.cfi_endproc
+  90              	.LFE57:
+  92 001a 00BF     		.align	2
+  93              		.global	BusFault_Handler
+  94              		.thumb
+  95              		.thumb_func
+  97              	BusFault_Handler:
+  98              	.LFB58:
+ 116:../src/stm32f2xx_it.c **** }
+ 117:../src/stm32f2xx_it.c **** 
+ 118:../src/stm32f2xx_it.c **** /**
+ 119:../src/stm32f2xx_it.c ****   * @brief  This function handles Bus Fault exception.
+ 120:../src/stm32f2xx_it.c ****   * @param  None
+ 121:../src/stm32f2xx_it.c ****   * @retval None
+ 122:../src/stm32f2xx_it.c ****   */
+ 123:../src/stm32f2xx_it.c **** void BusFault_Handler(void)
+ 124:../src/stm32f2xx_it.c **** {
+  99              		.loc 1 124 0
+ 100              		.cfi_startproc
+ 101              		@ args = 0, pretend = 0, frame = 0
+ 102              		@ frame_needed = 1, uses_anonymous_args = 0
+ 103              		@ link register save eliminated.
+ 104 001c 80B4     		push	{r7}
+ 105              		.cfi_def_cfa_offset 4
+ 106              		.cfi_offset 7, -4
+ 107 001e 00AF     		add	r7, sp, #0
+ 108              		.cfi_def_cfa_register 7
+ 109              	.L7:
+ 125:../src/stm32f2xx_it.c ****   /* Go to infinite loop when Bus Fault exception occurs */
+ 126:../src/stm32f2xx_it.c ****   while (1)
+ 127:../src/stm32f2xx_it.c ****   {
+ 128:../src/stm32f2xx_it.c ****   }
+ 110              		.loc 1 128 0 discriminator 1
+ 111 0020 FEE7     		b	.L7
+ 112              		.cfi_endproc
+ 113              	.LFE58:
+ 115 0022 00BF     		.align	2
+ 116              		.global	UsageFault_Handler
+ 117              		.thumb
+ 118              		.thumb_func
+ 120              	UsageFault_Handler:
+ 121              	.LFB59:
+ 129:../src/stm32f2xx_it.c **** }
+ 130:../src/stm32f2xx_it.c **** 
+ 131:../src/stm32f2xx_it.c **** /**
+ 132:../src/stm32f2xx_it.c ****   * @brief  This function handles Usage Fault exception.
+ 133:../src/stm32f2xx_it.c ****   * @param  None
+ 134:../src/stm32f2xx_it.c ****   * @retval None
+ 135:../src/stm32f2xx_it.c ****   */
+ 136:../src/stm32f2xx_it.c **** void UsageFault_Handler(void)
+ 137:../src/stm32f2xx_it.c **** {
+ 122              		.loc 1 137 0
+ 123              		.cfi_startproc
+ 124              		@ args = 0, pretend = 0, frame = 0
+ 125              		@ frame_needed = 1, uses_anonymous_args = 0
+ 126              		@ link register save eliminated.
+ 127 0024 80B4     		push	{r7}
+ 128              		.cfi_def_cfa_offset 4
+ 129              		.cfi_offset 7, -4
+ 130 0026 00AF     		add	r7, sp, #0
+ 131              		.cfi_def_cfa_register 7
+ 132              	.L9:
+ 138:../src/stm32f2xx_it.c ****   /* Go to infinite loop when Usage Fault exception occurs */
+ 139:../src/stm32f2xx_it.c ****   while (1)
+ 140:../src/stm32f2xx_it.c ****   {
+ 141:../src/stm32f2xx_it.c ****   }
+ 133              		.loc 1 141 0 discriminator 1
+ 134 0028 FEE7     		b	.L9
+ 135              		.cfi_endproc
+ 136              	.LFE59:
+ 138 002a 00BF     		.align	2
+ 139              		.global	DebugMon_Handler
+ 140              		.thumb
+ 141              		.thumb_func
+ 143              	DebugMon_Handler:
+ 144              	.LFB60:
+ 142:../src/stm32f2xx_it.c **** }
+ 143:../src/stm32f2xx_it.c **** 
+ 144:../src/stm32f2xx_it.c **** /**
+ 145:../src/stm32f2xx_it.c ****   * @brief  This function handles Debug Monitor exception.
+ 146:../src/stm32f2xx_it.c ****   * @param  None
+ 147:../src/stm32f2xx_it.c ****   * @retval None
+ 148:../src/stm32f2xx_it.c ****   */
+ 149:../src/stm32f2xx_it.c **** void DebugMon_Handler(void)
+ 150:../src/stm32f2xx_it.c **** {
+ 145              		.loc 1 150 0
+ 146              		.cfi_startproc
+ 147              		@ args = 0, pretend = 0, frame = 0
+ 148              		@ frame_needed = 1, uses_anonymous_args = 0
+ 149              		@ link register save eliminated.
+ 150 002c 80B4     		push	{r7}
+ 151              		.cfi_def_cfa_offset 4
+ 152              		.cfi_offset 7, -4
+ 153 002e 00AF     		add	r7, sp, #0
+ 154              		.cfi_def_cfa_register 7
+ 151:../src/stm32f2xx_it.c **** }
+ 155              		.loc 1 151 0
+ 156 0030 BD46     		mov	sp, r7
+ 157              		@ sp needed
+ 158 0032 5DF8047B 		ldr	r7, [sp], #4
+ 159 0036 7047     		bx	lr
+ 160              		.cfi_endproc
+ 161              	.LFE60:
+ 163              		.align	2
+ 164              		.global	OTG_FS_IRQHandler
+ 165              		.thumb
+ 166              		.thumb_func
+ 168              	OTG_FS_IRQHandler:
+ 169              	.LFB61:
+ 152:../src/stm32f2xx_it.c **** /**
+ 153:../src/stm32f2xx_it.c ****   * @bri
+ 154:../src/stm32f2xx_it.c ****   * @param  None
+ 155:../src/stm32f2xx_it.c ****   * @retval None
+ 156:../src/stm32f2xx_it.c ****   */
+ 157:../src/stm32f2xx_it.c **** 
+ 158:../src/stm32f2xx_it.c **** 
+ 159:../src/stm32f2xx_it.c **** /******************************************************************************/
+ 160:../src/stm32f2xx_it.c **** /*                 STM32F2xx Peripherals Interrupt Handlers                   */
+ 161:../src/stm32f2xx_it.c **** /*  Add here the Interrupt Handler for the used peripheral(s) (PPP), for the  */
+ 162:../src/stm32f2xx_it.c **** /*  available peripheral interrupt handler's name please refer to the startup */
+ 163:../src/stm32f2xx_it.c **** /*  file (startup_stm32f2xx.s).                                               */
+ 164:../src/stm32f2xx_it.c **** /******************************************************************************/
+ 165:../src/stm32f2xx_it.c **** /**
+ 166:../src/stm32f2xx_it.c ****   * @brief  This function handles USB-On-The-Go FS or HS global interrupt request.
+ 167:../src/stm32f2xx_it.c ****   * @param  None
+ 168:../src/stm32f2xx_it.c ****   * @retval None
+ 169:../src/stm32f2xx_it.c ****   */
+ 170:../src/stm32f2xx_it.c **** void OTG_FS_IRQHandler(void)
+ 171:../src/stm32f2xx_it.c **** 
+ 172:../src/stm32f2xx_it.c **** {
+ 170              		.loc 1 172 0
+ 171              		.cfi_startproc
+ 172              		@ args = 0, pretend = 0, frame = 0
+ 173              		@ frame_needed = 1, uses_anonymous_args = 0
+ 174 0038 80B5     		push	{r7, lr}
+ 175              		.cfi_def_cfa_offset 8
+ 176              		.cfi_offset 7, -8
+ 177              		.cfi_offset 14, -4
+ 178 003a 00AF     		add	r7, sp, #0
+ 179              		.cfi_def_cfa_register 7
+ 173:../src/stm32f2xx_it.c **** //portBASE_TYPE xTaskWoken= pdFALSE;
+ 174:../src/stm32f2xx_it.c **** 
+ 175:../src/stm32f2xx_it.c **** //	TST_High(TST6);
+ 176:../src/stm32f2xx_it.c **** 
+ 177:../src/stm32f2xx_it.c **** 	LED_Toggle(LED5);
+ 180              		.loc 1 177 0
+ 181 003c 0520     		movs	r0, #5
+ 182 003e FFF7FEFF 		bl	LED_Toggle
+ 178:../src/stm32f2xx_it.c **** 
+ 179:../src/stm32f2xx_it.c **** 
+ 180:../src/stm32f2xx_it.c **** 	HAL_PCD_IRQHandler(&hpcd);
+ 183              		.loc 1 180 0
+ 184 0042 40F20000 		movw	r0, #:lower16:hpcd
+ 185 0046 C0F20000 		movt	r0, #:upper16:hpcd
+ 186 004a FFF7FEFF 		bl	HAL_PCD_IRQHandler
+ 181:../src/stm32f2xx_it.c **** //	HAL_HCD_IRQHandler(&hhcd);
+ 182:../src/stm32f2xx_it.c **** 
+ 183:../src/stm32f2xx_it.c **** //	    xSemaphoreGiveFromISR( xSemaphore_USBInt, &xTaskWoken );
+ 184:../src/stm32f2xx_it.c **** //	    if( xTaskWoken == pdTRUE) {
+ 185:../src/stm32f2xx_it.c **** //	        taskYIELD();
+ 186:../src/stm32f2xx_it.c **** //	    }
+ 187:../src/stm32f2xx_it.c **** //	TST_Low(TST6);
+ 188:../src/stm32f2xx_it.c **** 
+ 189:../src/stm32f2xx_it.c **** }
+ 187              		.loc 1 189 0
+ 188 004e 80BD     		pop	{r7, pc}
+ 189              		.cfi_endproc
+ 190              	.LFE61:
+ 192              		.align	2
+ 193              		.global	OTG_HS_IRQHandler
+ 194              		.thumb
+ 195              		.thumb_func
+ 197              	OTG_HS_IRQHandler:
+ 198              	.LFB62:
+ 190:../src/stm32f2xx_it.c **** void OTG_HS_IRQHandler(void)
+ 191:../src/stm32f2xx_it.c **** {
+ 199              		.loc 1 191 0
+ 200              		.cfi_startproc
+ 201              		@ args = 0, pretend = 0, frame = 0
+ 202              		@ frame_needed = 1, uses_anonymous_args = 0
+ 203 0050 80B5     		push	{r7, lr}
+ 204              		.cfi_def_cfa_offset 8
+ 205              		.cfi_offset 7, -8
+ 206              		.cfi_offset 14, -4
+ 207 0052 00AF     		add	r7, sp, #0
+ 208              		.cfi_def_cfa_register 7
+ 192:../src/stm32f2xx_it.c ****     LED_Toggle(LED4);
+ 209              		.loc 1 192 0
+ 210 0054 0420     		movs	r0, #4
+ 211 0056 FFF7FEFF 		bl	LED_Toggle
+ 193:../src/stm32f2xx_it.c **** 
+ 194:../src/stm32f2xx_it.c **** 	TST_High(TST4);
+ 212              		.loc 1 194 0
+ 213 005a 0220     		movs	r0, #2
+ 214 005c FFF7FEFF 		bl	TST_High
+ 195:../src/stm32f2xx_it.c **** 	HAL_HCD_IRQHandler(&hhcd);
+ 215              		.loc 1 195 0
+ 216 0060 40F20000 		movw	r0, #:lower16:hhcd
+ 217 0064 C0F20000 		movt	r0, #:upper16:hhcd
+ 218 0068 FFF7FEFF 		bl	HAL_HCD_IRQHandler
+ 196:../src/stm32f2xx_it.c **** 	TST_Low(TST4);
+ 219              		.loc 1 196 0
+ 220 006c 0220     		movs	r0, #2
+ 221 006e FFF7FEFF 		bl	TST_Low
+ 197:../src/stm32f2xx_it.c **** 
+ 198:../src/stm32f2xx_it.c **** }
+ 222              		.loc 1 198 0
+ 223 0072 80BD     		pop	{r7, pc}
+ 224              		.cfi_endproc
+ 225              	.LFE62:
+ 227              		.align	2
+ 228              		.global	DMA2_Stream7_IRQHandler
+ 229              		.thumb
+ 230              		.thumb_func
+ 232              	DMA2_Stream7_IRQHandler:
+ 233              	.LFB63:
+ 199:../src/stm32f2xx_it.c **** /**
+ 200:../src/stm32f2xx_it.c ****   * @brief  This function handles DMA interrupt request.
+ 201:../src/stm32f2xx_it.c ****   * @param  None
+ 202:../src/stm32f2xx_it.c ****   * @retval None
+ 203:../src/stm32f2xx_it.c ****   * @Note   This function is redefined in "main.h" and related to DMA stream
+ 204:../src/stm32f2xx_it.c ****   *         used for USART data reception
+ 205:../src/stm32f2xx_it.c ****   */
+ 206:../src/stm32f2xx_it.c **** void USARTx_DMA_TX_IRQHandler(void)
+ 207:../src/stm32f2xx_it.c **** {
+ 234              		.loc 1 207 0
+ 235              		.cfi_startproc
+ 236              		@ args = 0, pretend = 0, frame = 0
+ 237              		@ frame_needed = 1, uses_anonymous_args = 0
+ 238 0074 80B5     		push	{r7, lr}
+ 239              		.cfi_def_cfa_offset 8
+ 240              		.cfi_offset 7, -8
+ 241              		.cfi_offset 14, -4
+ 242 0076 00AF     		add	r7, sp, #0
+ 243              		.cfi_def_cfa_register 7
+ 208:../src/stm32f2xx_it.c ****   LED_Toggle(LED3);
+ 244              		.loc 1 208 0
+ 245 0078 0320     		movs	r0, #3
+ 246 007a FFF7FEFF 		bl	LED_Toggle
+ 209:../src/stm32f2xx_it.c ****   TST_High(TST1);
+ 247              		.loc 1 209 0
+ 248 007e 0020     		movs	r0, #0
+ 249 0080 FFF7FEFF 		bl	TST_High
+ 210:../src/stm32f2xx_it.c ****   HAL_DMA_IRQHandler(UartHandle.hdmatx);
+ 250              		.loc 1 210 0
+ 251 0084 40F20003 		movw	r3, #:lower16:UartHandle
+ 252 0088 C0F20003 		movt	r3, #:upper16:UartHandle
+ 253 008c 1B6B     		ldr	r3, [r3, #48]
+ 254 008e 1846     		mov	r0, r3
+ 255 0090 FFF7FEFF 		bl	HAL_DMA_IRQHandler
+ 211:../src/stm32f2xx_it.c ****   TST_Low(TST1);
+ 256              		.loc 1 211 0
+ 257 0094 0020     		movs	r0, #0
+ 258 0096 FFF7FEFF 		bl	TST_Low
+ 212:../src/stm32f2xx_it.c **** 
+ 213:../src/stm32f2xx_it.c **** }
+ 259              		.loc 1 213 0
+ 260 009a 80BD     		pop	{r7, pc}
+ 261              		.cfi_endproc
+ 262              	.LFE63:
+ 264              		.align	2
+ 265              		.global	DMA2_Stream5_IRQHandler
+ 266              		.thumb
+ 267              		.thumb_func
+ 269              	DMA2_Stream5_IRQHandler:
+ 270              	.LFB64:
+ 214:../src/stm32f2xx_it.c **** 
+ 215:../src/stm32f2xx_it.c **** void USARTx_DMA_RX_IRQHandler(void)
+ 216:../src/stm32f2xx_it.c **** {
+ 271              		.loc 1 216 0
+ 272              		.cfi_startproc
+ 273              		@ args = 0, pretend = 0, frame = 0
+ 274              		@ frame_needed = 1, uses_anonymous_args = 0
+ 275 009c 80B5     		push	{r7, lr}
+ 276              		.cfi_def_cfa_offset 8
+ 277              		.cfi_offset 7, -8
+ 278              		.cfi_offset 14, -4
+ 279 009e 00AF     		add	r7, sp, #0
+ 280              		.cfi_def_cfa_register 7
+ 217:../src/stm32f2xx_it.c **** //	TST_High(TST3);
+ 218:../src/stm32f2xx_it.c ****   HAL_DMA_IRQHandler(UartHandle.hdmarx);
+ 281              		.loc 1 218 0
+ 282 00a0 40F20003 		movw	r3, #:lower16:UartHandle
+ 283 00a4 C0F20003 		movt	r3, #:upper16:UartHandle
+ 284 00a8 5B6B     		ldr	r3, [r3, #52]
+ 285 00aa 1846     		mov	r0, r3
+ 286 00ac FFF7FEFF 		bl	HAL_DMA_IRQHandler
+ 219:../src/stm32f2xx_it.c **** }
+ 287              		.loc 1 219 0
+ 288 00b0 80BD     		pop	{r7, pc}
+ 289              		.cfi_endproc
+ 290              	.LFE64:
+ 292 00b2 00BF     		.align	2
+ 293              		.global	SPIx_DMA_RX_IRQHandler
+ 294              		.thumb
+ 295              		.thumb_func
+ 297              	SPIx_DMA_RX_IRQHandler:
+ 298              	.LFB65:
+ 220:../src/stm32f2xx_it.c **** 
+ 221:../src/stm32f2xx_it.c **** 
+ 222:../src/stm32f2xx_it.c **** /**
+ 223:../src/stm32f2xx_it.c ****   * @brief  This function handles DMA Rx interrupt request.
+ 224:../src/stm32f2xx_it.c ****   * @param  None
+ 225:../src/stm32f2xx_it.c ****   * @retval None
+ 226:../src/stm32f2xx_it.c ****   */
+ 227:../src/stm32f2xx_it.c **** void SPIx_DMA_RX_IRQHandler(void)
+ 228:../src/stm32f2xx_it.c **** {
+ 299              		.loc 1 228 0
+ 300              		.cfi_startproc
+ 301              		@ args = 0, pretend = 0, frame = 0
+ 302              		@ frame_needed = 1, uses_anonymous_args = 0
+ 303              		@ link register save eliminated.
+ 304 00b4 80B4     		push	{r7}
+ 305              		.cfi_def_cfa_offset 4
+ 306              		.cfi_offset 7, -4
+ 307 00b6 00AF     		add	r7, sp, #0
+ 308              		.cfi_def_cfa_register 7
+ 229:../src/stm32f2xx_it.c **** 
+ 230:../src/stm32f2xx_it.c **** //  HAL_DMA_IRQHandler(SpiHandle.hdmarx);
+ 231:../src/stm32f2xx_it.c **** //	HAL_DMA_IRQHandler(uSdHandle.hdmarx);
+ 232:../src/stm32f2xx_it.c **** }
+ 309              		.loc 1 232 0
+ 310 00b8 BD46     		mov	sp, r7
+ 311              		@ sp needed
+ 312 00ba 5DF8047B 		ldr	r7, [sp], #4
+ 313 00be 7047     		bx	lr
+ 314              		.cfi_endproc
+ 315              	.LFE65:
+ 317              		.align	2
+ 318              		.global	SPIx_DMA_TX_IRQHandler
+ 319              		.thumb
+ 320              		.thumb_func
+ 322              	SPIx_DMA_TX_IRQHandler:
+ 323              	.LFB66:
+ 233:../src/stm32f2xx_it.c **** 
+ 234:../src/stm32f2xx_it.c **** /**
+ 235:../src/stm32f2xx_it.c ****   * @brief  This function handles DMA Tx interrupt request.
+ 236:../src/stm32f2xx_it.c ****   * @param  None
+ 237:../src/stm32f2xx_it.c ****   * @retval None
+ 238:../src/stm32f2xx_it.c ****   */
+ 239:../src/stm32f2xx_it.c **** void SPIx_DMA_TX_IRQHandler(void)
+ 240:../src/stm32f2xx_it.c **** {
+ 324              		.loc 1 240 0
+ 325              		.cfi_startproc
+ 326              		@ args = 0, pretend = 0, frame = 0
+ 327              		@ frame_needed = 1, uses_anonymous_args = 0
+ 328              		@ link register save eliminated.
+ 329 00c0 80B4     		push	{r7}
+ 330              		.cfi_def_cfa_offset 4
+ 331              		.cfi_offset 7, -4
+ 332 00c2 00AF     		add	r7, sp, #0
+ 333              		.cfi_def_cfa_register 7
+ 241:../src/stm32f2xx_it.c **** //  HAL_DMA_IRQHandler(SpiHandle.hdmatx);
+ 242:../src/stm32f2xx_it.c **** //	HAL_DMA_IRQHandler(uSdHandle.hdmatx);
+ 243:../src/stm32f2xx_it.c **** 
+ 244:../src/stm32f2xx_it.c **** }
+ 334              		.loc 1 244 0
+ 335 00c4 BD46     		mov	sp, r7
+ 336              		@ sp needed
+ 337 00c6 5DF8047B 		ldr	r7, [sp], #4
+ 338 00ca 7047     		bx	lr
+ 339              		.cfi_endproc
+ 340              	.LFE66:
+ 342              		.align	2
+ 343              		.global	ADCTS_IRQHandler
+ 344              		.thumb
+ 345              		.thumb_func
+ 347              	ADCTS_IRQHandler:
+ 348              	.LFB67:
+ 245:../src/stm32f2xx_it.c **** 
+ 246:../src/stm32f2xx_it.c **** /**
+ 247:../src/stm32f2xx_it.c ****   * @brief  This function handles ADC interrupt request.
+ 248:../src/stm32f2xx_it.c ****   * @param  None
+ 249:../src/stm32f2xx_it.c ****   * @retval None
+ 250:../src/stm32f2xx_it.c ****   */
+ 251:../src/stm32f2xx_it.c **** void ADCTS_IRQHandler(void)
+ 252:../src/stm32f2xx_it.c **** {
+ 349              		.loc 1 252 0
+ 350              		.cfi_startproc
+ 351              		@ args = 0, pretend = 0, frame = 0
+ 352              		@ frame_needed = 1, uses_anonymous_args = 0
+ 353              		@ link register save eliminated.
+ 354 00cc 80B4     		push	{r7}
+ 355              		.cfi_def_cfa_offset 4
+ 356              		.cfi_offset 7, -4
+ 357 00ce 00AF     		add	r7, sp, #0
+ 358              		.cfi_def_cfa_register 7
+ 253:../src/stm32f2xx_it.c **** //  HAL_ADC_IRQHandler(&AdcHandle);
+ 254:../src/stm32f2xx_it.c **** //  printf("HAL_ADC_IRQHandler\n");
+ 255:../src/stm32f2xx_it.c **** 
+ 256:../src/stm32f2xx_it.c **** }
+ 359              		.loc 1 256 0
+ 360 00d0 BD46     		mov	sp, r7
+ 361              		@ sp needed
+ 362 00d2 5DF8047B 		ldr	r7, [sp], #4
+ 363 00d6 7047     		bx	lr
+ 364              		.cfi_endproc
+ 365              	.LFE67:
+ 367              		.align	2
+ 368              		.global	ADCTS_DMA_IRQHandler
+ 369              		.thumb
+ 370              		.thumb_func
+ 372              	ADCTS_DMA_IRQHandler:
+ 373              	.LFB68:
+ 257:../src/stm32f2xx_it.c **** /**
+ 258:../src/stm32f2xx_it.c **** * @brief  This function handles DMA interrupt request.
+ 259:../src/stm32f2xx_it.c **** * @param  None
+ 260:../src/stm32f2xx_it.c **** * @retval None
+ 261:../src/stm32f2xx_it.c **** */
+ 262:../src/stm32f2xx_it.c **** void ADCTS_DMA_IRQHandler(void)
+ 263:../src/stm32f2xx_it.c **** {
+ 374              		.loc 1 263 0
+ 375              		.cfi_startproc
+ 376              		@ args = 0, pretend = 0, frame = 0
+ 377              		@ frame_needed = 1, uses_anonymous_args = 0
+ 378              		@ link register save eliminated.
+ 379 00d8 80B4     		push	{r7}
+ 380              		.cfi_def_cfa_offset 4
+ 381              		.cfi_offset 7, -4
+ 382 00da 00AF     		add	r7, sp, #0
+ 383              		.cfi_def_cfa_register 7
+ 264:../src/stm32f2xx_it.c **** //  HAL_DMA_IRQHandler(AdcHandle.DMA_Handle);
+ 265:../src/stm32f2xx_it.c ****  // printf("ADCTS_DMA_IRQHandler\n");
+ 266:../src/stm32f2xx_it.c **** }
+ 384              		.loc 1 266 0
+ 385 00dc BD46     		mov	sp, r7
+ 386              		@ sp needed
+ 387 00de 5DF8047B 		ldr	r7, [sp], #4
+ 388 00e2 7047     		bx	lr
+ 389              		.cfi_endproc
+ 390              	.LFE68:
+ 392              		.align	2
+ 393              		.global	DMA2_Stream3_IRQHandler
+ 394              		.thumb
+ 395              		.thumb_func
+ 397              	DMA2_Stream3_IRQHandler:
+ 398              	.LFB69:
+ 267:../src/stm32f2xx_it.c **** 
+ 268:../src/stm32f2xx_it.c **** 
+ 269:../src/stm32f2xx_it.c **** /**
+ 270:../src/stm32f2xx_it.c ****   * @brief  This function handles DMA2 Stream 3 interrupt request.
+ 271:../src/stm32f2xx_it.c ****   * @param  None
+ 272:../src/stm32f2xx_it.c ****   * @retval None
+ 273:../src/stm32f2xx_it.c ****   */
+ 274:../src/stm32f2xx_it.c **** void DMA2_Stream3_IRQHandler(void)
+ 275:../src/stm32f2xx_it.c **** {
+ 399              		.loc 1 275 0
+ 400              		.cfi_startproc
+ 401              		@ args = 0, pretend = 0, frame = 0
+ 402              		@ frame_needed = 1, uses_anonymous_args = 0
+ 403 00e4 80B5     		push	{r7, lr}
+ 404              		.cfi_def_cfa_offset 8
+ 405              		.cfi_offset 7, -8
+ 406              		.cfi_offset 14, -4
+ 407 00e6 00AF     		add	r7, sp, #0
+ 408              		.cfi_def_cfa_register 7
+ 276:../src/stm32f2xx_it.c ****   LED_High(LED0);
+ 409              		.loc 1 276 0
+ 410 00e8 0020     		movs	r0, #0
+ 411 00ea FFF7FEFF 		bl	LED_High
+ 277:../src/stm32f2xx_it.c **** //  HAL_DMA_IRQHandler(uSdHandle.hdmarx);
+ 278:../src/stm32f2xx_it.c ****   BSP_SD_DMA_Rx_IRQHandler();
+ 412              		.loc 1 278 0
+ 413 00ee FFF7FEFF 		bl	BSP_SD_DMA_Rx_IRQHandler
+ 279:../src/stm32f2xx_it.c **** }
+ 414              		.loc 1 279 0
+ 415 00f2 80BD     		pop	{r7, pc}
+ 416              		.cfi_endproc
+ 417              	.LFE69:
+ 419              		.align	2
+ 420              		.global	DMA2_Stream6_IRQHandler
+ 421              		.thumb
+ 422              		.thumb_func
+ 424              	DMA2_Stream6_IRQHandler:
+ 425              	.LFB70:
+ 280:../src/stm32f2xx_it.c **** 
+ 281:../src/stm32f2xx_it.c **** /**
+ 282:../src/stm32f2xx_it.c ****   * @brief  This function handles DMA2 Stream 6 interrupt request.
+ 283:../src/stm32f2xx_it.c ****   * @param  None
+ 284:../src/stm32f2xx_it.c ****   * @retval None
+ 285:../src/stm32f2xx_it.c ****   */
+ 286:../src/stm32f2xx_it.c **** void DMA2_Stream6_IRQHandler(void)
+ 287:../src/stm32f2xx_it.c **** {
+ 426              		.loc 1 287 0
+ 427              		.cfi_startproc
+ 428              		@ args = 0, pretend = 0, frame = 0
+ 429              		@ frame_needed = 1, uses_anonymous_args = 0
+ 430 00f4 80B5     		push	{r7, lr}
+ 431              		.cfi_def_cfa_offset 8
+ 432              		.cfi_offset 7, -8
+ 433              		.cfi_offset 14, -4
+ 434 00f6 00AF     		add	r7, sp, #0
+ 435              		.cfi_def_cfa_register 7
+ 288:../src/stm32f2xx_it.c ****    LED_High(LED1);
+ 436              		.loc 1 288 0
+ 437 00f8 0120     		movs	r0, #1
+ 438 00fa FFF7FEFF 		bl	LED_High
+ 289:../src/stm32f2xx_it.c **** //   HAL_DMA_IRQHandler(uSdHandle.hdmatx);
+ 290:../src/stm32f2xx_it.c ****   BSP_SD_DMA_Tx_IRQHandler();
+ 439              		.loc 1 290 0
+ 440 00fe FFF7FEFF 		bl	BSP_SD_DMA_Tx_IRQHandler
+ 291:../src/stm32f2xx_it.c **** }
+ 441              		.loc 1 291 0
+ 442 0102 80BD     		pop	{r7, pc}
+ 443              		.cfi_endproc
+ 444              	.LFE70:
+ 446              		.align	2
+ 447              		.global	SDIO_IRQHandler
+ 448              		.thumb
+ 449              		.thumb_func
+ 451              	SDIO_IRQHandler:
+ 452              	.LFB71:
+ 292:../src/stm32f2xx_it.c **** 
+ 293:../src/stm32f2xx_it.c **** /**
+ 294:../src/stm32f2xx_it.c ****   * @brief  This function handles SDIO interrupt request.
+ 295:../src/stm32f2xx_it.c ****   * @param  None
+ 296:../src/stm32f2xx_it.c ****   * @retval None
+ 297:../src/stm32f2xx_it.c ****   */
+ 298:../src/stm32f2xx_it.c **** void SDIO_IRQHandler(void)
+ 299:../src/stm32f2xx_it.c **** {
+ 453              		.loc 1 299 0
+ 454              		.cfi_startproc
+ 455              		@ args = 0, pretend = 0, frame = 0
+ 456              		@ frame_needed = 1, uses_anonymous_args = 0
+ 457 0104 80B5     		push	{r7, lr}
+ 458              		.cfi_def_cfa_offset 8
+ 459              		.cfi_offset 7, -8
+ 460              		.cfi_offset 14, -4
+ 461 0106 00AF     		add	r7, sp, #0
+ 462              		.cfi_def_cfa_register 7
+ 300:../src/stm32f2xx_it.c ****   LED_High(LED2);
+ 463              		.loc 1 300 0
+ 464 0108 0220     		movs	r0, #2
+ 465 010a FFF7FEFF 		bl	LED_High
+ 301:../src/stm32f2xx_it.c **** //  HAL_SD_IRQHandler(&uSdHandle);		//&uSdHandle
+ 302:../src/stm32f2xx_it.c ****   BSP_SD_IRQHandler();
+ 466              		.loc 1 302 0
+ 467 010e FFF7FEFF 		bl	BSP_SD_IRQHandler
+ 303:../src/stm32f2xx_it.c ****  // SD_ProcessIRQSrc ();
+ 304:../src/stm32f2xx_it.c **** }
+ 468              		.loc 1 304 0
+ 469 0112 80BD     		pop	{r7, pc}
+ 470              		.cfi_endproc
+ 471              	.LFE71:
+ 473              	.Letext0:
+ 474              		.file 2 "c:\\program files (x86)\\codesourcery\\arm-none-eabi\\include\\stdint.h"
+ 475              		.file 3 "D:\\workspace\\console800480\\system/stm32f217xx.h"
+ 476              		.file 4 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_hal_def.h"
+ 477              		.file 5 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_hal_dma.h"
+ 478              		.file 6 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_ll_sdmmc.h"
+ 479              		.file 7 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_hal_sd.h"
+ 480              		.file 8 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_hal_uart.h"
+ 481              		.file 9 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_ll_usb.h"
+ 482              		.file 10 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_hal_pcd.h"
+ 483              		.file 11 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_hal_hcd.h"
+ 484              		.file 12 "../src/LEDs.h"
+ 485              		.file 13 "D:\\workspace\\console800480\\system/core_cm3.h"
+ 486              		.file 14 "D:\\workspace\\console800480/main.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 stm32f2xx_it.c
+                            *COM*:00000060 uSdHandle
+                            *COM*:00000058 SD_CardInfo
+C:\Users\sagok\AppData\Local\Temp\ccyxLA1g.s:20     .text:00000000 $t
+C:\Users\sagok\AppData\Local\Temp\ccyxLA1g.s:25     .text:00000000 NMI_Handler
+C:\Users\sagok\AppData\Local\Temp\ccyxLA1g.s:51     .text:0000000c HardFault_Handler
+C:\Users\sagok\AppData\Local\Temp\ccyxLA1g.s:74     .text:00000014 MemManage_Handler
+C:\Users\sagok\AppData\Local\Temp\ccyxLA1g.s:97     .text:0000001c BusFault_Handler
+C:\Users\sagok\AppData\Local\Temp\ccyxLA1g.s:120    .text:00000024 UsageFault_Handler
+C:\Users\sagok\AppData\Local\Temp\ccyxLA1g.s:143    .text:0000002c DebugMon_Handler
+C:\Users\sagok\AppData\Local\Temp\ccyxLA1g.s:168    .text:00000038 OTG_FS_IRQHandler
+C:\Users\sagok\AppData\Local\Temp\ccyxLA1g.s:197    .text:00000050 OTG_HS_IRQHandler
+C:\Users\sagok\AppData\Local\Temp\ccyxLA1g.s:232    .text:00000074 DMA2_Stream7_IRQHandler
+C:\Users\sagok\AppData\Local\Temp\ccyxLA1g.s:269    .text:0000009c DMA2_Stream5_IRQHandler
+C:\Users\sagok\AppData\Local\Temp\ccyxLA1g.s:297    .text:000000b4 SPIx_DMA_RX_IRQHandler
+C:\Users\sagok\AppData\Local\Temp\ccyxLA1g.s:322    .text:000000c0 SPIx_DMA_TX_IRQHandler
+C:\Users\sagok\AppData\Local\Temp\ccyxLA1g.s:347    .text:000000cc ADCTS_IRQHandler
+C:\Users\sagok\AppData\Local\Temp\ccyxLA1g.s:372    .text:000000d8 ADCTS_DMA_IRQHandler
+C:\Users\sagok\AppData\Local\Temp\ccyxLA1g.s:397    .text:000000e4 DMA2_Stream3_IRQHandler
+C:\Users\sagok\AppData\Local\Temp\ccyxLA1g.s:424    .text:000000f4 DMA2_Stream6_IRQHandler
+C:\Users\sagok\AppData\Local\Temp\ccyxLA1g.s:451    .text:00000104 SDIO_IRQHandler
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.1.7f551ac7fcad8b79b9df4bfdaa536673
+                           .group:00000000 wm4.stm32f2xx_hal_conf.h.40.007126baefb9f966c36646edbf8040d2
+                           .group:00000000 wm4.stm32f2xx.h.57.5ec1581efc43612c411d33a8686e9ec7
+                           .group:00000000 wm4.stm32f217xx.h.52.9c940d76d00294b78837dc334c172fdd
+                           .group:00000000 wm4.core_cm3.h.32.49180ccb4d36cabd2d7016d2a51d91ae
+                           .group:00000000 wm4.newlib.h.8.384a112feabb3bef7b573ae48cde2e3b
+                           .group:00000000 wm4.features.h.22.6a4ca7cd053637cc1d0db6c16f39b2d7
+                           .group:00000000 wm4.config.h.183.aa62afef667fb61d15fa64c48beb2f14
+                           .group:00000000 wm4._ansi.h.23.5644b60c990a4800b02a6e654e88f93a
+                           .group:00000000 wm4.stdint.h.20.54ad762faa59e3c05491630641c8d8bf
+                           .group:00000000 wm4.core_cmInstr.h.25.f50f886f2edf670cf199b35fd96f5c91
+                           .group:00000000 wm4.core_cm3.h.130.63ab2348a6eed0fdb318040d970b676c
+                           .group:00000000 wm4.stm32f217xx.h.978.a5c681952b2f704a0e7f2ba21d08adf5
+                           .group:00000000 wm4.stm32f2xx.h.142.bc2155a1f7498bab16371e38413a9e41
+                           .group:00000000 wm4.stm32f2xx_hal_def.h.74.8ad2dc8aa82c4fd02e5aeaae592641ba
+                           .group:00000000 wm4.stm32f2xx_hal_rcc.h.142.ec0f91cc6576a6acebd17e6dd85829ae
+                           .group:00000000 wm4.stm32f2xx_hal_rcc_ex.h.40.0829033e864455c6bdd0db01f8ba5a50
+                           .group:00000000 wm4.stm32f2xx_hal_gpio.h.40.ba64e0bb94d9a68835f80159f39a86f1
+                           .group:00000000 wm4.stm32f2xx_hal_gpio_ex.h.40.24e547fd402281923f446b510381083f
+                           .group:00000000 wm4.stm32f2xx_hal_dma.h.40.5d9732ace2a21a4526ce8f0c52428fff
+                           .group:00000000 wm4.stm32f2xx_hal_cortex.h.40.e10263d2ec5d4fa79b4180ce1a38aff1
+                           .group:00000000 wm4.stm32f2xx_hal_adc.h.40.89ac8b78113cac4cf63847587daabac9
+                           .group:00000000 wm4.stm32f2xx_hal_adc_ex.h.40.7de68ed256ef25526ee31cc017f2c291
+                           .group:00000000 wm4.stm32f2xx_hal_flash.h.40.c3171719ce015e9cff20c795e44e886d
+                           .group:00000000 wm4.stm32f2xx_hal_flash_ex.h.40.7389508bd24a0aeb077bde0c9fb651eb
+                           .group:00000000 wm4.stm32f2xx_ll_fsmc.h.40.c1c32f2e1862f4dd342bd9b80fb895bb
+                           .group:00000000 wm4.stm32f2xx_hal_pwr.h.40.812df32e5c31b609a128e9db0eb4cbd0
+                           .group:00000000 wm4.stm32f2xx_hal_rtc.h.40.850fda5fe2cce8797446913dee18382f
+                           .group:00000000 wm4.stm32f2xx_hal_rtc_ex.h.40.f3e0c408e3bf4e8a0352d7ec9a18a822
+                           .group:00000000 wm4.stm32f2xx_ll_sdmmc.h.40.3719ab487c4b77401c572f459adf6eb7
+                           .group:00000000 wm4.stm32f2xx_hal_sd.h.58.760215394dcc316161a6482c0af9b866
+                           .group:00000000 wm4.stm32f2xx_hal_spi.h.40.7984243dbaba8b21c6392998a47e6987
+                           .group:00000000 wm4.stm32f2xx_hal_tim.h.40.d79172f25d0e9a15dc346aba8515bdd6
+                           .group:00000000 wm4.stm32f2xx_hal_tim_ex.h.40.361f280a7a3f60b4b238bb99ca728d83
+                           .group:00000000 wm4.stm32f2xx_hal_uart.h.40.d74def561ae6f78f40f477c8426ecbef
+                           .group:00000000 wm4.stm32f2xx_ll_usb.h.40.9b0206a05bc6ce3bec1648b51f22cb81
+                           .group:00000000 wm4.stm32f2xx_hal_pcd.h.99.11faba414c39e357b2f23364912d0605
+                           .group:00000000 wm4.stm32f2xx_hal_hcd.h.40.44ee5e972983ae0139ddbacdc75c44ef
+                           .group:00000000 wm4.stm32f2xx_hal.h.64.ed79ee83e52b151b3c365392b398f866
+                           .group:00000000 wm4.stdio.h.31.7c0e28c411445f3f9c5b11accf882760
+                           .group:00000000 wm4.stddef.h.184.159df79b4ca79c76561572a55985524c
+                           .group:00000000 wm4.stdarg.h.34.3a23a216c0c293b3d2ea2e89281481e6
+                           .group:00000000 wm4._default_types.h.6.5e12cd604db8ce00b62bb2f02708eaf3
+                           .group:00000000 wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea
+                           .group:00000000 wm4._types.h.59.db8450f33c1f6150c0372fa1091a887a
+                           .group:00000000 wm4.stddef.h.348.9a99de77b6ba3b4278b57e9cc6d6e349
+                           .group:00000000 wm4.reent.h.16.567d760e6ae9ad7f917851a308bd7a57
+                           .group:00000000 wm4.types.h.23.0d949686bbcadd1621462d4fa1f884f9
+                           .group:00000000 wm4.stddef.h.39.7e3d906ac58942e0b374c527445f5de5
+                           .group:00000000 wm4.types.h.2.e9cec8c90ab35f77d9f499e06ae02400
+                           .group:00000000 wm4.types.h.80.5759fe41f87f5211a5952dfb1fc64f19
+                           .group:00000000 wm4.stdio.h.2.4aa87247282eca6c8f36f9de33d8df1a
+                           .group:00000000 wm4.stdio.h.64.f9f1bb6b0d3d7e12f6a27968d859709c
+                           .group:00000000 wm4.stdlib.h.18.8bab2fb43ac4e90235390733c30a4530
+                           .group:00000000 wm4.stddef.h.158.a7efb00f6cbc6f43213b50e183c9830c
+                           .group:00000000 wm4.alloca.h.8.dfc0c703c47ec3e69746825b17d9e66d
+                           .group:00000000 wm4.stdlib.h.55.7091a050e07f1c4abd225630fe3d62f1
+                           .group:00000000 wm4.cdefs.h.56.efab90f4d89fbc41d6b3a5c5fb0d3d0f
+                           .group:00000000 wm4.string.h.15.dab3980bf35408a4c507182805e2de3a
+                           .group:00000000 wm4.string.h.126.6ff3aa59129e7f66b2c273baf353e066
+                           .group:00000000 wm4.Display.h.39.49592f1e6d055d6383457fd20cdd98de
+                           .group:00000000 wm4.usbd_conf.h.42.6b5dabdfef26be13dabbf5c06e1837cb
+                           .group:00000000 wm4.usbd_def.h.54.f0a777e557f44b0cdc32a86cdf6d44e8
+                           .group:00000000 wm4.usbd_cdc.h.48.93470a15f0b6146c8b31621ae3de674b
+                           .group:00000000 wm4.LEDs.h.9.36ffa4b30bd168dc58d64fa6e53a9a30
+                           .group:00000000 wm4.projdefs.h.67.1891ed3aab788f154f6e7a8ff42f2cfd
+                           .group:00000000 wm4.FreeRTOSConfig.h.51.b259e2e835793b5f31e6fb224a543b76
+                           .group:00000000 wm4.portmacro.h.68.b9ad41c1c2fd3fb36d97939d17ebacd9
+                           .group:00000000 wm4.portable.h.325.a31e8973a246cd28421ddb595e37fd13
+                           .group:00000000 wm4.mpu_wrappers.h.67.4bcfd12ce15e5313ce3efd77400f8168
+                           .group:00000000 wm4.FreeRTOS.h.177.d801ec107caaf24697618049ed7605b1
+                           .group:00000000 wm4.list.h.96.eaa3d29743bd681933f9f5e726c756a1
+                           .group:00000000 wm4.task.h.84.ff846741c7bdac87bd4a7636d5320d68
+                           .group:00000000 wm4.queue.h.68.1266563298ebacb4a83c08ead1e4111f
+                           .group:00000000 wm4.semphr.h.77.cfc41285e8d228b828c00c3fce52801f
+
+UNDEFINED SYMBOLS
+LED_Toggle
+hpcd
+HAL_PCD_IRQHandler
+TST_High
+hhcd
+HAL_HCD_IRQHandler
+TST_Low
+UartHandle
+HAL_DMA_IRQHandler
+LED_High
+BSP_SD_DMA_Rx_IRQHandler
+BSP_SD_DMA_Tx_IRQHandler
+BSP_SD_IRQHandler

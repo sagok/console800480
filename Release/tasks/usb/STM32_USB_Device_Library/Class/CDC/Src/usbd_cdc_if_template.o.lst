@@ -1,0 +1,601 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"usbd_cdc_if_template.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.global	USBD_CDC_Template_fops
+  19              		.data
+  20              		.align	2
+  23              	USBD_CDC_Template_fops:
+  24 0000 00000000 		.word	TEMPLATE_Init
+  25 0004 00000000 		.word	TEMPLATE_DeInit
+  26 0008 00000000 		.word	TEMPLATE_Control
+  27 000c 00000000 		.word	TEMPLATE_Receive
+  28              		.global	linecoding
+  29              		.align	2
+  32              	linecoding:
+  33 0010 00C20100 		.word	115200
+  34 0014 00       		.byte	0
+  35 0015 00       		.byte	0
+  36 0016 08       		.byte	8
+  37 0017 00       		.space	1
+  38              		.text
+  39              		.align	2
+  40              		.thumb
+  41              		.thumb_func
+  43              	TEMPLATE_Init:
+  44              	.LFB55:
+  45              		.file 1 "../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c"
+   1:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** /**
+   2:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   ******************************************************************************
+   3:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * @file    usbd_cdc_if_template.c
+   4:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * @author  MCD Application Team
+   5:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * @version V2.0.0
+   6:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * @date    18-February-2014
+   7:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * @brief   Generic media access Layer.
+   8:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   ******************************************************************************
+   9:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * @attention
+  10:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   *
+  11:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * <h2><center>&copy; COPYRIGHT 2014 STMicroelectronics</center></h2>
+  12:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   *
+  13:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+  14:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * You may not use this file except in compliance with the License.
+  15:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * You may obtain a copy of the License at:
+  16:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   *
+  17:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   *        http://www.st.com/software_license_agreement_liberty_v2
+  18:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   *
+  19:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * Unless required by applicable law or agreed to in writing, software 
+  20:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * distributed under the License is distributed on an "AS IS" BASIS, 
+  21:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  22:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * See the License for the specific language governing permissions and
+  23:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * limitations under the License.
+  24:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   *
+  25:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   ******************************************************************************
+  26:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   */ 
+  27:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** 
+  28:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** /* Includes ------------------------------------------------------------------*/
+  29:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** #include "usbd_cdc_if_template.h"
+  30:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** 
+  31:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
+  32:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * @{
+  33:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   */
+  34:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** 
+  35:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** 
+  36:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** /** @defgroup USBD_CDC 
+  37:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * @brief usbd core module
+  38:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * @{
+  39:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   */ 
+  40:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** 
+  41:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** /** @defgroup USBD_CDC_Private_TypesDefinitions
+  42:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * @{
+  43:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   */ 
+  44:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** /**
+  45:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * @}
+  46:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   */ 
+  47:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** 
+  48:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** 
+  49:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** /** @defgroup USBD_CDC_Private_Defines
+  50:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * @{
+  51:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   */ 
+  52:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** /**
+  53:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * @}
+  54:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   */ 
+  55:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** 
+  56:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** 
+  57:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** /** @defgroup USBD_CDC_Private_Macros
+  58:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * @{
+  59:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   */ 
+  60:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** 
+  61:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** /**
+  62:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * @}
+  63:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   */ 
+  64:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** 
+  65:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** 
+  66:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** /** @defgroup USBD_CDC_Private_FunctionPrototypes
+  67:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * @{
+  68:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   */
+  69:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** 
+  70:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** static int8_t TEMPLATE_Init     (void);
+  71:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** static int8_t TEMPLATE_DeInit   (void);
+  72:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** static int8_t TEMPLATE_Control  (uint8_t cmd, uint8_t* pbuf, uint16_t length);
+  73:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** static int8_t TEMPLATE_Receive  (uint8_t* pbuf, uint32_t *Len);
+  74:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** 
+  75:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** USBD_CDC_ItfTypeDef USBD_CDC_Template_fops = 
+  76:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** {
+  77:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   TEMPLATE_Init,
+  78:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   TEMPLATE_DeInit,
+  79:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   TEMPLATE_Control,
+  80:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   TEMPLATE_Receive
+  81:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** };
+  82:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** 
+  83:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** USBD_CDC_LineCodingTypeDef linecoding =
+  84:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   {
+  85:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****     115200, /* baud rate*/
+  86:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****     0x00,   /* stop bits-1*/
+  87:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****     0x00,   /* parity - none*/
+  88:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****     0x08    /* nb. of bits 8*/
+  89:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   };
+  90:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** 
+  91:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** /* Private functions ---------------------------------------------------------*/
+  92:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** 
+  93:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** /**
+  94:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * @brief  TEMPLATE_Init
+  95:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   *         Initializes the CDC media low layer
+  96:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * @param  None
+  97:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
+  98:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   */
+  99:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** static int8_t TEMPLATE_Init(void)
+ 100:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** {
+  46              		.loc 1 100 0
+  47              		.cfi_startproc
+  48              		@ args = 0, pretend = 0, frame = 0
+  49              		@ frame_needed = 1, uses_anonymous_args = 0
+  50              		@ link register save eliminated.
+  51 0000 80B4     		push	{r7}
+  52              		.cfi_def_cfa_offset 4
+  53              		.cfi_offset 7, -4
+  54 0002 00AF     		add	r7, sp, #0
+  55              		.cfi_def_cfa_register 7
+ 101:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   /*
+ 102:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****      Add your initialization code here 
+ 103:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   */  
+ 104:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   return (0);
+  56              		.loc 1 104 0
+  57 0004 0023     		movs	r3, #0
+  58 0006 5BB2     		sxtb	r3, r3
+ 105:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** }
+  59              		.loc 1 105 0
+  60 0008 1846     		mov	r0, r3
+  61 000a BD46     		mov	sp, r7
+  62              		@ sp needed
+  63 000c 5DF8047B 		ldr	r7, [sp], #4
+  64 0010 7047     		bx	lr
+  65              		.cfi_endproc
+  66              	.LFE55:
+  68 0012 00BF     		.align	2
+  69              		.thumb
+  70              		.thumb_func
+  72              	TEMPLATE_DeInit:
+  73              	.LFB56:
+ 106:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** 
+ 107:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** /**
+ 108:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * @brief  TEMPLATE_DeInit
+ 109:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   *         DeInitializes the CDC media low layer
+ 110:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * @param  None
+ 111:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
+ 112:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   */
+ 113:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** static int8_t TEMPLATE_DeInit(void)
+ 114:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** {
+  74              		.loc 1 114 0
+  75              		.cfi_startproc
+  76              		@ args = 0, pretend = 0, frame = 0
+  77              		@ frame_needed = 1, uses_anonymous_args = 0
+  78              		@ link register save eliminated.
+  79 0014 80B4     		push	{r7}
+  80              		.cfi_def_cfa_offset 4
+  81              		.cfi_offset 7, -4
+  82 0016 00AF     		add	r7, sp, #0
+  83              		.cfi_def_cfa_register 7
+ 115:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   /*
+ 116:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****      Add your deinitialization code here 
+ 117:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   */  
+ 118:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   return (0);
+  84              		.loc 1 118 0
+  85 0018 0023     		movs	r3, #0
+  86 001a 5BB2     		sxtb	r3, r3
+ 119:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** }
+  87              		.loc 1 119 0
+  88 001c 1846     		mov	r0, r3
+  89 001e BD46     		mov	sp, r7
+  90              		@ sp needed
+  91 0020 5DF8047B 		ldr	r7, [sp], #4
+  92 0024 7047     		bx	lr
+  93              		.cfi_endproc
+  94              	.LFE56:
+  96 0026 00BF     		.align	2
+  97              		.thumb
+  98              		.thumb_func
+ 100              	TEMPLATE_Control:
+ 101              	.LFB57:
+ 120:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** 
+ 121:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** 
+ 122:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** /**
+ 123:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * @brief  TEMPLATE_Control
+ 124:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   *         Manage the CDC class requests
+ 125:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * @param  Cmd: Command code            
+ 126:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * @param  Buf: Buffer containing command data (request parameters)
+ 127:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * @param  Len: Number of data to be sent (in bytes)
+ 128:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
+ 129:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   */
+ 130:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** static int8_t TEMPLATE_Control  (uint8_t cmd, uint8_t* pbuf, uint16_t length)
+ 131:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** { 
+ 102              		.loc 1 131 0
+ 103              		.cfi_startproc
+ 104              		@ args = 0, pretend = 0, frame = 8
+ 105              		@ frame_needed = 1, uses_anonymous_args = 0
+ 106              		@ link register save eliminated.
+ 107 0028 80B4     		push	{r7}
+ 108              		.cfi_def_cfa_offset 4
+ 109              		.cfi_offset 7, -4
+ 110 002a 83B0     		sub	sp, sp, #12
+ 111              		.cfi_def_cfa_offset 16
+ 112 002c 00AF     		add	r7, sp, #0
+ 113              		.cfi_def_cfa_register 7
+ 114 002e 3960     		str	r1, [r7]
+ 115 0030 1346     		mov	r3, r2
+ 116 0032 0246     		mov	r2, r0
+ 117 0034 FA71     		strb	r2, [r7, #7]
+ 118 0036 BB80     		strh	r3, [r7, #4]	@ movhi
+ 132:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   switch (cmd)
+ 119              		.loc 1 132 0
+ 120 0038 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 121 003a 232B     		cmp	r3, #35
+ 122 003c 00F2B980 		bhi	.L19
+ 123 0040 01A2     		adr	r2, .L8
+ 124 0042 52F823F0 		ldr	pc, [r2, r3, lsl #2]
+ 125 0046 00BF     		.p2align 2
+ 126              	.L8:
+ 127 0048 B3010000 		.word	.L19+1
+ 128 004c B3010000 		.word	.L19+1
+ 129 0050 B3010000 		.word	.L19+1
+ 130 0054 B3010000 		.word	.L19+1
+ 131 0058 B3010000 		.word	.L19+1
+ 132 005c B3010000 		.word	.L19+1
+ 133 0060 B3010000 		.word	.L19+1
+ 134 0064 B3010000 		.word	.L19+1
+ 135 0068 B3010000 		.word	.L19+1
+ 136 006c B3010000 		.word	.L19+1
+ 137 0070 B3010000 		.word	.L19+1
+ 138 0074 B3010000 		.word	.L19+1
+ 139 0078 B3010000 		.word	.L19+1
+ 140 007c B3010000 		.word	.L19+1
+ 141 0080 B3010000 		.word	.L19+1
+ 142 0084 B3010000 		.word	.L19+1
+ 143 0088 B3010000 		.word	.L19+1
+ 144 008c B3010000 		.word	.L19+1
+ 145 0090 B3010000 		.word	.L19+1
+ 146 0094 B3010000 		.word	.L19+1
+ 147 0098 B3010000 		.word	.L19+1
+ 148 009c B3010000 		.word	.L19+1
+ 149 00a0 B3010000 		.word	.L19+1
+ 150 00a4 B3010000 		.word	.L19+1
+ 151 00a8 B3010000 		.word	.L19+1
+ 152 00ac B3010000 		.word	.L19+1
+ 153 00b0 B3010000 		.word	.L19+1
+ 154 00b4 B3010000 		.word	.L19+1
+ 155 00b8 B3010000 		.word	.L19+1
+ 156 00bc B3010000 		.word	.L19+1
+ 157 00c0 B3010000 		.word	.L19+1
+ 158 00c4 B3010000 		.word	.L19+1
+ 159 00c8 D9000000 		.word	.L13+1
+ 160 00cc 35010000 		.word	.L14+1
+ 161 00d0 B3010000 		.word	.L19+1
+ 162 00d4 B3010000 		.word	.L19+1
+ 163              	.L13:
+ 133:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   {
+ 134:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   case CDC_SEND_ENCAPSULATED_COMMAND:
+ 135:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****     /* Add your code here */
+ 136:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****     break;
+ 137:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** 
+ 138:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   case CDC_GET_ENCAPSULATED_RESPONSE:
+ 139:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****     /* Add your code here */
+ 140:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****     break;
+ 141:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** 
+ 142:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   case CDC_SET_COMM_FEATURE:
+ 143:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****     /* Add your code here */
+ 144:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****     break;
+ 145:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** 
+ 146:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   case CDC_GET_COMM_FEATURE:
+ 147:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****     /* Add your code here */
+ 148:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****     break;
+ 149:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** 
+ 150:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   case CDC_CLEAR_COMM_FEATURE:
+ 151:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****     /* Add your code here */
+ 152:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****     break;
+ 153:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** 
+ 154:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   case CDC_SET_LINE_CODING:
+ 155:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****     linecoding.bitrate    = (uint32_t)(pbuf[0] | (pbuf[1] << 8) |\
+ 164              		.loc 1 155 0
+ 165 00d8 3B68     		ldr	r3, [r7]
+ 166 00da 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 167 00dc 1A46     		mov	r2, r3
+ 168 00de 3B68     		ldr	r3, [r7]
+ 169 00e0 0133     		adds	r3, r3, #1
+ 170 00e2 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 171 00e4 1B02     		lsls	r3, r3, #8
+ 172 00e6 1A43     		orrs	r2, r2, r3
+ 156:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****                             (pbuf[2] << 16) | (pbuf[3] << 24));
+ 173              		.loc 1 156 0
+ 174 00e8 3B68     		ldr	r3, [r7]
+ 175 00ea 0233     		adds	r3, r3, #2
+ 176 00ec 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 177 00ee 1B04     		lsls	r3, r3, #16
+ 155:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****                             (pbuf[2] << 16) | (pbuf[3] << 24));
+ 178              		.loc 1 155 0
+ 179 00f0 1A43     		orrs	r2, r2, r3
+ 180              		.loc 1 156 0
+ 181 00f2 3B68     		ldr	r3, [r7]
+ 182 00f4 0333     		adds	r3, r3, #3
+ 183 00f6 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 184 00f8 1B06     		lsls	r3, r3, #24
+ 185 00fa 1343     		orrs	r3, r3, r2
+ 155:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****                             (pbuf[2] << 16) | (pbuf[3] << 24));
+ 186              		.loc 1 155 0
+ 187 00fc 1A46     		mov	r2, r3
+ 188 00fe 40F20003 		movw	r3, #:lower16:linecoding
+ 189 0102 C0F20003 		movt	r3, #:upper16:linecoding
+ 190 0106 1A60     		str	r2, [r3]
+ 157:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****     linecoding.format     = pbuf[4];
+ 191              		.loc 1 157 0
+ 192 0108 3B68     		ldr	r3, [r7]
+ 193 010a 1A79     		ldrb	r2, [r3, #4]	@ zero_extendqisi2
+ 194 010c 40F20003 		movw	r3, #:lower16:linecoding
+ 195 0110 C0F20003 		movt	r3, #:upper16:linecoding
+ 196 0114 1A71     		strb	r2, [r3, #4]
+ 158:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****     linecoding.paritytype = pbuf[5];
+ 197              		.loc 1 158 0
+ 198 0116 3B68     		ldr	r3, [r7]
+ 199 0118 5A79     		ldrb	r2, [r3, #5]	@ zero_extendqisi2
+ 200 011a 40F20003 		movw	r3, #:lower16:linecoding
+ 201 011e C0F20003 		movt	r3, #:upper16:linecoding
+ 202 0122 5A71     		strb	r2, [r3, #5]
+ 159:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****     linecoding.datatype   = pbuf[6];
+ 203              		.loc 1 159 0
+ 204 0124 3B68     		ldr	r3, [r7]
+ 205 0126 9A79     		ldrb	r2, [r3, #6]	@ zero_extendqisi2
+ 206 0128 40F20003 		movw	r3, #:lower16:linecoding
+ 207 012c C0F20003 		movt	r3, #:upper16:linecoding
+ 208 0130 9A71     		strb	r2, [r3, #6]
+ 160:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****     
+ 161:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****     /* Add your code here */
+ 162:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****     break;
+ 209              		.loc 1 162 0
+ 210 0132 3FE0     		b	.L17
+ 211              	.L14:
+ 163:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** 
+ 164:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   case CDC_GET_LINE_CODING:
+ 165:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****     pbuf[0] = (uint8_t)(linecoding.bitrate);
+ 212              		.loc 1 165 0
+ 213 0134 40F20003 		movw	r3, #:lower16:linecoding
+ 214 0138 C0F20003 		movt	r3, #:upper16:linecoding
+ 215 013c 1B68     		ldr	r3, [r3]
+ 216 013e DAB2     		uxtb	r2, r3
+ 217 0140 3B68     		ldr	r3, [r7]
+ 218 0142 1A70     		strb	r2, [r3]
+ 166:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****     pbuf[1] = (uint8_t)(linecoding.bitrate >> 8);
+ 219              		.loc 1 166 0
+ 220 0144 3B68     		ldr	r3, [r7]
+ 221 0146 5A1C     		adds	r2, r3, #1
+ 222 0148 40F20003 		movw	r3, #:lower16:linecoding
+ 223 014c C0F20003 		movt	r3, #:upper16:linecoding
+ 224 0150 1B68     		ldr	r3, [r3]
+ 225 0152 1B0A     		lsrs	r3, r3, #8
+ 226 0154 DBB2     		uxtb	r3, r3
+ 227 0156 1370     		strb	r3, [r2]
+ 167:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****     pbuf[2] = (uint8_t)(linecoding.bitrate >> 16);
+ 228              		.loc 1 167 0
+ 229 0158 3B68     		ldr	r3, [r7]
+ 230 015a 9A1C     		adds	r2, r3, #2
+ 231 015c 40F20003 		movw	r3, #:lower16:linecoding
+ 232 0160 C0F20003 		movt	r3, #:upper16:linecoding
+ 233 0164 1B68     		ldr	r3, [r3]
+ 234 0166 1B0C     		lsrs	r3, r3, #16
+ 235 0168 DBB2     		uxtb	r3, r3
+ 236 016a 1370     		strb	r3, [r2]
+ 168:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****     pbuf[3] = (uint8_t)(linecoding.bitrate >> 24);
+ 237              		.loc 1 168 0
+ 238 016c 3B68     		ldr	r3, [r7]
+ 239 016e DA1C     		adds	r2, r3, #3
+ 240 0170 40F20003 		movw	r3, #:lower16:linecoding
+ 241 0174 C0F20003 		movt	r3, #:upper16:linecoding
+ 242 0178 1B68     		ldr	r3, [r3]
+ 243 017a 1B0E     		lsrs	r3, r3, #24
+ 244 017c DBB2     		uxtb	r3, r3
+ 245 017e 1370     		strb	r3, [r2]
+ 169:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****     pbuf[4] = linecoding.format;
+ 246              		.loc 1 169 0
+ 247 0180 3B68     		ldr	r3, [r7]
+ 248 0182 1A1D     		adds	r2, r3, #4
+ 249 0184 40F20003 		movw	r3, #:lower16:linecoding
+ 250 0188 C0F20003 		movt	r3, #:upper16:linecoding
+ 251 018c 1B79     		ldrb	r3, [r3, #4]	@ zero_extendqisi2
+ 252 018e 1370     		strb	r3, [r2]
+ 170:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****     pbuf[5] = linecoding.paritytype;
+ 253              		.loc 1 170 0
+ 254 0190 3B68     		ldr	r3, [r7]
+ 255 0192 5A1D     		adds	r2, r3, #5
+ 256 0194 40F20003 		movw	r3, #:lower16:linecoding
+ 257 0198 C0F20003 		movt	r3, #:upper16:linecoding
+ 258 019c 5B79     		ldrb	r3, [r3, #5]	@ zero_extendqisi2
+ 259 019e 1370     		strb	r3, [r2]
+ 171:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****     pbuf[6] = linecoding.datatype;     
+ 260              		.loc 1 171 0
+ 261 01a0 3B68     		ldr	r3, [r7]
+ 262 01a2 9A1D     		adds	r2, r3, #6
+ 263 01a4 40F20003 		movw	r3, #:lower16:linecoding
+ 264 01a8 C0F20003 		movt	r3, #:upper16:linecoding
+ 265 01ac 9B79     		ldrb	r3, [r3, #6]	@ zero_extendqisi2
+ 266 01ae 1370     		strb	r3, [r2]
+ 172:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****     
+ 173:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****     /* Add your code here */
+ 174:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****     break;
+ 267              		.loc 1 174 0
+ 268 01b0 00E0     		b	.L17
+ 269              	.L19:
+ 175:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** 
+ 176:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   case CDC_SET_CONTROL_LINE_STATE:
+ 177:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****     /* Add your code here */
+ 178:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****     break;
+ 179:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** 
+ 180:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   case CDC_SEND_BREAK:
+ 181:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****      /* Add your code here */
+ 182:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****     break;    
+ 183:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****     
+ 184:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   default:
+ 185:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****     break;
+ 270              		.loc 1 185 0
+ 271 01b2 00BF     		nop
+ 272              	.L17:
+ 186:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   }
+ 187:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** 
+ 188:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   return (0);
+ 273              		.loc 1 188 0
+ 274 01b4 0023     		movs	r3, #0
+ 275 01b6 5BB2     		sxtb	r3, r3
+ 189:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** }
+ 276              		.loc 1 189 0
+ 277 01b8 1846     		mov	r0, r3
+ 278 01ba 0C37     		adds	r7, r7, #12
+ 279 01bc BD46     		mov	sp, r7
+ 280              		@ sp needed
+ 281 01be 5DF8047B 		ldr	r7, [sp], #4
+ 282 01c2 7047     		bx	lr
+ 283              		.cfi_endproc
+ 284              	.LFE57:
+ 286              		.align	2
+ 287              		.thumb
+ 288              		.thumb_func
+ 290              	TEMPLATE_Receive:
+ 291              	.LFB58:
+ 190:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** 
+ 191:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** /**
+ 192:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * @brief  TEMPLATE_DataRx
+ 193:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   *         Data received over USB OUT endpoint are sent over CDC interface 
+ 194:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   *         through this function.
+ 195:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   *           
+ 196:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   *         @note
+ 197:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   *         This function will block any OUT packet reception on USB endpoint 
+ 198:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   *         untill exiting this function. If you exit this function before transfer
+ 199:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   *         is complete on CDC interface (ie. using DMA controller) it will result 
+ 200:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   *         in receiving more data while previous ones are still not sent.
+ 201:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   *                 
+ 202:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * @param  Buf: Buffer of data to be received
+ 203:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * @param  Len: Number of data received (in bytes)
+ 204:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   * @retval Result of the opeartion: USBD_OK if all operations are OK else USBD_FAIL
+ 205:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   */
+ 206:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** static int8_t TEMPLATE_Receive (uint8_t* Buf, uint32_t *Len)
+ 207:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** {
+ 292              		.loc 1 207 0
+ 293              		.cfi_startproc
+ 294              		@ args = 0, pretend = 0, frame = 8
+ 295              		@ frame_needed = 1, uses_anonymous_args = 0
+ 296              		@ link register save eliminated.
+ 297 01c4 80B4     		push	{r7}
+ 298              		.cfi_def_cfa_offset 4
+ 299              		.cfi_offset 7, -4
+ 300 01c6 83B0     		sub	sp, sp, #12
+ 301              		.cfi_def_cfa_offset 16
+ 302 01c8 00AF     		add	r7, sp, #0
+ 303              		.cfi_def_cfa_register 7
+ 304 01ca 7860     		str	r0, [r7, #4]
+ 305 01cc 3960     		str	r1, [r7]
+ 208:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****  
+ 209:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c ****   return (0);
+ 306              		.loc 1 209 0
+ 307 01ce 0023     		movs	r3, #0
+ 308 01d0 5BB2     		sxtb	r3, r3
+ 210:../tasks/usb/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc_if_template.c **** }
+ 309              		.loc 1 210 0
+ 310 01d2 1846     		mov	r0, r3
+ 311 01d4 0C37     		adds	r7, r7, #12
+ 312 01d6 BD46     		mov	sp, r7
+ 313              		@ sp needed
+ 314 01d8 5DF8047B 		ldr	r7, [sp], #4
+ 315 01dc 7047     		bx	lr
+ 316              		.cfi_endproc
+ 317              	.LFE58:
+ 319              	.Letext0:
+ 320              		.file 2 "c:\\program files (x86)\\codesourcery\\arm-none-eabi\\include\\stdint.h"
+ 321              		.file 3 "D:\\workspace\\console800480\\tasks\\usb\\STM32_USB_Device_Library\\Class\\CDC\\Inc/usbd_
+ 322              		.file 4 "D:\\workspace\\console800480\\system/core_cm3.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 usbd_cdc_if_template.c
+C:\Users\sagok\AppData\Local\Temp\ccNLPnkU.s:23     .data:00000000 USBD_CDC_Template_fops
+C:\Users\sagok\AppData\Local\Temp\ccNLPnkU.s:20     .data:00000000 $d
+C:\Users\sagok\AppData\Local\Temp\ccNLPnkU.s:43     .text:00000000 TEMPLATE_Init
+C:\Users\sagok\AppData\Local\Temp\ccNLPnkU.s:72     .text:00000014 TEMPLATE_DeInit
+C:\Users\sagok\AppData\Local\Temp\ccNLPnkU.s:100    .text:00000028 TEMPLATE_Control
+C:\Users\sagok\AppData\Local\Temp\ccNLPnkU.s:290    .text:000001c4 TEMPLATE_Receive
+C:\Users\sagok\AppData\Local\Temp\ccNLPnkU.s:32     .data:00000010 linecoding
+C:\Users\sagok\AppData\Local\Temp\ccNLPnkU.s:39     .text:00000000 $t
+C:\Users\sagok\AppData\Local\Temp\ccNLPnkU.s:127    .text:00000048 $d
+C:\Users\sagok\AppData\Local\Temp\ccNLPnkU.s:165    .text:000000d8 $t
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.1.7f551ac7fcad8b79b9df4bfdaa536673
+                           .group:00000000 wm4.stm32f2xx_hal_conf.h.40.007126baefb9f966c36646edbf8040d2
+                           .group:00000000 wm4.stm32f2xx.h.57.5ec1581efc43612c411d33a8686e9ec7
+                           .group:00000000 wm4.stm32f217xx.h.52.9c940d76d00294b78837dc334c172fdd
+                           .group:00000000 wm4.core_cm3.h.32.49180ccb4d36cabd2d7016d2a51d91ae
+                           .group:00000000 wm4.newlib.h.8.384a112feabb3bef7b573ae48cde2e3b
+                           .group:00000000 wm4.features.h.22.6a4ca7cd053637cc1d0db6c16f39b2d7
+                           .group:00000000 wm4.config.h.183.aa62afef667fb61d15fa64c48beb2f14
+                           .group:00000000 wm4._ansi.h.23.5644b60c990a4800b02a6e654e88f93a
+                           .group:00000000 wm4.stdint.h.20.54ad762faa59e3c05491630641c8d8bf
+                           .group:00000000 wm4.core_cmInstr.h.25.f50f886f2edf670cf199b35fd96f5c91
+                           .group:00000000 wm4.core_cm3.h.130.63ab2348a6eed0fdb318040d970b676c
+                           .group:00000000 wm4.stm32f217xx.h.978.a5c681952b2f704a0e7f2ba21d08adf5
+                           .group:00000000 wm4.stm32f2xx.h.142.bc2155a1f7498bab16371e38413a9e41
+                           .group:00000000 wm4.stm32f2xx_hal_def.h.74.8ad2dc8aa82c4fd02e5aeaae592641ba
+                           .group:00000000 wm4.stm32f2xx_hal_rcc.h.142.ec0f91cc6576a6acebd17e6dd85829ae
+                           .group:00000000 wm4.stm32f2xx_hal_rcc_ex.h.40.0829033e864455c6bdd0db01f8ba5a50
+                           .group:00000000 wm4.stm32f2xx_hal_gpio.h.40.ba64e0bb94d9a68835f80159f39a86f1
+                           .group:00000000 wm4.stm32f2xx_hal_gpio_ex.h.40.24e547fd402281923f446b510381083f
+                           .group:00000000 wm4.stm32f2xx_hal_dma.h.40.5d9732ace2a21a4526ce8f0c52428fff
+                           .group:00000000 wm4.stm32f2xx_hal_cortex.h.40.e10263d2ec5d4fa79b4180ce1a38aff1
+                           .group:00000000 wm4.stm32f2xx_hal_adc.h.40.89ac8b78113cac4cf63847587daabac9
+                           .group:00000000 wm4.stm32f2xx_hal_adc_ex.h.40.7de68ed256ef25526ee31cc017f2c291
+                           .group:00000000 wm4.stm32f2xx_hal_flash.h.40.c3171719ce015e9cff20c795e44e886d
+                           .group:00000000 wm4.stm32f2xx_hal_flash_ex.h.40.7389508bd24a0aeb077bde0c9fb651eb
+                           .group:00000000 wm4.stm32f2xx_ll_fsmc.h.40.c1c32f2e1862f4dd342bd9b80fb895bb
+                           .group:00000000 wm4.stm32f2xx_hal_pwr.h.40.812df32e5c31b609a128e9db0eb4cbd0
+                           .group:00000000 wm4.stm32f2xx_hal_rtc.h.40.850fda5fe2cce8797446913dee18382f
+                           .group:00000000 wm4.stm32f2xx_hal_rtc_ex.h.40.f3e0c408e3bf4e8a0352d7ec9a18a822
+                           .group:00000000 wm4.stm32f2xx_ll_sdmmc.h.40.3719ab487c4b77401c572f459adf6eb7
+                           .group:00000000 wm4.stm32f2xx_hal_sd.h.58.760215394dcc316161a6482c0af9b866
+                           .group:00000000 wm4.stm32f2xx_hal_spi.h.40.7984243dbaba8b21c6392998a47e6987
+                           .group:00000000 wm4.stm32f2xx_hal_tim.h.40.d79172f25d0e9a15dc346aba8515bdd6
+                           .group:00000000 wm4.stm32f2xx_hal_tim_ex.h.40.361f280a7a3f60b4b238bb99ca728d83
+                           .group:00000000 wm4.stm32f2xx_hal_uart.h.40.d74def561ae6f78f40f477c8426ecbef
+                           .group:00000000 wm4.stm32f2xx_ll_usb.h.40.9b0206a05bc6ce3bec1648b51f22cb81
+                           .group:00000000 wm4.stm32f2xx_hal_pcd.h.99.11faba414c39e357b2f23364912d0605
+                           .group:00000000 wm4.stm32f2xx_hal_hcd.h.40.44ee5e972983ae0139ddbacdc75c44ef
+                           .group:00000000 wm4.stm32f2xx_hal.h.64.ed79ee83e52b151b3c365392b398f866
+                           .group:00000000 wm4.stdio.h.31.7c0e28c411445f3f9c5b11accf882760
+                           .group:00000000 wm4.stddef.h.184.159df79b4ca79c76561572a55985524c
+                           .group:00000000 wm4.stdarg.h.34.3a23a216c0c293b3d2ea2e89281481e6
+                           .group:00000000 wm4._default_types.h.6.5e12cd604db8ce00b62bb2f02708eaf3
+                           .group:00000000 wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea
+                           .group:00000000 wm4._types.h.59.db8450f33c1f6150c0372fa1091a887a
+                           .group:00000000 wm4.stddef.h.348.9a99de77b6ba3b4278b57e9cc6d6e349
+                           .group:00000000 wm4.reent.h.16.567d760e6ae9ad7f917851a308bd7a57
+                           .group:00000000 wm4.types.h.23.0d949686bbcadd1621462d4fa1f884f9
+                           .group:00000000 wm4.stddef.h.39.7e3d906ac58942e0b374c527445f5de5
+                           .group:00000000 wm4.types.h.2.e9cec8c90ab35f77d9f499e06ae02400
+                           .group:00000000 wm4.types.h.80.5759fe41f87f5211a5952dfb1fc64f19
+                           .group:00000000 wm4.stdio.h.2.4aa87247282eca6c8f36f9de33d8df1a
+                           .group:00000000 wm4.stdio.h.64.f9f1bb6b0d3d7e12f6a27968d859709c
+                           .group:00000000 wm4.stdlib.h.18.8bab2fb43ac4e90235390733c30a4530
+                           .group:00000000 wm4.stddef.h.158.a7efb00f6cbc6f43213b50e183c9830c
+                           .group:00000000 wm4.alloca.h.8.dfc0c703c47ec3e69746825b17d9e66d
+                           .group:00000000 wm4.stdlib.h.55.7091a050e07f1c4abd225630fe3d62f1
+                           .group:00000000 wm4.cdefs.h.56.efab90f4d89fbc41d6b3a5c5fb0d3d0f
+                           .group:00000000 wm4.string.h.15.dab3980bf35408a4c507182805e2de3a
+                           .group:00000000 wm4.string.h.126.6ff3aa59129e7f66b2c273baf353e066
+                           .group:00000000 wm4.Display.h.39.49592f1e6d055d6383457fd20cdd98de
+                           .group:00000000 wm4.usbd_conf.h.42.6b5dabdfef26be13dabbf5c06e1837cb
+                           .group:00000000 wm4.usbd_def.h.54.f0a777e557f44b0cdc32a86cdf6d44e8
+                           .group:00000000 wm4.usbd_cdc.h.48.93470a15f0b6146c8b31621ae3de674b
+
+NO UNDEFINED SYMBOLS

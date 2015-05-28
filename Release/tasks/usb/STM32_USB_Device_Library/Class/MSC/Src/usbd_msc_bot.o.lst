@@ -1,0 +1,1290 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"usbd_msc_bot.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.align	2
+  19              		.global	MSC_BOT_Init
+  20              		.thumb
+  21              		.thumb_func
+  23              	MSC_BOT_Init:
+  24              	.LFB55:
+  25              		.file 1 "../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c"
+   1:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** /**
+   2:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   ******************************************************************************
+   3:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   * @file    usbd_msc_bot.c
+   4:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   * @author  MCD Application Team
+   5:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   * @version V2.0.0
+   6:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   * @date    18-February-2014
+   7:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   * @brief   This file provides all the BOT protocol core functions.
+   8:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   ******************************************************************************
+   9:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   * @attention
+  10:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   *
+  11:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   * <h2><center>&copy; COPYRIGHT 2014 STMicroelectronics</center></h2>
+  12:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   *
+  13:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+  14:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   * You may not use this file except in compliance with the License.
+  15:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   * You may obtain a copy of the License at:
+  16:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   *
+  17:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   *        http://www.st.com/software_license_agreement_liberty_v2
+  18:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   *
+  19:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   * Unless required by applicable law or agreed to in writing, software 
+  20:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   * distributed under the License is distributed on an "AS IS" BASIS, 
+  21:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  22:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   * See the License for the specific language governing permissions and
+  23:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   * limitations under the License.
+  24:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   *
+  25:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   ******************************************************************************
+  26:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   */ 
+  27:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** 
+  28:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** /* Includes ------------------------------------------------------------------*/
+  29:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** #include "usbd_msc_bot.h"
+  30:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** #include "usbd_msc.h"
+  31:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** #include "usbd_msc_scsi.h"
+  32:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** #include "usbd_ioreq.h"
+  33:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** 
+  34:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
+  35:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   * @{
+  36:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   */
+  37:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** 
+  38:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** 
+  39:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** /** @defgroup MSC_BOT 
+  40:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   * @brief BOT protocol module
+  41:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   * @{
+  42:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   */ 
+  43:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** 
+  44:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** /** @defgroup MSC_BOT_Private_TypesDefinitions
+  45:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   * @{
+  46:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   */ 
+  47:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** /**
+  48:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   * @}
+  49:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   */ 
+  50:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** 
+  51:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** 
+  52:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** /** @defgroup MSC_BOT_Private_Defines
+  53:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   * @{
+  54:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   */ 
+  55:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** 
+  56:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** /**
+  57:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   * @}
+  58:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   */ 
+  59:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** 
+  60:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** 
+  61:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** /** @defgroup MSC_BOT_Private_Macros
+  62:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   * @{
+  63:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   */ 
+  64:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** /**
+  65:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   * @}
+  66:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   */ 
+  67:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** 
+  68:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** 
+  69:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** /** @defgroup MSC_BOT_Private_Variables
+  70:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   * @{
+  71:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   */ 
+  72:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** 
+  73:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** /**
+  74:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   * @}
+  75:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   */ 
+  76:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** 
+  77:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** 
+  78:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** /** @defgroup MSC_BOT_Private_FunctionPrototypes
+  79:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   * @{
+  80:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   */ 
+  81:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** static void MSC_BOT_CBW_Decode (USBD_HandleTypeDef  *pdev);
+  82:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** 
+  83:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** static void MSC_BOT_SendData (USBD_HandleTypeDef  *pdev, 
+  84:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                               uint8_t* pbuf, 
+  85:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                               uint16_t len);
+  86:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** 
+  87:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** static void MSC_BOT_Abort(USBD_HandleTypeDef  *pdev);
+  88:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** /**
+  89:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   * @}
+  90:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   */ 
+  91:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** 
+  92:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** 
+  93:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** /** @defgroup MSC_BOT_Private_Functions
+  94:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   * @{
+  95:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   */ 
+  96:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** 
+  97:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** 
+  98:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** 
+  99:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** /**
+ 100:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** * @brief  MSC_BOT_Init
+ 101:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** *         Initialize the BOT Process
+ 102:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** * @param  pdev: device instance
+ 103:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** * @retval None
+ 104:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** */
+ 105:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** void MSC_BOT_Init (USBD_HandleTypeDef  *pdev)
+ 106:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** {
+  26              		.loc 1 106 0
+  27              		.cfi_startproc
+  28              		@ args = 0, pretend = 0, frame = 16
+  29              		@ frame_needed = 1, uses_anonymous_args = 0
+  30 0000 80B5     		push	{r7, lr}
+  31              		.cfi_def_cfa_offset 8
+  32              		.cfi_offset 7, -8
+  33              		.cfi_offset 14, -4
+  34 0002 84B0     		sub	sp, sp, #16
+  35              		.cfi_def_cfa_offset 24
+  36 0004 00AF     		add	r7, sp, #0
+  37              		.cfi_def_cfa_register 7
+  38 0006 7860     		str	r0, [r7, #4]
+ 107:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   USBD_MSC_BOT_HandleTypeDef  *hmsc = pdev->pClassData;
+  39              		.loc 1 107 0
+  40 0008 7B68     		ldr	r3, [r7, #4]
+  41 000a D3F81832 		ldr	r3, [r3, #536]
+  42 000e FB60     		str	r3, [r7, #12]
+ 108:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     
+ 109:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   hmsc->bot_state  = USBD_BOT_IDLE;
+  43              		.loc 1 109 0
+  44 0010 FB68     		ldr	r3, [r7, #12]
+  45 0012 0022     		movs	r2, #0
+  46 0014 1A72     		strb	r2, [r3, #8]
+ 110:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   hmsc->bot_status = USBD_BOT_STATUS_NORMAL;
+  47              		.loc 1 110 0
+  48 0016 FB68     		ldr	r3, [r7, #12]
+  49 0018 0022     		movs	r2, #0
+  50 001a 5A72     		strb	r2, [r3, #9]
+ 111:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   
+ 112:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   hmsc->scsi_sense_tail = 0;
+  51              		.loc 1 112 0
+  52 001c FB68     		ldr	r3, [r7, #12]
+  53 001e 03F50153 		add	r3, r3, #8256
+  54 0022 1D33     		adds	r3, r3, #29
+  55 0024 0022     		movs	r2, #0
+  56 0026 1A70     		strb	r2, [r3]
+ 113:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   hmsc->scsi_sense_head = 0;
+  57              		.loc 1 113 0
+  58 0028 FB68     		ldr	r3, [r7, #12]
+  59 002a 03F50153 		add	r3, r3, #8256
+  60 002e 1C33     		adds	r3, r3, #28
+  61 0030 0022     		movs	r2, #0
+  62 0032 1A70     		strb	r2, [r3]
+ 114:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   
+ 115:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   ((USBD_StorageTypeDef *)pdev->pUserData)->Init(0);
+  63              		.loc 1 115 0
+  64 0034 7B68     		ldr	r3, [r7, #4]
+  65 0036 D3F81C32 		ldr	r3, [r3, #540]
+  66 003a 1B68     		ldr	r3, [r3]
+  67 003c 0020     		movs	r0, #0
+  68 003e 9847     		blx	r3
+ 116:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   
+ 117:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   USBD_LL_FlushEP(pdev, MSC_EPOUT_ADDR);
+  69              		.loc 1 117 0
+  70 0040 7868     		ldr	r0, [r7, #4]
+  71 0042 0121     		movs	r1, #1
+  72 0044 FFF7FEFF 		bl	USBD_LL_FlushEP
+ 118:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   USBD_LL_FlushEP(pdev, MSC_EPIN_ADDR);
+  73              		.loc 1 118 0
+  74 0048 7868     		ldr	r0, [r7, #4]
+  75 004a 8121     		movs	r1, #129
+  76 004c FFF7FEFF 		bl	USBD_LL_FlushEP
+ 119:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   
+ 120:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   /* Prapare EP to Receive First BOT Cmd */
+ 121:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   USBD_LL_PrepareReceive (pdev,
+ 122:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                           MSC_EPOUT_ADDR,
+ 123:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                           (uint8_t *)&hmsc->cbw,
+  77              		.loc 1 123 0
+  78 0050 FB68     		ldr	r3, [r7, #12]
+  79 0052 03F50053 		add	r3, r3, #8192
+  80 0056 0C33     		adds	r3, r3, #12
+ 121:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                           MSC_EPOUT_ADDR,
+  81              		.loc 1 121 0
+  82 0058 7868     		ldr	r0, [r7, #4]
+  83 005a 0121     		movs	r1, #1
+  84 005c 1A46     		mov	r2, r3
+  85 005e 1F23     		movs	r3, #31
+  86 0060 FFF7FEFF 		bl	USBD_LL_PrepareReceive
+ 124:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                           USBD_BOT_CBW_LENGTH);    
+ 125:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** }
+  87              		.loc 1 125 0
+  88 0064 1037     		adds	r7, r7, #16
+  89 0066 BD46     		mov	sp, r7
+  90              		@ sp needed
+  91 0068 80BD     		pop	{r7, pc}
+  92              		.cfi_endproc
+  93              	.LFE55:
+  95 006a 00BF     		.align	2
+  96              		.global	MSC_BOT_Reset
+  97              		.thumb
+  98              		.thumb_func
+ 100              	MSC_BOT_Reset:
+ 101              	.LFB56:
+ 126:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** 
+ 127:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** /**
+ 128:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** * @brief  MSC_BOT_Reset
+ 129:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** *         Reset the BOT Machine
+ 130:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** * @param  pdev: device instance
+ 131:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** * @retval  None
+ 132:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** */
+ 133:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** void MSC_BOT_Reset (USBD_HandleTypeDef  *pdev)
+ 134:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** {
+ 102              		.loc 1 134 0
+ 103              		.cfi_startproc
+ 104              		@ args = 0, pretend = 0, frame = 16
+ 105              		@ frame_needed = 1, uses_anonymous_args = 0
+ 106 006c 80B5     		push	{r7, lr}
+ 107              		.cfi_def_cfa_offset 8
+ 108              		.cfi_offset 7, -8
+ 109              		.cfi_offset 14, -4
+ 110 006e 84B0     		sub	sp, sp, #16
+ 111              		.cfi_def_cfa_offset 24
+ 112 0070 00AF     		add	r7, sp, #0
+ 113              		.cfi_def_cfa_register 7
+ 114 0072 7860     		str	r0, [r7, #4]
+ 135:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   USBD_MSC_BOT_HandleTypeDef  *hmsc = pdev->pClassData;
+ 115              		.loc 1 135 0
+ 116 0074 7B68     		ldr	r3, [r7, #4]
+ 117 0076 D3F81832 		ldr	r3, [r3, #536]
+ 118 007a FB60     		str	r3, [r7, #12]
+ 136:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     
+ 137:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   hmsc->bot_state  = USBD_BOT_IDLE;
+ 119              		.loc 1 137 0
+ 120 007c FB68     		ldr	r3, [r7, #12]
+ 121 007e 0022     		movs	r2, #0
+ 122 0080 1A72     		strb	r2, [r3, #8]
+ 138:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   hmsc->bot_status = USBD_BOT_STATUS_RECOVERY;  
+ 123              		.loc 1 138 0
+ 124 0082 FB68     		ldr	r3, [r7, #12]
+ 125 0084 0122     		movs	r2, #1
+ 126 0086 5A72     		strb	r2, [r3, #9]
+ 139:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   
+ 140:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   /* Prapare EP to Receive First BOT Cmd */
+ 141:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   USBD_LL_PrepareReceive (pdev,
+ 142:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                           MSC_EPOUT_ADDR,
+ 143:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                           (uint8_t *)&hmsc->cbw,
+ 127              		.loc 1 143 0
+ 128 0088 FB68     		ldr	r3, [r7, #12]
+ 129 008a 03F50053 		add	r3, r3, #8192
+ 130 008e 0C33     		adds	r3, r3, #12
+ 141:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                           MSC_EPOUT_ADDR,
+ 131              		.loc 1 141 0
+ 132 0090 7868     		ldr	r0, [r7, #4]
+ 133 0092 0121     		movs	r1, #1
+ 134 0094 1A46     		mov	r2, r3
+ 135 0096 1F23     		movs	r3, #31
+ 136 0098 FFF7FEFF 		bl	USBD_LL_PrepareReceive
+ 144:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                           USBD_BOT_CBW_LENGTH);   
+ 145:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** }
+ 137              		.loc 1 145 0
+ 138 009c 1037     		adds	r7, r7, #16
+ 139 009e BD46     		mov	sp, r7
+ 140              		@ sp needed
+ 141 00a0 80BD     		pop	{r7, pc}
+ 142              		.cfi_endproc
+ 143              	.LFE56:
+ 145 00a2 00BF     		.align	2
+ 146              		.global	MSC_BOT_DeInit
+ 147              		.thumb
+ 148              		.thumb_func
+ 150              	MSC_BOT_DeInit:
+ 151              	.LFB57:
+ 146:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** 
+ 147:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** /**
+ 148:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** * @brief  MSC_BOT_DeInit
+ 149:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** *         Uninitialize the BOT Machine
+ 150:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** * @param  pdev: device instance
+ 151:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** * @retval None
+ 152:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** */
+ 153:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** void MSC_BOT_DeInit (USBD_HandleTypeDef  *pdev)
+ 154:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** {
+ 152              		.loc 1 154 0
+ 153              		.cfi_startproc
+ 154              		@ args = 0, pretend = 0, frame = 16
+ 155              		@ frame_needed = 1, uses_anonymous_args = 0
+ 156              		@ link register save eliminated.
+ 157 00a4 80B4     		push	{r7}
+ 158              		.cfi_def_cfa_offset 4
+ 159              		.cfi_offset 7, -4
+ 160 00a6 85B0     		sub	sp, sp, #20
+ 161              		.cfi_def_cfa_offset 24
+ 162 00a8 00AF     		add	r7, sp, #0
+ 163              		.cfi_def_cfa_register 7
+ 164 00aa 7860     		str	r0, [r7, #4]
+ 155:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   USBD_MSC_BOT_HandleTypeDef  *hmsc = pdev->pClassData;  
+ 165              		.loc 1 155 0
+ 166 00ac 7B68     		ldr	r3, [r7, #4]
+ 167 00ae D3F81832 		ldr	r3, [r3, #536]
+ 168 00b2 FB60     		str	r3, [r7, #12]
+ 156:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   hmsc->bot_state  = USBD_BOT_IDLE;
+ 169              		.loc 1 156 0
+ 170 00b4 FB68     		ldr	r3, [r7, #12]
+ 171 00b6 0022     		movs	r2, #0
+ 172 00b8 1A72     		strb	r2, [r3, #8]
+ 157:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** }
+ 173              		.loc 1 157 0
+ 174 00ba 1437     		adds	r7, r7, #20
+ 175 00bc BD46     		mov	sp, r7
+ 176              		@ sp needed
+ 177 00be 5DF8047B 		ldr	r7, [sp], #4
+ 178 00c2 7047     		bx	lr
+ 179              		.cfi_endproc
+ 180              	.LFE57:
+ 182              		.align	2
+ 183              		.global	MSC_BOT_DataIn
+ 184              		.thumb
+ 185              		.thumb_func
+ 187              	MSC_BOT_DataIn:
+ 188              	.LFB58:
+ 158:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** 
+ 159:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** /**
+ 160:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** * @brief  MSC_BOT_DataIn
+ 161:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** *         Handle BOT IN data stage
+ 162:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** * @param  pdev: device instance
+ 163:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** * @param  epnum: endpoint index
+ 164:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** * @retval None
+ 165:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** */
+ 166:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** void MSC_BOT_DataIn (USBD_HandleTypeDef  *pdev, 
+ 167:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                      uint8_t epnum)
+ 168:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** {
+ 189              		.loc 1 168 0
+ 190              		.cfi_startproc
+ 191              		@ args = 0, pretend = 0, frame = 16
+ 192              		@ frame_needed = 1, uses_anonymous_args = 0
+ 193 00c4 80B5     		push	{r7, lr}
+ 194              		.cfi_def_cfa_offset 8
+ 195              		.cfi_offset 7, -8
+ 196              		.cfi_offset 14, -4
+ 197 00c6 84B0     		sub	sp, sp, #16
+ 198              		.cfi_def_cfa_offset 24
+ 199 00c8 00AF     		add	r7, sp, #0
+ 200              		.cfi_def_cfa_register 7
+ 201 00ca 7860     		str	r0, [r7, #4]
+ 202 00cc 0B46     		mov	r3, r1
+ 203 00ce FB70     		strb	r3, [r7, #3]
+ 169:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   USBD_MSC_BOT_HandleTypeDef  *hmsc = pdev->pClassData;  
+ 204              		.loc 1 169 0
+ 205 00d0 7B68     		ldr	r3, [r7, #4]
+ 206 00d2 D3F81832 		ldr	r3, [r3, #536]
+ 207 00d6 FB60     		str	r3, [r7, #12]
+ 170:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   
+ 171:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   switch (hmsc->bot_state)
+ 208              		.loc 1 171 0
+ 209 00d8 FB68     		ldr	r3, [r7, #12]
+ 210 00da 1B7A     		ldrb	r3, [r3, #8]	@ zero_extendqisi2
+ 211 00dc 022B     		cmp	r3, #2
+ 212 00de 04D0     		beq	.L6
+ 213 00e0 022B     		cmp	r3, #2
+ 214 00e2 1EDB     		blt	.L11
+ 215 00e4 042B     		cmp	r3, #4
+ 216 00e6 1CDC     		bgt	.L11
+ 217 00e8 16E0     		b	.L10
+ 218              	.L6:
+ 172:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   {
+ 173:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   case USBD_BOT_DATA_IN:
+ 174:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     if(SCSI_ProcessCmd(pdev,
+ 219              		.loc 1 174 0
+ 220 00ea FB68     		ldr	r3, [r7, #12]
+ 221 00ec 03F50053 		add	r3, r3, #8192
+ 222 00f0 1933     		adds	r3, r3, #25
+ 223 00f2 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+ 224 00f4 FB68     		ldr	r3, [r7, #12]
+ 225 00f6 03F50053 		add	r3, r3, #8192
+ 226 00fa 1B33     		adds	r3, r3, #27
+ 227 00fc 7868     		ldr	r0, [r7, #4]
+ 228 00fe 1146     		mov	r1, r2
+ 229 0100 1A46     		mov	r2, r3
+ 230 0102 FFF7FEFF 		bl	SCSI_ProcessCmd
+ 231 0106 0346     		mov	r3, r0
+ 232 0108 002B     		cmp	r3, #0
+ 233 010a 04DA     		bge	.L8
+ 175:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                         hmsc->cbw.bLUN,
+ 176:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                         &hmsc->cbw.CB[0]) < 0)
+ 177:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     {
+ 178:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****       MSC_BOT_SendCSW (pdev, USBD_CSW_CMD_FAILED);
+ 234              		.loc 1 178 0
+ 235 010c 7868     		ldr	r0, [r7, #4]
+ 236 010e 0121     		movs	r1, #1
+ 237 0110 FFF7FEFF 		bl	MSC_BOT_SendCSW
+ 179:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     }
+ 180:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     break;
+ 238              		.loc 1 180 0
+ 239 0114 06E0     		b	.L4
+ 240              	.L8:
+ 241 0116 05E0     		b	.L4
+ 242              	.L10:
+ 181:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     
+ 182:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   case USBD_BOT_SEND_DATA:
+ 183:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   case USBD_BOT_LAST_DATA_IN:
+ 184:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     MSC_BOT_SendCSW (pdev, USBD_CSW_CMD_PASSED);
+ 243              		.loc 1 184 0
+ 244 0118 7868     		ldr	r0, [r7, #4]
+ 245 011a 0021     		movs	r1, #0
+ 246 011c FFF7FEFF 		bl	MSC_BOT_SendCSW
+ 185:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     
+ 186:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     break;
+ 247              		.loc 1 186 0
+ 248 0120 00E0     		b	.L4
+ 249              	.L11:
+ 187:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     
+ 188:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   default:
+ 189:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     break;
+ 250              		.loc 1 189 0
+ 251 0122 00BF     		nop
+ 252              	.L4:
+ 190:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   }
+ 191:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** }
+ 253              		.loc 1 191 0
+ 254 0124 1037     		adds	r7, r7, #16
+ 255 0126 BD46     		mov	sp, r7
+ 256              		@ sp needed
+ 257 0128 80BD     		pop	{r7, pc}
+ 258              		.cfi_endproc
+ 259              	.LFE58:
+ 261 012a 00BF     		.align	2
+ 262              		.global	MSC_BOT_DataOut
+ 263              		.thumb
+ 264              		.thumb_func
+ 266              	MSC_BOT_DataOut:
+ 267              	.LFB59:
+ 192:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** /**
+ 193:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** * @brief  MSC_BOT_DataOut
+ 194:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** *         Proccess MSC OUT data
+ 195:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** * @param  pdev: device instance
+ 196:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** * @param  epnum: endpoint index
+ 197:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** * @retval None
+ 198:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** */
+ 199:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** void MSC_BOT_DataOut (USBD_HandleTypeDef  *pdev, 
+ 200:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                       uint8_t epnum)
+ 201:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** {
+ 268              		.loc 1 201 0
+ 269              		.cfi_startproc
+ 270              		@ args = 0, pretend = 0, frame = 16
+ 271              		@ frame_needed = 1, uses_anonymous_args = 0
+ 272 012c 80B5     		push	{r7, lr}
+ 273              		.cfi_def_cfa_offset 8
+ 274              		.cfi_offset 7, -8
+ 275              		.cfi_offset 14, -4
+ 276 012e 84B0     		sub	sp, sp, #16
+ 277              		.cfi_def_cfa_offset 24
+ 278 0130 00AF     		add	r7, sp, #0
+ 279              		.cfi_def_cfa_register 7
+ 280 0132 7860     		str	r0, [r7, #4]
+ 281 0134 0B46     		mov	r3, r1
+ 282 0136 FB70     		strb	r3, [r7, #3]
+ 202:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   USBD_MSC_BOT_HandleTypeDef  *hmsc = pdev->pClassData;
+ 283              		.loc 1 202 0
+ 284 0138 7B68     		ldr	r3, [r7, #4]
+ 285 013a D3F81832 		ldr	r3, [r3, #536]
+ 286 013e FB60     		str	r3, [r7, #12]
+ 203:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   
+ 204:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   switch (hmsc->bot_state)
+ 287              		.loc 1 204 0
+ 288 0140 FB68     		ldr	r3, [r7, #12]
+ 289 0142 1B7A     		ldrb	r3, [r3, #8]	@ zero_extendqisi2
+ 290 0144 002B     		cmp	r3, #0
+ 291 0146 02D0     		beq	.L14
+ 292 0148 012B     		cmp	r3, #1
+ 293 014a 04D0     		beq	.L15
+ 205:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   {
+ 206:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   case USBD_BOT_IDLE:
+ 207:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     MSC_BOT_CBW_Decode(pdev);
+ 208:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     break;
+ 209:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     
+ 210:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   case USBD_BOT_DATA_OUT:
+ 211:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     
+ 212:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     if(SCSI_ProcessCmd(pdev,
+ 213:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                         hmsc->cbw.bLUN,
+ 214:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                         &hmsc->cbw.CB[0]) < 0)
+ 215:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     {
+ 216:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****       MSC_BOT_SendCSW (pdev, USBD_CSW_CMD_FAILED);
+ 217:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     }
+ 218:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** 
+ 219:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     break;
+ 220:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     
+ 221:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   default:
+ 222:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     break;
+ 294              		.loc 1 222 0
+ 295 014c 1AE0     		b	.L12
+ 296              	.L14:
+ 207:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     break;
+ 297              		.loc 1 207 0
+ 298 014e 7868     		ldr	r0, [r7, #4]
+ 299 0150 00F01CF8 		bl	MSC_BOT_CBW_Decode
+ 208:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     
+ 300              		.loc 1 208 0
+ 301 0154 16E0     		b	.L12
+ 302              	.L15:
+ 212:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                         hmsc->cbw.bLUN,
+ 303              		.loc 1 212 0
+ 304 0156 FB68     		ldr	r3, [r7, #12]
+ 305 0158 03F50053 		add	r3, r3, #8192
+ 306 015c 1933     		adds	r3, r3, #25
+ 307 015e 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+ 308 0160 FB68     		ldr	r3, [r7, #12]
+ 309 0162 03F50053 		add	r3, r3, #8192
+ 310 0166 1B33     		adds	r3, r3, #27
+ 311 0168 7868     		ldr	r0, [r7, #4]
+ 312 016a 1146     		mov	r1, r2
+ 313 016c 1A46     		mov	r2, r3
+ 314 016e FFF7FEFF 		bl	SCSI_ProcessCmd
+ 315 0172 0346     		mov	r3, r0
+ 316 0174 002B     		cmp	r3, #0
+ 317 0176 04DA     		bge	.L17
+ 216:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     }
+ 318              		.loc 1 216 0
+ 319 0178 7868     		ldr	r0, [r7, #4]
+ 320 017a 0121     		movs	r1, #1
+ 321 017c FFF7FEFF 		bl	MSC_BOT_SendCSW
+ 219:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     
+ 322              		.loc 1 219 0
+ 323 0180 FFE7     		b	.L18
+ 324              	.L17:
+ 325              	.L18:
+ 326 0182 00BF     		nop
+ 327              	.L12:
+ 223:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   }
+ 224:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** }
+ 328              		.loc 1 224 0
+ 329 0184 1037     		adds	r7, r7, #16
+ 330 0186 BD46     		mov	sp, r7
+ 331              		@ sp needed
+ 332 0188 80BD     		pop	{r7, pc}
+ 333              		.cfi_endproc
+ 334              	.LFE59:
+ 336 018a 00BF     		.align	2
+ 337              		.thumb
+ 338              		.thumb_func
+ 340              	MSC_BOT_CBW_Decode:
+ 341              	.LFB60:
+ 225:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** 
+ 226:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** /**
+ 227:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** * @brief  MSC_BOT_CBW_Decode
+ 228:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** *         Decode the CBW command and set the BOT state machine accordingtly  
+ 229:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** * @param  pdev: device instance
+ 230:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** * @retval None
+ 231:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** */
+ 232:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** static void  MSC_BOT_CBW_Decode (USBD_HandleTypeDef  *pdev)
+ 233:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** {
+ 342              		.loc 1 233 0
+ 343              		.cfi_startproc
+ 344              		@ args = 0, pretend = 0, frame = 16
+ 345              		@ frame_needed = 1, uses_anonymous_args = 0
+ 346 018c 80B5     		push	{r7, lr}
+ 347              		.cfi_def_cfa_offset 8
+ 348              		.cfi_offset 7, -8
+ 349              		.cfi_offset 14, -4
+ 350 018e 84B0     		sub	sp, sp, #16
+ 351              		.cfi_def_cfa_offset 24
+ 352 0190 00AF     		add	r7, sp, #0
+ 353              		.cfi_def_cfa_register 7
+ 354 0192 7860     		str	r0, [r7, #4]
+ 234:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   USBD_MSC_BOT_HandleTypeDef  *hmsc = pdev->pClassData;  
+ 355              		.loc 1 234 0
+ 356 0194 7B68     		ldr	r3, [r7, #4]
+ 357 0196 D3F81832 		ldr	r3, [r3, #536]
+ 358 019a FB60     		str	r3, [r7, #12]
+ 235:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   
+ 236:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   hmsc->csw.dTag = hmsc->cbw.dTag;
+ 359              		.loc 1 236 0
+ 360 019c FB68     		ldr	r3, [r7, #12]
+ 361 019e 03F50053 		add	r3, r3, #8192
+ 362 01a2 1033     		adds	r3, r3, #16
+ 363 01a4 1A68     		ldr	r2, [r3]
+ 364 01a6 FB68     		ldr	r3, [r7, #12]
+ 365 01a8 03F50053 		add	r3, r3, #8192
+ 366 01ac 3033     		adds	r3, r3, #48
+ 367 01ae 1A60     		str	r2, [r3]
+ 237:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   hmsc->csw.dDataResidue = hmsc->cbw.dDataLength;
+ 368              		.loc 1 237 0
+ 369 01b0 FB68     		ldr	r3, [r7, #12]
+ 370 01b2 03F50053 		add	r3, r3, #8192
+ 371 01b6 1433     		adds	r3, r3, #20
+ 372 01b8 1A68     		ldr	r2, [r3]
+ 373 01ba FB68     		ldr	r3, [r7, #12]
+ 374 01bc 03F50053 		add	r3, r3, #8192
+ 375 01c0 3433     		adds	r3, r3, #52
+ 376 01c2 1A60     		str	r2, [r3]
+ 238:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   
+ 239:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   if ((USBD_LL_GetRxDataSize (pdev ,MSC_EPOUT_ADDR) != USBD_BOT_CBW_LENGTH) ||
+ 377              		.loc 1 239 0
+ 378 01c4 7868     		ldr	r0, [r7, #4]
+ 379 01c6 0121     		movs	r1, #1
+ 380 01c8 FFF7FEFF 		bl	USBD_LL_GetRxDataSize
+ 381 01cc 0346     		mov	r3, r0
+ 382 01ce 1F2B     		cmp	r3, #31
+ 383 01d0 1FD1     		bne	.L20
+ 240:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****       (hmsc->cbw.dSignature != USBD_BOT_CBW_SIGNATURE)||
+ 384              		.loc 1 240 0 discriminator 1
+ 385 01d2 FB68     		ldr	r3, [r7, #12]
+ 386 01d4 03F50053 		add	r3, r3, #8192
+ 387 01d8 0C33     		adds	r3, r3, #12
+ 388 01da 1A68     		ldr	r2, [r3]
+ 239:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****       (hmsc->cbw.dSignature != USBD_BOT_CBW_SIGNATURE)||
+ 389              		.loc 1 239 0 discriminator 1
+ 390 01dc 45F25533 		movw	r3, #21333
+ 391 01e0 C4F24233 		movt	r3, 17218
+ 392 01e4 9A42     		cmp	r2, r3
+ 393 01e6 14D1     		bne	.L20
+ 241:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****         (hmsc->cbw.bLUN > 1) || 
+ 394              		.loc 1 241 0
+ 395 01e8 FB68     		ldr	r3, [r7, #12]
+ 396 01ea 03F50053 		add	r3, r3, #8192
+ 397 01ee 1933     		adds	r3, r3, #25
+ 398 01f0 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 240:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****       (hmsc->cbw.dSignature != USBD_BOT_CBW_SIGNATURE)||
+ 399              		.loc 1 240 0
+ 400 01f2 012B     		cmp	r3, #1
+ 401 01f4 0DD8     		bhi	.L20
+ 242:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****           (hmsc->cbw.bCBLength < 1) || 
+ 402              		.loc 1 242 0
+ 403 01f6 FB68     		ldr	r3, [r7, #12]
+ 404 01f8 03F50053 		add	r3, r3, #8192
+ 405 01fc 1A33     		adds	r3, r3, #26
+ 406 01fe 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 241:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****         (hmsc->cbw.bLUN > 1) || 
+ 407              		.loc 1 241 0
+ 408 0200 002B     		cmp	r3, #0
+ 409 0202 06D0     		beq	.L20
+ 243:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****             (hmsc->cbw.bCBLength > 16))
+ 410              		.loc 1 243 0
+ 411 0204 FB68     		ldr	r3, [r7, #12]
+ 412 0206 03F50053 		add	r3, r3, #8192
+ 413 020a 1A33     		adds	r3, r3, #26
+ 414 020c 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 242:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****           (hmsc->cbw.bCBLength < 1) || 
+ 415              		.loc 1 242 0
+ 416 020e 102B     		cmp	r3, #16
+ 417 0210 11D9     		bls	.L21
+ 418              	.L20:
+ 244:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   {
+ 245:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     
+ 246:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     SCSI_SenseCode(pdev,
+ 419              		.loc 1 246 0
+ 420 0212 FB68     		ldr	r3, [r7, #12]
+ 421 0214 03F50053 		add	r3, r3, #8192
+ 422 0218 1933     		adds	r3, r3, #25
+ 423 021a 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 424 021c 7868     		ldr	r0, [r7, #4]
+ 425 021e 1946     		mov	r1, r3
+ 426 0220 0522     		movs	r2, #5
+ 427 0222 2023     		movs	r3, #32
+ 428 0224 FFF7FEFF 		bl	SCSI_SenseCode
+ 247:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                    hmsc->cbw.bLUN, 
+ 248:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                    ILLEGAL_REQUEST, 
+ 249:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                    INVALID_CDB);
+ 250:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     
+ 251:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     hmsc->bot_status = USBD_BOT_STATUS_ERROR;   
+ 429              		.loc 1 251 0
+ 430 0228 FB68     		ldr	r3, [r7, #12]
+ 431 022a 0222     		movs	r2, #2
+ 432 022c 5A72     		strb	r2, [r3, #9]
+ 252:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     MSC_BOT_Abort(pdev);
+ 433              		.loc 1 252 0
+ 434 022e 7868     		ldr	r0, [r7, #4]
+ 435 0230 00F0AEF8 		bl	MSC_BOT_Abort
+ 436 0234 40E0     		b	.L19
+ 437              	.L21:
+ 253:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****  
+ 254:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   }
+ 255:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   else
+ 256:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   {
+ 257:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     if(SCSI_ProcessCmd(pdev,
+ 438              		.loc 1 257 0
+ 439 0236 FB68     		ldr	r3, [r7, #12]
+ 440 0238 03F50053 		add	r3, r3, #8192
+ 441 023c 1933     		adds	r3, r3, #25
+ 442 023e 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+ 443 0240 FB68     		ldr	r3, [r7, #12]
+ 444 0242 03F50053 		add	r3, r3, #8192
+ 445 0246 1B33     		adds	r3, r3, #27
+ 446 0248 7868     		ldr	r0, [r7, #4]
+ 447 024a 1146     		mov	r1, r2
+ 448 024c 1A46     		mov	r2, r3
+ 449 024e FFF7FEFF 		bl	SCSI_ProcessCmd
+ 450 0252 0346     		mov	r3, r0
+ 451 0254 002B     		cmp	r3, #0
+ 452 0256 0CDA     		bge	.L23
+ 258:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                        hmsc->cbw.bLUN,
+ 259:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                        &hmsc->cbw.CB[0]) < 0)
+ 260:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     {
+ 261:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****       if(hmsc->bot_state == USBD_BOT_NO_DATA)
+ 453              		.loc 1 261 0
+ 454 0258 FB68     		ldr	r3, [r7, #12]
+ 455 025a 1B7A     		ldrb	r3, [r3, #8]	@ zero_extendqisi2
+ 456 025c 052B     		cmp	r3, #5
+ 457 025e 04D1     		bne	.L24
+ 262:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****       {
+ 263:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****        MSC_BOT_SendCSW (pdev,
+ 458              		.loc 1 263 0
+ 459 0260 7868     		ldr	r0, [r7, #4]
+ 460 0262 0121     		movs	r1, #1
+ 461 0264 FFF7FEFF 		bl	MSC_BOT_SendCSW
+ 462 0268 26E0     		b	.L19
+ 463              	.L24:
+ 264:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                          USBD_CSW_CMD_FAILED); 
+ 265:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****       }
+ 266:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****       else
+ 267:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****       {
+ 268:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****         MSC_BOT_Abort(pdev);
+ 464              		.loc 1 268 0
+ 465 026a 7868     		ldr	r0, [r7, #4]
+ 466 026c 00F090F8 		bl	MSC_BOT_Abort
+ 467 0270 22E0     		b	.L19
+ 468              	.L23:
+ 269:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****       }
+ 270:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     }
+ 271:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     /*Burst xfer handled internally*/
+ 272:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     else if ((hmsc->bot_state != USBD_BOT_DATA_IN) && 
+ 469              		.loc 1 272 0
+ 470 0272 FB68     		ldr	r3, [r7, #12]
+ 471 0274 1B7A     		ldrb	r3, [r3, #8]	@ zero_extendqisi2
+ 472 0276 022B     		cmp	r3, #2
+ 473 0278 1ED0     		beq	.L19
+ 273:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****              (hmsc->bot_state != USBD_BOT_DATA_OUT) &&
+ 474              		.loc 1 273 0 discriminator 1
+ 475 027a FB68     		ldr	r3, [r7, #12]
+ 476 027c 1B7A     		ldrb	r3, [r3, #8]	@ zero_extendqisi2
+ 272:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****              (hmsc->bot_state != USBD_BOT_DATA_OUT) &&
+ 477              		.loc 1 272 0 discriminator 1
+ 478 027e 012B     		cmp	r3, #1
+ 479 0280 1AD0     		beq	.L19
+ 274:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****              (hmsc->bot_state != USBD_BOT_LAST_DATA_IN)) 
+ 480              		.loc 1 274 0
+ 481 0282 FB68     		ldr	r3, [r7, #12]
+ 482 0284 1B7A     		ldrb	r3, [r3, #8]	@ zero_extendqisi2
+ 273:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****              (hmsc->bot_state != USBD_BOT_DATA_OUT) &&
+ 483              		.loc 1 273 0
+ 484 0286 032B     		cmp	r3, #3
+ 485 0288 16D0     		beq	.L19
+ 275:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     {
+ 276:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****       if (hmsc->bot_data_length > 0)
+ 486              		.loc 1 276 0
+ 487 028a FB68     		ldr	r3, [r7, #12]
+ 488 028c 5B89     		ldrh	r3, [r3, #10]
+ 489 028e 002B     		cmp	r3, #0
+ 490 0290 0AD0     		beq	.L26
+ 277:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****       {
+ 278:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****         MSC_BOT_SendData(pdev,
+ 279:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                          hmsc->bot_data, 
+ 491              		.loc 1 279 0
+ 492 0292 FB68     		ldr	r3, [r7, #12]
+ 493 0294 03F10C02 		add	r2, r3, #12
+ 278:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                          hmsc->bot_data, 
+ 494              		.loc 1 278 0
+ 495 0298 FB68     		ldr	r3, [r7, #12]
+ 496 029a 5B89     		ldrh	r3, [r3, #10]
+ 497 029c 7868     		ldr	r0, [r7, #4]
+ 498 029e 1146     		mov	r1, r2
+ 499 02a0 1A46     		mov	r2, r3
+ 500 02a2 00F00DF8 		bl	MSC_BOT_SendData
+ 501 02a6 07E0     		b	.L19
+ 502              	.L26:
+ 280:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                          hmsc->bot_data_length);
+ 281:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****       }
+ 282:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****       else if (hmsc->bot_data_length == 0) 
+ 503              		.loc 1 282 0
+ 504 02a8 FB68     		ldr	r3, [r7, #12]
+ 505 02aa 5B89     		ldrh	r3, [r3, #10]
+ 506 02ac 002B     		cmp	r3, #0
+ 507 02ae 03D1     		bne	.L19
+ 283:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****       {
+ 284:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****         MSC_BOT_SendCSW (pdev,
+ 508              		.loc 1 284 0
+ 509 02b0 7868     		ldr	r0, [r7, #4]
+ 510 02b2 0021     		movs	r1, #0
+ 511 02b4 FFF7FEFF 		bl	MSC_BOT_SendCSW
+ 512              	.L19:
+ 285:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                          USBD_CSW_CMD_PASSED);
+ 286:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****       }
+ 287:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     }
+ 288:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   }
+ 289:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** }
+ 513              		.loc 1 289 0
+ 514 02b8 1037     		adds	r7, r7, #16
+ 515 02ba BD46     		mov	sp, r7
+ 516              		@ sp needed
+ 517 02bc 80BD     		pop	{r7, pc}
+ 518              		.cfi_endproc
+ 519              	.LFE60:
+ 521 02be 00BF     		.align	2
+ 522              		.thumb
+ 523              		.thumb_func
+ 525              	MSC_BOT_SendData:
+ 526              	.LFB61:
+ 290:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** 
+ 291:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** /**
+ 292:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** * @brief  MSC_BOT_SendData
+ 293:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** *         Send the requested data
+ 294:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** * @param  pdev: device instance
+ 295:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** * @param  buf: pointer to data buffer
+ 296:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** * @param  len: Data Length
+ 297:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** * @retval None
+ 298:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** */
+ 299:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** static void  MSC_BOT_SendData(USBD_HandleTypeDef  *pdev,
+ 300:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                               uint8_t* buf, 
+ 301:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                               uint16_t len)
+ 302:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** {
+ 527              		.loc 1 302 0
+ 528              		.cfi_startproc
+ 529              		@ args = 0, pretend = 0, frame = 24
+ 530              		@ frame_needed = 1, uses_anonymous_args = 0
+ 531 02c0 80B5     		push	{r7, lr}
+ 532              		.cfi_def_cfa_offset 8
+ 533              		.cfi_offset 7, -8
+ 534              		.cfi_offset 14, -4
+ 535 02c2 86B0     		sub	sp, sp, #24
+ 536              		.cfi_def_cfa_offset 32
+ 537 02c4 00AF     		add	r7, sp, #0
+ 538              		.cfi_def_cfa_register 7
+ 539 02c6 F860     		str	r0, [r7, #12]
+ 540 02c8 B960     		str	r1, [r7, #8]
+ 541 02ca 1346     		mov	r3, r2
+ 542 02cc FB80     		strh	r3, [r7, #6]	@ movhi
+ 303:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   USBD_MSC_BOT_HandleTypeDef  *hmsc = pdev->pClassData; 
+ 543              		.loc 1 303 0
+ 544 02ce FB68     		ldr	r3, [r7, #12]
+ 545 02d0 D3F81832 		ldr	r3, [r3, #536]
+ 546 02d4 7B61     		str	r3, [r7, #20]
+ 304:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   
+ 305:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   len = MIN (hmsc->cbw.dDataLength, len);
+ 547              		.loc 1 305 0
+ 548 02d6 FA88     		ldrh	r2, [r7, #6]
+ 549 02d8 7B69     		ldr	r3, [r7, #20]
+ 550 02da 03F50053 		add	r3, r3, #8192
+ 551 02de 1433     		adds	r3, r3, #20
+ 552 02e0 1B68     		ldr	r3, [r3]
+ 553 02e2 9A42     		cmp	r2, r3
+ 554 02e4 38BF     		it	cc
+ 555 02e6 1346     		movcc	r3, r2
+ 556 02e8 FB80     		strh	r3, [r7, #6]	@ movhi
+ 306:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   hmsc->csw.dDataResidue -= len;
+ 557              		.loc 1 306 0
+ 558 02ea 7B69     		ldr	r3, [r7, #20]
+ 559 02ec 03F50053 		add	r3, r3, #8192
+ 560 02f0 3433     		adds	r3, r3, #52
+ 561 02f2 1A68     		ldr	r2, [r3]
+ 562 02f4 FB88     		ldrh	r3, [r7, #6]
+ 563 02f6 D21A     		subs	r2, r2, r3
+ 564 02f8 7B69     		ldr	r3, [r7, #20]
+ 565 02fa 03F50053 		add	r3, r3, #8192
+ 566 02fe 3433     		adds	r3, r3, #52
+ 567 0300 1A60     		str	r2, [r3]
+ 307:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   hmsc->csw.bStatus = USBD_CSW_CMD_PASSED;
+ 568              		.loc 1 307 0
+ 569 0302 7B69     		ldr	r3, [r7, #20]
+ 570 0304 03F50053 		add	r3, r3, #8192
+ 571 0308 3833     		adds	r3, r3, #56
+ 572 030a 0022     		movs	r2, #0
+ 573 030c 1A70     		strb	r2, [r3]
+ 308:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   hmsc->bot_state = USBD_BOT_SEND_DATA;
+ 574              		.loc 1 308 0
+ 575 030e 7B69     		ldr	r3, [r7, #20]
+ 576 0310 0422     		movs	r2, #4
+ 577 0312 1A72     		strb	r2, [r3, #8]
+ 309:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   
+ 310:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   USBD_LL_Transmit (pdev, MSC_EPIN_ADDR, buf, len);  
+ 578              		.loc 1 310 0
+ 579 0314 FB88     		ldrh	r3, [r7, #6]
+ 580 0316 F868     		ldr	r0, [r7, #12]
+ 581 0318 8121     		movs	r1, #129
+ 582 031a BA68     		ldr	r2, [r7, #8]
+ 583 031c FFF7FEFF 		bl	USBD_LL_Transmit
+ 311:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** }
+ 584              		.loc 1 311 0
+ 585 0320 1837     		adds	r7, r7, #24
+ 586 0322 BD46     		mov	sp, r7
+ 587              		@ sp needed
+ 588 0324 80BD     		pop	{r7, pc}
+ 589              		.cfi_endproc
+ 590              	.LFE61:
+ 592 0326 00BF     		.align	2
+ 593              		.global	MSC_BOT_SendCSW
+ 594              		.thumb
+ 595              		.thumb_func
+ 597              	MSC_BOT_SendCSW:
+ 598              	.LFB62:
+ 312:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** 
+ 313:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** /**
+ 314:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** * @brief  MSC_BOT_SendCSW
+ 315:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** *         Send the Command Status Wrapper
+ 316:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** * @param  pdev: device instance
+ 317:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** * @param  status : CSW status
+ 318:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** * @retval None
+ 319:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** */
+ 320:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** void  MSC_BOT_SendCSW (USBD_HandleTypeDef  *pdev,
+ 321:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                               uint8_t CSW_Status)
+ 322:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** {
+ 599              		.loc 1 322 0
+ 600              		.cfi_startproc
+ 601              		@ args = 0, pretend = 0, frame = 16
+ 602              		@ frame_needed = 1, uses_anonymous_args = 0
+ 603 0328 80B5     		push	{r7, lr}
+ 604              		.cfi_def_cfa_offset 8
+ 605              		.cfi_offset 7, -8
+ 606              		.cfi_offset 14, -4
+ 607 032a 84B0     		sub	sp, sp, #16
+ 608              		.cfi_def_cfa_offset 24
+ 609 032c 00AF     		add	r7, sp, #0
+ 610              		.cfi_def_cfa_register 7
+ 611 032e 7860     		str	r0, [r7, #4]
+ 612 0330 0B46     		mov	r3, r1
+ 613 0332 FB70     		strb	r3, [r7, #3]
+ 323:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   USBD_MSC_BOT_HandleTypeDef  *hmsc = pdev->pClassData; 
+ 614              		.loc 1 323 0
+ 615 0334 7B68     		ldr	r3, [r7, #4]
+ 616 0336 D3F81832 		ldr	r3, [r3, #536]
+ 617 033a FB60     		str	r3, [r7, #12]
+ 324:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   
+ 325:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   hmsc->csw.dSignature = USBD_BOT_CSW_SIGNATURE;
+ 618              		.loc 1 325 0
+ 619 033c FB68     		ldr	r3, [r7, #12]
+ 620 033e 03F50053 		add	r3, r3, #8192
+ 621 0342 2C33     		adds	r3, r3, #44
+ 622 0344 45F25532 		movw	r2, #21333
+ 623 0348 C5F24232 		movt	r2, 21314
+ 624 034c 1A60     		str	r2, [r3]
+ 326:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   hmsc->csw.bStatus = CSW_Status;
+ 625              		.loc 1 326 0
+ 626 034e FB68     		ldr	r3, [r7, #12]
+ 627 0350 03F50053 		add	r3, r3, #8192
+ 628 0354 3833     		adds	r3, r3, #56
+ 629 0356 FA78     		ldrb	r2, [r7, #3]
+ 630 0358 1A70     		strb	r2, [r3]
+ 327:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   hmsc->bot_state = USBD_BOT_IDLE;
+ 631              		.loc 1 327 0
+ 632 035a FB68     		ldr	r3, [r7, #12]
+ 633 035c 0022     		movs	r2, #0
+ 634 035e 1A72     		strb	r2, [r3, #8]
+ 328:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   
+ 329:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   USBD_LL_Transmit (pdev, 
+ 330:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****              MSC_EPIN_ADDR, 
+ 331:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****              (uint8_t *)&hmsc->csw, 
+ 635              		.loc 1 331 0
+ 636 0360 FB68     		ldr	r3, [r7, #12]
+ 637 0362 03F50053 		add	r3, r3, #8192
+ 638 0366 2C33     		adds	r3, r3, #44
+ 329:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****              MSC_EPIN_ADDR, 
+ 639              		.loc 1 329 0
+ 640 0368 7868     		ldr	r0, [r7, #4]
+ 641 036a 8121     		movs	r1, #129
+ 642 036c 1A46     		mov	r2, r3
+ 643 036e 0D23     		movs	r3, #13
+ 644 0370 FFF7FEFF 		bl	USBD_LL_Transmit
+ 332:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****              USBD_BOT_CSW_LENGTH);
+ 333:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   
+ 334:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   /* Prapare EP to Receive next Cmd */
+ 335:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   USBD_LL_PrepareReceive (pdev,
+ 336:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                     MSC_EPOUT_ADDR,
+ 337:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                     (uint8_t *)&hmsc->cbw, 
+ 645              		.loc 1 337 0
+ 646 0374 FB68     		ldr	r3, [r7, #12]
+ 647 0376 03F50053 		add	r3, r3, #8192
+ 648 037a 0C33     		adds	r3, r3, #12
+ 335:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                     MSC_EPOUT_ADDR,
+ 649              		.loc 1 335 0
+ 650 037c 7868     		ldr	r0, [r7, #4]
+ 651 037e 0121     		movs	r1, #1
+ 652 0380 1A46     		mov	r2, r3
+ 653 0382 1F23     		movs	r3, #31
+ 654 0384 FFF7FEFF 		bl	USBD_LL_PrepareReceive
+ 338:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                     USBD_BOT_CBW_LENGTH);  
+ 339:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   
+ 340:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** }
+ 655              		.loc 1 340 0
+ 656 0388 1037     		adds	r7, r7, #16
+ 657 038a BD46     		mov	sp, r7
+ 658              		@ sp needed
+ 659 038c 80BD     		pop	{r7, pc}
+ 660              		.cfi_endproc
+ 661              	.LFE62:
+ 663 038e 00BF     		.align	2
+ 664              		.thumb
+ 665              		.thumb_func
+ 667              	MSC_BOT_Abort:
+ 668              	.LFB63:
+ 341:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** 
+ 342:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** /**
+ 343:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** * @brief  MSC_BOT_Abort
+ 344:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** *         Abort the current transfer
+ 345:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** * @param  pdev: device instance
+ 346:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** * @retval status
+ 347:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** */
+ 348:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** 
+ 349:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** static void  MSC_BOT_Abort (USBD_HandleTypeDef  *pdev)
+ 350:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** {
+ 669              		.loc 1 350 0
+ 670              		.cfi_startproc
+ 671              		@ args = 0, pretend = 0, frame = 16
+ 672              		@ frame_needed = 1, uses_anonymous_args = 0
+ 673 0390 80B5     		push	{r7, lr}
+ 674              		.cfi_def_cfa_offset 8
+ 675              		.cfi_offset 7, -8
+ 676              		.cfi_offset 14, -4
+ 677 0392 84B0     		sub	sp, sp, #16
+ 678              		.cfi_def_cfa_offset 24
+ 679 0394 00AF     		add	r7, sp, #0
+ 680              		.cfi_def_cfa_register 7
+ 681 0396 7860     		str	r0, [r7, #4]
+ 351:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   USBD_MSC_BOT_HandleTypeDef  *hmsc = pdev->pClassData; 
+ 682              		.loc 1 351 0
+ 683 0398 7B68     		ldr	r3, [r7, #4]
+ 684 039a D3F81832 		ldr	r3, [r3, #536]
+ 685 039e FB60     		str	r3, [r7, #12]
+ 352:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   
+ 353:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   if ((hmsc->cbw.bmFlags == 0) && 
+ 686              		.loc 1 353 0
+ 687 03a0 FB68     		ldr	r3, [r7, #12]
+ 688 03a2 03F50053 		add	r3, r3, #8192
+ 689 03a6 1833     		adds	r3, r3, #24
+ 690 03a8 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 691 03aa 002B     		cmp	r3, #0
+ 692 03ac 0ED1     		bne	.L30
+ 354:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****       (hmsc->cbw.dDataLength != 0) &&
+ 693              		.loc 1 354 0 discriminator 1
+ 694 03ae FB68     		ldr	r3, [r7, #12]
+ 695 03b0 03F50053 		add	r3, r3, #8192
+ 696 03b4 1433     		adds	r3, r3, #20
+ 697 03b6 1B68     		ldr	r3, [r3]
+ 353:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****       (hmsc->cbw.dDataLength != 0) &&
+ 698              		.loc 1 353 0 discriminator 1
+ 699 03b8 002B     		cmp	r3, #0
+ 700 03ba 07D0     		beq	.L30
+ 355:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****       (hmsc->bot_status == USBD_BOT_STATUS_NORMAL) )
+ 701              		.loc 1 355 0
+ 702 03bc FB68     		ldr	r3, [r7, #12]
+ 703 03be 5B7A     		ldrb	r3, [r3, #9]	@ zero_extendqisi2
+ 354:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****       (hmsc->cbw.dDataLength != 0) &&
+ 704              		.loc 1 354 0
+ 705 03c0 002B     		cmp	r3, #0
+ 706 03c2 03D1     		bne	.L30
+ 356:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   {
+ 357:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     USBD_LL_StallEP(pdev, MSC_EPOUT_ADDR );
+ 707              		.loc 1 357 0
+ 708 03c4 7868     		ldr	r0, [r7, #4]
+ 709 03c6 0121     		movs	r1, #1
+ 710 03c8 FFF7FEFF 		bl	USBD_LL_StallEP
+ 711              	.L30:
+ 358:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   }
+ 359:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   USBD_LL_StallEP(pdev, MSC_EPIN_ADDR);
+ 712              		.loc 1 359 0
+ 713 03cc 7868     		ldr	r0, [r7, #4]
+ 714 03ce 8121     		movs	r1, #129
+ 715 03d0 FFF7FEFF 		bl	USBD_LL_StallEP
+ 360:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   
+ 361:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   if(hmsc->bot_status == USBD_BOT_STATUS_ERROR)
+ 716              		.loc 1 361 0
+ 717 03d4 FB68     		ldr	r3, [r7, #12]
+ 718 03d6 5B7A     		ldrb	r3, [r3, #9]	@ zero_extendqisi2
+ 719 03d8 022B     		cmp	r3, #2
+ 720 03da 09D1     		bne	.L29
+ 362:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   {
+ 363:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     USBD_LL_PrepareReceive (pdev,
+ 364:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                       MSC_EPOUT_ADDR,
+ 365:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                       (uint8_t *)&hmsc->cbw, 
+ 721              		.loc 1 365 0
+ 722 03dc FB68     		ldr	r3, [r7, #12]
+ 723 03de 03F50053 		add	r3, r3, #8192
+ 724 03e2 0C33     		adds	r3, r3, #12
+ 363:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                       MSC_EPOUT_ADDR,
+ 725              		.loc 1 363 0
+ 726 03e4 7868     		ldr	r0, [r7, #4]
+ 727 03e6 0121     		movs	r1, #1
+ 728 03e8 1A46     		mov	r2, r3
+ 729 03ea 1F23     		movs	r3, #31
+ 730 03ec FFF7FEFF 		bl	USBD_LL_PrepareReceive
+ 731              	.L29:
+ 366:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****                       USBD_BOT_CBW_LENGTH);    
+ 367:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   }
+ 368:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** }
+ 732              		.loc 1 368 0
+ 733 03f0 1037     		adds	r7, r7, #16
+ 734 03f2 BD46     		mov	sp, r7
+ 735              		@ sp needed
+ 736 03f4 80BD     		pop	{r7, pc}
+ 737              		.cfi_endproc
+ 738              	.LFE63:
+ 740 03f6 00BF     		.align	2
+ 741              		.global	MSC_BOT_CplClrFeature
+ 742              		.thumb
+ 743              		.thumb_func
+ 745              	MSC_BOT_CplClrFeature:
+ 746              	.LFB64:
+ 369:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** 
+ 370:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** /**
+ 371:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** * @brief  MSC_BOT_CplClrFeature
+ 372:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** *         Complete the clear feature request
+ 373:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** * @param  pdev: device instance
+ 374:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** * @param  epnum: endpoint index
+ 375:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** * @retval None
+ 376:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** */
+ 377:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** 
+ 378:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** void  MSC_BOT_CplClrFeature (USBD_HandleTypeDef  *pdev, uint8_t epnum)
+ 379:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** {
+ 747              		.loc 1 379 0
+ 748              		.cfi_startproc
+ 749              		@ args = 0, pretend = 0, frame = 16
+ 750              		@ frame_needed = 1, uses_anonymous_args = 0
+ 751 03f8 80B5     		push	{r7, lr}
+ 752              		.cfi_def_cfa_offset 8
+ 753              		.cfi_offset 7, -8
+ 754              		.cfi_offset 14, -4
+ 755 03fa 84B0     		sub	sp, sp, #16
+ 756              		.cfi_def_cfa_offset 24
+ 757 03fc 00AF     		add	r7, sp, #0
+ 758              		.cfi_def_cfa_register 7
+ 759 03fe 7860     		str	r0, [r7, #4]
+ 760 0400 0B46     		mov	r3, r1
+ 761 0402 FB70     		strb	r3, [r7, #3]
+ 380:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   USBD_MSC_BOT_HandleTypeDef  *hmsc = pdev->pClassData; 
+ 762              		.loc 1 380 0
+ 763 0404 7B68     		ldr	r3, [r7, #4]
+ 764 0406 D3F81832 		ldr	r3, [r3, #536]
+ 765 040a FB60     		str	r3, [r7, #12]
+ 381:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   
+ 382:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   if(hmsc->bot_status == USBD_BOT_STATUS_ERROR )/* Bad CBW Signature */
+ 766              		.loc 1 382 0
+ 767 040c FB68     		ldr	r3, [r7, #12]
+ 768 040e 5B7A     		ldrb	r3, [r3, #9]	@ zero_extendqisi2
+ 769 0410 022B     		cmp	r3, #2
+ 770 0412 07D1     		bne	.L33
+ 383:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   {
+ 384:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     USBD_LL_StallEP(pdev, MSC_EPIN_ADDR);
+ 771              		.loc 1 384 0
+ 772 0414 7868     		ldr	r0, [r7, #4]
+ 773 0416 8121     		movs	r1, #129
+ 774 0418 FFF7FEFF 		bl	USBD_LL_StallEP
+ 385:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     hmsc->bot_status = USBD_BOT_STATUS_NORMAL;    
+ 775              		.loc 1 385 0
+ 776 041c FB68     		ldr	r3, [r7, #12]
+ 777 041e 0022     		movs	r2, #0
+ 778 0420 5A72     		strb	r2, [r3, #9]
+ 779 0422 0BE0     		b	.L32
+ 780              	.L33:
+ 386:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   }
+ 387:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   else if(((epnum & 0x80) == 0x80) && ( hmsc->bot_status != USBD_BOT_STATUS_RECOVERY))
+ 781              		.loc 1 387 0
+ 782 0424 FB78     		ldrb	r3, [r7, #3]	@ zero_extendqisi2
+ 783 0426 5BB2     		sxtb	r3, r3
+ 784 0428 002B     		cmp	r3, #0
+ 785 042a 07DA     		bge	.L32
+ 786              		.loc 1 387 0 is_stmt 0 discriminator 1
+ 787 042c FB68     		ldr	r3, [r7, #12]
+ 788 042e 5B7A     		ldrb	r3, [r3, #9]	@ zero_extendqisi2
+ 789 0430 012B     		cmp	r3, #1
+ 790 0432 03D0     		beq	.L32
+ 388:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   {
+ 389:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****     MSC_BOT_SendCSW (pdev, USBD_CSW_CMD_FAILED);
+ 791              		.loc 1 389 0 is_stmt 1
+ 792 0434 7868     		ldr	r0, [r7, #4]
+ 793 0436 0121     		movs	r1, #1
+ 794 0438 FFF7FEFF 		bl	MSC_BOT_SendCSW
+ 795              	.L32:
+ 390:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   }
+ 391:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c ****   
+ 392:../tasks/usb/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c **** }
+ 796              		.loc 1 392 0
+ 797 043c 1037     		adds	r7, r7, #16
+ 798 043e BD46     		mov	sp, r7
+ 799              		@ sp needed
+ 800 0440 80BD     		pop	{r7, pc}
+ 801              		.cfi_endproc
+ 802              	.LFE64:
+ 804              	.Letext0:
+ 805              		.file 2 "c:\\program files (x86)\\codesourcery\\arm-none-eabi\\include\\stdint.h"
+ 806              		.file 3 "D:\\workspace\\console800480\\tasks\\usb\\STM32_USB_Device_Library\\Core\\Inc/usbd_def.h"
+ 807              		.file 4 "D:\\workspace\\console800480\\tasks\\usb\\STM32_USB_Device_Library\\Class\\MSC\\Inc/usbd_
+ 808              		.file 5 "D:\\workspace\\console800480\\tasks\\usb\\STM32_USB_Device_Library\\Class\\MSC\\Inc/usbd_
+ 809              		.file 6 "D:\\workspace\\console800480\\tasks\\usb\\STM32_USB_Device_Library\\Class\\MSC\\Inc/usbd_
+ 810              		.file 7 "D:\\workspace\\console800480\\system/core_cm3.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 usbd_msc_bot.c
+C:\Users\sagok\AppData\Local\Temp\ccmRah2C.s:18     .text:00000000 $t
+C:\Users\sagok\AppData\Local\Temp\ccmRah2C.s:23     .text:00000000 MSC_BOT_Init
+C:\Users\sagok\AppData\Local\Temp\ccmRah2C.s:100    .text:0000006c MSC_BOT_Reset
+C:\Users\sagok\AppData\Local\Temp\ccmRah2C.s:150    .text:000000a4 MSC_BOT_DeInit
+C:\Users\sagok\AppData\Local\Temp\ccmRah2C.s:187    .text:000000c4 MSC_BOT_DataIn
+C:\Users\sagok\AppData\Local\Temp\ccmRah2C.s:597    .text:00000328 MSC_BOT_SendCSW
+C:\Users\sagok\AppData\Local\Temp\ccmRah2C.s:266    .text:0000012c MSC_BOT_DataOut
+C:\Users\sagok\AppData\Local\Temp\ccmRah2C.s:340    .text:0000018c MSC_BOT_CBW_Decode
+C:\Users\sagok\AppData\Local\Temp\ccmRah2C.s:667    .text:00000390 MSC_BOT_Abort
+C:\Users\sagok\AppData\Local\Temp\ccmRah2C.s:525    .text:000002c0 MSC_BOT_SendData
+C:\Users\sagok\AppData\Local\Temp\ccmRah2C.s:745    .text:000003f8 MSC_BOT_CplClrFeature
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.1.7f551ac7fcad8b79b9df4bfdaa536673
+                           .group:00000000 wm4.stm32f2xx_hal_conf.h.40.007126baefb9f966c36646edbf8040d2
+                           .group:00000000 wm4.stm32f2xx.h.57.5ec1581efc43612c411d33a8686e9ec7
+                           .group:00000000 wm4.stm32f217xx.h.52.9c940d76d00294b78837dc334c172fdd
+                           .group:00000000 wm4.core_cm3.h.32.49180ccb4d36cabd2d7016d2a51d91ae
+                           .group:00000000 wm4.newlib.h.8.384a112feabb3bef7b573ae48cde2e3b
+                           .group:00000000 wm4.features.h.22.6a4ca7cd053637cc1d0db6c16f39b2d7
+                           .group:00000000 wm4.config.h.183.aa62afef667fb61d15fa64c48beb2f14
+                           .group:00000000 wm4._ansi.h.23.5644b60c990a4800b02a6e654e88f93a
+                           .group:00000000 wm4.stdint.h.20.54ad762faa59e3c05491630641c8d8bf
+                           .group:00000000 wm4.core_cmInstr.h.25.f50f886f2edf670cf199b35fd96f5c91
+                           .group:00000000 wm4.core_cm3.h.130.63ab2348a6eed0fdb318040d970b676c
+                           .group:00000000 wm4.stm32f217xx.h.978.a5c681952b2f704a0e7f2ba21d08adf5
+                           .group:00000000 wm4.stm32f2xx.h.142.bc2155a1f7498bab16371e38413a9e41
+                           .group:00000000 wm4.stm32f2xx_hal_def.h.74.8ad2dc8aa82c4fd02e5aeaae592641ba
+                           .group:00000000 wm4.stm32f2xx_hal_rcc.h.142.ec0f91cc6576a6acebd17e6dd85829ae
+                           .group:00000000 wm4.stm32f2xx_hal_rcc_ex.h.40.0829033e864455c6bdd0db01f8ba5a50
+                           .group:00000000 wm4.stm32f2xx_hal_gpio.h.40.ba64e0bb94d9a68835f80159f39a86f1
+                           .group:00000000 wm4.stm32f2xx_hal_gpio_ex.h.40.24e547fd402281923f446b510381083f
+                           .group:00000000 wm4.stm32f2xx_hal_dma.h.40.5d9732ace2a21a4526ce8f0c52428fff
+                           .group:00000000 wm4.stm32f2xx_hal_cortex.h.40.e10263d2ec5d4fa79b4180ce1a38aff1
+                           .group:00000000 wm4.stm32f2xx_hal_adc.h.40.89ac8b78113cac4cf63847587daabac9
+                           .group:00000000 wm4.stm32f2xx_hal_adc_ex.h.40.7de68ed256ef25526ee31cc017f2c291
+                           .group:00000000 wm4.stm32f2xx_hal_flash.h.40.c3171719ce015e9cff20c795e44e886d
+                           .group:00000000 wm4.stm32f2xx_hal_flash_ex.h.40.7389508bd24a0aeb077bde0c9fb651eb
+                           .group:00000000 wm4.stm32f2xx_ll_fsmc.h.40.c1c32f2e1862f4dd342bd9b80fb895bb
+                           .group:00000000 wm4.stm32f2xx_hal_pwr.h.40.812df32e5c31b609a128e9db0eb4cbd0
+                           .group:00000000 wm4.stm32f2xx_hal_rtc.h.40.850fda5fe2cce8797446913dee18382f
+                           .group:00000000 wm4.stm32f2xx_hal_rtc_ex.h.40.f3e0c408e3bf4e8a0352d7ec9a18a822
+                           .group:00000000 wm4.stm32f2xx_ll_sdmmc.h.40.3719ab487c4b77401c572f459adf6eb7
+                           .group:00000000 wm4.stm32f2xx_hal_sd.h.58.760215394dcc316161a6482c0af9b866
+                           .group:00000000 wm4.stm32f2xx_hal_spi.h.40.7984243dbaba8b21c6392998a47e6987
+                           .group:00000000 wm4.stm32f2xx_hal_tim.h.40.d79172f25d0e9a15dc346aba8515bdd6
+                           .group:00000000 wm4.stm32f2xx_hal_tim_ex.h.40.361f280a7a3f60b4b238bb99ca728d83
+                           .group:00000000 wm4.stm32f2xx_hal_uart.h.40.d74def561ae6f78f40f477c8426ecbef
+                           .group:00000000 wm4.stm32f2xx_ll_usb.h.40.9b0206a05bc6ce3bec1648b51f22cb81
+                           .group:00000000 wm4.stm32f2xx_hal_pcd.h.99.11faba414c39e357b2f23364912d0605
+                           .group:00000000 wm4.stm32f2xx_hal_hcd.h.40.44ee5e972983ae0139ddbacdc75c44ef
+                           .group:00000000 wm4.stm32f2xx_hal.h.64.ed79ee83e52b151b3c365392b398f866
+                           .group:00000000 wm4.stdio.h.31.7c0e28c411445f3f9c5b11accf882760
+                           .group:00000000 wm4.stddef.h.184.159df79b4ca79c76561572a55985524c
+                           .group:00000000 wm4.stdarg.h.34.3a23a216c0c293b3d2ea2e89281481e6
+                           .group:00000000 wm4._default_types.h.6.5e12cd604db8ce00b62bb2f02708eaf3
+                           .group:00000000 wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea
+                           .group:00000000 wm4._types.h.59.db8450f33c1f6150c0372fa1091a887a
+                           .group:00000000 wm4.stddef.h.348.9a99de77b6ba3b4278b57e9cc6d6e349
+                           .group:00000000 wm4.reent.h.16.567d760e6ae9ad7f917851a308bd7a57
+                           .group:00000000 wm4.types.h.23.0d949686bbcadd1621462d4fa1f884f9
+                           .group:00000000 wm4.stddef.h.39.7e3d906ac58942e0b374c527445f5de5
+                           .group:00000000 wm4.types.h.2.e9cec8c90ab35f77d9f499e06ae02400
+                           .group:00000000 wm4.types.h.80.5759fe41f87f5211a5952dfb1fc64f19
+                           .group:00000000 wm4.stdio.h.2.4aa87247282eca6c8f36f9de33d8df1a
+                           .group:00000000 wm4.stdio.h.64.f9f1bb6b0d3d7e12f6a27968d859709c
+                           .group:00000000 wm4.stdlib.h.18.8bab2fb43ac4e90235390733c30a4530
+                           .group:00000000 wm4.stddef.h.158.a7efb00f6cbc6f43213b50e183c9830c
+                           .group:00000000 wm4.alloca.h.8.dfc0c703c47ec3e69746825b17d9e66d
+                           .group:00000000 wm4.stdlib.h.55.7091a050e07f1c4abd225630fe3d62f1
+                           .group:00000000 wm4.cdefs.h.56.efab90f4d89fbc41d6b3a5c5fb0d3d0f
+                           .group:00000000 wm4.string.h.15.dab3980bf35408a4c507182805e2de3a
+                           .group:00000000 wm4.string.h.126.6ff3aa59129e7f66b2c273baf353e066
+                           .group:00000000 wm4.Display.h.39.49592f1e6d055d6383457fd20cdd98de
+                           .group:00000000 wm4.usbd_conf.h.42.6b5dabdfef26be13dabbf5c06e1837cb
+                           .group:00000000 wm4.usbd_def.h.31.c6dc8a88074757ab7e1498fc76ddfad4
+                           .group:00000000 wm4.usbd_msc_bot.h.34.a1295f43d177cf06aadfcf5e912da81a
+                           .group:00000000 wm4.usbd_msc_scsi.h.48.7c7638995c66421ebc78f294e16c7806
+                           .group:00000000 wm4.usbd_msc.h.49.47f2be42f997bf18a3795a843b205023
+
+UNDEFINED SYMBOLS
+USBD_LL_FlushEP
+USBD_LL_PrepareReceive
+SCSI_ProcessCmd
+USBD_LL_GetRxDataSize
+SCSI_SenseCode
+USBD_LL_Transmit
+USBD_LL_StallEP

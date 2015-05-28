@@ -1,0 +1,269 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"board.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.align	2
+  19              		.global	SystemClock_Config
+  20              		.thumb
+  21              		.thumb_func
+  23              	SystemClock_Config:
+  24              	.LFB55:
+  25              		.file 1 "../src/board.c"
+   1:../src/board.c **** /*
+   2:../src/board.c ****  * board.c
+   3:../src/board.c ****  *
+   4:../src/board.c ****  *  Created on: 08.08.2014
+   5:../src/board.c ****  *      Author: sagok
+   6:../src/board.c ****  */
+   7:../src/board.c **** #include "stm32f2xx_hal.h"
+   8:../src/board.c **** #include "stm32f2xx_hal_rcc.h"
+   9:../src/board.c **** #include "stm32f2xx_hal_cortex.h"
+  10:../src/board.c **** #include "board.h"
+  11:../src/board.c **** 
+  12:../src/board.c **** /* Scheduler includes. */
+  13:../src/board.c **** #include "FreeRTOS.h"
+  14:../src/board.c **** #include "task.h"
+  15:../src/board.c **** #include "queue.h"
+  16:../src/board.c **** #include "semphr.h"
+  17:../src/board.c **** #include "timers.h"
+  18:../src/board.c **** 
+  19:../src/board.c **** void SystemClock_Config(void) {
+  26              		.loc 1 19 0
+  27              		.cfi_startproc
+  28              		@ args = 0, pretend = 0, frame = 72
+  29              		@ frame_needed = 1, uses_anonymous_args = 0
+  30 0000 80B5     		push	{r7, lr}
+  31              		.cfi_def_cfa_offset 8
+  32              		.cfi_offset 7, -8
+  33              		.cfi_offset 14, -4
+  34 0002 92B0     		sub	sp, sp, #72
+  35              		.cfi_def_cfa_offset 80
+  36 0004 00AF     		add	r7, sp, #0
+  37              		.cfi_def_cfa_register 7
+  20:../src/board.c **** 	RCC_ClkInitTypeDef RCC_ClkInitStruct;
+  21:../src/board.c **** 	RCC_OscInitTypeDef RCC_OscInitStruct;
+  22:../src/board.c **** 
+  23:../src/board.c **** 	HAL_RCC_DeInit();
+  38              		.loc 1 23 0
+  39 0006 FFF7FEFF 		bl	HAL_RCC_DeInit
+  24:../src/board.c **** 
+  25:../src/board.c **** 	/* Enable HSE Oscillator and activate PLL with HSE as source */					// SYSCLK =120MHz
+  26:../src/board.c **** 	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;						// RCC_OSCILLATORTYPE_HSE;
+  40              		.loc 1 26 0
+  41 000a 0123     		movs	r3, #1
+  42 000c 7B60     		str	r3, [r7, #4]
+  27:../src/board.c **** 	RCC_OscInitStruct.HSEState = RCC_HSE_ON;										// RCC_HSE_ON;
+  43              		.loc 1 27 0
+  44 000e 0123     		movs	r3, #1
+  45 0010 BB60     		str	r3, [r7, #8]
+  28:../src/board.c **** //	RCC_OscInitStruct.HSIState = RCC_HSI_ON;										// RCC_HSE_ON;
+  29:../src/board.c **** 	RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;									// RCC_PLL_ON;
+  46              		.loc 1 29 0
+  47 0012 0223     		movs	r3, #2
+  48 0014 FB61     		str	r3, [r7, #28]
+  30:../src/board.c **** 	RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;							// RCC_PLLSOURCE_HSE;
+  49              		.loc 1 30 0
+  50 0016 4FF48003 		mov	r3, #4194304
+  51 001a 3B62     		str	r3, [r7, #32]
+  31:../src/board.c **** 	RCC_OscInitStruct.PLL.PLLM = 25;												// 25; 16-HSI
+  52              		.loc 1 31 0
+  53 001c 1923     		movs	r3, #25
+  54 001e 7B62     		str	r3, [r7, #36]
+  32:../src/board.c **** 	RCC_OscInitStruct.PLL.PLLN = 240;												// 240;
+  55              		.loc 1 32 0
+  56 0020 F023     		movs	r3, #240
+  57 0022 BB62     		str	r3, [r7, #40]
+  33:../src/board.c **** 	RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;										// RCC_PLLP_DIV2;			// это ядро, USB не цепля
+  58              		.loc 1 33 0
+  59 0024 0223     		movs	r3, #2
+  60 0026 FB62     		str	r3, [r7, #44]
+  34:../src/board.c **** 	RCC_OscInitStruct.PLL.PLLQ = 5;													// 5;
+  61              		.loc 1 34 0
+  62 0028 0523     		movs	r3, #5
+  63 002a 3B63     		str	r3, [r7, #48]
+  35:../src/board.c **** 	HAL_RCC_OscConfig(&RCC_OscInitStruct);
+  64              		.loc 1 35 0
+  65 002c 3B1D     		adds	r3, r7, #4
+  66 002e 1846     		mov	r0, r3
+  67 0030 FFF7FEFF 		bl	HAL_RCC_OscConfig
+  36:../src/board.c **** 
+  37:../src/board.c **** 	/* Select PLL as system clock source and configure the HCLK, PCLK1 and PCLK2
+  38:../src/board.c **** 	 clocks dividers */
+  39:../src/board.c **** 	RCC_ClkInitStruct.ClockType = (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK
+  68              		.loc 1 39 0
+  69 0034 0F23     		movs	r3, #15
+  70 0036 7B63     		str	r3, [r7, #52]
+  40:../src/board.c **** 			| RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2);							//  (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HC
+  41:../src/board.c **** 	RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;						// RCC_SYSCLKSOURCE_PLLCLK;
+  71              		.loc 1 41 0
+  72 0038 0223     		movs	r3, #2
+  73 003a BB63     		str	r3, [r7, #56]
+  42:../src/board.c **** 	RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;								// RCC_SYSCLK_DIV1;
+  74              		.loc 1 42 0
+  75 003c 0023     		movs	r3, #0
+  76 003e FB63     		str	r3, [r7, #60]
+  43:../src/board.c **** 	RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;								// RCC_HCLK_DIV4;
+  77              		.loc 1 43 0
+  78 0040 4FF4A053 		mov	r3, #5120
+  79 0044 3B64     		str	r3, [r7, #64]
+  44:../src/board.c **** 	RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;								// RCC_HCLK_DIV2;
+  80              		.loc 1 44 0
+  81 0046 4FF48053 		mov	r3, #4096
+  82 004a 7B64     		str	r3, [r7, #68]
+  45:../src/board.c **** 	HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_3);						// FLASH_LATENCY_3
+  83              		.loc 1 45 0
+  84 004c 07F13403 		add	r3, r7, #52
+  85 0050 1846     		mov	r0, r3
+  86 0052 0321     		movs	r1, #3
+  87 0054 FFF7FEFF 		bl	HAL_RCC_ClockConfig
+  46:../src/board.c **** 
+  47:../src/board.c **** }
+  88              		.loc 1 47 0
+  89 0058 4837     		adds	r7, r7, #72
+  90 005a BD46     		mov	sp, r7
+  91              		@ sp needed
+  92 005c 80BD     		pop	{r7, pc}
+  93              		.cfi_endproc
+  94              	.LFE55:
+  96 005e 00BF     		.align	2
+  97              		.global	NVIC_Configuration
+  98              		.thumb
+  99              		.thumb_func
+ 101              	NVIC_Configuration:
+ 102              	.LFB56:
+  48:../src/board.c **** 
+  49:../src/board.c **** /*************************************************************************
+  50:../src/board.c ****  * NVIC_Configuration
+  51:../src/board.c ****  *************************************************************************/
+  52:../src/board.c **** void NVIC_Configuration(void)
+  53:../src/board.c ****     {
+ 103              		.loc 1 53 0
+ 104              		.cfi_startproc
+ 105              		@ args = 0, pretend = 0, frame = 0
+ 106              		@ frame_needed = 1, uses_anonymous_args = 0
+ 107 0060 80B5     		push	{r7, lr}
+ 108              		.cfi_def_cfa_offset 8
+ 109              		.cfi_offset 7, -8
+ 110              		.cfi_offset 14, -4
+ 111 0062 00AF     		add	r7, sp, #0
+ 112              		.cfi_def_cfa_register 7
+  54:../src/board.c **** 
+  55:../src/board.c **** 	  HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);			//NVIC_PRIORITYGROUP_1
+ 113              		.loc 1 55 0
+ 114 0064 0320     		movs	r0, #3
+ 115 0066 FFF7FEFF 		bl	HAL_NVIC_SetPriorityGrouping
+  56:../src/board.c **** 
+  57:../src/board.c **** 	  HAL_NVIC_SetPriority(RCC_IRQn,(uint8_t)(configKERNEL_INTERRUPT_PRIORITY >> 4),0);
+ 116              		.loc 1 57 0
+ 117 006a 0520     		movs	r0, #5
+ 118 006c 0F21     		movs	r1, #15
+ 119 006e 0022     		movs	r2, #0
+ 120 0070 FFF7FEFF 		bl	HAL_NVIC_SetPriority
+  58:../src/board.c **** 	  HAL_NVIC_SetPriority(PVD_IRQn,0,0);
+ 121              		.loc 1 58 0
+ 122 0074 0120     		movs	r0, #1
+ 123 0076 0021     		movs	r1, #0
+ 124 0078 0022     		movs	r2, #0
+ 125 007a FFF7FEFF 		bl	HAL_NVIC_SetPriority
+  59:../src/board.c **** 
+  60:../src/board.c **** 
+  61:../src/board.c **** /*
+  62:../src/board.c **** 	  HAL_NVIC_SetPriority(SDIO_IRQn,0,0);
+  63:../src/board.c **** 	  HAL_NVIC_EnableIRQ(SDIO_IRQn);
+  64:../src/board.c **** 	  HAL_NVIC_SetPriority(DMA2_Stream3_IRQn,0,0);
+  65:../src/board.c **** 	  HAL_NVIC_EnableIRQ(DMA2_Stream3_IRQn);
+  66:../src/board.c **** 	  HAL_NVIC_SetPriority(DMA2_Stream6_IRQn,0,0);
+  67:../src/board.c **** 	  HAL_NVIC_EnableIRQ(DMA2_Stream6_IRQn);
+  68:../src/board.c **** */
+  69:../src/board.c **** 
+  70:../src/board.c **** 	//  HAL_NVIC_SetPriority(DMA2_Stream3_IRQn,0,0);
+  71:../src/board.c **** 	//  HAL_NVIC_SetPriority(DMA2_Stream6_IRQn,0,0);
+  72:../src/board.c **** 
+  73:../src/board.c ****     }
+ 126              		.loc 1 73 0
+ 127 007e 80BD     		pop	{r7, pc}
+ 128              		.cfi_endproc
+ 129              	.LFE56:
+ 131              	.Letext0:
+ 132              		.file 2 "c:\\program files (x86)\\codesourcery\\arm-none-eabi\\include\\stdint.h"
+ 133              		.file 3 "D:\\workspace\\console800480\\STM32F2xx_HAL_Driver\\Inc/stm32f2xx_hal_rcc.h"
+ 134              		.file 4 "D:\\workspace\\console800480\\system/stm32f217xx.h"
+ 135              		.file 5 "D:\\workspace\\console800480\\system/core_cm3.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 board.c
+C:\Users\sagok\AppData\Local\Temp\cc87ztJl.s:18     .text:00000000 $t
+C:\Users\sagok\AppData\Local\Temp\cc87ztJl.s:23     .text:00000000 SystemClock_Config
+C:\Users\sagok\AppData\Local\Temp\cc87ztJl.s:101    .text:00000060 NVIC_Configuration
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.1.7f551ac7fcad8b79b9df4bfdaa536673
+                           .group:00000000 wm4.stm32f2xx_hal_conf.h.40.007126baefb9f966c36646edbf8040d2
+                           .group:00000000 wm4.stm32f2xx.h.57.5ec1581efc43612c411d33a8686e9ec7
+                           .group:00000000 wm4.stm32f217xx.h.52.9c940d76d00294b78837dc334c172fdd
+                           .group:00000000 wm4.core_cm3.h.32.49180ccb4d36cabd2d7016d2a51d91ae
+                           .group:00000000 wm4.newlib.h.8.384a112feabb3bef7b573ae48cde2e3b
+                           .group:00000000 wm4.features.h.22.6a4ca7cd053637cc1d0db6c16f39b2d7
+                           .group:00000000 wm4.config.h.183.aa62afef667fb61d15fa64c48beb2f14
+                           .group:00000000 wm4._ansi.h.23.5644b60c990a4800b02a6e654e88f93a
+                           .group:00000000 wm4.stdint.h.20.54ad762faa59e3c05491630641c8d8bf
+                           .group:00000000 wm4.core_cmInstr.h.25.f50f886f2edf670cf199b35fd96f5c91
+                           .group:00000000 wm4.core_cm3.h.130.63ab2348a6eed0fdb318040d970b676c
+                           .group:00000000 wm4.stm32f217xx.h.978.a5c681952b2f704a0e7f2ba21d08adf5
+                           .group:00000000 wm4.stm32f2xx.h.142.bc2155a1f7498bab16371e38413a9e41
+                           .group:00000000 wm4.stm32f2xx_hal_def.h.74.8ad2dc8aa82c4fd02e5aeaae592641ba
+                           .group:00000000 wm4.stm32f2xx_hal_rcc.h.142.ec0f91cc6576a6acebd17e6dd85829ae
+                           .group:00000000 wm4.stm32f2xx_hal_rcc_ex.h.40.0829033e864455c6bdd0db01f8ba5a50
+                           .group:00000000 wm4.stm32f2xx_hal_gpio.h.40.ba64e0bb94d9a68835f80159f39a86f1
+                           .group:00000000 wm4.stm32f2xx_hal_gpio_ex.h.40.24e547fd402281923f446b510381083f
+                           .group:00000000 wm4.stm32f2xx_hal_dma.h.40.5d9732ace2a21a4526ce8f0c52428fff
+                           .group:00000000 wm4.stm32f2xx_hal_cortex.h.40.e10263d2ec5d4fa79b4180ce1a38aff1
+                           .group:00000000 wm4.stm32f2xx_hal_adc.h.40.89ac8b78113cac4cf63847587daabac9
+                           .group:00000000 wm4.stm32f2xx_hal_adc_ex.h.40.7de68ed256ef25526ee31cc017f2c291
+                           .group:00000000 wm4.stm32f2xx_hal_flash.h.40.c3171719ce015e9cff20c795e44e886d
+                           .group:00000000 wm4.stm32f2xx_hal_flash_ex.h.40.7389508bd24a0aeb077bde0c9fb651eb
+                           .group:00000000 wm4.stm32f2xx_ll_fsmc.h.40.c1c32f2e1862f4dd342bd9b80fb895bb
+                           .group:00000000 wm4.stm32f2xx_hal_pwr.h.40.812df32e5c31b609a128e9db0eb4cbd0
+                           .group:00000000 wm4.stm32f2xx_hal_rtc.h.40.850fda5fe2cce8797446913dee18382f
+                           .group:00000000 wm4.stm32f2xx_hal_rtc_ex.h.40.f3e0c408e3bf4e8a0352d7ec9a18a822
+                           .group:00000000 wm4.stm32f2xx_ll_sdmmc.h.40.3719ab487c4b77401c572f459adf6eb7
+                           .group:00000000 wm4.stm32f2xx_hal_sd.h.58.760215394dcc316161a6482c0af9b866
+                           .group:00000000 wm4.stm32f2xx_hal_spi.h.40.7984243dbaba8b21c6392998a47e6987
+                           .group:00000000 wm4.stm32f2xx_hal_tim.h.40.d79172f25d0e9a15dc346aba8515bdd6
+                           .group:00000000 wm4.stm32f2xx_hal_tim_ex.h.40.361f280a7a3f60b4b238bb99ca728d83
+                           .group:00000000 wm4.stm32f2xx_hal_uart.h.40.d74def561ae6f78f40f477c8426ecbef
+                           .group:00000000 wm4.stm32f2xx_ll_usb.h.40.9b0206a05bc6ce3bec1648b51f22cb81
+                           .group:00000000 wm4.stm32f2xx_hal_pcd.h.99.11faba414c39e357b2f23364912d0605
+                           .group:00000000 wm4.stm32f2xx_hal_hcd.h.40.44ee5e972983ae0139ddbacdc75c44ef
+                           .group:00000000 wm4.stm32f2xx_hal.h.64.ed79ee83e52b151b3c365392b398f866
+                           .group:00000000 wm4.board.h.9.ca6a3a7983a4f498f7ee9ff88019bd2b
+                           .group:00000000 wm4.stddef.h.39.daafd3d79fe2f3a84d2d73d7d4e706f8
+                           .group:00000000 wm4.projdefs.h.67.1891ed3aab788f154f6e7a8ff42f2cfd
+                           .group:00000000 wm4.FreeRTOSConfig.h.51.b259e2e835793b5f31e6fb224a543b76
+                           .group:00000000 wm4.portmacro.h.68.b9ad41c1c2fd3fb36d97939d17ebacd9
+                           .group:00000000 wm4.portable.h.325.a31e8973a246cd28421ddb595e37fd13
+                           .group:00000000 wm4.mpu_wrappers.h.67.4bcfd12ce15e5313ce3efd77400f8168
+                           .group:00000000 wm4.FreeRTOS.h.177.d801ec107caaf24697618049ed7605b1
+                           .group:00000000 wm4.list.h.96.eaa3d29743bd681933f9f5e726c756a1
+                           .group:00000000 wm4.task.h.84.ff846741c7bdac87bd4a7636d5320d68
+                           .group:00000000 wm4.queue.h.68.1266563298ebacb4a83c08ead1e4111f
+                           .group:00000000 wm4.semphr.h.77.cfc41285e8d228b828c00c3fce52801f
+                           .group:00000000 wm4.timers.h.92.7e7e1a9bf65701faf3dfc9cf90e720c0
+
+UNDEFINED SYMBOLS
+HAL_RCC_DeInit
+HAL_RCC_OscConfig
+HAL_RCC_ClockConfig
+HAL_NVIC_SetPriorityGrouping
+HAL_NVIC_SetPriority

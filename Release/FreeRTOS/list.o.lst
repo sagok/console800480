@@ -1,0 +1,557 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"list.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.align	2
+  19              		.global	vListInitialise
+  20              		.thumb
+  21              		.thumb_func
+  23              	vListInitialise:
+  24              	.LFB0:
+  25              		.file 1 "../FreeRTOS/list.c"
+   1:../FreeRTOS/list.c **** /*
+   2:../FreeRTOS/list.c ****     FreeRTOS V8.0.1 - Copyright (C) 2014 Real Time Engineers Ltd.
+   3:../FreeRTOS/list.c ****     All rights reserved
+   4:../FreeRTOS/list.c **** 
+   5:../FreeRTOS/list.c ****     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
+   6:../FreeRTOS/list.c **** 
+   7:../FreeRTOS/list.c ****     ***************************************************************************
+   8:../FreeRTOS/list.c ****      *                                                                       *
+   9:../FreeRTOS/list.c ****      *    FreeRTOS provides completely free yet professionally developed,    *
+  10:../FreeRTOS/list.c ****      *    robust, strictly quality controlled, supported, and cross          *
+  11:../FreeRTOS/list.c ****      *    platform software that has become a de facto standard.             *
+  12:../FreeRTOS/list.c ****      *                                                                       *
+  13:../FreeRTOS/list.c ****      *    Help yourself get started quickly and support the FreeRTOS         *
+  14:../FreeRTOS/list.c ****      *    project by purchasing a FreeRTOS tutorial book, reference          *
+  15:../FreeRTOS/list.c ****      *    manual, or both from: http://www.FreeRTOS.org/Documentation        *
+  16:../FreeRTOS/list.c ****      *                                                                       *
+  17:../FreeRTOS/list.c ****      *    Thank you!                                                         *
+  18:../FreeRTOS/list.c ****      *                                                                       *
+  19:../FreeRTOS/list.c ****     ***************************************************************************
+  20:../FreeRTOS/list.c **** 
+  21:../FreeRTOS/list.c ****     This file is part of the FreeRTOS distribution.
+  22:../FreeRTOS/list.c **** 
+  23:../FreeRTOS/list.c ****     FreeRTOS is free software; you can redistribute it and/or modify it under
+  24:../FreeRTOS/list.c ****     the terms of the GNU General Public License (version 2) as published by the
+  25:../FreeRTOS/list.c ****     Free Software Foundation >>!AND MODIFIED BY!<< the FreeRTOS exception.
+  26:../FreeRTOS/list.c **** 
+  27:../FreeRTOS/list.c ****     >>!   NOTE: The modification to the GPL is included to allow you to     !<<
+  28:../FreeRTOS/list.c ****     >>!   distribute a combined work that includes FreeRTOS without being   !<<
+  29:../FreeRTOS/list.c ****     >>!   obliged to provide the source code for proprietary components     !<<
+  30:../FreeRTOS/list.c ****     >>!   outside of the FreeRTOS kernel.                                   !<<
+  31:../FreeRTOS/list.c **** 
+  32:../FreeRTOS/list.c ****     FreeRTOS is distributed in the hope that it will be useful, but WITHOUT ANY
+  33:../FreeRTOS/list.c ****     WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  34:../FreeRTOS/list.c ****     FOR A PARTICULAR PURPOSE.  Full license text is available from the following
+  35:../FreeRTOS/list.c ****     link: http://www.freertos.org/a00114.html
+  36:../FreeRTOS/list.c **** 
+  37:../FreeRTOS/list.c ****     1 tab == 4 spaces!
+  38:../FreeRTOS/list.c **** 
+  39:../FreeRTOS/list.c ****     ***************************************************************************
+  40:../FreeRTOS/list.c ****      *                                                                       *
+  41:../FreeRTOS/list.c ****      *    Having a problem?  Start by reading the FAQ "My application does   *
+  42:../FreeRTOS/list.c ****      *    not run, what could be wrong?"                                     *
+  43:../FreeRTOS/list.c ****      *                                                                       *
+  44:../FreeRTOS/list.c ****      *    http://www.FreeRTOS.org/FAQHelp.html                               *
+  45:../FreeRTOS/list.c ****      *                                                                       *
+  46:../FreeRTOS/list.c ****     ***************************************************************************
+  47:../FreeRTOS/list.c **** 
+  48:../FreeRTOS/list.c ****     http://www.FreeRTOS.org - Documentation, books, training, latest versions,
+  49:../FreeRTOS/list.c ****     license and Real Time Engineers Ltd. contact details.
+  50:../FreeRTOS/list.c **** 
+  51:../FreeRTOS/list.c ****     http://www.FreeRTOS.org/plus - A selection of FreeRTOS ecosystem products,
+  52:../FreeRTOS/list.c ****     including FreeRTOS+Trace - an indispensable productivity tool, a DOS
+  53:../FreeRTOS/list.c ****     compatible FAT file system, and our tiny thread aware UDP/IP stack.
+  54:../FreeRTOS/list.c **** 
+  55:../FreeRTOS/list.c ****     http://www.OpenRTOS.com - Real Time Engineers ltd license FreeRTOS to High
+  56:../FreeRTOS/list.c ****     Integrity Systems to sell under the OpenRTOS brand.  Low cost OpenRTOS
+  57:../FreeRTOS/list.c ****     licenses offer ticketed support, indemnification and middleware.
+  58:../FreeRTOS/list.c **** 
+  59:../FreeRTOS/list.c ****     http://www.SafeRTOS.com - High Integrity Systems also provide a safety
+  60:../FreeRTOS/list.c ****     engineered and independently SIL3 certified version for use in safety and
+  61:../FreeRTOS/list.c ****     mission critical applications that require provable dependability.
+  62:../FreeRTOS/list.c **** 
+  63:../FreeRTOS/list.c ****     1 tab == 4 spaces!
+  64:../FreeRTOS/list.c **** */
+  65:../FreeRTOS/list.c **** 
+  66:../FreeRTOS/list.c **** 
+  67:../FreeRTOS/list.c **** #include <stdlib.h>
+  68:../FreeRTOS/list.c **** #include "FreeRTOS.h"
+  69:../FreeRTOS/list.c **** #include "list.h"
+  70:../FreeRTOS/list.c **** 
+  71:../FreeRTOS/list.c **** /*-----------------------------------------------------------
+  72:../FreeRTOS/list.c ****  * PUBLIC LIST API documented in list.h
+  73:../FreeRTOS/list.c ****  *----------------------------------------------------------*/
+  74:../FreeRTOS/list.c **** 
+  75:../FreeRTOS/list.c **** void vListInitialise( List_t * const pxList )
+  76:../FreeRTOS/list.c **** {
+  26              		.loc 1 76 0
+  27              		.cfi_startproc
+  28              		@ args = 0, pretend = 0, frame = 8
+  29              		@ frame_needed = 1, uses_anonymous_args = 0
+  30              		@ link register save eliminated.
+  31 0000 80B4     		push	{r7}
+  32              		.cfi_def_cfa_offset 4
+  33              		.cfi_offset 7, -4
+  34 0002 83B0     		sub	sp, sp, #12
+  35              		.cfi_def_cfa_offset 16
+  36 0004 00AF     		add	r7, sp, #0
+  37              		.cfi_def_cfa_register 7
+  38 0006 7860     		str	r0, [r7, #4]
+  77:../FreeRTOS/list.c **** 	/* The list structure contains a list item which is used to mark the
+  78:../FreeRTOS/list.c **** 	end of the list.  To initialise the list the list end is inserted
+  79:../FreeRTOS/list.c **** 	as the only list entry. */
+  80:../FreeRTOS/list.c **** 	pxList->pxIndex = ( ListItem_t * ) &( pxList->xListEnd );			/*lint !e826 !e740 The mini list struc
+  39              		.loc 1 80 0
+  40 0008 7B68     		ldr	r3, [r7, #4]
+  41 000a 03F10802 		add	r2, r3, #8
+  42 000e 7B68     		ldr	r3, [r7, #4]
+  43 0010 5A60     		str	r2, [r3, #4]
+  81:../FreeRTOS/list.c **** 
+  82:../FreeRTOS/list.c **** 	/* The list end value is the highest possible value in the list to
+  83:../FreeRTOS/list.c **** 	ensure it remains at the end of the list. */
+  84:../FreeRTOS/list.c **** 	pxList->xListEnd.xItemValue = portMAX_DELAY;
+  44              		.loc 1 84 0
+  45 0012 7B68     		ldr	r3, [r7, #4]
+  46 0014 4FF0FF32 		mov	r2, #-1
+  47 0018 9A60     		str	r2, [r3, #8]
+  85:../FreeRTOS/list.c **** 
+  86:../FreeRTOS/list.c **** 	/* The list end next and previous pointers point to itself so we know
+  87:../FreeRTOS/list.c **** 	when the list is empty. */
+  88:../FreeRTOS/list.c **** 	pxList->xListEnd.pxNext = ( ListItem_t * ) &( pxList->xListEnd );	/*lint !e826 !e740 The mini list
+  48              		.loc 1 88 0
+  49 001a 7B68     		ldr	r3, [r7, #4]
+  50 001c 03F10802 		add	r2, r3, #8
+  51 0020 7B68     		ldr	r3, [r7, #4]
+  52 0022 DA60     		str	r2, [r3, #12]
+  89:../FreeRTOS/list.c **** 	pxList->xListEnd.pxPrevious = ( ListItem_t * ) &( pxList->xListEnd );/*lint !e826 !e740 The mini l
+  53              		.loc 1 89 0
+  54 0024 7B68     		ldr	r3, [r7, #4]
+  55 0026 03F10802 		add	r2, r3, #8
+  56 002a 7B68     		ldr	r3, [r7, #4]
+  57 002c 1A61     		str	r2, [r3, #16]
+  90:../FreeRTOS/list.c **** 
+  91:../FreeRTOS/list.c **** 	pxList->uxNumberOfItems = ( UBaseType_t ) 0U;
+  58              		.loc 1 91 0
+  59 002e 7B68     		ldr	r3, [r7, #4]
+  60 0030 0022     		movs	r2, #0
+  61 0032 1A60     		str	r2, [r3]
+  92:../FreeRTOS/list.c **** }
+  62              		.loc 1 92 0
+  63 0034 0C37     		adds	r7, r7, #12
+  64 0036 BD46     		mov	sp, r7
+  65              		@ sp needed
+  66 0038 5DF8047B 		ldr	r7, [sp], #4
+  67 003c 7047     		bx	lr
+  68              		.cfi_endproc
+  69              	.LFE0:
+  71 003e 00BF     		.align	2
+  72              		.global	vListInitialiseItem
+  73              		.thumb
+  74              		.thumb_func
+  76              	vListInitialiseItem:
+  77              	.LFB1:
+  93:../FreeRTOS/list.c **** /*-----------------------------------------------------------*/
+  94:../FreeRTOS/list.c **** 
+  95:../FreeRTOS/list.c **** void vListInitialiseItem( ListItem_t * const pxItem )
+  96:../FreeRTOS/list.c **** {
+  78              		.loc 1 96 0
+  79              		.cfi_startproc
+  80              		@ args = 0, pretend = 0, frame = 8
+  81              		@ frame_needed = 1, uses_anonymous_args = 0
+  82              		@ link register save eliminated.
+  83 0040 80B4     		push	{r7}
+  84              		.cfi_def_cfa_offset 4
+  85              		.cfi_offset 7, -4
+  86 0042 83B0     		sub	sp, sp, #12
+  87              		.cfi_def_cfa_offset 16
+  88 0044 00AF     		add	r7, sp, #0
+  89              		.cfi_def_cfa_register 7
+  90 0046 7860     		str	r0, [r7, #4]
+  97:../FreeRTOS/list.c **** 	/* Make sure the list item is not recorded as being on a list. */
+  98:../FreeRTOS/list.c **** 	pxItem->pvContainer = NULL;
+  91              		.loc 1 98 0
+  92 0048 7B68     		ldr	r3, [r7, #4]
+  93 004a 0022     		movs	r2, #0
+  94 004c 1A61     		str	r2, [r3, #16]
+  99:../FreeRTOS/list.c **** }
+  95              		.loc 1 99 0
+  96 004e 0C37     		adds	r7, r7, #12
+  97 0050 BD46     		mov	sp, r7
+  98              		@ sp needed
+  99 0052 5DF8047B 		ldr	r7, [sp], #4
+ 100 0056 7047     		bx	lr
+ 101              		.cfi_endproc
+ 102              	.LFE1:
+ 104              		.align	2
+ 105              		.global	vListInsertEnd
+ 106              		.thumb
+ 107              		.thumb_func
+ 109              	vListInsertEnd:
+ 110              	.LFB2:
+ 100:../FreeRTOS/list.c **** /*-----------------------------------------------------------*/
+ 101:../FreeRTOS/list.c **** 
+ 102:../FreeRTOS/list.c **** void vListInsertEnd( List_t * const pxList, ListItem_t * const pxNewListItem )
+ 103:../FreeRTOS/list.c **** {
+ 111              		.loc 1 103 0
+ 112              		.cfi_startproc
+ 113              		@ args = 0, pretend = 0, frame = 16
+ 114              		@ frame_needed = 1, uses_anonymous_args = 0
+ 115              		@ link register save eliminated.
+ 116 0058 80B4     		push	{r7}
+ 117              		.cfi_def_cfa_offset 4
+ 118              		.cfi_offset 7, -4
+ 119 005a 85B0     		sub	sp, sp, #20
+ 120              		.cfi_def_cfa_offset 24
+ 121 005c 00AF     		add	r7, sp, #0
+ 122              		.cfi_def_cfa_register 7
+ 123 005e 7860     		str	r0, [r7, #4]
+ 124 0060 3960     		str	r1, [r7]
+ 104:../FreeRTOS/list.c **** ListItem_t * const pxIndex = pxList->pxIndex;
+ 125              		.loc 1 104 0
+ 126 0062 7B68     		ldr	r3, [r7, #4]
+ 127 0064 5B68     		ldr	r3, [r3, #4]
+ 128 0066 FB60     		str	r3, [r7, #12]
+ 105:../FreeRTOS/list.c **** 
+ 106:../FreeRTOS/list.c **** 	/* Insert a new list item into pxList, but rather than sort the list,
+ 107:../FreeRTOS/list.c **** 	makes the new list item the last item to be removed by a call to
+ 108:../FreeRTOS/list.c **** 	listGET_OWNER_OF_NEXT_ENTRY(). */
+ 109:../FreeRTOS/list.c **** 	pxNewListItem->pxNext = pxIndex;
+ 129              		.loc 1 109 0
+ 130 0068 3B68     		ldr	r3, [r7]
+ 131 006a FA68     		ldr	r2, [r7, #12]
+ 132 006c 5A60     		str	r2, [r3, #4]
+ 110:../FreeRTOS/list.c **** 	pxNewListItem->pxPrevious = pxIndex->pxPrevious;
+ 133              		.loc 1 110 0
+ 134 006e FB68     		ldr	r3, [r7, #12]
+ 135 0070 9A68     		ldr	r2, [r3, #8]
+ 136 0072 3B68     		ldr	r3, [r7]
+ 137 0074 9A60     		str	r2, [r3, #8]
+ 111:../FreeRTOS/list.c **** 	pxIndex->pxPrevious->pxNext = pxNewListItem;
+ 138              		.loc 1 111 0
+ 139 0076 FB68     		ldr	r3, [r7, #12]
+ 140 0078 9B68     		ldr	r3, [r3, #8]
+ 141 007a 3A68     		ldr	r2, [r7]
+ 142 007c 5A60     		str	r2, [r3, #4]
+ 112:../FreeRTOS/list.c **** 	pxIndex->pxPrevious = pxNewListItem;
+ 143              		.loc 1 112 0
+ 144 007e FB68     		ldr	r3, [r7, #12]
+ 145 0080 3A68     		ldr	r2, [r7]
+ 146 0082 9A60     		str	r2, [r3, #8]
+ 113:../FreeRTOS/list.c **** 
+ 114:../FreeRTOS/list.c **** 	/* Remember which list the item is in. */
+ 115:../FreeRTOS/list.c **** 	pxNewListItem->pvContainer = ( void * ) pxList;
+ 147              		.loc 1 115 0
+ 148 0084 3B68     		ldr	r3, [r7]
+ 149 0086 7A68     		ldr	r2, [r7, #4]
+ 150 0088 1A61     		str	r2, [r3, #16]
+ 116:../FreeRTOS/list.c **** 
+ 117:../FreeRTOS/list.c **** 	( pxList->uxNumberOfItems )++;
+ 151              		.loc 1 117 0
+ 152 008a 7B68     		ldr	r3, [r7, #4]
+ 153 008c 1B68     		ldr	r3, [r3]
+ 154 008e 5A1C     		adds	r2, r3, #1
+ 155 0090 7B68     		ldr	r3, [r7, #4]
+ 156 0092 1A60     		str	r2, [r3]
+ 118:../FreeRTOS/list.c **** }
+ 157              		.loc 1 118 0
+ 158 0094 1437     		adds	r7, r7, #20
+ 159 0096 BD46     		mov	sp, r7
+ 160              		@ sp needed
+ 161 0098 5DF8047B 		ldr	r7, [sp], #4
+ 162 009c 7047     		bx	lr
+ 163              		.cfi_endproc
+ 164              	.LFE2:
+ 166 009e 00BF     		.align	2
+ 167              		.global	vListInsert
+ 168              		.thumb
+ 169              		.thumb_func
+ 171              	vListInsert:
+ 172              	.LFB3:
+ 119:../FreeRTOS/list.c **** /*-----------------------------------------------------------*/
+ 120:../FreeRTOS/list.c **** 
+ 121:../FreeRTOS/list.c **** void vListInsert( List_t * const pxList, ListItem_t * const pxNewListItem )
+ 122:../FreeRTOS/list.c **** {
+ 173              		.loc 1 122 0
+ 174              		.cfi_startproc
+ 175              		@ args = 0, pretend = 0, frame = 16
+ 176              		@ frame_needed = 1, uses_anonymous_args = 0
+ 177              		@ link register save eliminated.
+ 178 00a0 80B4     		push	{r7}
+ 179              		.cfi_def_cfa_offset 4
+ 180              		.cfi_offset 7, -4
+ 181 00a2 85B0     		sub	sp, sp, #20
+ 182              		.cfi_def_cfa_offset 24
+ 183 00a4 00AF     		add	r7, sp, #0
+ 184              		.cfi_def_cfa_register 7
+ 185 00a6 7860     		str	r0, [r7, #4]
+ 186 00a8 3960     		str	r1, [r7]
+ 123:../FreeRTOS/list.c **** ListItem_t *pxIterator;
+ 124:../FreeRTOS/list.c **** const TickType_t xValueOfInsertion = pxNewListItem->xItemValue;
+ 187              		.loc 1 124 0
+ 188 00aa 3B68     		ldr	r3, [r7]
+ 189 00ac 1B68     		ldr	r3, [r3]
+ 190 00ae BB60     		str	r3, [r7, #8]
+ 125:../FreeRTOS/list.c **** 
+ 126:../FreeRTOS/list.c **** 	/* Insert the new list item into the list, sorted in xItemValue order.
+ 127:../FreeRTOS/list.c **** 
+ 128:../FreeRTOS/list.c **** 	If the list already contains a list item with the same item value then
+ 129:../FreeRTOS/list.c **** 	the new list item should be placed after it.  This ensures that TCB's which
+ 130:../FreeRTOS/list.c **** 	are stored in ready lists (all of which have the same xItemValue value)
+ 131:../FreeRTOS/list.c **** 	get an equal share of the CPU.  However, if the xItemValue is the same as
+ 132:../FreeRTOS/list.c **** 	the back marker the iteration loop below will not end.  This means we need
+ 133:../FreeRTOS/list.c **** 	to guard against this by checking the value first and modifying the
+ 134:../FreeRTOS/list.c **** 	algorithm slightly if necessary. */
+ 135:../FreeRTOS/list.c **** 	if( xValueOfInsertion == portMAX_DELAY )
+ 191              		.loc 1 135 0
+ 192 00b0 BB68     		ldr	r3, [r7, #8]
+ 193 00b2 B3F1FF3F 		cmp	r3, #-1
+ 194 00b6 03D1     		bne	.L5
+ 136:../FreeRTOS/list.c **** 	{
+ 137:../FreeRTOS/list.c **** 		pxIterator = pxList->xListEnd.pxPrevious;
+ 195              		.loc 1 137 0
+ 196 00b8 7B68     		ldr	r3, [r7, #4]
+ 197 00ba 1B69     		ldr	r3, [r3, #16]
+ 198 00bc FB60     		str	r3, [r7, #12]
+ 199 00be 0CE0     		b	.L6
+ 200              	.L5:
+ 138:../FreeRTOS/list.c **** 	}
+ 139:../FreeRTOS/list.c **** 	else
+ 140:../FreeRTOS/list.c **** 	{
+ 141:../FreeRTOS/list.c **** 		/* *** NOTE ***********************************************************
+ 142:../FreeRTOS/list.c **** 		If you find your application is crashing here then likely causes are:
+ 143:../FreeRTOS/list.c **** 			1) Stack overflow -
+ 144:../FreeRTOS/list.c **** 			   see http://www.freertos.org/Stacks-and-stack-overflow-checking.html
+ 145:../FreeRTOS/list.c **** 			2) Incorrect interrupt priority assignment, especially on Cortex-M3
+ 146:../FreeRTOS/list.c **** 			   parts where numerically high priority values denote low actual
+ 147:../FreeRTOS/list.c **** 			   interrupt priories, which can seem counter intuitive.  See
+ 148:../FreeRTOS/list.c **** 			   configMAX_SYSCALL_INTERRUPT_PRIORITY on http://www.freertos.org/a00110.html
+ 149:../FreeRTOS/list.c **** 			3) Calling an API function from within a critical section or when
+ 150:../FreeRTOS/list.c **** 			   the scheduler is suspended, or calling an API function that does
+ 151:../FreeRTOS/list.c **** 			   not end in "FromISR" from an interrupt.
+ 152:../FreeRTOS/list.c **** 			4) Using a queue or semaphore before it has been initialised or
+ 153:../FreeRTOS/list.c **** 			   before the scheduler has been started (are interrupts firing
+ 154:../FreeRTOS/list.c **** 			   before vTaskStartScheduler() has been called?).
+ 155:../FreeRTOS/list.c **** 		See http://www.freertos.org/FAQHelp.html for more tips, and ensure
+ 156:../FreeRTOS/list.c **** 		configASSERT() is defined!  http://www.freertos.org/a00110.html#configASSERT
+ 157:../FreeRTOS/list.c **** 		**********************************************************************/
+ 158:../FreeRTOS/list.c **** 
+ 159:../FreeRTOS/list.c **** 		for( pxIterator = ( ListItem_t * ) &( pxList->xListEnd ); pxIterator->pxNext->xItemValue <= xValu
+ 201              		.loc 1 159 0
+ 202 00c0 7B68     		ldr	r3, [r7, #4]
+ 203 00c2 0833     		adds	r3, r3, #8
+ 204 00c4 FB60     		str	r3, [r7, #12]
+ 205 00c6 02E0     		b	.L7
+ 206              	.L8:
+ 207              		.loc 1 159 0 is_stmt 0 discriminator 2
+ 208 00c8 FB68     		ldr	r3, [r7, #12]
+ 209 00ca 5B68     		ldr	r3, [r3, #4]
+ 210 00cc FB60     		str	r3, [r7, #12]
+ 211              	.L7:
+ 212              		.loc 1 159 0 discriminator 1
+ 213 00ce FB68     		ldr	r3, [r7, #12]
+ 214 00d0 5B68     		ldr	r3, [r3, #4]
+ 215 00d2 1A68     		ldr	r2, [r3]
+ 216 00d4 BB68     		ldr	r3, [r7, #8]
+ 217 00d6 9A42     		cmp	r2, r3
+ 218 00d8 F6D9     		bls	.L8
+ 219              	.L6:
+ 160:../FreeRTOS/list.c **** 		{
+ 161:../FreeRTOS/list.c **** 			/* There is nothing to do here, we are just iterating to the
+ 162:../FreeRTOS/list.c **** 			wanted insertion position. */
+ 163:../FreeRTOS/list.c **** 		}
+ 164:../FreeRTOS/list.c **** 	}
+ 165:../FreeRTOS/list.c **** 
+ 166:../FreeRTOS/list.c **** 	pxNewListItem->pxNext = pxIterator->pxNext;
+ 220              		.loc 1 166 0 is_stmt 1
+ 221 00da FB68     		ldr	r3, [r7, #12]
+ 222 00dc 5A68     		ldr	r2, [r3, #4]
+ 223 00de 3B68     		ldr	r3, [r7]
+ 224 00e0 5A60     		str	r2, [r3, #4]
+ 167:../FreeRTOS/list.c **** 	pxNewListItem->pxNext->pxPrevious = pxNewListItem;
+ 225              		.loc 1 167 0
+ 226 00e2 3B68     		ldr	r3, [r7]
+ 227 00e4 5B68     		ldr	r3, [r3, #4]
+ 228 00e6 3A68     		ldr	r2, [r7]
+ 229 00e8 9A60     		str	r2, [r3, #8]
+ 168:../FreeRTOS/list.c **** 	pxNewListItem->pxPrevious = pxIterator;
+ 230              		.loc 1 168 0
+ 231 00ea 3B68     		ldr	r3, [r7]
+ 232 00ec FA68     		ldr	r2, [r7, #12]
+ 233 00ee 9A60     		str	r2, [r3, #8]
+ 169:../FreeRTOS/list.c **** 	pxIterator->pxNext = pxNewListItem;
+ 234              		.loc 1 169 0
+ 235 00f0 FB68     		ldr	r3, [r7, #12]
+ 236 00f2 3A68     		ldr	r2, [r7]
+ 237 00f4 5A60     		str	r2, [r3, #4]
+ 170:../FreeRTOS/list.c **** 
+ 171:../FreeRTOS/list.c **** 	/* Remember which list the item is in.  This allows fast removal of the
+ 172:../FreeRTOS/list.c **** 	item later. */
+ 173:../FreeRTOS/list.c **** 	pxNewListItem->pvContainer = ( void * ) pxList;
+ 238              		.loc 1 173 0
+ 239 00f6 3B68     		ldr	r3, [r7]
+ 240 00f8 7A68     		ldr	r2, [r7, #4]
+ 241 00fa 1A61     		str	r2, [r3, #16]
+ 174:../FreeRTOS/list.c **** 
+ 175:../FreeRTOS/list.c **** 	( pxList->uxNumberOfItems )++;
+ 242              		.loc 1 175 0
+ 243 00fc 7B68     		ldr	r3, [r7, #4]
+ 244 00fe 1B68     		ldr	r3, [r3]
+ 245 0100 5A1C     		adds	r2, r3, #1
+ 246 0102 7B68     		ldr	r3, [r7, #4]
+ 247 0104 1A60     		str	r2, [r3]
+ 176:../FreeRTOS/list.c **** }
+ 248              		.loc 1 176 0
+ 249 0106 1437     		adds	r7, r7, #20
+ 250 0108 BD46     		mov	sp, r7
+ 251              		@ sp needed
+ 252 010a 5DF8047B 		ldr	r7, [sp], #4
+ 253 010e 7047     		bx	lr
+ 254              		.cfi_endproc
+ 255              	.LFE3:
+ 257              		.align	2
+ 258              		.global	uxListRemove
+ 259              		.thumb
+ 260              		.thumb_func
+ 262              	uxListRemove:
+ 263              	.LFB4:
+ 177:../FreeRTOS/list.c **** /*-----------------------------------------------------------*/
+ 178:../FreeRTOS/list.c **** 
+ 179:../FreeRTOS/list.c **** UBaseType_t uxListRemove( ListItem_t * const pxItemToRemove )
+ 180:../FreeRTOS/list.c **** {
+ 264              		.loc 1 180 0
+ 265              		.cfi_startproc
+ 266              		@ args = 0, pretend = 0, frame = 16
+ 267              		@ frame_needed = 1, uses_anonymous_args = 0
+ 268              		@ link register save eliminated.
+ 269 0110 80B4     		push	{r7}
+ 270              		.cfi_def_cfa_offset 4
+ 271              		.cfi_offset 7, -4
+ 272 0112 85B0     		sub	sp, sp, #20
+ 273              		.cfi_def_cfa_offset 24
+ 274 0114 00AF     		add	r7, sp, #0
+ 275              		.cfi_def_cfa_register 7
+ 276 0116 7860     		str	r0, [r7, #4]
+ 181:../FreeRTOS/list.c **** /* The list item knows which list it is in.  Obtain the list from the list
+ 182:../FreeRTOS/list.c **** item. */
+ 183:../FreeRTOS/list.c **** List_t * const pxList = ( List_t * ) pxItemToRemove->pvContainer;
+ 277              		.loc 1 183 0
+ 278 0118 7B68     		ldr	r3, [r7, #4]
+ 279 011a 1B69     		ldr	r3, [r3, #16]
+ 280 011c FB60     		str	r3, [r7, #12]
+ 184:../FreeRTOS/list.c **** 
+ 185:../FreeRTOS/list.c **** 	pxItemToRemove->pxNext->pxPrevious = pxItemToRemove->pxPrevious;
+ 281              		.loc 1 185 0
+ 282 011e 7B68     		ldr	r3, [r7, #4]
+ 283 0120 5B68     		ldr	r3, [r3, #4]
+ 284 0122 7A68     		ldr	r2, [r7, #4]
+ 285 0124 9268     		ldr	r2, [r2, #8]
+ 286 0126 9A60     		str	r2, [r3, #8]
+ 186:../FreeRTOS/list.c **** 	pxItemToRemove->pxPrevious->pxNext = pxItemToRemove->pxNext;
+ 287              		.loc 1 186 0
+ 288 0128 7B68     		ldr	r3, [r7, #4]
+ 289 012a 9B68     		ldr	r3, [r3, #8]
+ 290 012c 7A68     		ldr	r2, [r7, #4]
+ 291 012e 5268     		ldr	r2, [r2, #4]
+ 292 0130 5A60     		str	r2, [r3, #4]
+ 187:../FreeRTOS/list.c **** 
+ 188:../FreeRTOS/list.c **** 	/* Make sure the index is left pointing to a valid item. */
+ 189:../FreeRTOS/list.c **** 	if( pxList->pxIndex == pxItemToRemove )
+ 293              		.loc 1 189 0
+ 294 0132 FB68     		ldr	r3, [r7, #12]
+ 295 0134 5A68     		ldr	r2, [r3, #4]
+ 296 0136 7B68     		ldr	r3, [r7, #4]
+ 297 0138 9A42     		cmp	r2, r3
+ 298 013a 03D1     		bne	.L10
+ 190:../FreeRTOS/list.c **** 	{
+ 191:../FreeRTOS/list.c **** 		pxList->pxIndex = pxItemToRemove->pxPrevious;
+ 299              		.loc 1 191 0
+ 300 013c 7B68     		ldr	r3, [r7, #4]
+ 301 013e 9A68     		ldr	r2, [r3, #8]
+ 302 0140 FB68     		ldr	r3, [r7, #12]
+ 303 0142 5A60     		str	r2, [r3, #4]
+ 304              	.L10:
+ 192:../FreeRTOS/list.c **** 	}
+ 193:../FreeRTOS/list.c **** 	else
+ 194:../FreeRTOS/list.c **** 	{
+ 195:../FreeRTOS/list.c **** 		mtCOVERAGE_TEST_MARKER();
+ 196:../FreeRTOS/list.c **** 	}
+ 197:../FreeRTOS/list.c **** 
+ 198:../FreeRTOS/list.c **** 	pxItemToRemove->pvContainer = NULL;
+ 305              		.loc 1 198 0
+ 306 0144 7B68     		ldr	r3, [r7, #4]
+ 307 0146 0022     		movs	r2, #0
+ 308 0148 1A61     		str	r2, [r3, #16]
+ 199:../FreeRTOS/list.c **** 	( pxList->uxNumberOfItems )--;
+ 309              		.loc 1 199 0
+ 310 014a FB68     		ldr	r3, [r7, #12]
+ 311 014c 1B68     		ldr	r3, [r3]
+ 312 014e 5A1E     		subs	r2, r3, #1
+ 313 0150 FB68     		ldr	r3, [r7, #12]
+ 314 0152 1A60     		str	r2, [r3]
+ 200:../FreeRTOS/list.c **** 
+ 201:../FreeRTOS/list.c **** 	return pxList->uxNumberOfItems;
+ 315              		.loc 1 201 0
+ 316 0154 FB68     		ldr	r3, [r7, #12]
+ 317 0156 1B68     		ldr	r3, [r3]
+ 202:../FreeRTOS/list.c **** }
+ 318              		.loc 1 202 0
+ 319 0158 1846     		mov	r0, r3
+ 320 015a 1437     		adds	r7, r7, #20
+ 321 015c BD46     		mov	sp, r7
+ 322              		@ sp needed
+ 323 015e 5DF8047B 		ldr	r7, [sp], #4
+ 324 0162 7047     		bx	lr
+ 325              		.cfi_endproc
+ 326              	.LFE4:
+ 328              	.Letext0:
+ 329              		.file 2 "c:\\program files (x86)\\codesourcery\\arm-none-eabi\\include\\stdint.h"
+ 330              		.file 3 "D:\\workspace\\console800480\\FreeRTOS\\portable\\GCC\\ARM_CM3/portmacro.h"
+ 331              		.file 4 "D:\\workspace\\console800480\\FreeRTOS\\include/list.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 list.c
+C:\Users\sagok\AppData\Local\Temp\cc1qK41M.s:18     .text:00000000 $t
+C:\Users\sagok\AppData\Local\Temp\cc1qK41M.s:23     .text:00000000 vListInitialise
+C:\Users\sagok\AppData\Local\Temp\cc1qK41M.s:76     .text:00000040 vListInitialiseItem
+C:\Users\sagok\AppData\Local\Temp\cc1qK41M.s:109    .text:00000058 vListInsertEnd
+C:\Users\sagok\AppData\Local\Temp\cc1qK41M.s:171    .text:000000a0 vListInsert
+C:\Users\sagok\AppData\Local\Temp\cc1qK41M.s:262    .text:00000110 uxListRemove
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.1.7f551ac7fcad8b79b9df4bfdaa536673
+                           .group:00000000 wm4.newlib.h.8.384a112feabb3bef7b573ae48cde2e3b
+                           .group:00000000 wm4.features.h.22.6a4ca7cd053637cc1d0db6c16f39b2d7
+                           .group:00000000 wm4.config.h.183.aa62afef667fb61d15fa64c48beb2f14
+                           .group:00000000 wm4._ansi.h.23.5644b60c990a4800b02a6e654e88f93a
+                           .group:00000000 wm4.stdlib.h.18.8bab2fb43ac4e90235390733c30a4530
+                           .group:00000000 wm4.stddef.h.184.aa65fb7281d578229bbad41b91862635
+                           .group:00000000 wm4._default_types.h.6.5e12cd604db8ce00b62bb2f02708eaf3
+                           .group:00000000 wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea
+                           .group:00000000 wm4._types.h.59.db8450f33c1f6150c0372fa1091a887a
+                           .group:00000000 wm4.stddef.h.348.9a99de77b6ba3b4278b57e9cc6d6e349
+                           .group:00000000 wm4.reent.h.16.567d760e6ae9ad7f917851a308bd7a57
+                           .group:00000000 wm4.alloca.h.8.dfc0c703c47ec3e69746825b17d9e66d
+                           .group:00000000 wm4.stdlib.h.55.7091a050e07f1c4abd225630fe3d62f1
+                           .group:00000000 wm4.stddef.h.39.d0197034aa5fd947cae140b9289e6734
+                           .group:00000000 wm4.stdint.h.10.90b695f550ca6cc3fb08fa83baf01e05
+                           .group:00000000 wm4.projdefs.h.67.1891ed3aab788f154f6e7a8ff42f2cfd
+                           .group:00000000 wm4.FreeRTOSConfig.h.51.b259e2e835793b5f31e6fb224a543b76
+                           .group:00000000 wm4.portmacro.h.68.b9ad41c1c2fd3fb36d97939d17ebacd9
+                           .group:00000000 wm4.portable.h.325.a31e8973a246cd28421ddb595e37fd13
+                           .group:00000000 wm4.mpu_wrappers.h.67.4bcfd12ce15e5313ce3efd77400f8168
+                           .group:00000000 wm4.FreeRTOS.h.177.d801ec107caaf24697618049ed7605b1
+                           .group:00000000 wm4.list.h.96.eaa3d29743bd681933f9f5e726c756a1
+
+NO UNDEFINED SYMBOLS
